@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dynamic Clinic Branding */
+:root {
+    --color-primary: 79 70 229; /* indigo-600 default */
+    --color-primary-hover: 67 56 202; /* indigo-700 default */
+    --color-secondary: 16 185 129; /* emerald-500 default */
+}
+
+@layer components {
+    /* Primary button with dynamic color */
+    .btn-primary {
+        @apply inline-flex items-center px-4 py-2 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest transition focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50;
+        background-color: rgb(var(--color-primary));
+    }
+    .btn-primary:hover:not(:disabled) {
+        background-color: rgb(var(--color-primary-hover));
+    }
+    .btn-primary:focus {
+        --tw-ring-color: rgb(var(--color-primary) / 0.5);
+    }
+
+    /* Secondary/outline button */
+    .btn-secondary {
+        @apply inline-flex items-center px-4 py-2 border rounded-lg font-semibold text-xs uppercase tracking-widest transition focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50;
+        border-color: rgb(var(--color-primary));
+        color: rgb(var(--color-primary));
+    }
+    .btn-secondary:hover:not(:disabled) {
+        background-color: rgb(var(--color-primary) / 0.1);
+    }
+
+    /* Active nav indicator */
+    .nav-active {
+        border-color: rgb(var(--color-primary));
+        color: rgb(var(--color-primary));
+    }
+
+    /* Badge/pill with primary color */
+    .badge-primary {
+        background-color: rgb(var(--color-primary) / 0.1);
+        color: rgb(var(--color-primary));
+    }
+
+    /* Link with primary color */
+    .link-primary {
+        color: rgb(var(--color-primary));
+    }
+    .link-primary:hover {
+        color: rgb(var(--color-primary-hover));
+    }
+}
+
+/* Override indigo colors with dynamic primary - applied globally */
+@layer utilities {
+    /* Backgrounds */
+    .bg-indigo-600 {
+        background-color: rgb(var(--color-primary)) !important;
+    }
+    .bg-indigo-700, .hover\:bg-indigo-700:hover {
+        background-color: rgb(var(--color-primary-hover)) !important;
+    }
+    .bg-indigo-500 {
+        background-color: rgb(var(--color-primary)) !important;
+    }
+    .bg-indigo-50, .dark\:bg-indigo-900\/50 {
+        background-color: rgb(var(--color-primary) / 0.1) !important;
+    }
+
+    /* Text colors */
+    .text-indigo-600, .text-indigo-700, .dark\:text-indigo-300, .dark\:text-indigo-400 {
+        color: rgb(var(--color-primary)) !important;
+    }
+
+    /* Borders */
+    .border-indigo-500, .border-indigo-600 {
+        border-color: rgb(var(--color-primary)) !important;
+    }
+
+    /* Focus rings */
+    .focus\:ring-indigo-500:focus, .focus\:border-indigo-500:focus {
+        --tw-ring-color: rgb(var(--color-primary) / 0.5);
+        border-color: rgb(var(--color-primary));
+    }
+
+    /* Toggle switches */
+    .bg-indigo-600[type="button"], button.bg-indigo-600 {
+        background-color: rgb(var(--color-primary)) !important;
+    }
+}

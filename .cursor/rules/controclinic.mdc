@@ -1,0 +1,58 @@
+---
+description: Rules for ControClinic Laravel SaaS project
+globs: **/*.php, **/*.blade.php, **/*.js
+alwaysApply: true
+---
+
+# ControClinic Project Rules
+
+## Context
+
+ControClinic is a multi-tenant SaaS for medical clinics built with Laravel 12 + TALL Stack.
+
+## Must Read
+
+Before making changes, review these context files:
+- `.context/STATUS.md` - Current project state
+- `.context/CONVENTIONS.md` - Code standards
+- `.context/MODELS.md` - Model documentation
+
+## Key Rules
+
+1. **Multi-tenancy**: All queries must be scoped by `clinic_id`. Use `BelongsToClinic` trait.
+
+2. **Translations**: Never hardcode strings. Use `__('file.key')` for all user-facing text.
+
+3. **Permissions**: Check user permissions before any action: `$user->can('permission.name')`
+
+4. **UUIDs**: Patient, Appointment, MedicalRecord use UUID. User uses bigint.
+
+5. **Livewire**: Place components in `app/Livewire/App/{Resource}/{Action}.php`
+
+6. **Roles**: owner, doctor, assistant, secretary, receptionist, admin
+
+## Patterns
+
+```php
+// Model with tenant isolation
+class Patient extends Model
+{
+    use HasUuids, SoftDeletes, BelongsToClinic, LogsActivity;
+}
+
+// Access current clinic
+$clinic = app('current_clinic');
+
+// Livewire computed property
+public function getPatientsProperty()
+{
+    return Patient::query()->paginate(15);
+}
+```
+
+## Forbidden
+
+- Queries without clinic scope
+- Hardcoded strings
+- Sequential IDs in URLs
+- Medical data without auth
