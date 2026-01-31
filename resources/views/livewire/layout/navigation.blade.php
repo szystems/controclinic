@@ -38,25 +38,46 @@ new class extends Component
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('app.dashboard', $clinicSlug)" :active="request()->routeIs('app.dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        {{ __('general.dashboard') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('app.patients.index', $clinicSlug)" :active="request()->routeIs('app.patients.*')" wire:navigate>
-                        {{ __('Pacientes') }}
+                        {{ __('general.patients') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('app.appointments.index', $clinicSlug)" :active="request()->routeIs('app.appointments.*')" wire:navigate>
-                        {{ __('Citas') }}
+                        {{ __('general.appointments') }}
                     </x-nav-link>
                 </div>
             </div>
 
             <!-- Settings Icon & User Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 sm:gap-2">
+                <!-- Language Switcher -->
+                <x-dropdown align="right" width="32">
+                    <x-slot name="trigger">
+                        <button class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-1" title="{{ __('general.language') }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                            </svg>
+                            <span class="text-xs font-medium uppercase">{{ app()->getLocale() }}</span>
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        <a href="{{ route('lang.switch', 'es') }}" class="block px-4 py-2 text-sm {{ app()->getLocale() === 'es' ? 'bg-gray-100 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                            🇪🇸 Español
+                        </a>
+                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm {{ app()->getLocale() === 'en' ? 'bg-gray-100 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                            🇺🇸 English
+                        </a>
+                    </x-slot>
+                </x-dropdown>
+
                 <!-- Settings Link -->
                 <a href="{{ route('app.settings', $clinicSlug) }}" wire:navigate
                    class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition {{ request()->routeIs('app.settings') ? 'bg-gray-100 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400' : '' }}"
-                   title="{{ __('Configuración') }}">
+                   title="{{ __('general.settings') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -79,13 +100,13 @@ new class extends Component
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile')" wire:navigate>
-                            {{ __('Profile') }}
+                            {{ __('general.profile') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
                         <button wire:click="logout" class="w-full text-start">
                             <x-dropdown-link>
-                                {{ __('Log Out') }}
+                                {{ __('general.logout') }}
                             </x-dropdown-link>
                         </button>
                     </x-slot>
@@ -108,15 +129,15 @@ new class extends Component
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('app.dashboard', $clinicSlug)" :active="request()->routeIs('app.dashboard')" wire:navigate>
-                {{ __('Dashboard') }}
+                {{ __('general.dashboard') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('app.patients.index', $clinicSlug)" :active="request()->routeIs('app.patients.*')" wire:navigate>
-                {{ __('Pacientes') }}
+                {{ __('general.patients') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('app.appointments.index', $clinicSlug)" :active="request()->routeIs('app.appointments.*')" wire:navigate>
-                {{ __('Citas') }}
+                {{ __('general.appointments') }}
             </x-responsive-nav-link>
         </div>
 
@@ -128,24 +149,39 @@ new class extends Component
             </div>
 
             <div class="mt-3 space-y-1">
+                <!-- Language Switcher (Responsive) -->
+                <div class="px-4 py-2">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">{{ __('general.language') }}</p>
+                    <div class="flex gap-2">
+                        <a href="{{ route('lang.switch', 'es') }}"
+                           class="flex items-center px-3 py-1.5 rounded-md text-sm {{ app()->getLocale() === 'es' ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-medium' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' }}">
+                            🇪🇸 ES
+                        </a>
+                        <a href="{{ route('lang.switch', 'en') }}"
+                           class="flex items-center px-3 py-1.5 rounded-md text-sm {{ app()->getLocale() === 'en' ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-medium' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' }}">
+                            🇺🇸 EN
+                        </a>
+                    </div>
+                </div>
+
                 <x-responsive-nav-link :href="route('app.settings', $clinicSlug)" :active="request()->routeIs('app.settings')" wire:navigate>
                     <span class="flex items-center">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        {{ __('Configuración') }}
+                        {{ __('general.settings') }}
                     </span>
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('profile')" wire:navigate>
-                    {{ __('Profile') }}
+                    {{ __('general.profile') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
                 <button wire:click="logout" class="w-full text-start">
                     <x-responsive-nav-link>
-                        {{ __('Log Out') }}
+                        {{ __('general.logout') }}
                     </x-responsive-nav-link>
                 </button>
             </div>

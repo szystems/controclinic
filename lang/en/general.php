@@ -47,6 +47,12 @@ return [
     'error_occurred' => 'An error occurred. Please try again.',
     'no_results' => 'No results found',
     'confirm_delete' => 'Are you sure you want to delete this :item?',
+    'unauthorized' => 'You do not have permission to perform this action',
+    'action_not_allowed' => 'This action is not allowed',
+    'success' => 'Operation successful',
+    'error' => 'An error occurred',
+    'loading' => 'Loading...',
+    'clear_filters' => 'Clear filters',
 
     // Dates
     'today' => 'Today',
@@ -60,4 +66,7 @@ return [
     'of' => 'of',
     'results' => 'results',
     'per_page' => 'per page',
+
+    // Language
+    'language' => 'Language',
 ];

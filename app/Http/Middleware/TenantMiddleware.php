@@ -52,8 +52,9 @@ class TenantMiddleware
         // Compartir con todas las vistas
         view()->share('currentClinic', $clinic);
 
-        // Setear locale y timezone de la clínica
-        app()->setLocale($clinic->locale ?? config('app.locale'));
+        // Setear locale: prioriza sesión del usuario > config de clínica > config default
+        $locale = session('locale', $clinic->locale ?? config('app.locale'));
+        app()->setLocale($locale);
         config(['app.timezone' => $clinic->timezone ?? config('app.timezone')]);
 
         return $next($request);

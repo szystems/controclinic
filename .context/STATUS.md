@@ -85,12 +85,14 @@
 
 ## 🔄 En Progreso
 
-### Sistema de Citas
+### Sistema de Citas ✅
 - [x] Modelo `Appointment` creado
 - [x] Migración ejecutada
-- [ ] UI de lista de citas
-- [ ] Calendario visual
-- [ ] Crear/editar citas
+- [x] UI de lista de citas
+- [x] Crear/editar citas
+- [x] Vista detalle de cita
+- [x] Workflow de estados (confirmar, check-in, iniciar, completar, cancelar)
+- [ ] Calendario visual (mejora futura)
 
 ---
 
@@ -139,10 +141,10 @@
 ```
 Modelos creados: 5 (Clinic, User, Patient, Appointment, MedicalRecord)
 Migraciones: 16
-Componentes Livewire: 4 (Patients x3, Settings x1)
-Vistas Blade: ~15
-Archivos de traducción: 6 (es/en x patients, settings, general)
-Rutas definidas: ~12
+Componentes Livewire: 8 (Patients x4, Settings x1, Appointments x4)
+Vistas Blade: ~20
+Archivos de traducción: 8 (es/en x patients, settings, general, appointments)
+Rutas definidas: ~15
 ```
 - [ ] Tests de multi-tenancy
 

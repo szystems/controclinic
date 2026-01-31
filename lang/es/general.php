@@ -67,9 +67,11 @@ return [
     'no_results' => 'No se encontraron resultados',
     'confirm_delete' => '¿Está seguro que desea eliminar este :item?',
     'unauthorized' => 'No tienes permiso para realizar esta acción',
+    'action_not_allowed' => 'Esta acción no está permitida',
     'success' => 'Operación exitosa',
     'error' => 'Ha ocurrido un error',
     'loading' => 'Cargando...',
+    'clear_filters' => 'Limpiar filtros',
 
     // Fechas
     'today' => 'Hoy',
@@ -90,4 +92,7 @@ return [
     'per_page' => 'por página',
     'previous' => 'Anterior',
     'next' => 'Siguiente',
+
+    // Idioma
+    'language' => 'Idioma',
 ];

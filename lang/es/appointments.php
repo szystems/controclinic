@@ -95,4 +95,28 @@ return [
     'total_appointments' => 'Total de Citas',
     'completed_today' => 'Completadas Hoy',
     'pending_today' => 'Pendientes Hoy',
+
+    // Filters
+    'all_statuses' => 'Todos los Estados',
+    'all_doctors' => 'Todos los Doctores',
+    'all_types' => 'Todos los Tipos',
+    'filter_by_date' => 'Filtrar por Fecha',
+    'filter_by_status' => 'Filtrar por Estado',
+    'filter_by_doctor' => 'Filtrar por Doctor',
+
+    // Workflow
+    'checked_in_at' => 'Registró llegada',
+    'started_at' => 'Inició consulta',
+    'completed_at' => 'Completó cita',
+    'cancelled_at' => 'Canceló cita',
+
+    // Confirmations
+    'confirm_cancel' => '¿Está seguro que desea cancelar esta cita?',
+    'confirm_no_show' => '¿Está seguro que desea marcar a este paciente como no presentado?',
+
+    // Select
+    'select_patient' => 'Seleccionar Paciente',
+    'select_doctor' => 'Seleccionar Doctor',
+    'select_type' => 'Seleccionar Tipo',
+    'search_patient' => 'Buscar paciente...',
 ];

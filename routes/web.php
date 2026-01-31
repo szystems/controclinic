@@ -5,8 +5,25 @@ use App\Livewire\App\Patients\Index as PatientsIndex;
 use App\Livewire\App\Patients\Create as PatientsCreate;
 use App\Livewire\App\Patients\Edit as PatientsEdit;
 use App\Livewire\App\Patients\Show as PatientsShow;
+use App\Livewire\App\Appointments\Index as AppointmentsIndex;
+use App\Livewire\App\Appointments\Create as AppointmentsCreate;
+use App\Livewire\App\Appointments\Edit as AppointmentsEdit;
+use App\Livewire\App\Appointments\Show as AppointmentsShow;
 use App\Livewire\App\Settings\Index as SettingsIndex;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Language Switch Route
+|--------------------------------------------------------------------------
+*/
+Route::get('/lang/{locale}', function (string $locale) {
+    if (in_array($locale, ['en', 'es'])) {
+        session(['locale' => $locale]);
+        app()->setLocale($locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 /*
 |--------------------------------------------------------------------------
@@ -54,11 +71,13 @@ Route::prefix('app/{clinic}')
             Route::get('/{patient}/edit', PatientsEdit::class)->name('edit');
         });
 
-        // Appointments (placeholder)
+        // Appointments
         Route::prefix('appointments')->name('appointments.')->group(function () {
-            Route::view('/', 'app.appointments.index')->name('index');
-            Route::view('/create', 'app.appointments.create')->name('create');
-            Route::view('/calendar', 'app.appointments.calendar')->name('calendar');
+            Route::get('/', AppointmentsIndex::class)->name('index');
+            Route::get('/create', AppointmentsCreate::class)->name('create');
+            Route::get('/calendar', AppointmentsIndex::class)->name('calendar'); // TODO: Calendar component
+            Route::get('/{appointment}', AppointmentsShow::class)->name('show');
+            Route::get('/{appointment}/edit', AppointmentsEdit::class)->name('edit');
         });
 
         // Settings
