@@ -1,59 +1,95 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ControClinic - Multi-Tenant SaaS for Medical Clinic Management
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-12-red.svg" alt="Laravel 12">
+  <img src="https://img.shields.io/badge/Livewire-3-purple.svg" alt="Livewire 3">
+  <img src="https://img.shields.io/badge/PHP-8.2+-blue.svg" alt="PHP 8.2+">
+  <img src="https://img.shields.io/badge/Architecture-Multi--Tenant%20SaaS-orange.svg" alt="Multi-Tenant SaaS">
 </p>
 
-## About Laravel
+A multi-tenant SaaS platform for medical clinic management built with **Laravel 12** and **Livewire 3 (Volt)**. Designed for clinics to manage patients, appointments, medical records, and billing through a modern reactive interface with subscription-based access via Paddle.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Multi-Tenant Architecture** — Each clinic operates in an isolated data context with tenant-scoped queries and role-based access control (Spatie Permission)
+- **Patient Management** — Complete patient registry with medical history, contact information, and document tracking
+- **Appointment Scheduling** — Real-time appointment booking, calendar management, and automated status workflows
+- **Medical Records (EMR)** — Electronic medical records with structured clinical data per patient visit
+- **Activity Logging** — Full audit trail of all system operations using Spatie Activity Log
+- **Subscription Billing** — Integrated payment processing with Laravel Cashier (Paddle) for SaaS monetization
+- **Internationalization** — Multi-language support via `mcamara/laravel-localization`
+- **Reactive UI** — Livewire 3 + Volt components for real-time interactions without page reloads
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | Laravel 12 |
+| **Frontend** | Livewire 3 + Volt, Tailwind CSS, Vite |
+| **Authentication** | Laravel Breeze |
+| **Authorization** | Spatie Laravel Permission (roles & permissions) |
+| **Audit Trail** | Spatie Activity Log |
+| **Payments** | Laravel Cashier (Paddle) |
+| **i18n** | mcamara/laravel-localization |
+| **Testing** | PHPUnit 11 |
+| **Code Style** | Laravel Pint |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Architecture Overview
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+app/
+├── Http/              # Controllers & middleware
+├── Livewire/
+│   ├── Actions/       # Reusable Livewire actions
+│   ├── App/
+│   │   ├── Appointments/  # Appointment management components
+│   │   ├── Patients/      # Patient CRUD components
+│   │   └── Settings/      # Clinic settings components
+│   └── Forms/         # Livewire form objects
+├── Models/
+│   ├── Clinic.php         # Tenant model (multi-tenant root)
+│   ├── User.php           # Authenticated users with roles
+│   ├── Patient.php        # Patient registry
+│   ├── Appointment.php    # Scheduling & calendar
+│   └── MedicalRecord.php  # Clinical records (EMR)
+├── Traits/            # Shared behaviors (tenant scoping, etc.)
+└── View/              # View composers & components
+```
 
-## Laravel Sponsors
+## Getting Started
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Requirements
+- PHP 8.2+
+- Composer
+- Node.js 18+ & NPM
+- SQLite (default) or MySQL 8.0+
 
-### Premium Partners
+### Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+git clone https://github.com/szystems/controclinic.git
+cd controclinic
 
-## Contributing
+# Run the setup script (installs deps, generates key, runs migrations)
+composer setup
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Start the development server (app + queue + logs + vite)
+composer dev
+```
 
-## Code of Conduct
+The application will be available at `http://localhost:8000`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Testing
 
-## Security Vulnerabilities
+```bash
+composer test
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Author
+
+**Otto Szarata** — Senior Full-Stack Developer  
+[GitHub](https://github.com/szystems) · Victoria, BC, Canada
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is proprietary software. All rights reserved.
