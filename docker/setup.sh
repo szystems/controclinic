@@ -47,7 +47,7 @@ docker compose exec app php artisan optimize:clear
 
 echo ""
 echo "✅ ControClinic listo!"
-echo "🌐 http://localhost:8080"
+echo "🌐 http://localhost:8088"
 echo "📧 doctor@controclinic.com / password"
 echo ""
 echo "Para Vite dev server: docker compose --profile dev up node"
