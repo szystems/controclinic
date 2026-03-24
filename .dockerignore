@@ -1,0 +1,14 @@
+.git
+.github
+.context
+node_modules
+vendor
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+.env
+.env.backup
+*.md
+docker-compose.yml
+Dockerfile

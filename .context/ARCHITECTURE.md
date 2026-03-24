@@ -1,6 +1,6 @@
 # 🏗️ Arquitectura de ControClinic
 
-> Actualizado: 2026-01-30
+> Actualizado: 2026-03-23
 
 ## Estructura de Directorios
 
@@ -13,8 +13,18 @@ controclinic/
 │   │   │   └── TenantMiddleware.php    # Aislamiento multi-tenant
 │   │   └── Requests/           # Form Requests
 │   ├── Livewire/               # Componentes Livewire
+│   │   ├── Actions/
+│   │   │   └── Logout.php
+│   │   ├── Forms/
+│   │   │   └── LoginForm.php
 │   │   └── App/                # Dashboard de clínica
 │   │       ├── Patients/       # CRUD Pacientes ✅
+│   │       │   ├── Index.php
+│   │       │   ├── Create.php
+│   │       │   ├── Edit.php
+│   │       │   └── Show.php
+│   │       ├── Appointments/   # Sistema de Citas ✅
+│   │       │   ├── Index.php
 │   │       │   ├── Create.php
 │   │       │   ├── Edit.php
 │   │       │   └── Show.php
@@ -26,10 +36,12 @@ controclinic/
 │   │   ├── Patient.php         # Pacientes (UUID)
 │   │   ├── Appointment.php     # Citas (UUID)
 │   │   └── MedicalRecord.php   # Historiales
+│   ├── Traits/
+│   │   └── BelongsToClinic.php
 │   └── Providers/
-│       └── AppServiceProvider.php  # Route Model Binding
+│       └── AppServiceProvider.php
 ├── database/
-│   ├── migrations/             # 16 migraciones
+│   ├── migrations/             # 17 migraciones
 │   ├── seeders/
 │   │   └── DatabaseSeeder.php  # Datos demo
 │   └── factories/
@@ -37,25 +49,33 @@ controclinic/
 │   ├── views/
 │   │   ├── app/                # Vistas dashboard
 │   │   │   ├── dashboard.blade.php
-│   │   │   ├── patients/       # Vistas pacientes
-│   │   │   └── appointments/   # Vistas citas (placeholder)
+│   │   │   ├── patients/
+│   │   │   └── appointments/
 │   │   ├── public/             # Portal público
+│   │   │   ├── home.blade.php
+│   │   │   ├── pricing.blade.php
+│   │   │   ├── contact.blade.php
 │   │   │   └── clinic.blade.php
 │   │   ├── layouts/
-│   │   │   └── app.blade.php   # Layout con colores dinámicos
+│   │   │   ├── app.blade.php       # Layout con colores dinámicos
+│   │   │   ├── guest.blade.php     # Layout autenticación
+│   │   │   └── public.blade.php    # Layout público
 │   │   └── livewire/
 │   │       ├── layout/
-│   │       │   └── navigation.blade.php
+│   │       │   └── navigation.blade.php  # Nav con selector idioma
 │   │       └── app/
-│   │           ├── patients/   # Vistas Livewire pacientes
+│   │           ├── patients/   # 4 vistas Livewire
+│   │           ├── appointments/ # 4 vistas Livewire
 │   │           └── settings/   # Vista Settings (6 tabs)
 │   ├── css/
 │   │   └── app.css             # CSS con variables dinámicas
 │   └── lang/
-│       ├── es/                 # patients.php, settings.php, general.php
-│       └── en/                 # patients.php, settings.php, general.php
+│       ├── es/                 # patients, settings, general, appointments
+│       └── en/                 # patients, settings, general, appointments
 ├── routes/
-│   └── web.php                 # Rutas con {clinic} binding
+│   ├── web.php                 # Rutas con {clinic} binding + lang.switch
+│   └── auth.php                # Rutas de autenticación
+├── docker/                     # 🔜 Configuración Docker
 └── .context/                   # Documentación de contexto AI
 ```
 

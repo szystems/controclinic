@@ -4,9 +4,10 @@
 
 - **Nombre:** ControClinic
 - **Tipo:** SaaS Multi-tenant para clínicas médicas
-- **Versión:** 0.2.0-alpha
+- **Versión:** 0.3.0-alpha
 - **Estado:** En desarrollo (Fase 1 - Fundación SaaS)
-- **Última actualización:** 2026-01-30
+- **Última actualización:** 2026-03-23
+- **Repositorio:** github.com/szystems/controclinic
 
 ## Stack Tecnológico
 
@@ -23,17 +24,18 @@ Frontend:
   Components: Livewire 3 + Volt
 
 Paquetes Principales:
-  - livewire/livewire: ^3.7
-  - livewire/volt: ^1.10
+  - livewire/livewire: ^3.6
+  - livewire/volt: ^1.7
   - laravel/breeze: ^2.3 (autenticación)
-  - laravel/cashier: (pagos Stripe - por configurar)
+  - laravel/cashier-paddle: ^2.6 (pagos Paddle)
   - spatie/laravel-permission: ^6.24 (roles)
   - spatie/laravel-activitylog: ^4.10 (audit logs)
+  - mcamara/laravel-localization: ^2.3 (i18n)
 
 Ambiente:
-  Local: Laravel Herd
-  Database: MySQL 8.0
-  Dominio Dev: localhost:8000
+  Local: Docker (PHP 8.3, MySQL 8.0, Node 20, Redis)
+  WSL: Ubuntu en \\wsl.localhost\Ubuntu\home\szott\proyectos
+  Dominio Dev: localhost:8080
   Dominio Prod: controclinic.com (por configurar)
 ```
 
@@ -71,5 +73,5 @@ Mercados:
 ## Equipo y Contacto
 
 - **Desarrollador:** Szystems
-- **Repositorio:** Local (por subir a GitHub)
+- **Repositorio:** github.com/szystems/controclinic
 - **Documentación:** .context/

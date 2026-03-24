@@ -1,18 +1,32 @@
 # 🗺️ Roadmap de Desarrollo
 
-> Actualizado: 2026-01-30
+> Actualizado: 2026-03-23
 > Enfoque: SaaS-First
 
 ## Visión General
 
 ```
-Fase 1 (SaaS Foundation) → Semana 1-3  → Landing + Registro + Stripe
-Fase 2 (Admin Panel)     → Semana 4    → Panel Admin SaaS
-Fase 3 (Plan Limits)     → Semana 5    → Límites y monetización
-Fase 4 (Core Features)   → Semana 6-7  → Citas completo
-Fase 5 (Public Portal)   → Semana 8    → Booking online
-Fase 6 (Launch)          → Semana 9-10 → Testing + Beta Launch
+Fase 0 (DevOps)          → Actual     → Docker + WSL + CI
+Fase 1 (SaaS Foundation) → Semana 1-3 → Landing + Registro + Paddle
+Fase 2 (Admin Panel)     → Semana 4   → Panel Admin SaaS
+Fase 3 (Plan Limits)     → Semana 5   → Límites y monetización
+Fase 4 (Core Features)   → Semana 6-7 → Calendario + Historiales
+Fase 5 (Public Portal)   → Semana 8   → Booking online
+Fase 6 (Launch)          → Semana 9-10→ Testing + Beta Launch
 ```
+
+---
+
+## Fase 0: DevOps ⭕ En Progreso
+
+**Objetivo:** Entorno de desarrollo reproducible con Docker en WSL
+
+### Sprint 0.1 - Docker + WSL
+- [ ] Dockerfile (PHP 8.3-FPM + extensiones)
+- [ ] docker-compose.yml (app, mysql, redis, node/vite)
+- [ ] Nginx config
+- [ ] Migrar a WSL Ubuntu
+- [ ] Actualizar README
 
 ---
 
@@ -40,9 +54,9 @@ Fase 6 (Launch)          → Semana 9-10 → Testing + Beta Launch
 - [ ] Paso 4: Perfil del doctor
 - [ ] Paso 5: Resumen y tutorial
 
-### Sprint 1.4 - Integración Stripe ⬜
-- [ ] Configurar Laravel Cashier
-- [ ] Productos en Stripe
+### Sprint 1.4 - Integración Paddle ⬜
+- [ ] Configurar Laravel Cashier Paddle
+- [ ] Productos en Paddle
 - [ ] Checkout de suscripción
 - [ ] Trial de 14 días
 - [ ] Webhooks
@@ -159,6 +173,20 @@ Fase 6 (Launch)          → Semana 9-10 → Testing + Beta Launch
 ### Navegación ✅
 - [x] Dashboard, Pacientes, Citas
 - [x] Settings (⚙️)
+- [x] Selector de idioma ES/EN
+- [x] Menú móvil responsive
+
+### Sistema de Citas ✅
+- [x] CRUD completo (Index, Create, Edit, Show)
+- [x] Workflow de estados (7 estados, 5 tipos)
+- [x] Validación de conflictos de horario
+- [x] Traducciones appointments.php (ES/EN)
+
+### Traducciones ✅
+- [x] 8 archivos (ES/EN x patients, settings, general, appointments)
+- [x] Selector de idioma en navegación
+- [x] Ruta lang.switch con sesión
+- [x] Repositorio en GitHub (szystems/controclinic)
 - [x] Menú móvil
 - Integraciones contables
 - API pública documentada

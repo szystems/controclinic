@@ -1,11 +1,25 @@
 # 📝 Tareas Pendientes
 
-> Actualizado: 2026-01-30
+> Actualizado: 2026-03-23
 > Enfoque: SaaS-First
 
 ---
 
-## 🔥 Prioridad Alta (Esta Semana) - FASE 1 SaaS
+## 🔥 Prioridad Alta (Esta Semana) - INFRAESTRUCTURA
+
+### 0.1 Docker + Migración WSL
+- [ ] Crear Dockerfile (PHP 8.3-FPM + extensiones)
+- [ ] Crear docker-compose.yml (app, mysql, redis, node)
+- [ ] Crear docker/nginx/default.conf
+- [ ] Crear docker/php/php.ini (configuración optimizada)
+- [ ] Crear .dockerignore
+- [ ] Migrar proyecto a \\wsl.localhost\Ubuntu\home\szott\proyectos\controclinic
+- [ ] Verificar que todo funcione en Docker
+- [ ] Actualizar README con instrucciones Docker
+
+---
+
+## 📅 Prioridad Media - FASE 1 SaaS
 
 ### 1.1 Landing Page Pública
 - [ ] Crear layout público (sin autenticación)
@@ -42,25 +56,16 @@
 
 ---
 
-## 📋 Prioridad Media (Próximas 2 Semanas) - FASE 1 Continuación
+## � Prioridad Siguiente - FASE 1 Continuación
 
-### 1.5 Integración Stripe
-- [ ] Instalar/configurar Laravel Cashier (Stripe)
-- [ ] Crear productos en Stripe Dashboard
+### 1.5 Integración Paddle
+- [ ] Configurar Laravel Cashier Paddle (ya instalado ^2.6)
+- [ ] Crear productos en Paddle Dashboard
 - [ ] Página de checkout para upgrade
 - [ ] Portal de facturación del cliente
 - [ ] Webhooks: subscription.created, updated, deleted
 - [ ] Trial de 14 días para planes pagos
 - [ ] Lógica de cancelación y downgrade
-
-### Sistema de Citas (completar UI)
-- [ ] `App\Livewire\App\Appointments\Index` - Lista de citas con filtros
-- [ ] `App\Livewire\App\Appointments\Create` - Modal o página para crear
-- [ ] `App\Livewire\App\Appointments\Calendar` - Vista calendario (día/semana/mes)
-- [ ] Selección de paciente con búsqueda
-- [ ] Verificación de disponibilidad
-- [ ] Cambio de estados (workflow)
-- [ ] Notas de cita
 
 ---
 
@@ -95,6 +100,22 @@
 
 ## ✅ Completado Recientemente
 
+### Sistema de Citas ✅ (2026-01-30)
+- [x] `App\Livewire\App\Appointments\Index` - Lista con filtros y workflow
+- [x] `App\Livewire\App\Appointments\Create` - Con búsqueda de paciente
+- [x] `App\Livewire\App\Appointments\Edit` - Edición con validación
+- [x] `App\Livewire\App\Appointments\Show` - Detalle con timeline
+- [x] Workflow: confirmar, check-in, iniciar, completar, cancelar, no-show
+- [x] Validación de conflictos de horario (checkConflicts)
+- [x] Traducciones appointments.php (ES/EN)
+
+### Traducciones y Selector de Idioma ✅ (2026-01-30)
+- [x] Traducciones EN: patients.php, settings.php
+- [x] Selector de idioma en navegación (desktop + móvil)
+- [x] Ruta lang.switch con sesión
+- [x] TenantMiddleware prioriza sesión > clínica > default
+- [x] Nav links usando claves de traducción
+
 ### CRUD Pacientes ✅
 - [x] Crear `app/Livewire/App/Patients/Create.php`
 - [x] Crear `app/Livewire/App/Patients/Edit.php`
@@ -113,6 +134,7 @@
 - [x] Links a Dashboard, Pacientes, Citas
 - [x] Icono de Settings (⚙️)
 - [x] Menú móvil responsive
+- [x] Selector de idioma ES/EN
 
 ### Colores Dinámicos ✅
 - [x] CSS Variables

@@ -1,6 +1,6 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-01-30
+> **Última actualización:** 2026-03-23
 > **Fase actual:** 1 - Fundación SaaS
 > **Enfoque:** SaaS-First
 
@@ -39,7 +39,8 @@
 
 ### Localización
 - [x] Multi-idioma configurado (ES/EN)
-- [x] Archivos de traducción: patients.php, settings.php, general.php
+- [x] Archivos de traducción: patients.php, settings.php, general.php, appointments.php
+- [x] Selector de idioma en navegación (ES/EN con sesión)
 - [x] Zonas horarias completas (Canadá, USA, México, LATAM, Europa)
 - [x] Monedas completas (22 monedas soportadas)
 
@@ -83,16 +84,30 @@
 
 ---
 
+### Sistema de Citas ✅
+- [x] Modelo `Appointment` creado con 7 estados y 5 tipos
+- [x] Migración ejecutada
+- [x] `App\Livewire\App\Appointments\Index` - Lista con filtros y paginación
+- [x] `App\Livewire\App\Appointments\Create` - Formulario con búsqueda de paciente
+- [x] `App\Livewire\App\Appointments\Edit` - Edición con validación
+- [x] `App\Livewire\App\Appointments\Show` - Detalle con timeline
+- [x] Workflow de estados (confirmar, check-in, iniciar, completar, cancelar, no-show)
+- [x] Validación de conflictos de horario (checkConflicts)
+- [x] Traducciones appointments.php (ES/EN)
+- [ ] Calendario visual (mejora futura)
+
+### Repositorio
+- [x] GitHub: szystems/controclinic
+- [x] Branch principal: main
+
+---
+
 ## 🔄 En Progreso
 
-### Sistema de Citas ✅
-- [x] Modelo `Appointment` creado
-- [x] Migración ejecutada
-- [x] UI de lista de citas
-- [x] Crear/editar citas
-- [x] Vista detalle de cita
-- [x] Workflow de estados (confirmar, check-in, iniciar, completar, cancelar)
-- [ ] Calendario visual (mejora futura)
+### Dockerización y WSL
+- [ ] Dockerfile y docker-compose.yml
+- [ ] Migración a WSL Ubuntu
+- [ ] Entorno de desarrollo Linux
 
 ---
 
@@ -140,11 +155,12 @@
 
 ```
 Modelos creados: 5 (Clinic, User, Patient, Appointment, MedicalRecord)
-Migraciones: 16
-Componentes Livewire: 8 (Patients x4, Settings x1, Appointments x4)
-Vistas Blade: ~20
+Migraciones: 17
+Componentes Livewire: 10 (Patients x4, Settings x1, Appointments x4, Logout)
+Vistas Blade: ~45 (app, livewire, components, auth, public)
 Archivos de traducción: 8 (es/en x patients, settings, general, appointments)
-Rutas definidas: ~15
+Rutas definidas: 33
+Repositorio: github.com/szystems/controclinic
 ```
 - [ ] Tests de multi-tenancy
 
@@ -175,8 +191,9 @@ Rutas definidas: ~15
 
 ## 🐛 Issues Conocidos
 
-1. **Rutas con closures** - Las rutas actuales usan closures, migrar a controllers
-2. **SQLite en dev** - Algunas features de MySQL no disponibles
+1. **Dashboard/Landing usan closures** - Migrar a controllers o Livewire
+2. **Sin tests** - Necesita tests unitarios y de integración
+3. **Assets** - Necesitan compilarse con `npm run build` después de cambios
 3. **Assets** - Necesitan compilarse con `npm run build` después de cambios
 
 ---
@@ -184,11 +201,11 @@ Rutas definidas: ~15
 ## 📈 Métricas
 
 ```yaml
-Líneas de código: ~2,500
+Líneas de código: ~4,000
 Modelos: 5
-Migraciones: 16
-Vistas: 5
-Componentes Livewire: 0 (pendiente)
+Migraciones: 17
+Vistas: ~45
+Componentes Livewire: 10
 Tests: 0 (pendiente)
 Cobertura: 0%
 ```

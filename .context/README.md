@@ -60,6 +60,4 @@ El archivo `AI_INSTRUCTIONS.md` contiene instrucciones específicas para AI assi
 
 Esta documentación es un **documento vivo**. Debe actualizarse regularmente para mantener su valor.
 
-**Responsable:** Desarrollador principal  
-**Frecuencia mínima de revisión:** Semanal  
-**Última revisión:** 2026-01-28
+**Responsable:** Desarrollador principal  \n**Frecuencia mínima de revisión:** Semanal  \n**Última revisión:** 2026-03-23", "oldString": "**Responsable:** Desarrollador principal  \n**Frecuencia mínima de revisión:** Semanal  \n**Última revisión:** 2026-01-28
