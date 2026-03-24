@@ -102,12 +102,17 @@
 
 ---
 
-## 🔄 En Progreso
+## ✅ Completado (Reciente)
 
 ### Dockerización y WSL
-- [ ] Dockerfile y docker-compose.yml
-- [ ] Migración a WSL Ubuntu
-- [ ] Entorno de desarrollo Linux
+- [x] Dockerfile (PHP 8.3-FPM + Composer + Node 20)
+- [x] docker-compose.yml (app, nginx, mysql, redis)
+- [x] Nginx y PHP config personalizados
+- [x] .env.docker y .dockerignore
+- [x] Script de setup automatizado (docker/setup.sh)
+- [x] Migración a WSL Ubuntu (/home/szott/proyectos/controclinic)
+- [x] Puertos: Nginx 8088, MySQL 33060, Redis 63790
+- [x] App funcionando en http://localhost:8088
 
 ---
 

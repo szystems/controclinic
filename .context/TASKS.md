@@ -5,16 +5,16 @@
 
 ---
 
-## 🔥 Prioridad Alta (Esta Semana) - INFRAESTRUCTURA
+## ✅ Completado - INFRAESTRUCTURA
 
-### 0.1 Docker + Migración WSL
-- [ ] Crear Dockerfile (PHP 8.3-FPM + extensiones)
-- [ ] Crear docker-compose.yml (app, mysql, redis, node)
-- [ ] Crear docker/nginx/default.conf
-- [ ] Crear docker/php/php.ini (configuración optimizada)
-- [ ] Crear .dockerignore
-- [ ] Migrar proyecto a \\wsl.localhost\Ubuntu\home\szott\proyectos\controclinic
-- [ ] Verificar que todo funcione en Docker
+### 0.1 Docker + Migración WSL ✅
+- [x] Crear Dockerfile (PHP 8.3-FPM + extensiones)
+- [x] Crear docker-compose.yml (app, nginx, mysql, redis)
+- [x] Crear docker/nginx/default.conf
+- [x] Crear docker/php/php.ini (configuración optimizada)
+- [x] Crear .dockerignore y .env.docker
+- [x] Migrar proyecto a WSL Ubuntu (/home/szott/proyectos/controclinic)
+- [x] Verificar que todo funcione en Docker (http://localhost:8088)
 - [ ] Actualizar README con instrucciones Docker
 
 ---
