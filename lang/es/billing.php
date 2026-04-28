@@ -9,6 +9,7 @@ return [
     'banner_trial_expired_body' => 'Tu trial expiró el :date. Actualiza tu plan para seguir creando registros.',
     'banner_subscription_expired_body' => 'Tu suscripción no está activa. Renueva para seguir creando registros.',
     'banner_view_plans' => 'Ver planes',
+    'plan_status_inactive' => 'sin suscripción activa',
     'title' => 'Facturación y Suscripción',
     'subtitle' => 'Gestiona tu plan, suscripción y métodos de pago.',
 

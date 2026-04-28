@@ -5,10 +5,19 @@
                 {{ __('general.dashboard') }} - {{ $clinic->name }}
             </h2>
             <div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                @php
+                    $isCourtesyFree = $clinic->plan_type === 'free' && $clinic->is_manual_plan;
+                    $isPaidPlan = $clinic->plan_type !== 'free';
+                    $accessLevel = $clinic->accessLevel();
+                @endphp
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                    @if($accessLevel === \App\Models\Clinic::ACCESS_FULL) bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                    @else bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200
+                    @endif">
                     {{ $clinic->plan?->name ?? __('admin.plan_type_' . $clinic->plan_type) }}
                 </span>
-                @if($clinic->plan_type === 'free' || $clinic->plan_type === 'solo')
+                {{-- Upgrade button: hide if courtesy free or already in read-only (global banner already shows it) --}}
+                @if(($clinic->plan_type === 'free' && ! $clinic->is_manual_plan && $accessLevel === \App\Models\Clinic::ACCESS_FULL) || $clinic->plan_type === 'solo')
                     @if(auth()->user()->hasRole('owner'))
                         <a href="{{ route('app.billing.index', $clinic->slug) }}" wire:navigate
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition shadow-sm">
@@ -26,8 +35,8 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            {{-- Upgrade Banner --}}
-            @if($clinic->plan_type === 'free')
+            {{-- Usage limit banner: only for FREE plan in FULL access (courtesy) reaching real usage limits.\n                 If access is read_only/billing_only the global x-account-status-banner already covers it. --}}
+            @if($clinic->plan_type === 'free' && $clinic->accessLevel() === \App\Models\Clinic::ACCESS_FULL)
                 @php
                     $nearLimit = ($usageStats['patients']['percentage'] >= 80 || $usageStats['appointments']['percentage'] >= 80);
                     $atLimit = ($usageStats['patients']['percentage'] >= 100 || $usageStats['appointments']['percentage'] >= 100);

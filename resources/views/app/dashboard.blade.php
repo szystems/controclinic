@@ -217,8 +217,14 @@
                         <dl class="space-y-3">
                             <div class="flex justify-between">
                                 <dt class="text-sm text-gray-500 dark:text-gray-400">Plan actual</dt>
-                                <dd class="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                                <dd class="text-sm font-medium capitalize
+                                    @if($currentClinic->accessLevel() === \App\Models\Clinic::ACCESS_FULL) text-gray-900 dark:text-white
+                                    @else text-amber-700 dark:text-amber-400
+                                    @endif">
                                     {{ $currentClinic->plan_type ?? 'Free' }}
+                                    @if($currentClinic->plan_type === 'free' && ! $currentClinic->is_manual_plan)
+                                        <span class="ml-1 text-xs font-normal">({{ __('billing.plan_status_inactive') }})</span>
+                                    @endif
                                 </dd>
                             </div>
                             <div class="flex justify-between">

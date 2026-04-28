@@ -9,6 +9,7 @@ return [
     'banner_trial_expired_body' => 'Your trial expired on :date. Upgrade your plan to keep creating records.',
     'banner_subscription_expired_body' => 'Your subscription is not active. Renew to keep creating records.',
     'banner_view_plans' => 'View plans',
+    'plan_status_inactive' => 'no active subscription',
     'title' => 'Billing & Subscription',
     'subtitle' => 'Manage your plan, subscription, and payment methods.',
 
