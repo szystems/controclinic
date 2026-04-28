@@ -178,6 +178,9 @@ class Clinic extends Model
 
     public function canAddPatient(): bool
     {
+        if (! $this->canWrite()) {
+            return false;
+        }
         $limits = $this->getPlanLimits();
         if ($limits['max_patients'] === null) {
             return true;
@@ -188,6 +191,9 @@ class Clinic extends Model
 
     public function canAddAppointmentThisMonth(): bool
     {
+        if (! $this->canWrite()) {
+            return false;
+        }
         $limits = $this->getPlanLimits();
         if ($limits['max_appointments_per_month'] === null) {
             return true;
@@ -202,6 +208,9 @@ class Clinic extends Model
 
     public function canAddDoctor(): bool
     {
+        if (! $this->canWrite()) {
+            return false;
+        }
         $limits = $this->getPlanLimits();
         if ($limits['max_doctors'] === null) {
             return true;
@@ -212,6 +221,9 @@ class Clinic extends Model
 
     public function canAddStaff(): bool
     {
+        if (! $this->canWrite()) {
+            return false;
+        }
         $limits = $this->getPlanLimits();
         if ($limits['max_staff'] === null) {
             return true;

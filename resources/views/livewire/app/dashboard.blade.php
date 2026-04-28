@@ -181,7 +181,7 @@
 
             {{-- Quick Actions --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                @if(!$usageStats['appointments']['unlimited'] && $usageStats['appointments']['percentage'] >= 100)
+                @if(! $clinic->canAddAppointmentThisMonth())
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-2 border-dashed border-amber-300 dark:border-amber-700">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-gray-300 dark:bg-gray-600 rounded-md p-3">
@@ -213,7 +213,7 @@
                     </a>
                 @endif
 
-                @if(!$usageStats['patients']['unlimited'] && $usageStats['patients']['percentage'] >= 100)
+                @if(! $clinic->canAddPatient())
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-2 border-dashed border-amber-300 dark:border-amber-700">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-gray-300 dark:bg-gray-600 rounded-md p-3">
