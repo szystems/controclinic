@@ -17,14 +17,14 @@ trait BelongsToClinic
     {
         // Auto-filtrar por clinic_id en todas las queries
         static::addGlobalScope('clinic', function ($query) {
-            if ($clinic = app('current_clinic')) {
-                $query->where($query->getModel()->getTable() . '.clinic_id', $clinic->id);
+            if (app()->bound('current_clinic') && ($clinic = app('current_clinic'))) {
+                $query->where($query->getModel()->getTable().'.clinic_id', $clinic->id);
             }
         });
 
         // Auto-asignar clinic_id al crear
         static::creating(function ($model) {
-            if (empty($model->clinic_id) && $clinic = app('current_clinic')) {
+            if (empty($model->clinic_id) && app()->bound('current_clinic') && ($clinic = app('current_clinic'))) {
                 $model->clinic_id = $clinic->id;
             }
         });
@@ -36,6 +36,7 @@ trait BelongsToClinic
     public function scopeForClinic($query, string|Clinic $clinic)
     {
         $clinicId = $clinic instanceof Clinic ? $clinic->id : $clinic;
+
         return $query->withoutGlobalScope('clinic')->where('clinic_id', $clinicId);
     }
 

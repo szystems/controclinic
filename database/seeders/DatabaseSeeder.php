@@ -17,6 +17,9 @@ class DatabaseSeeder extends Seeder
         // Crear roles y permisos primero
         $this->call(RolesAndPermissionsSeeder::class);
 
+        // Crear planes
+        $this->call(PlansSeeder::class);
+
         // Crear clínica demo para desarrollo
         $this->call(DemoClinicSeeder::class);
     }

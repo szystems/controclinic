@@ -38,13 +38,13 @@ return new class extends Migration
             $table->boolean('public_portal_enabled')->default(true);
             $table->string('public_portal_slug')->unique()->nullable();
 
-            // Límites según plan (para plan Free)
-            $table->integer('max_patients')->default(25); // Free: 25, otros: null (ilimitado)
-            $table->integer('max_appointments_per_month')->default(5); // Free: 5, otros: null
-            $table->integer('max_doctors')->default(1);
-            $table->integer('max_staff')->default(0);
+            // Límites según plan (null = ilimitado)
+            $table->integer('max_patients')->nullable()->default(25);
+            $table->integer('max_appointments_per_month')->nullable()->default(5);
+            $table->integer('max_doctors')->nullable()->default(1);
+            $table->integer('max_staff')->nullable()->default(0);
             $table->bigInteger('storage_used_bytes')->default(0);
-            $table->bigInteger('max_storage_bytes')->default(524288000); // 500MB default
+            $table->bigInteger('max_storage_bytes')->nullable()->default(524288000);
 
             $table->timestamps();
             $table->softDeletes();

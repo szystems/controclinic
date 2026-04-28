@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
+use App\Jobs\SendAppointmentNotification;
+use App\Traits\BelongsToClinic;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Appointment extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, LogsActivity;
+    use BelongsToClinic, HasFactory, HasUuids, LogsActivity, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -65,18 +68,28 @@ class Appointment extends Model
 
     // Status constants
     public const STATUS_SCHEDULED = 'scheduled';
+
     public const STATUS_CONFIRMED = 'confirmed';
+
     public const STATUS_WAITING = 'waiting';
+
     public const STATUS_IN_PROGRESS = 'in_progress';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_CANCELLED = 'cancelled';
+
     public const STATUS_NO_SHOW = 'no_show';
 
     // Type constants
     public const TYPE_SCHEDULED = 'scheduled';
+
     public const TYPE_WALK_IN = 'walk_in';
+
     public const TYPE_EMERGENCY = 'emergency';
+
     public const TYPE_FOLLOW_UP = 'follow_up';
+
     public const TYPE_TELEMEDICINE = 'telemedicine';
 
     // ==================== ACTIVITY LOG ====================
@@ -115,23 +128,25 @@ class Appointment extends Model
 
     public function getStartDateTimeAttribute(): ?Carbon
     {
-        if (!$this->start_time) {
+        if (! $this->start_time) {
             return null;
         }
-        return Carbon::parse($this->appointment_date->format('Y-m-d') . ' ' . $this->start_time);
+
+        return Carbon::parse($this->appointment_date->format('Y-m-d').' '.$this->start_time);
     }
 
     public function getEndDateTimeAttribute(): ?Carbon
     {
-        if (!$this->end_time) {
+        if (! $this->end_time) {
             return $this->start_date_time?->addMinutes($this->duration_minutes);
         }
-        return Carbon::parse($this->appointment_date->format('Y-m-d') . ' ' . $this->end_time);
+
+        return Carbon::parse($this->appointment_date->format('Y-m-d').' '.$this->end_time);
     }
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_SCHEDULED => 'blue',
             self::STATUS_CONFIRMED => 'indigo',
             self::STATUS_WAITING => 'yellow',
@@ -145,7 +160,7 @@ class Appointment extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_SCHEDULED => __('Programada'),
             self::STATUS_CONFIRMED => __('Confirmada'),
             self::STATUS_WAITING => __('En espera'),
@@ -159,7 +174,7 @@ class Appointment extends Model
 
     public function getTypeLabelAttribute(): string
     {
-        return match($this->appointment_type) {
+        return match ($this->appointment_type) {
             self::TYPE_SCHEDULED => __('Programada'),
             self::TYPE_WALK_IN => __('Orden de llegada'),
             self::TYPE_EMERGENCY => __('Emergencia'),
@@ -199,7 +214,7 @@ class Appointment extends Model
     public function scopeUpcoming($query)
     {
         return $query->where('appointment_date', '>=', now()->toDateString())
-                     ->whereIn('status', [self::STATUS_SCHEDULED, self::STATUS_CONFIRMED]);
+            ->whereIn('status', [self::STATUS_SCHEDULED, self::STATUS_CONFIRMED]);
     }
 
     public function scopeToday($query)
@@ -287,13 +302,18 @@ class Appointment extends Model
         ]);
     }
 
-    public function cancel(string $reason = null): void
+    public function cancel(?string $reason = null): void
     {
         $this->update([
             'status' => self::STATUS_CANCELLED,
             'cancelled_at' => now(),
             'cancellation_reason' => $reason,
         ]);
+
+        SendAppointmentNotification::dispatch(
+            $this->id,
+            SendAppointmentNotification::TYPE_CANCELLED,
+        );
     }
 
     public function markAsNoShow(): void
@@ -308,6 +328,11 @@ class Appointment extends Model
         $this->update([
             'status' => self::STATUS_CONFIRMED,
         ]);
+
+        SendAppointmentNotification::dispatch(
+            $this->id,
+            SendAppointmentNotification::TYPE_CONFIRMED,
+        );
     }
 
     /**
@@ -315,9 +340,10 @@ class Appointment extends Model
      */
     public function calculateEndTime(): string
     {
-        if (!$this->start_time) {
+        if (! $this->start_time) {
             return '';
         }
+
         return Carbon::parse($this->start_time)
             ->addMinutes($this->duration_minutes)
             ->format('H:i');
@@ -332,7 +358,7 @@ class Appointment extends Model
             return false;
         }
 
-        if (!$this->appointment_date->isSameDay($other->appointment_date)) {
+        if (! $this->appointment_date->isSameDay($other->appointment_date)) {
             return false;
         }
 

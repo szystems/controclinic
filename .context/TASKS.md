@@ -1,193 +1,197 @@
 # 📝 Tareas Pendientes
 
-> Actualizado: 2026-03-23
+> Actualizado: 2026-04-28
 > Enfoque: SaaS-First
 
 ---
 
-## ✅ Completado - INFRAESTRUCTURA
+## 🔥 Prioridad Alta — PRÓXIMO SPRINT
 
-### 0.1 Docker + Migración WSL ✅
-- [x] Crear Dockerfile (PHP 8.3-FPM + extensiones)
-- [x] Crear docker-compose.yml (app, nginx, mysql, redis)
-- [x] Crear docker/nginx/default.conf
-- [x] Crear docker/php/php.ini (configuración optimizada)
-- [x] Crear .dockerignore y .env.docker
-- [x] Migrar proyecto a WSL Ubuntu (/home/szott/proyectos/controclinic)
-- [x] Verificar que todo funcione en Docker (http://localhost:8088)
-- [ ] Actualizar README con instrucciones Docker
+> Orden lógico: primero **estabilizar la base** (docs, seguridad, bugs latentes, DX), luego cerrar el ciclo de vida de la cuenta (Fase 4), después completar el flujo médico (historias clínicas), después UX (calendario, perfil) y finalmente personalización avanzada.
 
 ---
 
-## 📅 Prioridad Media - FASE 1 SaaS
+### 🛡️ Sprint Estabilización 🔥 ANTES DE TODO
+> **Por qué primero:** consolidar documentación, seguridad, bugs latentes y DX para que las próximas fases tengan una base limpia, testeada y observable. Sin esto, cada feature nueva acumula deuda técnica.
 
-### 1.1 Landing Page Pública
-- [ ] Crear layout público (sin autenticación)
-- [ ] Hero section con propuesta de valor
-- [ ] Sección de features/beneficios
-- [ ] Testimonials placeholders
-- [ ] Footer con links legales
-- [ ] Mobile responsive
+#### Bloque A — Documentación y ADRs ✅
+- [x] Actualizar `PROJECT.md` (versión, puerto 8088, DB real, precios reales)
+- [x] Regenerar `MODELS.md` (agregar Plan, ClinicInvitation, campos faltantes)
+- [x] Reorientar `ROADMAP.md` (eliminar fases ya completadas, redirigir a TASKS.md)
+- [x] Limpiar `STATUS.md` (eliminar "Próximas Fases" obsoleta)
+- [x] Añadir ADR-008 (Política de Acceso), ADR-009 (Notificaciones), ADR-010 (Plan Free cortesía)
+- [x] Verificar/actualizar `CONVENTIONS.md` (BelongsToClinic, ActivityLog, Tests)
+- [x] Insertar Sprint Estabilización en este archivo (TASKS.md)
 
-### 1.2 Página de Precios
-- [ ] Tabla comparativa de planes (Free, Solo, Group, Enterprise)
-- [ ] Toggle mensual/anual
-- [ ] CTAs a registro
-- [ ] FAQ de precios
+#### Bloque B — Seguridad + Multi-tenant tests ✅
+- [x] Rate limiting en rutas sensibles: `/login`, `/register`, `/forgot-password`, `/invitation/*`
+- [x] `tests/Feature/MultiTenantIsolationTest.php` con 2 clínicas + cross-data leak verificación (10 tests)
+- [x] **CRÍTICO**: fix cross-tenant leak en Patients/Show, Patients/Edit, Staff/Edit (abort_if defense-in-depth)
+- [x] `BelongsToClinic` aplicado a Patient, Appointment, MedicalRecord (con guard `app()->bound`)
+- [x] Auditar factories: `clinic_id` siempre real (verificado en MultiTenantIsolationTest)
 
-### 1.3 Sistema de Registro de Clínicas
-- [ ] Ruta /register para nuevas clínicas
-- [ ] Formulario: nombre clínica, nombre owner, email, password, país
-- [ ] Verificación de email
-- [ ] Creación automática de Clinic + User (owner)
-- [ ] Slug único generado automáticamente
-- [ ] Configuración por defecto según país (timezone, moneda)
-- [ ] Redirección a onboarding
+#### Bloque C — Bugs y polish ✅
+- [x] **Timezone fix** en `SendAppointmentReminders` (compara en `clinic.timezone` con test específico)
+- [x] Demo seeder: `trial_ends_at = now()->addDays(30)` + 8 pacientes + 16 citas demo
+- [x] Páginas de error custom: `403`, `404`, `500`, `419`, `503` con branding y traducciones ES/EN
+- [x] Páginas legales: `/terms`, `/privacy` con vistas Blade y traducciones ES/EN
+- [x] `Mail::to()->locale($clinic->locale)` en Staff\Create y Staff\Index (resend)
 
-### 1.4 Onboarding Wizard (5 pasos)
-- [ ] Componente Livewire multi-step
-- [ ] Paso 1: Datos de la clínica (nombre, dirección, teléfono, especialidad)
-- [ ] Paso 2: Personalización (logo, colores con preview)
-- [ ] Paso 3: Horarios de atención (días, horas)
-- [ ] Paso 4: Perfil del doctor (especialidad, colegiado, foto)
-- [ ] Paso 5: Resumen + tutorial + CTA al dashboard
-- [ ] Marcar onboarding como completado
-- [ ] Skip option para usuarios que quieran configurar después
+#### Bloque D — Developer Experience / CI ✅
+- [x] Scripts en `composer.json`: `lint`, `format`, `test`, `stan`, `check`
+- [x] GitHub Actions workflow: `.github/workflows/ci.yml` (tests PHP 8.3 + Pint + PHPStan)
+- [x] Larastan/PHPStan nivel 5 con baseline (116 errores legacy congelados, 0 nuevos)
+- [x] README.md con quick-start Docker + tabla de servicios + comandos diarios
+- [ ] Telescope en local (opcional, pospuesto)
 
----
-
-## � Prioridad Siguiente - FASE 1 Continuación
-
-### 1.5 Integración Paddle
-- [ ] Configurar Laravel Cashier Paddle (ya instalado ^2.6)
-- [ ] Crear productos en Paddle Dashboard
-- [ ] Página de checkout para upgrade
-- [ ] Portal de facturación del cliente
-- [ ] Webhooks: subscription.created, updated, deleted
-- [ ] Trial de 14 días para planes pagos
-- [ ] Lógica de cancelación y downgrade
+**Estado final del Sprint:** 212 tests / 464 asserts ✓ · Pint clean ✓ · PHPStan clean ✓
 
 ---
 
-## 📅 Prioridad Baja (Este Mes) - FASE 2
+### Fase 4 — Política de Acceso (Trial Expirado / Read-Only) 🔥 DESPUÉS DEL SPRINT
+> **Por qué después de Estabilización:** ya está documentada como ADR-008. Implementarla con la base limpia y los tests multi-tenant en su lugar.
 
-### Panel Admin SaaS
-- [ ] Ruta /admin con autenticación separada
-- [ ] Dashboard: total clínicas, MRR, nuevos registros, churn
-- [ ] Lista de clínicas con filtros (plan, status, fecha)
-- [ ] Detalle de clínica (usuarios, actividad, plan)
-- [ ] Acciones: suspender, extender trial, cambiar plan
-- [ ] Impersonar usuario para soporte
+#### 4.1 Modelo & lógica core
+- [ ] Añadir a `Clinic`:
+  - `accessLevel(): string` → `'full' | 'read_only' | 'billing_only' | 'blocked'`
+  - `isAccessible(): bool` (todo excepto `cancelled`)
+  - `isReadOnly(): bool` (trial expirado o suscripción inactiva con plan free)
+  - `canWrite(): bool` (inverso de read-only)
+- [ ] Mantener `isActive()` retrocompatible o reemplazar usos.
 
-### Límites por Plan
-- [ ] Middleware `CheckPlanLimits`
-- [ ] Verificar límite de usuarios al crear
-- [ ] Verificar límite de pacientes
-- [ ] Verificar límite de citas/mes
-- [ ] Mostrar uso actual en dashboard
-- [ ] Banners de upgrade cuando cerca del límite
-- [ ] Modal de upgrade con beneficios
+#### 4.2 Middlewares
+- [ ] Modificar `TenantMiddleware`: 403 sólo para `cancelled` o si el usuario no pertenece. El resto pasa.
+- [ ] Crear `EnsureCanWrite` middleware: si `isReadOnly()` y la ruta es de escritura → redirige a `app.billing.index` con flash.
+- [ ] Modificar `CheckPlanLimits`: trial expirado en plan free → marca read-only y deja entrar al panel pero sólo a billing en vista de escritura.
+- [ ] Aplicar `EnsureCanWrite` a rutas Create/Edit de patients, appointments, staff, settings (en grupo).
 
-### Portal Público de Clínica
-- [ ] URL: /c/{clinic-slug}
-- [ ] Información de la clínica
-- [ ] Horarios de atención
-- [ ] Lista de doctores
-- [ ] Formulario de booking online
-- [ ] Confirmación por email
+#### 4.3 UI / Experiencia
+- [ ] Componente Blade `x-account-status-banner` (persistente arriba del layout app):
+  - "Tu trial expiró el {fecha}. Actualiza tu plan para seguir creando registros."
+  - Botón "Ver planes" → billing.
+- [ ] Deshabilitar botones "Nuevo paciente / Nueva cita / Invitar staff" cuando read-only (visualmente atenuados con tooltip).
+- [ ] En el portal público `/c/{slug}`: si `isReadOnly()` → mostrar mensaje "Reservas temporalmente no disponibles" en lugar del wizard (el dueño no podría atender).
+
+#### 4.4 Tests
+- [ ] Test cada estado: trial vigente, trial expirado, suspended, cancelled, plan pago activo, plan pago expirado.
+- [ ] Test que `EnsureCanWrite` redirige bien en cada Livewire de escritura.
+- [ ] Test del banner visible y portal público bloqueado en read-only.
+
+---
+
+### Fase 5 — Historial Médico (MedicalRecord CRUD) 🔥 SEGUNDA
+> **Por qué después:** es el siguiente módulo médico crítico (la app guarda pacientes y citas pero aún no consultas). Depende de tener el ciclo de cuenta estable.
+
+- [ ] Migración + modelo `MedicalRecord` (revisar lo existente, completar campos)
+- [ ] `App\Livewire\App\MedicalRecords\Index` (listado por paciente)
+- [ ] `App\Livewire\App\MedicalRecords\Create` (con plantilla SOAP: Subjetivo/Objetivo/Análisis/Plan)
+- [ ] `App\Livewire\App\MedicalRecords\Edit`
+- [ ] `App\Livewire\App\MedicalRecords\Show` (read-only para roles sin permisos de edición)
+- [ ] Asociar al `Appointment` (botón "Crear consulta" desde Show del appointment)
+- [ ] Permisos Spatie: `records.view`, `records.create`, `records.edit`, `records.delete`
+- [ ] Adjuntos: subir documentos/imágenes (storage local)
+- [ ] Activity Log + soft deletes
+- [ ] Traducciones records.php (ES/EN)
+- [ ] Tests Feature (CRUD + permisos + multi-tenant scope)
+
+---
+
+### Fase 6 — Calendario Visual de Citas (UX)
+> **Por qué después:** la lista de citas funciona, el calendario es visual y de productividad. Requiere data ya estable.
+
+- [ ] Componente Livewire `App\Livewire\App\Appointments\Calendar`
+- [ ] Vista mensual / semanal / diaria (toggle)
+- [ ] Drag & drop para reagendar (Alpine + emitir a backend)
+- [ ] Filtros por doctor (color por doctor)
+- [ ] Click en hueco vacío → modal con `Create`
+- [ ] Click en cita → modal con `Show`
+- [ ] Reemplazar la ruta placeholder `app.appointments.calendar`
+- [ ] Tests
+
+---
+
+### Fase 7 — Perfil del Usuario + Transferencia de Ownership (Fase 3D)
+- [ ] Página `/app/{clinic}/profile` editable por cada usuario
+- [ ] Cambio de contraseña propia
+- [ ] Owner puede forzar reset de contraseña a un staff
+- [ ] Transferir ownership a otro usuario (con confirmación + email)
+- [ ] Historial de actividad por usuario (filtrar Activity Log por user_id)
+- [ ] Tests
+
+---
+
+### Fase 8 — Reportes / Dashboard Avanzado
+- [ ] Reporte de citas por período (filtros: doctor, estado, tipo)
+- [ ] Reporte de pacientes nuevos por mes
+- [ ] Reporte de ingresos (cuando exista facturación de servicios)
+- [ ] Exportación a CSV / PDF
+- [ ] Gráficas en dashboard del owner (Chart.js o ApexCharts)
+- [ ] Permisos: `reports.view`, `reports.export`
+- [ ] Tests
+
+---
+
+### Fase 3C — Permisos Personalizados (Última)
+> **Por qué al final:** depende de tener todos los módulos definidos para saber qué permisos personalizar.
+
+- [ ] UI en `Staff\Edit` con tabla de permisos agrupados por módulo (Pacientes, Citas, Historiales, Reportes, Config)
+- [ ] Toggle on/off por permiso por usuario (Spatie direct permissions)
+- [ ] Botón "Restaurar permisos del rol"
+- [ ] Preview de capacidades del usuario
+- [ ] Activity Log de cambios de permisos
+- [ ] Traducciones permissions.php
+- [ ] Tests
+
+---
+
+## 🟢 Backlog (Sin orden estricto)
+
+### Mejoras técnicas
+- [ ] Rate limiting global en rutas públicas
+- [ ] Policies de autorización por modelo (complementar Spatie)
+- [ ] PHPDoc en métodos públicos
+- [ ] CI/CD básico (GitHub Actions: tests + Pint)
+- [ ] Webhook Paddle con secret en producción
+- [ ] Cron de scheduler en producción
+
+### Features futuras (Roadmap fase 2+)
+- [ ] Portal del paciente (login, ver historial, próximas citas)
+- [ ] Notificaciones SMS / WhatsApp Business
+- [ ] Telemedicina (videollamada integrada)
+- [ ] Importación de pacientes desde CSV/Excel
+- [ ] Recetas electrónicas con QR
+- [ ] IA: resúmenes de consulta, recordatorios inteligentes
+- [ ] Mobile app
+- [ ] API pública
 
 ---
 
 ## ✅ Completado Recientemente
 
-### Sistema de Citas ✅ (2026-01-30)
-- [x] `App\Livewire\App\Appointments\Index` - Lista con filtros y workflow
-- [x] `App\Livewire\App\Appointments\Create` - Con búsqueda de paciente
-- [x] `App\Livewire\App\Appointments\Edit` - Edición con validación
-- [x] `App\Livewire\App\Appointments\Show` - Detalle con timeline
-- [x] Workflow: confirmar, check-in, iniciar, completar, cancelar, no-show
-- [x] Validación de conflictos de horario (checkConflicts)
-- [x] Traducciones appointments.php (ES/EN)
+### 2026-04-28 — Sistema de Notificaciones por Email
+- 5 Mailables (booked-patient, booked-clinic, confirmed, cancelled, reminder)
+- Job `SendAppointmentNotification` con cola Redis y locale por clínica
+- Comando `appointments:send-reminders` + scheduler horario
+- 10 tests, verificado en Mailpit
 
-### Traducciones y Selector de Idioma ✅ (2026-01-30)
-- [x] Traducciones EN: patients.php, settings.php
-- [x] Selector de idioma en navegación (desktop + móvil)
-- [x] Ruta lang.switch con sesión
-- [x] TenantMiddleware prioriza sesión > clínica > default
-- [x] Nav links usando claves de traducción
+### 2026-04-28 — Portal Público de Clínica
+- Ruta `/c/{slug}` con wizard de 3 pasos (doctor → fecha → paciente)
+- Layout con branding dinámico (CSS vars de la clínica)
+- Honeypot + RateLimiter, reutilización de paciente, conflictos de horario
+- Selector ES/EN, traducciones booking.php, 14 tests
 
-### CRUD Pacientes ✅
-- [x] Crear `app/Livewire/App/Patients/Create.php`
-- [x] Crear `app/Livewire/App/Patients/Edit.php`
-- [x] Crear `app/Livewire/App/Patients/Show.php`
-- [x] Lista con búsqueda y paginación
-- [x] Validaciones completas
-- [x] Activity Log funcionando
+### 2026-04-28 — Actualización de dependencias
+- Composer minor/patch + parches CVE (commonmark, psysh)
+- npm: vite 7.3.2, tailwindcss/vite 4.2.4, etc.
+- 199 tests pasando sin regresiones
 
-### Módulo Settings ✅
-- [x] 6 tabs de configuración
-- [x] Guardado por sección
-- [x] Upload de logo
-- [x] Colores dinámicos funcionando
 
-### Navegación ✅
-- [x] Links a Dashboard, Pacientes, Citas
-- [x] Icono de Settings (⚙️)
-- [x] Menú móvil responsive
-- [x] Selector de idioma ES/EN
-
-### Colores Dinámicos ✅
-- [x] CSS Variables
-- [x] Override de indigo-* classes
-- [x] btn-primary, bg-primary disponibles
 
 ---
 
-## 🐛 Bugs y Mejoras Técnicas
+## 📝 Notas
 
-### Bugs Conocidos
-- [x] Activity Log no soportaba UUIDs → FIXED
-
-### Deuda Técnica
-- [ ] Agregar PHPDoc a métodos públicos
-- [ ] Crear factories para testing
-- [ ] Configurar CI/CD básico
-- [ ] Tests unitarios básicos
-
-### Seguridad
-- [ ] Rate limiting en rutas públicas
-- [ ] CSRF en formularios Livewire
-- [ ] Sanitización de inputs
-- [ ] Políticas de autorización (Policies)
-
----
-
-## 📚 Documentación
-
-- [ ] README.md del proyecto
-- [ ] Guía de instalación local
-- [ ] Documentación de API (cuando exista)
-- [ ] Guía de contribución
-- [ ] Changelog
-
----
-
-## 💡 Ideas para Futuro
-
-- [ ] Importación de pacientes desde CSV/Excel
-- [ ] Exportación de datos
-- [ ] Reportes PDF
-- [ ] Integración con laboratorios
-- [ ] Recetas electrónicas con QR
-- [ ] Chat interno entre staff
-- [ ] Recordatorios automáticos
-- [ ] Encuestas de satisfacción
-
----
-
-## Notas
-
-- Priorizar features que generen valor para el usuario
-- Mantener código simple y mantenible
-- Testing antes de features complejas
-- Documentar decisiones importantes en `.context/DECISIONS.md`
+- **Convención:** mantener este archivo enfocado en lo PRÓXIMO. Lo viejo va a STATUS.md.
+- **Decisiones arquitectónicas:** documentar en `.context/DECISIONS.md`.
+- **Cambios mayores:** actualizar `STATUS.md` con la fecha y los tests que pasan.
+- **Tests primero** en cada fase: definir los tests antes de implementar.

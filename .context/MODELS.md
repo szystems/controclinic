@@ -18,11 +18,16 @@ Campos:
 ├── timezone (string, default: 'America/Guatemala')
 ├── currency (string, default: 'USD')
 ├── locale (string, default: 'es')
+├── owner_id (bigint, FK → users.id)
+├── plan_id (bigint, FK → plans.id, nullable)
 ├── plan_type (enum: free/solo/group/enterprise)
+├── is_manual_plan (boolean, default: false) - Cortesía/manual
+├── manual_plan_reason (string, nullable) - Razón cortesía
 ├── status (enum: active/suspended/cancelled/trial)
 ├── trial_ends_at (timestamp, nullable)
+├── onboarding_completed_at (timestamp, nullable)
 ├── settings (json, nullable) - Configuración
-├── branding (json, nullable) - Personalización visual
+├── branding (json, nullable) - Personalización visual + theme
 ├── public_portal_enabled (boolean, default: true)
 ├── public_portal_slug (string, unique, nullable)
 ├── max_patients (integer, default: 25)
@@ -34,10 +39,12 @@ Campos:
 ├── created_at, updated_at, deleted_at
 
 Relaciones:
+├── plan() → BelongsTo Plan
 ├── users() → HasMany User
 ├── owner() → BelongsTo User
 ├── doctors() → HasMany User (where role = doctor)
 ├── staff() → HasMany User (where role in assistant, secretary, receptionist)
+├── invitations() → HasMany ClinicInvitation
 ├── patients() → HasMany Patient
 ├── appointments() → HasMany Appointment
 └── medicalRecords() → HasMany MedicalRecord
@@ -76,11 +83,13 @@ Campos:
 ├── avatar (string, nullable)
 ├── locale (string, default: 'es')
 ├── timezone (string, nullable)
+├── theme (string, default: 'light') - light/dark/system
 ├── specialties (json, nullable) - Para doctores
 ├── bio (text, nullable)
 ├── license_number (string, nullable) - Número colegiado
 ├── working_hours (json, nullable)
 ├── is_active (boolean, default: true)
+├── is_super_admin (boolean, default: false) - Acceso panel admin SaaS
 ├── two_factor_enabled (boolean, default: false)
 ├── last_login_at (timestamp, nullable)
 ├── last_login_ip (string, nullable)
@@ -347,4 +356,82 @@ Constantes de Status:
 ├── STATUS_FINAL
 ├── STATUS_AMENDED
 └── STATUS_DELETED
+```
+
+## Plan
+
+```php
+Tabla: plans
+Primary Key: id (bigint auto-increment)
+
+Campos:
+├── id (bigint)
+├── name (string) - Nombre visible (Free/Solo/Group/Enterprise)
+├── slug (string, unique) - Identificador interno
+├── description (string, nullable)
+├── max_patients (integer, nullable) - null = ilimitado
+├── max_appointments_per_month (integer, nullable)
+├── max_doctors (integer, nullable)
+├── max_staff (integer, nullable)
+├── max_storage_bytes (bigint, nullable)
+├── features (json, nullable) - Array de features habilitados
+├── monthly_price (decimal:2)
+├── yearly_price (decimal:2)
+├── paddle_monthly_price_id (string, nullable)
+├── paddle_yearly_price_id (string, nullable)
+├── paddle_product_id (string, nullable)
+├── trial_days (integer, default: 14)
+├── sort_order (integer, default: 0)
+├── is_active (boolean, default: true)
+├── is_popular (boolean, default: false)
+├── is_free (boolean, default: false) - Cortesía/regalo
+├── is_enterprise (boolean, default: false)
+├── created_at, updated_at
+
+Relaciones:
+└── clinics() → HasMany Clinic
+
+Notas:
+- El plan Free es CORTESÍA: solo asignable desde admin.
+- En registro nuevo se asigna 'solo' con trial 14 días.
+- Ver DECISIONS.md ADR-006.
+```
+
+## ClinicInvitation
+
+```php
+Tabla: clinic_invitations
+Primary Key: id (UUID)
+
+Campos:
+├── id (uuid)
+├── clinic_id (uuid, FK → clinics.id)
+├── email (string)
+├── name (string, nullable)
+├── role (enum: doctor/assistant/secretary/receptionist)
+├── token (string, unique) - URL de aceptación
+├── invited_by (bigint, FK → users.id)
+├── expires_at (timestamp)
+├── accepted_at (timestamp, nullable)
+├── cancelled_at (timestamp, nullable)
+├── created_at, updated_at
+
+Relaciones:
+├── clinic() → BelongsTo Clinic
+└── inviter() → BelongsTo User (invited_by)
+
+Métodos:
+├── isPending(): bool
+├── isExpired(): bool
+├── isAccepted(): bool
+└── isCancelled(): bool
+
+Scopes:
+├── pending() - sin aceptar/cancelar y no expiradas
+└── forClinic(clinicId)
+
+Flujo:
+1. Owner/Admin crea invitación → email con token
+2. Receptor entra a /invitation/{token} → setea password
+3. Crea User con clinic_id + role + email_verified_at = now
 ```

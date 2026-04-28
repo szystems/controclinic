@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Clinic;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
@@ -56,11 +57,12 @@ class AuthenticationTest extends TestCase
 
     public function test_navigation_menu_can_be_rendered(): void
     {
-        $user = User::factory()->create();
+        $clinic = Clinic::factory()->onboarded()->create();
+        $user = User::factory()->create(['clinic_id' => $clinic->id]);
 
         $this->actingAs($user);
 
-        $response = $this->get('/dashboard');
+        $response = $this->get("/app/{$clinic->slug}");
 
         $response
             ->assertOk()

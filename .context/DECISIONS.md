@@ -216,6 +216,94 @@ Crear carpeta `.context/` con documentación estructurada.
 
 ---
 
+## ADR-008: Política de Acceso de Cuenta (Read-Only)
+
+**Fecha:** 2026-04-28
+**Estado:** Aceptada (implementación pendiente — Fase 4)
+
+### Contexto
+Cuando expira el trial o un plan pagado caduca, el usuario actualmente recibe un 403 del `TenantMiddleware`, lo cual deja a la clínica sin poder ver sus datos ni renovar.
+
+### Decisión
+La cuenta NUNCA pierde acceso de lectura. Los estados se mapean a un `accessLevel`:
+
+| Estado de cuenta             | Login | Lectura | Crear/Editar | Billing | Portal Público | Recordatorios |
+|------------------------------|:-----:|:-------:|:------------:|:-------:|:--------------:|:-------------:|
+| `active`                     | ✅    | ✅      | ✅           | ✅      | ✅             | ✅            |
+| `trial` vigente              | ✅    | ✅      | ✅           | ✅      | ✅             | ✅            |
+| `trial` expirado             | ✅    | ✅      | ❌           | ✅      | ❌             | ✅            |
+| Plan pagado caducado         | ✅    | ✅      | ❌           | ✅      | ❌             | ✅            |
+| `suspended` (acción admin)   | ✅    | ❌      | ❌           | ✅      | ❌             | ❌            |
+| `cancelled`                  | ✅    | ❌      | ❌           | ✅      | ❌             | ❌            |
+| Plan Free (cortesía)         | ✅    | ✅      | ✅           | ✅      | ✅             | ✅            |
+
+### Implementación
+- Método `Clinic::accessLevel()` devuelve enum: `full | read_only | billing_only`.
+- Middleware `EnsureCanWrite` aplica en rutas de creación/edición.
+- Componente `<x-account-status-banner>` muestra estado al usuario.
+- Portal público chequea `accessLevel === full` antes de aceptar reservas.
+- Recordatorios solo se envían si `accessLevel !== billing_only`.
+
+### Razones
+- Evita "secuestrar" datos del cliente.
+- El cliente puede recuperar acceso completo pagando sin perder histórico.
+- Soporte legal/regulatorio: las clínicas necesitan acceder a expedientes ante reclamos.
+
+### Consecuencias
+- ✅ Mejor UX y reputación.
+- ⚠️ Costo de almacenamiento incluso de cuentas inactivas (mitigar con purga ≥ 12 meses cancelado).
+- ❌ Más complejidad: cada acción de escritura debe pasar por el middleware.
+
+---
+
+## ADR-009: Notificaciones por Email vía Job Orquestador
+
+**Fecha:** 2026-04-28
+**Estado:** Aceptada (implementada)
+
+### Contexto
+Necesitamos enviar emails de citas (booking, confirmación, cancelación, recordatorio) sin acoplar la lógica al request HTTP.
+
+### Decisión
+Un único Job `SendAppointmentNotification` (`ShouldQueue`) recibe `(appointment, type)` y decide qué Mailable disparar. El locale se setea desde `clinic.locale` con `Mail::to()->locale($locale)`.
+
+### Razones
+- Un punto único de orquestación = más fácil de testear y observar.
+- Locale por clínica respeta la configuración de cada tenant.
+- Reintentos automáticos (3) por la cola si el SMTP falla.
+
+### Consecuencias
+- ✅ Desacoplamiento total del request.
+- ✅ Tests con `Queue::fake()` y `Mail::fake()` triviales.
+- ⚠️ Requiere worker `queue:work` en producción + scheduler para recordatorios.
+
+---
+
+## ADR-010: Plan Free como Cortesía (no autoservicio)
+
+**Fecha:** 2026-04-28
+**Estado:** Aceptada
+
+### Contexto
+Inicialmente el plan Free aparecía en `/pricing` y el onboarding como una opción gratis. Esto canibalizaba el plan Solo y atraía cuentas zombi.
+
+### Decisión
+- El plan Free **solo es asignable desde el panel admin** (`is_manual_plan = true`, con `manual_plan_reason`).
+- En registro nuevo se asigna automáticamente `plan = 'solo'` con `status = 'trial'` y `trial_ends_at = now()->addDays(14)`.
+- En `/pricing` y onboarding, el plan Free **no se ofrece** como opción.
+
+### Razones
+- Foco en conversión a planes pagos.
+- Permite seguir regalando cuentas (clínicas asociadas, prensa, casos comerciales) sin contaminar el funnel.
+- Alinea trial 14 días con la práctica del mercado SaaS.
+
+### Consecuencias
+- ✅ Funnel más limpio.
+- ✅ Cortesías controladas.
+- ⚠️ Hay que migrar clínicas Free preexistentes (mantenerlas con `is_manual_plan = true`).
+
+---
+
 ## Template para nuevas decisiones
 
 ```markdown

@@ -2,12 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Clinic;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -29,6 +31,9 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'clinic_id' => Clinic::factory(),
+            'role' => 'owner',
+            'is_active' => true,
         ];
     }
 
@@ -40,5 +45,20 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function owner(): static
+    {
+        return $this->state(fn () => ['role' => 'owner']);
+    }
+
+    public function doctor(): static
+    {
+        return $this->state(fn () => ['role' => 'doctor']);
+    }
+
+    public function assistant(): static
+    {
+        return $this->state(fn () => ['role' => 'assistant']);
     }
 }

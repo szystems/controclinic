@@ -13,41 +13,59 @@ class Create extends Component
 
     // Basic Info
     public string $first_name = '';
+
     public string $last_name = '';
+
     public string $email = '';
+
     public string $phone = '';
+
     public string $phone_secondary = '';
+
     public ?string $birth_date = null;
+
     public string $gender = '';
 
     // Identification
     public string $id_type = '';
+
     public string $id_number = '';
 
     // Address
     public string $address = '';
+
     public string $city = '';
+
     public string $state = '';
+
     public string $postal_code = '';
+
     public string $country = 'GT';
 
     // Medical Info
     public string $blood_type = '';
+
     public string $allergies = '';
+
     public string $chronic_conditions = '';
+
     public string $current_medications = '';
 
     // Emergency Contact
     public string $emergency_name = '';
+
     public string $emergency_phone = '';
+
     public string $emergency_relationship = '';
 
     // Insurance
     public string $insurance_provider = '';
+
     public string $insurance_policy_number = '';
 
     // Other
     public ?string $primary_doctor_id = null;
+
     public string $notes = '';
 
     protected function rules(): array
@@ -108,16 +126,18 @@ class Create extends Component
 
     public function save()
     {
-        if (!auth()->user()->can('patients.create')) {
+        if (! auth()->user()->can('patients.create')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
         $this->validate();
 
         // Check clinic limits
-        if (!$this->currentClinic->canAddPatient()) {
+        if (! $this->currentClinic->canAddPatient()) {
             session()->flash('error', __('patients.limit_reached'));
+
             return;
         }
 
@@ -147,7 +167,7 @@ class Create extends Component
                     'name' => $this->emergency_name,
                     'phone' => $this->emergency_phone,
                     'relationship' => $this->emergency_relationship,
-                ]
+                ],
             ] : null,
             'insurance_info' => $this->insurance_provider ? [
                 'provider' => $this->insurance_provider,

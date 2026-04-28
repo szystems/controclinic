@@ -119,4 +119,8 @@ return [
     'select_doctor' => 'Select Doctor',
     'select_type' => 'Select Type',
     'search_patient' => 'Search patient...',
+
+    // Limits
+    'limit_reached' => 'You have reached your plan\'s monthly appointment limit',
+    'consultation' => 'Consultation',
 ];

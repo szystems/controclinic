@@ -12,13 +12,17 @@
             </div>
             @can('patients.create')
             <div class="mt-4 sm:mt-0">
-                <a href="{{ route('app.patients.create', ['clinic' => $currentClinic->slug]) }}"
-                   class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    {{ __('patients.new_patient') }}
-                </a>
+                @if($currentClinic->canAddPatient())
+                    <a href="{{ route('app.patients.create', ['clinic' => $currentClinic->slug]) }}"
+                       class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        {{ __('patients.new_patient') }}
+                    </a>
+                @else
+                    <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
+                @endif
             </div>
             @endcan
         </div>
@@ -233,13 +237,17 @@
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('patients.no_patients_description') }}</p>
                 @can('patients.create')
                 <div class="mt-6">
-                    <a href="{{ route('app.patients.create', ['clinic' => $currentClinic->slug]) }}"
-                       class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        {{ __('patients.new_patient') }}
-                    </a>
+                    @if($currentClinic->canAddPatient())
+                        <a href="{{ route('app.patients.create', ['clinic' => $currentClinic->slug]) }}"
+                           class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            {{ __('patients.new_patient') }}
+                        </a>
+                    @else
+                        <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
+                    @endif
                 </div>
                 @endcan
             </div>

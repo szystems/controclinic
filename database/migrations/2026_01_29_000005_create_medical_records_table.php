@@ -37,7 +37,7 @@ return new class extends Migration
                 'follow_up_note',   // Nota de seguimiento
                 'vital_signs',      // Signos vitales
                 'vaccination',      // Vacunación
-                'other'
+                'other',
             ])->default('consultation');
 
             // Contenido principal

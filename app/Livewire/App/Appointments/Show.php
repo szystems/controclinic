@@ -9,9 +9,11 @@ use Livewire\Component;
 class Show extends Component
 {
     public Clinic $currentClinic;
+
     public Appointment $appointment;
 
     public bool $showCancelModal = false;
+
     public string $cancellationReason = '';
 
     public function mount(Clinic $clinic, Appointment $appointment): void
@@ -28,8 +30,9 @@ class Show extends Component
     // Workflow Actions
     public function confirmAppointment(): void
     {
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
@@ -40,8 +43,9 @@ class Show extends Component
 
     public function checkIn(): void
     {
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
@@ -52,35 +56,39 @@ class Show extends Component
 
         $this->appointment->checkIn();
         $this->appointment->refresh();
-        session()->flash('success', __('appointments.check_in') . ' ✓');
+        session()->flash('success', __('appointments.check_in').' ✓');
     }
 
     public function startConsultation(): void
     {
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        if (!$this->appointment->canStart()) {
+        if (! $this->appointment->canStart()) {
             session()->flash('error', __('general.action_not_allowed'));
+
             return;
         }
 
         $this->appointment->start();
         $this->appointment->refresh();
-        session()->flash('success', __('appointments.start_consultation') . ' ✓');
+        session()->flash('success', __('appointments.start_consultation').' ✓');
     }
 
     public function completeAppointment(): void
     {
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        if (!$this->appointment->canComplete()) {
+        if (! $this->appointment->canComplete()) {
             session()->flash('error', __('general.action_not_allowed'));
+
             return;
         }
 
@@ -102,13 +110,15 @@ class Show extends Component
 
     public function cancelAppointment(): void
     {
-        if (!auth()->user()->can('appointments.delete')) {
+        if (! auth()->user()->can('appointments.delete')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        if (!$this->appointment->isCancellable()) {
+        if (! $this->appointment->isCancellable()) {
             session()->flash('error', __('general.action_not_allowed'));
+
             return;
         }
 
@@ -120,8 +130,9 @@ class Show extends Component
 
     public function markNoShow(): void
     {
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 

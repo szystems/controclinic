@@ -1,8 +1,10 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-03-23
-> **Fase actual:** 1 - Fundación SaaS
+> **Última actualización:** 2026-04-28
+> **Fase actual:** Sprint Estabilización (✅ COMPLETADO)
+> **Próxima:** Fase 4 — Política de Acceso (Trial expirado / Read-Only)
 > **Enfoque:** SaaS-First
+> **Métricas:** 212 tests / 464 asserts · Pint clean · PHPStan level 5 (con baseline)
 
 ---
 
@@ -96,121 +98,299 @@
 - [x] Traducciones appointments.php (ES/EN)
 - [ ] Calendario visual (mejora futura)
 
+### Dockerización ✅
+- [x] Dockerfile (PHP 8.3-FPM + extensiones)
+- [x] docker-compose.yml (app, nginx, mysql, redis, node, phpmyadmin, mailpit)
+- [x] Nginx config + PHP config
+- [x] Migración a WSL Ubuntu completada
+- [x] Vite HMR configurado para Docker
+- [x] phpMyAdmin en :8089
+- [x] Mailpit en :8025 (SMTP testing)
+
+### Dark/Light Mode ✅
+- [x] Tailwind darkMode: 'class'
+- [x] Toggle en navegación (desktop + mobile)
+- [x] Persistencia en DB (campo 'theme' en users)
+- [x] Anti-flash script en layouts
+- [x] Traducciones ES/EN
+- [x] Persistencia en navegación SPA (livewire:navigated listener en app.js)
+
+### Sistema de Registro de Clínicas ✅
+- [x] Formulario: nombre clínica, nombre owner, email, password
+- [x] DB::transaction creando Clinic + User + Spatie Role
+- [x] Slug único generado automáticamente
+- [x] Plan Free por defecto con límites
+- [x] Verificación de email (MustVerifyEmail)
+- [x] Redirección a onboarding tras verificar
+- [x] Traducciones auth.php (ES/EN)
+
+### Onboarding Wizard (5 pasos) ✅
+- [x] Componente Livewire multi-step (App\Livewire\App\Onboarding\Index)
+- [x] Paso 1: Datos clínica (teléfono con código de área + banderitas, dirección, ciudad, país)
+- [x] Paso 2: Localización (timezone, moneda, idioma)
+- [x] Paso 3: Branding (colores primario/secundario con preview)
+- [x] Paso 4: Horarios con jornada partida/continua, turnos mañana/tarde, sección fin de semana separada
+- [x] Paso 5: Selección de plan (Free, Solo, Group, Enterprise) con tarjetas y features
+- [x] Middleware EnsureOnboardingCompleted
+- [x] Opción de saltar (skip)
+- [x] Traducciones onboarding.php (ES/EN)
+- [x] Selector de teléfono con 20 países LATAM/ES/US + banderas + códigos
+- [x] Auto-sync phone_country al cambiar país
+- [x] Planes pagos marcados como "Próximamente", guarda preferencia desired_plan
+
 ### Repositorio
 - [x] GitHub: szystems/controclinic
 - [x] Branch principal: main
 
----
+### Páginas Públicas (Marketing) ✅
+- [x] Layout público con nav, footer, SEO meta tags
+- [x] Landing page: hero, features (6), cómo funciona, testimonios, CTA
+- [x] Página de precios: 4 planes, toggle mensual/anual, tabla comparativa, FAQ, add-ons
+- [x] Página de contacto: formulario + info soporte
+- [x] Portal público de clínica: /public/{clinic}
+- [x] Precios alineados: Free $0, Solo $29/$23, Group $79/$63, Enterprise personalizado
+- [x] Rutas: /, /pricing, /contact
 
-## ✅ Completado (Reciente)
+### Integración Paddle (Billing) ✅
+- [x] Laravel Cashier Paddle configurado (env vars, config/cashier.php con price IDs)
+- [x] Componente Livewire: App\Livewire\App\Billing\Index
+  - Checkout con Paddle overlay (customData: clinic_id, plan, cycle)
+  - Cambio de plan (swap)
+  - Cancelar / reanudar suscripción
+  - Portal de cliente Paddle (facturas, métodos de pago)
+  - Toggle mensual/anual con -20%
+- [x] Vista billing: plan actual, stats de uso, tarjetas de planes, historial transacciones
+- [x] Middleware CheckPlanLimits: verifica suscripción activa, auto-downgrade a free
+- [x] Event Listener: PaddleEventListener (SubscriptionCreated/Updated/Canceled)
+  - Sincroniza plan_type y límites desde price_id del webhook
+- [x] Rutas: app/{clinic}/billing (fuera de CheckPlanLimits, dentro de EnsureOnboarding)
+- [x] Traducciones billing.php (ES/EN)
+- [x] Configurar productos reales en Paddle Dashboard
+- [x] Trial de 14 días en checkout
+- [x] Tests de billing
 
-### Dockerización y WSL
-- [x] Dockerfile (PHP 8.3-FPM + Composer + Node 20)
-- [x] docker-compose.yml (app, nginx, mysql, redis)
-- [x] Nginx y PHP config personalizados
-- [x] .env.docker y .dockerignore
-- [x] Script de setup automatizado (docker/setup.sh)
-- [x] Migración a WSL Ubuntu (/home/szott/proyectos/controclinic)
-- [x] Puertos: Nginx 8088, MySQL 33060, Redis 63790
-- [x] App funcionando en http://localhost:8088
+### Límites por Plan ✅
+- [x] Verificación de límite de pacientes en Patient Create
+- [x] Verificación de límite de citas/mes en Appointment Create
+- [x] Dashboard Livewire con barras de progreso de uso (pacientes, citas, doctores, staff)
+- [x] Banners de upgrade: amarillo al 80%, rojo al 100%
+- [x] Traducciones de límites ES/EN (general.php, appointments.php)
+- [x] 26 tests de límites de plan (PlanLimitsTest.php)
+
+### Paddle Sandbox Configurado ✅
+- [x] Cuenta Paddle sandbox creada (Seller ID: 53650)
+- [x] 2 productos: ControClinic Solo, ControClinic Group
+- [x] 4 precios: Solo Mensual $29, Solo Anual $276, Group Mensual $79, Group Anual $756
+- [x] Todas con trial de 14 días
+- [x] Variables de entorno configuradas (.env + .env.docker)
+- [x] Conexión API verificada (2 productos, 4 precios encontrados)
+
+### Panel Admin SaaS ✅
+- [x] Modelo `Plan` con migración (tabla plans + FK plan_id en clinics)
+- [x] PlansSeeder: 4 planes (Free, Solo, Group, Enterprise) con updateOrCreate
+- [x] Clinic model actualizado: plan() BelongsTo, getPlanLimits() usa Plan DB con fallback a constantes
+- [x] Campo is_super_admin en users + EnsureIsAdmin middleware
+- [x] Layout admin (layouts/admin.blade.php) con nav dark y badge ADMIN
+- [x] Admin Dashboard: stats, clínicas por plan, planes overview, clínicas recientes
+- [x] Admin Plans: listado con límites/precios/clinics count, edición completa con toggles unlimited
+- [x] Admin Clinics: lista con búsqueda/filtros, detalle con stats/acciones (suspender/activar/extender trial/cambiar plan)
+- [x] syncClinicLimits() al editar plan propaga cambios a todas las clínicas del plan
+- [x] Billing/Index.php migrado a Plan model (ya no usa PLANS constant)
+- [x] PaddleEventListener migrado a Plan model (resuelve plan desde Paddle price IDs en DB)
+- [x] Traducciones admin.php (ES/EN)
+- [x] 22 tests del admin panel (middleware, dashboard, plans CRUD, clinics management, Plan model)
+
+### Admin Panel - Mejoras Adicionales ✅
+- [x] Plan Manual (cortesías): is_manual_plan + manual_plan_reason en clinics
+- [x] PaddleEventListener respeta is_manual_plan (no override)
+- [x] Panel de suscripción Paddle en detalle de clínica (read-only)
+- [x] Admin Dashboard mejorado: suscripciones activas, ingresos, tasa conversión, desglose suscripciones, transacciones recientes
+- [x] Traducciones: dashboard stats, transacciones, suscripciones (ES/EN)
+- [x] 127 tests (278 assertions) - todos pasando
+
+### Upgrade Nudges (Conversión) ✅
+- [x] Componente reutilizable `x-upgrade-nudge` (3 variantes: inline, button, banner)
+- [x] Diferencia owner vs otros roles (owner ve Upgrade, otros ven "contacta al admin")
+- [x] Dashboard header: botón "Upgrade" junto al badge del plan (free/solo, solo owner)
+- [x] Dashboard Quick Actions: si al límite → botón bloqueado con nudge inline
+- [x] Dashboard Usage: pacientes/citas restantes + "Desbloquear recursos ilimitados"
+- [x] Pacientes Index: si !canAddPatient() → botón "Mejorar para continuar" reemplaza "Nuevo Paciente"
+- [x] Citas Index: si !canAddAppointmentThisMonth() → nudge reemplaza "Nueva Cita"
+- [x] Empty state de pacientes: nudge cuando al límite
+- [x] Traducciones ES/EN: upgrade, limit_reached_contact_admin, patients/appointments_remaining, unlock_unlimited
+- [x] Sin pop-ups ni modales intrusivos - diseño contextual y suave
 
 ---
 
 ## ❌ Pendiente Crítico (Infraestructura SaaS)
 
-### Fase 1.1 - Landing Page
-- [ ] Hero section
-- [ ] Features/beneficios
-- [ ] Página de precios
-- [ ] Footer con legales
+### Fase 1.1 - Landing Page ✅
+- [x] Completado (ver sección Páginas Públicas arriba)
 
-### Fase 1.2 - Sistema de Registro
-- [ ] Formulario de registro de clínica
-- [ ] Verificación de email
-- [ ] Creación automática de Clinic + User
-- [ ] Configuración por defecto según país
+### Fase 1.5 - Integración Paddle ✅ (parcial)
+- [x] Laravel Cashier Paddle configurado
+- [x] Checkout, cambio de plan, cancelar/reanudar
+- [x] Webhooks event listener
+- [x] Middleware CheckPlanLimits
+- [ ] Crear productos reales en Paddle Dashboard
+- [ ] Trial de 14 días en checkout
 
-### Fase 1.3 - Onboarding Wizard
-- [ ] Paso 1: Datos de la clínica
-- [ ] Paso 2: Personalización (logo, colores)
-- [ ] Paso 3: Horarios de atención
-- [ ] Paso 4: Perfil del doctor
-- [ ] Paso 5: Resumen y tutorial
+### Fase 2 - Panel Admin SaaS ✅
+- [x] Dashboard de métricas (clínicas totales, activas, trial, usuarios)
+- [x] Gestión de clínicas (lista, búsqueda, filtros, detalle, suspender/activar/cambiar plan)
+- [x] Gestión de planes en DB (CRUD, editar límites, sincronización a clínicas)
+- [x] Billing y PaddleEventListener migrados a Plan model (DB-driven)
 
-### Fase 1.4 - Integración Stripe
-- [ ] Configurar Laravel Cashier
-- [ ] Crear productos en Stripe
-- [ ] Checkout de suscripción
-- [ ] Trial de 14 días
-- [ ] Webhooks
+### Fase 3 - Límites por Plan ✅
+- [x] Middleware CheckPlanLimits
+- [x] Límites: usuarios, pacientes, citas
+- [x] Upgrade prompts
 
-### Fase 2 - Panel Admin SaaS
-- [ ] Dashboard de métricas (MRR, clínicas, churn)
-- [ ] Gestión de clínicas
-- [ ] Gestión de suscripciones
+### Fase 2.5 - Tiers Consistentes ✅
+- [x] Componentes x-plan-card y x-plan-comparison dinámicos desde Plan model (DB)
+- [x] Refactorizar /pricing (hardcodeado → dinámico)
+- [x] Refactorizar Onboarding paso 5 (hardcodeado → dinámico)
+- [x] Refactorizar Billing page (arrays mapeados → Plan models directos)
+- [x] Features traducidas desde keys JSON del Plan model (features.php ES/EN)
+- [x] Plan model con métodos display (translated_description, display_features, etc.)
 
-### Fase 3 - Límites por Plan
-- [ ] Middleware de verificación
-- [ ] Límites: usuarios, pacientes, citas
-- [ ] Upgrade prompts
+### Fase 3 - Gestión de Equipo
+
+#### Fase 3A — CRUD de Equipo ✅
+- [x] Rutas: `/app/{clinic}/staff` (index, create, /{user}/edit)
+- [x] `App\Livewire\App\Staff\Index` — lista con búsqueda, filtros (rol, estado), sort, paginación
+- [x] `App\Livewire\App\Staff\Create` — formulario con validación de límites de plan
+- [x] `App\Livewire\App\Staff\Edit` — edición con contraseña opcional, cambio de rol con validación
+- [x] Activar/Desactivar miembros (toggle is_active)
+- [x] Eliminar miembros (soft delete) con verificaciones (no owner, no self)
+- [x] Solo owners pueden gestionar equipo (`users.manage` permission)
+- [x] Enlace en navbar (desktop + mobile) con `@can('users.manage')` guard
+- [x] Badges de uso: "Doctores: X/Y" y "Personal: X/Y" con nudges
+- [x] Upgrade nudges cuando se alcanzan límites
+- [x] Traducciones staff.php (ES/EN, ~95 keys)
+- [x] 25 tests (53 assertions) — rendering, CRUD, límites, permisos, usage badges
+- [x] 152 tests totales (331 assertions) — sin regresiones
+
+#### Fase 3B — Invitaciones por Email ✅
+- [x] Modelo ClinicInvitation (UUID, token único, expiración 7 días)
+- [x] Migración: clinic_invitations con clinic_id, email, name, role, token, invited_by, expires_at, accepted_at, cancelled_at
+- [x] Mailable ClinicInvitationMail con template markdown
+- [x] Flujo: owner invita → email enviado → usuario acepta con contraseña → cuenta creada
+- [x] Staff\Create modificado: envía invitación en vez de crear usuario directo
+- [x] Staff\Index: sección de invitaciones pendientes con reenviar/cancelar
+- [x] Ruta pública /invitation/{token} para aceptar (sin auth)
+- [x] Componente Livewire Accept con layout guest
+- [x] Validaciones: email duplicado, invitación duplicada, límites de plan, expiración, token inválido
+- [x] Traducciones invitations.php (ES/EN, ~35 keys)
+- [x] Relaciones en Clinic: invitations(), pendingInvitations()
+- [x] 23 tests de invitaciones (61 assertions)
+- [x] 175 tests totales (391 assertions) — sin regresiones
+
+### Portal Público de Clínica ✅ (2026-04-28)
+- [x] Ruta `/c/{slug}` y alias `/public/{slug}` con route binding por slug o public_portal_slug
+- [x] `App\Livewire\Public\Booking` — wizard de 3 pasos (doctor → fecha/hora → datos paciente)
+- [x] Layout `components/layouts/public-clinic.blade.php` con branding dinámico (CSS vars)
+- [x] Aborta 404 si `public_portal_enabled = false`
+- [x] Slots calculados con `working_hours`, `appointment_duration`, días laborales
+- [x] Detección de conflictos de horario por doctor (whereDate + start_time)
+- [x] Honeypot anti-spam + RateLimiter (5/min por IP+clinic)
+- [x] Reutiliza paciente por email o teléfono dentro de la clínica
+- [x] Estado inicial según `require_booking_confirmation` (scheduled / confirmed)
+- [x] Pantalla de confirmación con número de referencia (8 chars del UUID)
+- [x] Selector ES/EN en header del portal
+- [x] Traducciones booking.php (ES/EN, ~50 keys)
+- [x] 14 tests de booking público
+
+### Sistema de Notificaciones por Email ✅ (2026-04-28)
+- [x] 5 Mailables: AppointmentBookedToPatient, AppointmentBookedToClinic, AppointmentConfirmed, AppointmentCancelled, AppointmentReminder
+- [x] 5 templates Markdown en `resources/views/mail/appointments/`
+- [x] Job `SendAppointmentNotification` (ShouldQueue, 3 reintentos, switch por tipo)
+- [x] Locale por clínica (`Mail::to()->locale($clinic->locale)`)
+- [x] Disparadores automáticos:
+  - Booking público → al paciente (si tiene email) + a la clínica
+  - `Appointment::confirm()` → al paciente
+  - `Appointment::cancel()` → al paciente
+- [x] Comando `appointments:send-reminders --hours=24 --dry-run` con scheduler horario
+- [x] Marca `reminder_sent=true` para evitar duplicados
+- [x] Traducciones appointments_mail.php (ES/EN)
+- [x] 10 tests del módulo
+- [x] Worker `queue:work` configurado para entorno Docker
+- [x] Verificado en Mailpit con locale ES correcto
+
+### Actualización de Dependencias ✅ (2026-04-28)
+- [x] Composer minor/patch: Breeze 2.4.1, Cashier-Paddle 2.8.1, Pail 1.2.6, Pint 1.29.1, Sail 1.58, Volt 1.10.5, Localization 2.4, Collision 8.9.4, Activitylog 4.12.3
+- [x] Parches de seguridad: commonmark 2.8.2 (CVE-2026-33347), psysh 0.12.22 (CVE-2026-25129)
+- [x] npm: @tailwindcss/vite 4.2.4, autoprefixer 10.5.0, axios 1.15.2, postcss 8.5.12, vite 7.3.2
+- [x] picomatch (ReDoS) y rollup (path traversal) parcheados vía npm audit fix
+
+### Sprint Estabilización ✅ (2026-04-28)
+**Bloque A — Documentación:** PROJECT/MODELS/ROADMAP/STATUS/CONVENTIONS al día · ADR-008/009/010 añadidos · Sprint insertado en TASKS.
+
+**Bloque B — Seguridad:**
+- [x] Rate limiting: login (10/min), register/forgot-password/reset-password (5/min), invitation accept (10/min)
+- [x] `BelongsToClinic` aplicado a Patient, Appointment, MedicalRecord (con guard `app()->bound('current_clinic')` para rutas públicas)
+- [x] **Cross-tenant data leak FIX**: `abort_if($model->clinic_id !== current->id, 404)` en Patients/Show, Patients/Edit, Staff/Edit (defense-in-depth porque SubstituteBindings corre antes que TenantMiddleware)
+- [x] `MultiTenantIsolationTest` con 10 tests cubriendo cross-tenant access, list filtering, super-admin, factories
+- [x] Defense-in-depth documentado en CONVENTIONS.md
+
+**Bloque C — Bugs y polish:**
+- [x] **Timezone fix** en `SendAppointmentReminders`: comparación en `clinic.timezone` (Carbon parse con tz, no setTimezone) + test específico con Asia/Tokyo
+- [x] Demo seeder: `trial_ends_at = now()->addDays(30)` + 8 pacientes + 16 citas (8 completadas + 8 confirmadas)
+- [x] Páginas de error custom: 403/404/419/500/503 con layout compartido y traducciones ES/EN (`lang/*/errors.php`)
+- [x] Páginas legales: `/terms` y `/privacy` con vistas Blade y traducciones ES/EN (`lang/*/legal.php`)
+- [x] `Mail::to()->locale($clinic->locale)` en `Staff\Create` y `Staff\Index::resendInvitation`
+
+**Bloque D — DX/CI:**
+- [x] Composer scripts: `lint`, `format`, `test`, `stan`, `check` (orquesta todo)
+- [x] GitHub Actions: `.github/workflows/ci.yml` con 3 jobs (tests + Pint + PHPStan) en PHP 8.3
+- [x] Larastan v3.9 + `phpstan.neon` level 5 + `phpstan-baseline.neon` (116 errores legacy congelados, 0 nuevos permitidos)
+- [x] README.md: sección "Quick Start (Docker)" + tabla servicios + comandos diarios
+
+**Métricas finales:** 212 tests (3 nuevos: timezone, terms, privacy) · 464 asserts · Pint 100% clean · PHPStan level 5 sin errores nuevos.
+
+#### Fase 3C — Permisos por Usuario (Baja - Final del proyecto)
+- [ ] UI para que el owner personalice permisos individuales por usuario
+- [ ] Toggles por permiso agrupados por módulo
+- [ ] Se expande conforme se creen nuevos módulos
+- [ ] No implementar hasta tener todos los módulos definidos
+
+#### Fase 3D — Extras Multi-usuario (Baja)
+- [ ] Perfil propio del staff, reset de contraseña, transferir ownership
+- [ ] Historial de actividad por usuario
 
 ---
 
 ## 📊 Métricas del Proyecto
 
 ```
-Modelos creados: 5 (Clinic, User, Patient, Appointment, MedicalRecord)
-Migraciones: 17
-Componentes Livewire: 10 (Patients x4, Settings x1, Appointments x4, Logout)
-Vistas Blade: ~45 (app, livewire, components, auth, public)
-Archivos de traducción: 8 (es/en x patients, settings, general, appointments)
-Rutas definidas: 33
+Modelos creados: 7 (Clinic, User, Patient, Appointment, MedicalRecord, Plan, ClinicInvitation)
+Migraciones: 24+
+Componentes Livewire: 23 (incluye Public\Booking)
+Mailables: 6 (ClinicInvitation + 5 de citas)
+Jobs: 1 (SendAppointmentNotification)
+Comandos Artisan: 1 (appointments:send-reminders)
+Vistas Blade: ~70
+Archivos de traducción: 24 (ES/EN x 12 módulos)
+Rutas definidas: 46+
+Tests: 199 (445 assertions) — todos pasando
 Repositorio: github.com/szystems/controclinic
 ```
-- [ ] Tests de multi-tenancy
+- [x] Tests de multi-tenancy (TenantMiddlewareTest)
 
 ---
 
-## 🚀 Próximas Fases
+## 🚀 Roadmap
 
-### Fase 2 (Mes 3-4)
-- Portal del paciente
-- Notificaciones (Email/SMS)
-- Módulo Farmacia (add-on)
-- IA básica (resúmenes)
-- Mobile app básica
-
-### Fase 3 (Mes 5-6)
-- WhatsApp Business
-- Telemedicina
-- Analytics avanzados
-- IA predictiva
-
-### Fase 4-5 (Mes 7-12)
-- IA diagnóstico
-- API pública
-- Marketplace
-- Enterprise features
+Ver [ROADMAP.md](ROADMAP.md) para visión por trimestres.
+Ver [TASKS.md](TASKS.md) para tareas concretas priorizadas.
 
 ---
 
 ## 🐛 Issues Conocidos
 
-1. **Dashboard/Landing usan closures** - Migrar a controllers o Livewire
-2. **Sin tests** - Necesita tests unitarios y de integración
-3. **Assets** - Necesitan compilarse con `npm run build` después de cambios
-3. **Assets** - Necesitan compilarse con `npm run build` después de cambios
-
----
-
-## 📈 Métricas
-
-```yaml
-Líneas de código: ~4,000
-Modelos: 5
-Migraciones: 17
-Vistas: ~45
-Componentes Livewire: 10
-Tests: 0 (pendiente)
-Cobertura: 0%
-```
+1. **Webhook Paddle** — Sin webhook secret en local (necesita URL pública para verificar firmas).
+2. **Assets** — Recompilar con `npm run build` tras cambios; eliminar `public/hot` si Vite dev no está corriendo.
+3. **Calendario visual** — La ruta `calendar` apunta a `AppointmentsIndex` (placeholder hasta Fase 6).
+4. **Política de acceso** — Cuando `trial_ends_at` expira el `TenantMiddleware` aborta con 403. Pendiente modo READ-ONLY (Fase 4, ver `DECISIONS.md` ADR-008).
+5. **Scheduler en producción** — Necesita `php artisan schedule:run` cada minuto (cron) para enviar recordatorios.
+6. **Recordatorios y zonas horarias** — `SendAppointmentReminders` compara en hora del servidor; debería operar en `clinic.timezone`.

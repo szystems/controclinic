@@ -87,4 +87,29 @@ return [
 
     'sandbox' => env('PADDLE_SANDBOX', false),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Paddle Price IDs
+    |--------------------------------------------------------------------------
+    |
+    | These are the Paddle price IDs for each subscription plan.
+    | Create these in your Paddle dashboard and set them in .env.
+    |
+    */
+
+    'prices' => [
+        'solo' => [
+            'monthly' => env('PADDLE_PRICE_SOLO_MONTHLY'),
+            'yearly' => env('PADDLE_PRICE_SOLO_YEARLY'),
+        ],
+        'group' => [
+            'monthly' => env('PADDLE_PRICE_GROUP_MONTHLY'),
+            'yearly' => env('PADDLE_PRICE_GROUP_YEARLY'),
+        ],
+        'enterprise' => [
+            'monthly' => env('PADDLE_PRICE_ENTERPRISE_MONTHLY'),
+            'yearly' => env('PADDLE_PRICE_ENTERPRISE_YEARLY'),
+        ],
+    ],
+
 ];

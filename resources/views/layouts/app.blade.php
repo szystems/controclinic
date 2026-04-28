@@ -7,6 +7,18 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <!-- Theme: apply before render to avoid flash -->
+        <script>
+            (function() {
+                var theme = localStorage.getItem('theme') || '{{ auth()->user()?->theme ?? 'light' }}';
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            })();
+        </script>
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -47,6 +59,7 @@
                 --color-secondary: {{ $hexToRgb($secondaryColor) }};
             }
         </style>
+        @paddleJS
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">

@@ -12,9 +12,13 @@ class Index extends Component
     use WithPagination;
 
     public Clinic $currentClinic;
+
     public string $search = '';
+
     public string $status = '';
+
     public string $sortField = 'created_at';
+
     public string $sortDirection = 'desc';
 
     protected $queryString = [
@@ -59,11 +63,11 @@ class Index extends Component
             ->where('clinic_id', $this->currentClinic->id)
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%')
-                        ->orWhere('phone', 'like', '%' . $this->search . '%')
-                        ->orWhere('medical_record_number', 'like', '%' . $this->search . '%');
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%')
+                        ->orWhere('phone', 'like', '%'.$this->search.'%')
+                        ->orWhere('medical_record_number', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->status !== '', function ($query) {
@@ -77,8 +81,9 @@ class Index extends Component
     {
         $patient = Patient::findOrFail($id);
 
-        if (!auth()->user()->can('patients.delete')) {
+        if (! auth()->user()->can('patients.delete')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
@@ -92,12 +97,13 @@ class Index extends Component
     {
         $patient = Patient::findOrFail($id);
 
-        if (!auth()->user()->can('patients.edit')) {
+        if (! auth()->user()->can('patients.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        $patient->update(['is_active' => !$patient->is_active]);
+        $patient->update(['is_active' => ! $patient->is_active]);
 
         session()->flash('success', __('patients.status_updated'));
     }

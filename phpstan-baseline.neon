@@ -1,0 +1,565 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$timezone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendAppointmentReminders.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>timezone" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Console/Commands/SendAppointmentReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Jobs/SendAppointmentNotification.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$locale\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/SendAppointmentNotification.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Paddle\\Events\\SubscriptionCanceled\:\:\$billable\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/PaddleEventListener.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Paddle\\Events\\SubscriptionUpdated\:\:\$billable\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/PaddleEventListener.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Clinics\\Show\:\:\$appointmentsThisMonth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Clinics/Show.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Clinics\\Show\:\:\$patientsCount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Clinics/Show.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Clinics\\Show\:\:\$subscriptionInfo\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Clinics/Show.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$price_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Clinics/Show.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$activeClinics\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$activePlans\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$activeSubscriptions\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$canceledSubscriptions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$clinicsByPlan\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$conversionRate\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$manualPlanClinics\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$newClinicsThisMonth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$pastDueSubscriptions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$pausedSubscriptions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$recentClinics\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$recentTransactions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$revenueLastMonth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$revenueThisMonth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$subscriptionBreakdown\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$suspendedClinics\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$totalClinics\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$totalUsers\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$trialClinics\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Dashboard\:\:\$trialingSubscriptions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>currency" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Livewire/Admin/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Admin\\Plans\\Edit\:\:\$affectedClinics\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Admin/Plans/Edit.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Create\:\:\$doctors\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/App/Appointments/Create.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Create\:\:\$patients\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Create.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Create\:\:\$types\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Create.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Edit\:\:\$doctors\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Edit.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Edit\:\:\$patients\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Edit.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Edit\:\:\$types\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Edit.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$full_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Edit.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Index\:\:\$appointments\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Appointments\\Index\:\:\$doctors\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Appointments/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Billing\\Index\:\:\$isSubscribed\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/App/Billing/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Billing\\Index\:\:\$plans\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Billing/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Billing\\Index\:\:\$subscription\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Billing/Index.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$paddle_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Billing/Index.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Clinic\:\:customerPortalUrl\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Livewire/App/Billing/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$appointmentsThisMonth\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$completedToday\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$doctorsCount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$patientsCount\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$pendingToday\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$staffCount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$todayAppointments\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$todaySchedule\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Dashboard\:\:\$usageStats\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Dashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Patients\\Create\:\:\$doctors\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Patients/Create.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Patients\\Edit\:\:\$doctors\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Patients/Edit.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Patients/Edit.php
+
+		-
+			message: '#^Property App\\Livewire\\App\\Patients\\Edit\:\:\$primary_doctor_id \(string\|null\) does not accept int\<0, max\>\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Livewire/App/Patients/Edit.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Patients\\Index\:\:\$patients\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Patients/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Patients\\Show\:\:\$recentRecords\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Patients/Show.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Patients\\Show\:\:\$upcomingAppointments\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Patients/Show.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Patients/Show.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Staff/Edit.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:canAddDoctor\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Livewire/App/Staff/Edit.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:canAddStaff\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Livewire/App/Staff/Edit.php
+
+		-
+			message: '#^Call to function is_array\(\) with string\|null will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: app/Livewire/App/Staff/Edit.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Staff\\Index\:\:\$members\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Staff/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\App\\Staff\\Index\:\:\$pendingInvitations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/App/Staff/Index.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Public\\Booking\:\:\$availableSlots\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Public/Booking.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Public\\Booking\:\:\$doctors\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Public/Booking.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Public\\Booking\:\:\$onlineBookingEnabled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Public/Booking.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Public\\Booking\:\:\$requiresConfirmation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Public/Booking.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Public\\Booking\:\:\$workingHours\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Livewire/Public/Booking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$full_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/AppointmentBookedToClinic.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/AppointmentBookedToClinic.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/AppointmentBookedToPatient.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/AppointmentCancelled.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/AppointmentConfirmed.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/AppointmentReminder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Mail/ClinicInvitationMail.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:updateLastVisit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Appointment.php
+
+		-
+			message: '#^Match arm comparison between ''no_show'' and ''no_show'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 2
+			path: app/Models/Appointment.php
+
+		-
+			message: '#^Match arm comparison between ''telemedicine'' and ''telemedicine'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Models/Appointment.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getLimitsArray\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Clinic.php
+
+		-
+			message: '#^Offset ''enterprise''\|''free''\|''group''\|''solo'' on array\{free\: array\{max_patients\: 25, max_appointments_per_month\: 5, max_doctors\: 1, max_staff\: 0, max_storage_bytes\: 524288000, features\: array\{''basic_forms'', ''basic_portal''\}\}, solo\: array\{max_patients\: null, max_appointments_per_month\: null, max_doctors\: 1, max_staff\: 1, max_storage_bytes\: null, features\: array\{''ai'', ''mobile_basic'', ''2fa'', ''compliance'', ''custom_portal'', ''booking''\}\}, group\: array\{max_patients\: null, max_appointments_per_month\: null, max_doctors\: 5, max_staff\: 3, max_storage_bytes\: null, features\: array\{''ai'', ''ai_collaborative'', ''mobile_advanced'', ''2fa'', ''compliance'', ''audit_logs'', ''multi_doctor_portal'', ''booking_advanced''\}\}, enterprise\: array\{max_patients\: null, max_appointments_per_month\: null, max_doctors\: null, max_staff\: null, max_storage_bytes\: null, features\: array\{''ai'', ''ai_custom'', ''mobile_enterprise'', ''2fa'', ''compliance'', ''audit_logs'', ''api'', ''white_label'', \.\.\.\}\}\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Clinic.php
+
+		-
+			message: '#^Match arm comparison between ''deleted'' and ''deleted'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Models/MedicalRecord.php
+
+		-
+			message: '#^Match arm comparison between ''other'' and ''other'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Models/MedicalRecord.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Patient.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:patients\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Patient.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:today\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:upcoming\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Match arm comparison between ''admin'' and ''admin'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/DemoClinicSeeder.php

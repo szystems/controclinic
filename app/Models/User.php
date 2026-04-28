@@ -4,25 +4,30 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasRoles, SoftDeletes, LogsActivity;
+    use HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
 
     // Role constants
     public const ROLE_OWNER = 'owner';
+
     public const ROLE_DOCTOR = 'doctor';
+
     public const ROLE_ASSISTANT = 'assistant';
+
     public const ROLE_SECRETARY = 'secretary';
+
     public const ROLE_RECEPTIONIST = 'receptionist';
+
     public const ROLE_ADMIN = 'admin';
 
     /**
@@ -38,11 +43,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
         'locale',
         'timezone',
+        'theme',
         'specialties',
         'bio',
         'license_number',
         'working_hours',
         'is_active',
+        'is_super_admin',
         'two_factor_enabled',
         'last_login_at',
         'last_login_ip',
@@ -67,6 +74,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'specialties' => 'array',
             'working_hours' => 'array',
             'is_active' => 'boolean',
+            'is_super_admin' => 'boolean',
             'two_factor_enabled' => 'boolean',
             'last_login_at' => 'datetime',
         ];
@@ -113,12 +121,13 @@ class User extends Authenticatable implements MustVerifyEmail
         foreach (array_slice($words, 0, 2) as $word) {
             $initials .= strtoupper(substr($word, 0, 1));
         }
+
         return $initials;
     }
 
     public function getRoleLabelAttribute(): string
     {
-        return match($this->role) {
+        return match ($this->role) {
             self::ROLE_OWNER => __('Propietario'),
             self::ROLE_DOCTOR => __('Doctor'),
             self::ROLE_ASSISTANT => __('Asistente'),
@@ -132,9 +141,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return asset('storage/'.$this->avatar);
         }
-        return "https://ui-avatars.com/api/?name=" . urlencode($this->name) . "&background=0D8ABC&color=fff";
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=0D8ABC&color=fff';
     }
 
     // ==================== ROLE CHECKS ====================
@@ -235,7 +245,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     // ==================== METHODS ====================
 
-    public function updateLastLogin(string $ip = null): void
+    public function updateLastLogin(?string $ip = null): void
     {
         $this->update([
             'last_login_at' => now(),

@@ -58,7 +58,7 @@ return new class extends Migration
                 'clinic_id', 'role', 'phone', 'avatar', 'locale', 'timezone',
                 'specialties', 'bio', 'license_number', 'working_hours',
                 'is_active', 'two_factor_enabled', 'last_login_at', 'last_login_ip',
-                'deleted_at'
+                'deleted_at',
             ]);
         });
     }

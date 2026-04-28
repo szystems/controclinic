@@ -6,8 +6,8 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
-use Livewire\Component;
 use Carbon\Carbon;
+use Livewire\Component;
 
 class Create extends Component
 {
@@ -15,18 +15,28 @@ class Create extends Component
 
     // Form fields
     public string $patient_id = '';
+
     public string $doctor_id = '';
+
     public string $appointment_type = 'scheduled';
+
     public string $appointment_date = '';
+
     public string $start_time = '';
+
     public int $duration_minutes = 30;
+
     public string $reason = '';
+
     public string $symptoms = '';
+
     public string $notes = '';
+
     public string $room = '';
 
     // UI state
     public string $patientSearch = '';
+
     public bool $showPatientDropdown = false;
 
     protected function rules(): array
@@ -96,10 +106,10 @@ class Create extends Component
         return Patient::where('clinic_id', $this->currentClinic->id)
             ->where('is_active', true)
             ->where(function ($query) {
-                $query->where('first_name', 'like', '%' . $this->patientSearch . '%')
-                    ->orWhere('last_name', 'like', '%' . $this->patientSearch . '%')
-                    ->orWhere('phone', 'like', '%' . $this->patientSearch . '%')
-                    ->orWhere('email', 'like', '%' . $this->patientSearch . '%');
+                $query->where('first_name', 'like', '%'.$this->patientSearch.'%')
+                    ->orWhere('last_name', 'like', '%'.$this->patientSearch.'%')
+                    ->orWhere('phone', 'like', '%'.$this->patientSearch.'%')
+                    ->orWhere('email', 'like', '%'.$this->patientSearch.'%');
             })
             ->limit(10)
             ->get();
@@ -136,7 +146,7 @@ class Create extends Component
 
     public function checkConflicts(): bool
     {
-        if (!$this->doctor_id || !$this->appointment_date || !$this->start_time) {
+        if (! $this->doctor_id || ! $this->appointment_date || ! $this->start_time) {
             return false;
         }
 
@@ -160,8 +170,15 @@ class Create extends Component
 
     public function save()
     {
-        if (!auth()->user()->can('appointments.create')) {
+        if (! auth()->user()->can('appointments.create')) {
             session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        if (! $this->currentClinic->canAddAppointmentThisMonth()) {
+            session()->flash('error', __('appointments.limit_reached'));
+
             return;
         }
 
@@ -170,6 +187,7 @@ class Create extends Component
         // Check for conflicts
         if ($this->checkConflicts()) {
             session()->flash('error', __('appointments.conflict_detected'));
+
             return;
         }
 

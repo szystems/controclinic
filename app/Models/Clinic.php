@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Paddle\Billable;
 
 class Clinic extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, Billable;
+    use Billable, HasFactory, HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -28,9 +29,14 @@ class Clinic extends Model
         'timezone',
         'currency',
         'locale',
+        'owner_id',
+        'plan_id',
         'plan_type',
+        'is_manual_plan',
+        'manual_plan_reason',
         'status',
         'trial_ends_at',
+        'onboarding_completed_at',
         'settings',
         'branding',
         'public_portal_enabled',
@@ -47,7 +53,9 @@ class Clinic extends Model
         'settings' => 'array',
         'branding' => 'array',
         'public_portal_enabled' => 'boolean',
+        'is_manual_plan' => 'boolean',
         'trial_ends_at' => 'datetime',
+        'onboarding_completed_at' => 'datetime',
         'max_patients' => 'integer',
         'max_appointments_per_month' => 'integer',
         'max_doctors' => 'integer',
@@ -96,6 +104,11 @@ class Clinic extends Model
 
     // ==================== RELATIONSHIPS ====================
 
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
@@ -131,16 +144,35 @@ class Clinic extends Model
         return $this->hasMany(MedicalRecord::class);
     }
 
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(ClinicInvitation::class);
+    }
+
+    public function pendingInvitations(): HasMany
+    {
+        return $this->hasMany(ClinicInvitation::class)
+            ->whereNull('accepted_at')
+            ->whereNull('cancelled_at')
+            ->where('expires_at', '>', now());
+    }
+
     // ==================== PLAN & LIMITS ====================
 
     public function getPlanLimits(): array
     {
+        // Prefer Plan model from DB, fallback to constants
+        if ($this->plan_id && $this->relationLoaded('plan') ? $this->plan : $this->plan()->exists()) {
+            return $this->plan->getLimitsArray();
+        }
+
         return self::PLAN_LIMITS[$this->plan_type] ?? self::PLAN_LIMITS['free'];
     }
 
     public function hasFeature(string $feature): bool
     {
         $limits = $this->getPlanLimits();
+
         return in_array($feature, $limits['features'] ?? []);
     }
 
@@ -150,6 +182,7 @@ class Clinic extends Model
         if ($limits['max_patients'] === null) {
             return true;
         }
+
         return $this->patients()->count() < $limits['max_patients'];
     }
 
@@ -163,6 +196,7 @@ class Clinic extends Model
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
+
         return $count < $limits['max_appointments_per_month'];
     }
 
@@ -172,6 +206,7 @@ class Clinic extends Model
         if ($limits['max_doctors'] === null) {
             return true;
         }
+
         return $this->doctors()->count() < $limits['max_doctors'];
     }
 
@@ -181,6 +216,7 @@ class Clinic extends Model
         if ($limits['max_staff'] === null) {
             return true;
         }
+
         return $this->staff()->count() < $limits['max_staff'];
     }
 
@@ -193,6 +229,11 @@ class Clinic extends Model
     {
         return in_array($this->status, ['active', 'trial']) &&
                ($this->status !== 'trial' || $this->isOnTrial());
+    }
+
+    public function hasCompletedOnboarding(): bool
+    {
+        return $this->onboarding_completed_at !== null;
     }
 
     // ==================== SCOPES ====================

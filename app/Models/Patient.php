@@ -2,20 +2,22 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToClinic;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Patient extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, LogsActivity;
+    use BelongsToClinic, HasFactory, HasUuids, LogsActivity, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -104,7 +106,7 @@ class Patient extends Model
     public function getInitialsAttribute(): string
     {
         return strtoupper(
-            substr($this->first_name, 0, 1) . substr($this->last_name, 0, 1)
+            substr($this->first_name, 0, 1).substr($this->last_name, 0, 1)
         );
     }
 
@@ -129,10 +131,10 @@ class Patient extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('first_name', 'like', "%{$search}%")
-              ->orWhere('last_name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('phone', 'like', "%{$search}%")
-              ->orWhere('medical_record_number', 'like', "%{$search}%");
+                ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%")
+                ->orWhere('medical_record_number', 'like', "%{$search}%");
         });
     }
 
@@ -154,12 +156,12 @@ class Patient extends Model
 
     public function hasAllergies(): bool
     {
-        return !empty($this->allergies);
+        return ! empty($this->allergies);
     }
 
     public function hasChronicConditions(): bool
     {
-        return !empty($this->chronic_conditions);
+        return ! empty($this->chronic_conditions);
     }
 
     public function getUpcomingAppointments(int $limit = 5)

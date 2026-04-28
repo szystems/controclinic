@@ -29,7 +29,7 @@ return new class extends Migration
                 'walk_in',      // Orden de llegada (ficha)
                 'emergency',    // Emergencia
                 'follow_up',    // Seguimiento
-                'telemedicine'  // Telemedicina (futuro)
+                'telemedicine',  // Telemedicina (futuro)
             ])->default('scheduled');
 
             // Fecha y hora
@@ -50,7 +50,7 @@ return new class extends Migration
                 'in_progress',  // En consulta
                 'completed',    // Completada
                 'cancelled',    // Cancelada
-                'no_show'       // No se presentó
+                'no_show',       // No se presentó
             ])->default('scheduled');
 
             // Motivo de la cita

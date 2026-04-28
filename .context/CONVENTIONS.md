@@ -85,16 +85,29 @@ Ejemplo: patient-card.blade.php
 ### Traducciones
 
 ```yaml
-Archivos: lang/{locale}/{domain}.php
-Dominios:
-  - general.php    # Términos comunes
-  - patients.php   # Módulo pacientes
-  - appointments.php # Módulo citas
-  - auth.php       # Autenticación
-  - validation.php # Validaciones
+Archivos: lang/{locale}/{domain}.php  (locale: es | en)
+Dominios actuales:
+  - admin.php          # Panel super-admin SaaS
+  - appointments.php   # Citas
+  - appointments_mail.php # Emails de citas
+  - auth.php           # Autenticación + Breeze
+  - billing.php        # Suscripción Paddle
+  - booking.php        # Portal público
+  - features.php       # Features de planes
+  - general.php        # Términos comunes (botones, navegación)
+  - invitations.php    # Invitaciones de staff
+  - onboarding.php     # Wizard de onboarding
+  - patients.php       # Pacientes
+  - settings.php       # Configuración de clínica
+  - staff.php          # Equipo
 
 Uso: __('domain.key') o @lang('domain.key')
 Ejemplo: __('patients.new_patient')
+
+Reglas:
+  - Nunca hardcodear strings visibles al usuario.
+  - Mantener paridad ES ↔ EN: si agregas key en es/, hacerlo en en/.
+  - Validation messages: usar archivos validation.php por defecto de Laravel.
 ```
 
 ---
@@ -317,4 +330,93 @@ Ejemplos:
   feature/patient-crud
   fix/calendar-timezone
   hotfix/login-error
+```
+
+---
+
+## Multi-tenancy y Activity Log
+
+### Modelos tenant-scoped
+
+Todo modelo que tenga `clinic_id` DEBE:
+
+1. Usar el trait `App\Traits\BelongsToClinic` (aplica Global Scope automático).
+2. Incluir `clinic_id` en `$fillable`.
+3. Definir relación `clinic(): BelongsTo`.
+4. Tener factory que setee `clinic_id` (no `null`).
+
+```php
+use App\Traits\BelongsToClinic;
+
+class Patient extends Model
+{
+    use BelongsToClinic; // ← Filtra por app('current_clinic') automáticamente
+
+    protected $fillable = ['clinic_id', /* ... */];
+
+    public function clinic(): BelongsTo
+    {
+        return $this->belongsTo(Clinic::class);
+    }
+}
+```
+
+> ⚠️ Para escapar el scope en jobs/comandos usa `Model::withoutGlobalScope('clinic')`.
+
+### ⚠️ Defensa en profundidad: Route Model Binding
+
+El Global Scope **NO basta** como única defensa cuando se usa Route Model Binding,
+porque `SubstituteBindings` se ejecuta ANTES que `TenantMiddleware` (no hay
+`current_clinic` bound aún → el scope no filtra). Por lo tanto, en cada
+componente Livewire que reciba un modelo tenant-scoped via mount, validar:
+
+```php
+public function mount(Patient $patient): void
+{
+    abort_if($patient->clinic_id !== app('current_clinic')->id, 404);
+    // ... resto de la lógica
+}
+```
+
+Esto cubre el escenario de un usuario malicioso accediendo
+`/app/{miClinica}/patients/{uuid_de_otra_clinica}`.
+
+### Activity Log (Spatie)
+
+Modelos sensibles (Patient, Appointment, MedicalRecord, User, Clinic) implementan `LogsActivity`:
+
+```php
+public function getActivitylogOptions(): LogOptions
+{
+    return LogOptions::defaults()
+        ->logOnly(['name', 'email', 'role'])  // Campos a registrar
+        ->logOnlyDirty()                       // Solo cambios reales
+        ->dontSubmitEmptyLogs();
+}
+```
+
+Reglas:
+- Nunca loguear `password`, tokens o datos sensibles directos.
+- Para acciones custom (login, billing, invitaciones) usar `activity()->log(...)` explícito.
+
+---
+
+## Tests
+
+```yaml
+Stack: PHPUnit 11 + RefreshDatabase + Mail::fake() + Queue::fake()
+Estructura:
+  - tests/Feature/    # Tests de integración (HTTP + Livewire)
+  - tests/Unit/       # Tests unitarios puros
+
+Convenciones:
+  - Un Test class por feature (PatientsCrudTest, BillingTest, etc.).
+  - Usar factory states (Patient::factory()->forClinic($clinic)).
+  - Para multi-tenant: crear 2 clínicas y verificar aislamiento.
+  - Helpers en tests/TestCase.php (actingAsOwner, actingAsDoctor).
+
+Comandos:
+  php artisan test                          # Todos
+  php artisan test --filter=PatientsTest    # Uno
+  php artisan test --parallel               # Paralelos
 ```

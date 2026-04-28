@@ -95,4 +95,47 @@ return [
 
     // Idioma
     'language' => 'Idioma',
+
+    // Tema
+    'theme' => 'Tema',
+    'light' => 'Claro',
+    'dark' => 'Oscuro',
+    'light_mode' => 'Modo claro',
+    'dark_mode' => 'Modo oscuro',
+
+    // Dashboard
+    'schedule_appointment' => 'Agendar una nueva cita',
+    'register_patient' => 'Registrar un nuevo paciente',
+    'view_full_calendar' => 'Ver calendario completo',
+    'plan_usage' => 'Uso del Plan',
+    'appointments_this_month' => 'Citas este mes',
+    'doctors' => 'Doctores',
+    'staff' => 'Personal',
+    'upgrade_to_add_staff' => 'Mejora tu plan para agregar personal',
+    'upgrade_plan' => 'Mejorar Plan',
+    'clinic_info' => 'Información de la Clínica',
+    'current_plan' => 'Plan actual',
+    'timezone_label' => 'Zona horaria',
+    'currency_label' => 'Moneda',
+    'public_portal' => 'Portal público',
+    'configure_clinic' => 'Configurar clínica',
+
+    // Límites de plan
+    'limit_reached_title' => 'Has alcanzado el límite de tu plan',
+    'limit_reached_description' => 'Para seguir creciendo, mejora tu plan y desbloquea más recursos.',
+    'upgrade_now' => 'Mejorar Ahora',
+    'near_limit_title' => 'Estás cerca del límite de tu plan',
+    'near_limit_description' => 'Considera mejorar tu plan para evitar interrupciones.',
+    'view_plans' => 'Ver Planes',
+    'upgrade' => 'Upgrade',
+    'upgrade_to_continue' => 'Mejorar para continuar',
+    'limit_reached_contact_admin' => 'Límite alcanzado – contacta al administrador',
+    'patients_limit_reached' => 'Límite de pacientes alcanzado',
+    'appointments_limit_reached' => 'Límite de citas del mes alcanzado',
+    'patients_remaining' => ':count pacientes restantes',
+    'appointments_remaining' => ':count citas restantes',
+    'unlock_unlimited' => 'Desbloquear recursos ilimitados',
+
+    // Email
+    'thanks' => 'Gracias',
 ];

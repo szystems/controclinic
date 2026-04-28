@@ -119,4 +119,8 @@ return [
     'select_doctor' => 'Seleccionar Doctor',
     'select_type' => 'Seleccionar Tipo',
     'search_patient' => 'Buscar paciente...',
+
+    // Límites
+    'limit_reached' => 'Has alcanzado el límite de citas mensuales de tu plan',
+    'consultation' => 'Consulta',
 ];

@@ -26,19 +26,19 @@ class SetLocale
      */
     protected function determineLocale(Request $request): string
     {
-        // 1. Si el usuario está autenticado, usar su preferencia
+        // 1. Si hay un locale en la sesión (cambiado explícitamente por el usuario)
+        if ($request->session()->has('locale')) {
+            return $request->session()->get('locale');
+        }
+
+        // 2. Si el usuario está autenticado, usar su preferencia guardada
         if (auth()->check() && auth()->user()->locale) {
             return auth()->user()->locale;
         }
 
-        // 2. Si hay una clínica en contexto, usar su locale
+        // 3. Si hay una clínica en contexto, usar su locale
         if (app()->bound('current_clinic') && app('current_clinic')) {
             return app('current_clinic')->locale;
-        }
-
-        // 3. Si hay un locale en la sesión
-        if ($request->session()->has('locale')) {
-            return $request->session()->get('locale');
         }
 
         // 4. Detectar desde el header Accept-Language
@@ -58,7 +58,7 @@ class SetLocale
     {
         $acceptLanguage = $request->header('Accept-Language');
 
-        if (!$acceptLanguage) {
+        if (! $acceptLanguage) {
             return null;
         }
 

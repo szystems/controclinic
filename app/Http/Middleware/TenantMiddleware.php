@@ -25,19 +25,19 @@ class TenantMiddleware
             // Es un slug string, buscar la clínica
             $clinicSlug = $clinicParam ?? $this->getSubdomain($request);
 
-            if (!$clinicSlug) {
+            if (! $clinicSlug) {
                 abort(404, 'Clínica no especificada');
             }
 
             $clinic = Clinic::where('slug', $clinicSlug)->first();
 
-            if (!$clinic) {
+            if (! $clinic) {
                 abort(404, 'Clínica no encontrada');
             }
         }
 
         // Verificar que la clínica está activa
-        if (!$clinic->isActive()) {
+        if (! $clinic->isActive()) {
             abort(403, 'Esta clínica no está activa. Contacte al administrador.');
         }
 
@@ -72,7 +72,7 @@ class TenantMiddleware
         if (count($parts) > 2) {
             $subdomain = $parts[0];
             // Excluir subdomains reservados
-            if (!in_array($subdomain, ['www', 'app', 'admin', 'api'])) {
+            if (! in_array($subdomain, ['www', 'app', 'admin', 'api'])) {
                 return $subdomain;
             }
         }

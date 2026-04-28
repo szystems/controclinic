@@ -7,18 +7,23 @@ use App\Models\Clinic;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
 class Index extends Component
 {
     use WithPagination;
 
     public Clinic $currentClinic;
+
     public string $search = '';
+
     public string $status = '';
+
     public string $doctorId = '';
+
     public string $dateFilter = '';
+
     public string $sortField = 'appointment_date';
+
     public string $sortDirection = 'asc';
 
     protected $queryString = [
@@ -99,9 +104,9 @@ class Index extends Component
             ->with(['patient', 'doctor'])
             ->when($this->search, function ($query) {
                 $query->whereHas('patient', function ($q) {
-                    $q->where('first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('phone', 'like', '%' . $this->search . '%');
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('phone', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->status, function ($query) {
@@ -123,8 +128,9 @@ class Index extends Component
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
@@ -136,13 +142,15 @@ class Index extends Component
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        if (!$appointment->canCheckIn() && $appointment->status !== Appointment::STATUS_SCHEDULED) {
+        if (! $appointment->canCheckIn() && $appointment->status !== Appointment::STATUS_SCHEDULED) {
             session()->flash('error', __('general.action_not_allowed'));
+
             return;
         }
 
@@ -152,38 +160,42 @@ class Index extends Component
         }
 
         $appointment->checkIn();
-        session()->flash('success', __('appointments.check_in') . ' ✓');
+        session()->flash('success', __('appointments.check_in').' ✓');
     }
 
     public function startConsultation(string $id): void
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        if (!$appointment->canStart()) {
+        if (! $appointment->canStart()) {
             session()->flash('error', __('general.action_not_allowed'));
+
             return;
         }
 
         $appointment->start();
-        session()->flash('success', __('appointments.start_consultation') . ' ✓');
+        session()->flash('success', __('appointments.start_consultation').' ✓');
     }
 
     public function completeAppointment(string $id): void
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        if (!$appointment->canComplete()) {
+        if (! $appointment->canComplete()) {
             session()->flash('error', __('general.action_not_allowed'));
+
             return;
         }
 
@@ -195,13 +207,15 @@ class Index extends Component
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!auth()->user()->can('appointments.delete')) {
+        if (! auth()->user()->can('appointments.delete')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        if (!$appointment->isCancellable()) {
+        if (! $appointment->isCancellable()) {
             session()->flash('error', __('general.action_not_allowed'));
+
             return;
         }
 
@@ -213,8 +227,9 @@ class Index extends Component
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!auth()->user()->can('appointments.edit')) {
+        if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 

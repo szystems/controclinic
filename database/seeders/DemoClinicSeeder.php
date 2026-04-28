@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -28,7 +30,8 @@ class DemoClinicSeeder extends Seeder
             'currency' => 'USD',
             'locale' => 'es',
             'plan_type' => 'solo',
-            'status' => 'active',
+            'status' => 'trial',
+            'trial_ends_at' => now()->addDays(30),
             'public_portal_enabled' => true,
             'public_portal_slug' => 'demo',
             'max_patients' => 999999, // "Ilimitado" para plan Solo
@@ -36,6 +39,7 @@ class DemoClinicSeeder extends Seeder
             'max_doctors' => 1,
             'max_staff' => 1,
             'settings' => Clinic::getDefaultSettings(),
+            'branding' => ['primary_color' => '#4f46e5', 'secondary_color' => '#10b981'],
         ]);
 
         // Crear usuario owner/doctor
@@ -57,6 +61,12 @@ class DemoClinicSeeder extends Seeder
         ]);
         $owner->assignRole('owner');
 
+        // Link owner to clinic and mark onboarding as completed
+        $clinic->update([
+            'owner_id' => $owner->id,
+            'onboarding_completed_at' => now(),
+        ]);
+
         // Crear asistente
         $assistant = User::create([
             'name' => 'María Asistente',
@@ -72,9 +82,40 @@ class DemoClinicSeeder extends Seeder
         ]);
         $assistant->assignRole('assistant');
 
+        // Bind clinic into container so BelongsToClinic trait fills clinic_id
+        app()->instance('current_clinic', $clinic);
+
+        // Demo patients
+        $patients = Patient::factory()
+            ->count(8)
+            ->create([
+                'clinic_id' => $clinic->id,
+                'primary_doctor_id' => $owner->id,
+            ]);
+
+        // Demo appointments: spread across past, today and next two weeks
+        foreach ($patients as $i => $patient) {
+            Appointment::factory()->create([
+                'clinic_id' => $clinic->id,
+                'patient_id' => $patient->id,
+                'doctor_id' => $owner->id,
+                'appointment_date' => now()->subDays($i + 1)->toDateString(),
+                'status' => Appointment::STATUS_COMPLETED,
+            ]);
+            Appointment::factory()->create([
+                'clinic_id' => $clinic->id,
+                'patient_id' => $patient->id,
+                'doctor_id' => $owner->id,
+                'appointment_date' => now()->addDays($i)->toDateString(),
+                'status' => Appointment::STATUS_CONFIRMED,
+            ]);
+        }
+
+        app()->forgetInstance('current_clinic');
+
         $this->command->info('✅ Clínica Demo creada exitosamente');
-        $this->command->info("   Email: doctor@controclinic.com");
-        $this->command->info("   Password: password");
-        $this->command->info("   URL: /app/demo");
+        $this->command->info('   Email: doctor@controclinic.com');
+        $this->command->info('   Password: password');
+        $this->command->info('   URL: /app/demo');
     }
 }

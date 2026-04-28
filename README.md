@@ -9,6 +9,57 @@
 
 A multi-tenant SaaS platform for medical clinic management built with **Laravel 12** and **Livewire 3 (Volt)**. Designed for clinics to manage patients, appointments, medical records, and billing through a modern reactive interface with subscription-based access via Paddle.
 
+## Quick Start (Docker)
+
+Requires Docker + Docker Compose.
+
+```bash
+git clone <repo-url> controclinic && cd controclinic
+cp .env.example .env
+docker compose up -d
+docker exec controclinic-app composer install
+docker exec controclinic-app php artisan key:generate
+docker exec controclinic-app php artisan migrate:fresh --seed
+docker exec controclinic-app npm install
+docker exec controclinic-app npm run build
+```
+
+Open http://localhost:8088 — login with the demo account:
+
+| Field | Value |
+|---|---|
+| Clinic slug | `demo` |
+| Email | `doctor@controclinic.com` |
+| Password | `password` |
+
+Other services:
+
+| Service | URL |
+|---|---|
+| Mailpit | http://localhost:8025 |
+| phpMyAdmin | http://localhost:8089 |
+| MySQL | localhost:33060 |
+| Redis | localhost:63790 |
+
+## Daily Commands
+
+```bash
+# Run tests
+docker exec controclinic-app composer test
+
+# Format code
+docker exec controclinic-app composer format
+
+# Static analysis
+docker exec controclinic-app composer stan
+
+# Run all checks (lint + stan + test)
+docker exec controclinic-app composer check
+
+# Reset DB with demo data
+docker exec controclinic-app php artisan migrate:fresh --seed
+```
+
 ## Key Features
 
 - **Multi-Tenant Architecture** — Each clinic operates in an isolated data context with tenant-scoped queries and role-based access control (Spatie Permission)

@@ -8,10 +8,14 @@ use Livewire\Component;
 class Show extends Component
 {
     public Patient $patient;
+
     public bool $showDeleteModal = false;
 
     public function mount(Patient $patient): void
     {
+        // Tenant isolation
+        abort_if($patient->clinic_id !== app('current_clinic')->id, 404);
+
         $this->patient = $patient->load(['primaryDoctor', 'appointments', 'medicalRecords']);
     }
 
@@ -27,8 +31,9 @@ class Show extends Component
 
     public function deletePatient()
     {
-        if (!auth()->user()->can('patients.delete')) {
+        if (! auth()->user()->can('patients.delete')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
@@ -41,12 +46,13 @@ class Show extends Component
 
     public function toggleStatus(): void
     {
-        if (!auth()->user()->can('patients.edit')) {
+        if (! auth()->user()->can('patients.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
             return;
         }
 
-        $this->patient->update(['is_active' => !$this->patient->is_active]);
+        $this->patient->update(['is_active' => ! $this->patient->is_active]);
         $this->patient->refresh();
 
         session()->flash('success', __('patients.status_updated'));

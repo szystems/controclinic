@@ -3,60 +3,88 @@
 namespace App\Livewire\App\Settings;
 
 use App\Models\Clinic;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
 
 class Index extends Component
 {
     use WithFileUploads;
 
     public Clinic $clinic;
+
     public string $activeTab = 'general';
 
     // General Info
     public string $name = '';
+
     public string $email = '';
+
     public string $phone = '';
+
     public string $address = '';
+
     public string $city = '';
+
     public string $country = '';
+
     public ?string $website = '';
+
     public ?string $description = '';
 
     // Localization
     public string $locale = 'es';
+
     public string $timezone = 'America/Guatemala';
+
     public string $currency = 'USD';
+
     public string $date_format = 'd/m/Y';
+
     public string $time_format = '24h';
 
     // Appointments
     public int $appointment_duration = 30;
+
     public int $appointment_buffer = 5;
+
     public array $working_days = [1, 2, 3, 4, 5];
+
     public string $working_hours_start = '08:00';
+
     public string $working_hours_end = '18:00';
+
     public bool $allow_online_booking = true;
+
     public bool $require_booking_confirmation = true;
+
     public int $min_booking_notice = 2;
+
     public int $max_booking_advance = 30;
+
     public int $cancellation_notice = 24;
 
     // Notifications
     public bool $send_reminders = true;
+
     public int $reminder_hours_before = 24;
+
     public bool $send_confirmations = true;
 
     // Billing
     public ?string $tax_id = '';
+
     public ?string $legal_name = '';
+
     public ?string $billing_address = '';
 
     // Branding
     public $logo;
+
     public ?string $currentLogo = null;
+
     public string $primary_color = '#4f46e5';
+
     public string $secondary_color = '#10b981';
 
     protected function rules(): array

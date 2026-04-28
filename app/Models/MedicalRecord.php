@@ -2,19 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToClinic;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class MedicalRecord extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, LogsActivity;
+    use BelongsToClinic, HasFactory, HasUuids, LogsActivity, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -52,22 +54,36 @@ class MedicalRecord extends Model
 
     // Record types
     public const TYPE_CONSULTATION = 'consultation';
+
     public const TYPE_DIAGNOSIS = 'diagnosis';
+
     public const TYPE_PRESCRIPTION = 'prescription';
+
     public const TYPE_LAB_RESULT = 'lab_result';
+
     public const TYPE_IMAGING = 'imaging';
+
     public const TYPE_PROCEDURE = 'procedure';
+
     public const TYPE_SURGERY = 'surgery';
+
     public const TYPE_REFERRAL = 'referral';
+
     public const TYPE_FOLLOW_UP_NOTE = 'follow_up_note';
+
     public const TYPE_VITAL_SIGNS = 'vital_signs';
+
     public const TYPE_VACCINATION = 'vaccination';
+
     public const TYPE_OTHER = 'other';
 
     // Status
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_FINAL = 'final';
+
     public const STATUS_AMENDED = 'amended';
+
     public const STATUS_DELETED = 'deleted';
 
     // ==================== ACTIVITY LOG ====================
@@ -106,7 +122,7 @@ class MedicalRecord extends Model
 
     public function getTypeLabelAttribute(): string
     {
-        return match($this->record_type) {
+        return match ($this->record_type) {
             self::TYPE_CONSULTATION => __('Consulta'),
             self::TYPE_DIAGNOSIS => __('Diagnóstico'),
             self::TYPE_PRESCRIPTION => __('Receta'),
@@ -125,7 +141,7 @@ class MedicalRecord extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_DRAFT => __('Borrador'),
             self::STATUS_FINAL => __('Finalizado'),
             self::STATUS_AMENDED => __('Modificado'),
@@ -136,7 +152,7 @@ class MedicalRecord extends Model
 
     public function getTypeIconAttribute(): string
     {
-        return match($this->record_type) {
+        return match ($this->record_type) {
             self::TYPE_CONSULTATION => 'clipboard-document-list',
             self::TYPE_DIAGNOSIS => 'magnifying-glass',
             self::TYPE_PRESCRIPTION => 'document-text',
@@ -203,7 +219,7 @@ class MedicalRecord extends Model
     {
         return $query->where(function ($q) use ($role) {
             $q->whereNull('visible_to_roles')
-              ->orWhereJsonContains('visible_to_roles', $role);
+                ->orWhereJsonContains('visible_to_roles', $role);
         });
     }
 
@@ -252,7 +268,7 @@ class MedicalRecord extends Model
         }
 
         // Si hay restricción de roles
-        if (!empty($this->visible_to_roles)) {
+        if (! empty($this->visible_to_roles)) {
             return in_array($user->role, $this->visible_to_roles);
         }
 
