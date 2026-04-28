@@ -51,6 +51,8 @@ class Booking extends Component
 
     public ?string $appointmentReference = null;
 
+    public bool $portalDisabled = false;
+
     public function mount(Clinic $clinic): void
     {
         // Resolved by route model binding via slug or public_portal_slug
@@ -59,6 +61,12 @@ class Booking extends Component
         }
 
         $this->clinic = $clinic;
+
+        // ADR-008: portal público sólo activo cuando la cuenta está full.
+        // En read-only o billing-only, mostramos un mensaje en lugar del wizard.
+        if (! $clinic->canWrite()) {
+            $this->portalDisabled = true;
+        }
 
         // Set locale from clinic if visitor has no session locale
         if (! session()->has('locale') && $clinic->locale) {
@@ -272,6 +280,11 @@ class Booking extends Component
         // Honeypot
         if (! empty($this->website)) {
             return;
+        }
+
+        // ADR-008: si la cuenta no está en estado 'full', no se aceptan reservas
+        if (! $this->clinic->canWrite()) {
+            abort(403);
         }
 
         // Rate limit per IP — 5 attempts per minute

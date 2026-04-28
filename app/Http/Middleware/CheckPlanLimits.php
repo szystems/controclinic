@@ -9,8 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckPlanLimits
 {
     /**
-     * Check if the clinic has an active subscription or valid free plan.
-     * Suspended/cancelled clinics get redirected to billing page.
+     * Sincroniza plan_type según la suscripción Paddle. NO redirige.
+     * - Si la cuenta es billing_only o read_only, los middlewares correspondientes
+     *   (TenantMiddleware / EnsureCanWrite) se encargan de redirigir o bloquear.
+     * - Plan pagado sin suscripción válida → downgrade silencioso a free
+     *   (accessLevel() lo verá como read_only por ADR-010 + ADR-008).
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -20,40 +23,18 @@ class CheckPlanLimits
             return $next($request);
         }
 
-        // Free plan and active/trial status — always allowed
-        if ($clinic->plan_type === 'free' && $clinic->isActive()) {
-            return $next($request);
-        }
-
-        // Paid plan: check subscription is valid
-        if ($clinic->plan_type !== 'free') {
+        // Plan pagado sin suscripción Paddle válida → downgrade a free
+        if ($clinic->plan_type !== 'free' && ! $clinic->is_manual_plan) {
             $subscription = $clinic->subscription();
+            $valid = $subscription && ($subscription->active() || $subscription->onTrial() || $subscription->pastDue());
 
-            // Has a valid (active, on trial, or past due but grace) subscription
-            if ($subscription && ($subscription->active() || $subscription->onTrial() || $subscription->pastDue())) {
-                return $next($request);
+            if (! $valid) {
+                $clinic->update(['plan_type' => 'free']);
+
+                if (! $request->session()->has('warning')) {
+                    $request->session()->flash('warning', __('billing.subscription_expired'));
+                }
             }
-
-            // Subscription expired or cancelled — still allow access to billing page
-            if ($request->routeIs('app.billing.*')) {
-                return $next($request);
-            }
-
-            // Downgrade to free if no valid subscription
-            $clinic->update(['plan_type' => 'free']);
-            session()->flash('warning', __('billing.subscription_expired'));
-
-            return redirect()->route('app.billing.index', $clinic->slug);
-        }
-
-        // Suspended clinic
-        if ($clinic->status === 'suspended') {
-            if ($request->routeIs('app.billing.*')) {
-                return $next($request);
-            }
-
-            return redirect()->route('app.billing.index', $clinic->slug)
-                ->with('error', __('billing.account_suspended'));
         }
 
         return $next($request);

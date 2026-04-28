@@ -231,6 +231,67 @@ class Clinic extends Model
                ($this->status !== 'trial' || $this->isOnTrial());
     }
 
+    // ==================== ACCESS POLICY (ADR-008) ====================
+
+    public const ACCESS_FULL = 'full';
+
+    public const ACCESS_READ_ONLY = 'read_only';
+
+    public const ACCESS_BILLING_ONLY = 'billing_only';
+
+    /**
+     * Nivel de acceso de la cuenta según ADR-008.
+     *
+     * - full         → lectura + escritura + portal público
+     * - read_only    → lectura sí, escritura no, portal público bloqueado, billing accesible
+     * - billing_only → ni lectura del panel; sólo billing (cuenta suspendida/cancelada)
+     */
+    public function accessLevel(): string
+    {
+        // Cuenta cerrada o suspendida: sólo billing accesible
+        if (in_array($this->status, ['suspended', 'cancelled'], true)) {
+            return self::ACCESS_BILLING_ONLY;
+        }
+
+        // Trial expirado: lectura sí, escritura no
+        if ($this->status === 'trial' && $this->trial_ends_at?->isPast()) {
+            return self::ACCESS_READ_ONLY;
+        }
+
+        // Free no-cortesía (auto-downgrade desde plan pagado caducado): read-only
+        // Plan free de cortesía (asignado por admin con is_manual_plan=true) sí mantiene escritura
+        if ($this->plan_type === 'free' && ! $this->is_manual_plan) {
+            return self::ACCESS_READ_ONLY;
+        }
+
+        // active, trial vigente, plan free de cortesía, plan pagado activo → full
+        return self::ACCESS_FULL;
+    }
+
+    public function canWrite(): bool
+    {
+        return $this->accessLevel() === self::ACCESS_FULL;
+    }
+
+    public function isReadOnly(): bool
+    {
+        return $this->accessLevel() === self::ACCESS_READ_ONLY;
+    }
+
+    public function isBillingOnly(): bool
+    {
+        return $this->accessLevel() === self::ACCESS_BILLING_ONLY;
+    }
+
+    /**
+     * Si la cuenta puede acceder al panel de la app (lectura mínima).
+     * billing_only NO puede acceder a la app, solo a /billing.
+     */
+    public function isAccessible(): bool
+    {
+        return $this->accessLevel() !== self::ACCESS_BILLING_ONLY;
+    }
+
     public function hasCompletedOnboarding(): bool
     {
         return $this->onboarding_completed_at !== null;

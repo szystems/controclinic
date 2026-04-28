@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\CheckPlanLimits;
 use App\Models\Clinic;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,10 +53,10 @@ class CheckPlanLimitsTest extends TestCase
             'status' => 'suspended',
         ]);
 
-        // Suspended clinic is blocked by TenantMiddleware (403), not CheckPlanLimits
+        // Per ADR-008: suspended clinic redirects to billing instead of 403
         $response = $this->actingAs($user)->get("/app/{$clinic->slug}");
 
-        $response->assertStatus(403);
+        $response->assertRedirect(route('app.billing.index', $clinic->slug));
     }
 
     public function test_billing_page_is_accessible(): void
@@ -76,15 +75,18 @@ class CheckPlanLimitsTest extends TestCase
     {
         [$clinic, $user] = $this->createClinicWithOwner([
             'plan_type' => 'solo',
+            'is_manual_plan' => false,
             'status' => 'active',
         ]);
 
-        // Solo plan but no Paddle subscription → should downgrade to free and redirect to billing
+        // Solo plan but no Paddle subscription → downgrade to free.
+        // ADR-008: read-only mode (no redirect on read routes); EnsureCanWrite handles writes.
         $response = $this->actingAs($user)->get("/app/{$clinic->slug}");
 
         $clinic->refresh();
         $this->assertEquals('free', $clinic->plan_type);
-        $response->assertRedirect(route('app.billing.index', $clinic->slug));
+        $response->assertOk();
+        $this->assertSame(Clinic::ACCESS_READ_ONLY, $clinic->accessLevel());
     }
 
     public function test_free_plan_user_can_access_patients(): void

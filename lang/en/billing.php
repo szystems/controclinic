@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'account_read_only' => 'Your account is in read-only mode. Upgrade your plan to create or edit records.',
+    'account_billing_only' => 'Your account is inactive. Activate a subscription to keep using the platform.',
+    'banner_read_only_title' => 'Read-only mode.',
+    'banner_billing_only_title' => 'Inactive account.',
+    'banner_billing_only_body' => 'Activate a subscription to restore full access to your data.',
+    'banner_trial_expired_body' => 'Your trial expired on :date. Upgrade your plan to keep creating records.',
+    'banner_subscription_expired_body' => 'Your subscription is not active. Renew to keep creating records.',
+    'banner_view_plans' => 'View plans',
     'title' => 'Billing & Subscription',
     'subtitle' => 'Manage your plan, subscription, and payment methods.',
 

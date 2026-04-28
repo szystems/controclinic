@@ -25,7 +25,10 @@ class ClinicFactory extends Factory
             'timezone' => 'America/Mexico_City',
             'currency' => 'MXN',
             'locale' => 'es',
-            'plan_type' => 'free',
+            'plan_type' => 'solo',
+            // Tests: marcar como manual para que CheckPlanLimits no haga downgrade
+            // (no hay Paddle subscription real en suite de tests).
+            'is_manual_plan' => true,
             'status' => 'active',
             'settings' => [],
             'branding' => [],
@@ -66,6 +69,12 @@ class ClinicFactory extends Factory
 
         return $this->state(fn () => [
             'plan_type' => $plan,
+            // Plan Free en factories legacy: marcar como cortesía admin para que tenga acceso full
+            // (ADR-010 + ADR-008). Si un test necesita Free no-cortesía, usa $clinic->update(['is_manual_plan' => false]).
+            'is_manual_plan' => $plan === 'free',
+            'manual_plan_reason' => $plan === 'free' ? 'Test fixture' : null,
+            'status' => 'active',
+            'trial_ends_at' => null,
             'max_patients' => $limits['max_patients'],
             'max_appointments_per_month' => $limits['max_appointments_per_month'],
             'max_doctors' => $limits['max_doctors'],

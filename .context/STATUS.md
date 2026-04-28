@@ -1,10 +1,10 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-04-28
-> **Fase actual:** Sprint Estabilización (✅ COMPLETADO)
-> **Próxima:** Fase 4 — Política de Acceso (Trial expirado / Read-Only)
+> **Fase actual:** Fase 4 — Política de Acceso (✅ COMPLETADO)
+> **Próxima:** Fase 5 — UX/Onboarding o expansión funcional
 > **Enfoque:** SaaS-First
-> **Métricas:** 212 tests / 464 asserts · Pint clean · PHPStan level 5 (con baseline)
+> **Métricas:** 227 tests / 511 asserts · Pint clean · PHPStan level 5 (con baseline)
 
 ---
 

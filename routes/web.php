@@ -129,28 +129,42 @@ Route::prefix('app/{clinic}')
                 // Patients
                 Route::prefix('patients')->name('patients.')->group(function () {
                     Route::get('/', PatientsIndex::class)->name('index');
-                    Route::get('/create', PatientsCreate::class)->name('create');
+
+                    // Write routes (require canWrite) — must come BEFORE /{patient} catch-all
+                    Route::middleware('can.write')->group(function () {
+                        Route::get('/create', PatientsCreate::class)->name('create');
+                        Route::get('/{patient}/edit', PatientsEdit::class)->name('edit');
+                    });
+
                     Route::get('/{patient}', PatientsShow::class)->name('show');
-                    Route::get('/{patient}/edit', PatientsEdit::class)->name('edit');
                 });
 
                 // Appointments
                 Route::prefix('appointments')->name('appointments.')->group(function () {
                     Route::get('/', AppointmentsIndex::class)->name('index');
-                    Route::get('/create', AppointmentsCreate::class)->name('create');
                     Route::get('/calendar', AppointmentsIndex::class)->name('calendar'); // TODO: Calendar component
+
+                    // Write routes (require canWrite) — must come BEFORE /{appointment} catch-all
+                    Route::middleware('can.write')->group(function () {
+                        Route::get('/create', AppointmentsCreate::class)->name('create');
+                        Route::get('/{appointment}/edit', AppointmentsEdit::class)->name('edit');
+                    });
+
                     Route::get('/{appointment}', AppointmentsShow::class)->name('show');
-                    Route::get('/{appointment}/edit', AppointmentsEdit::class)->name('edit');
                 });
 
-                // Settings
-                Route::get('/settings', SettingsIndex::class)->name('settings');
+                // Settings (write — only fully-active clinics can change settings)
+                Route::middleware('can.write')->get('/settings', SettingsIndex::class)->name('settings');
 
                 // Staff
                 Route::prefix('staff')->name('staff.')->group(function () {
                     Route::get('/', StaffIndex::class)->name('index');
-                    Route::get('/create', StaffCreate::class)->name('create');
-                    Route::get('/{user}/edit', StaffEdit::class)->name('edit');
+
+                    // Write routes (require canWrite)
+                    Route::middleware('can.write')->group(function () {
+                        Route::get('/create', StaffCreate::class)->name('create');
+                        Route::get('/{user}/edit', StaffEdit::class)->name('edit');
+                    });
                 });
             });
         });

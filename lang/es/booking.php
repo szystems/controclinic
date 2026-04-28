@@ -27,6 +27,8 @@ return [
     // Booking disabled / portal disabled
     'portal_disabled' => 'Esta clínica no tiene habilitado el portal público.',
     'booking_disabled' => 'Las reservas en línea están temporalmente deshabilitadas. Por favor contacta directamente a la clínica.',
+    'booking_unavailable' => 'Reservas no disponibles',
+    'booking_unavailable_body' => 'Esta clínica no está aceptando reservas en línea por el momento.',
 
     // Doctors section
     'our_doctors' => 'Nuestros Doctores',

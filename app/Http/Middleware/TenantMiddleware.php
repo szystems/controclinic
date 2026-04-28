@@ -36,9 +36,21 @@ class TenantMiddleware
             }
         }
 
-        // Verificar que la clínica está activa
-        if (! $clinic->isActive()) {
-            abort(403, 'Esta clínica no está activa. Contacte al administrador.');
+        // Verificar que la clínica es accesible (ADR-008).
+        // billing_only: redirigir a la ruta de billing si no estamos ya yendo allí.
+        if (! $clinic->isAccessible()) {
+            $routeName = $request->route()?->getName() ?? '';
+
+            if (! str_starts_with($routeName, 'app.billing.')) {
+                // Si el usuario no está autenticado todavía, dejar que continúe (o se redirija a login)
+                if (auth()->check() && auth()->user()->clinic_id === $clinic->id) {
+                    return redirect()
+                        ->route('app.billing.index', $clinic->slug)
+                        ->with('warning', __('billing.account_billing_only', [], session('locale', config('app.locale'))));
+                }
+
+                abort(403, 'Esta clínica no está activa. Contacte al administrador.');
+            }
         }
 
         // Si el usuario está autenticado, verificar que pertenece a esta clínica

@@ -27,7 +27,8 @@ return [
     // Booking disabled / portal disabled
     'portal_disabled' => 'This clinic does not have the public portal enabled.',
     'booking_disabled' => 'Online booking is temporarily disabled. Please contact the clinic directly.',
-
+    'booking_unavailable' => 'Bookings unavailable',
+    'booking_unavailable_body' => 'This clinic is not accepting online bookings at the moment.',
     // Doctors section
     'our_doctors' => 'Our Doctors',
     'no_doctors' => 'No doctors are available at this time.',

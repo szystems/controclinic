@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'account_read_only' => 'Tu cuenta está en modo sólo lectura. Actualiza tu plan para crear o editar registros.',
+    'account_billing_only' => 'Tu cuenta está inactiva. Activa una suscripción para volver a usar la plataforma.',
+    'banner_read_only_title' => 'Modo sólo lectura.',
+    'banner_billing_only_title' => 'Cuenta inactiva.',
+    'banner_billing_only_body' => 'Activa una suscripción para recuperar el acceso completo a tus datos.',
+    'banner_trial_expired_body' => 'Tu trial expiró el :date. Actualiza tu plan para seguir creando registros.',
+    'banner_subscription_expired_body' => 'Tu suscripción no está activa. Renueva para seguir creando registros.',
+    'banner_view_plans' => 'Ver planes',
     'title' => 'Facturación y Suscripción',
     'subtitle' => 'Gestiona tu plan, suscripción y métodos de pago.',
 
