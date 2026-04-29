@@ -14,6 +14,8 @@ class Show extends Component
 
     public MedicalRecord $record;
 
+    public string $clinicSlug = '';
+
     public function mount(Patient $patient, MedicalRecord $record): void
     {
         abort_if($patient->clinic_id !== app('current_clinic')->id, 404);
@@ -25,6 +27,7 @@ class Show extends Component
             abort(403, __('records.confidential_hidden'));
         }
 
+        $this->clinicSlug = app('current_clinic')->slug;
         $this->patient = $patient;
         $this->record = $record->load(['doctor', 'appointment']);
     }
@@ -37,7 +40,7 @@ class Show extends Component
             return;
         }
 
-        $clinicSlug = app('current_clinic')->slug;
+        $clinicSlug = $this->clinicSlug;
         $patientId = $this->patient->id;
 
         $this->record->delete();

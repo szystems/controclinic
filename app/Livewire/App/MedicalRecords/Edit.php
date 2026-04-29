@@ -14,6 +14,8 @@ class Edit extends Component
 
     public MedicalRecord $record;
 
+    public string $clinicSlug = '';
+
     public string $recordType = MedicalRecord::TYPE_CONSULTATION;
 
     public string $title = '';
@@ -51,10 +53,12 @@ class Edit extends Component
         abort_if($record->patient_id !== $patient->id, 404);
         abort_unless(auth()->user()->can('records.edit'), 403);
 
+        $this->clinicSlug = app('current_clinic')->slug;
+
         if ($record->status !== MedicalRecord::STATUS_DRAFT) {
             session()->flash('error', __('records.cannot_edit_finalized'));
             redirect()->route('app.records.show', [
-                'clinic' => app('current_clinic')->slug,
+                'clinic' => $this->clinicSlug,
                 'patient' => $patient->id,
                 'record' => $record->id,
             ]);
@@ -155,7 +159,7 @@ class Edit extends Component
         session()->flash('success', __('records.updated'));
 
         return redirect()->route('app.records.show', [
-            'clinic' => app('current_clinic')->slug,
+            'clinic' => $this->clinicSlug,
             'patient' => $this->patient->id,
             'record' => $this->record->id,
         ]);

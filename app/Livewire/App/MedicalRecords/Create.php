@@ -13,6 +13,8 @@ class Create extends Component
 {
     public Patient $patient;
 
+    public string $clinicSlug = '';
+
     public ?string $appointmentId = null;
 
     public string $recordType = MedicalRecord::TYPE_CONSULTATION;
@@ -54,6 +56,7 @@ class Create extends Component
         abort_unless(auth()->user()->can('records.create'), 403);
 
         $this->patient = $patient;
+        $this->clinicSlug = app('current_clinic')->slug;
 
         // Pre-fill from query string ?appointmentId=xxx
         $appointmentId = $appointmentId ?: request()->query('appointment_id');
@@ -151,7 +154,7 @@ class Create extends Component
         session()->flash('success', __('records.created'));
 
         return redirect()->route('app.records.show', [
-            'clinic' => app('current_clinic')->slug,
+            'clinic' => $this->clinicSlug,
             'patient' => $this->patient->id,
             'record' => $record->id,
         ]);
