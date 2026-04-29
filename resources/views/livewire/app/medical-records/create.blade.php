@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <div>
-            <a href="{{ route('app.records.index', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+            <a href="{{ route('app.records.index', ['clinic' => $clinic->slug, 'patient' => $patient->id]) }}"
                wire:navigate
                class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
                 {{ __('records.back_to_records') }}
@@ -167,7 +167,7 @@
 
                 {{-- Buttons --}}
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('app.records.index', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+                    <a href="{{ route('app.records.index', ['clinic' => $clinic->slug, 'patient' => $patient->id]) }}"
                        wire:navigate
                        class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:underline">
                         {{ __('records.cancel') }}

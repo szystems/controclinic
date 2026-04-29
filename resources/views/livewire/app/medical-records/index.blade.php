@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between flex-wrap gap-3">
             <div>
-                <a href="{{ route('app.patients.show', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+                <a href="{{ route('app.patients.show', ['clinic' => $clinic->slug, 'patient' => $patient->id]) }}"
                    wire:navigate
                    class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
                     {{ __('records.back_to_patient') }}
@@ -15,8 +15,8 @@
                 </p>
             </div>
             @can('records.create')
-                @if($currentClinic->canWrite())
-                    <a href="{{ route('app.records.create', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+                @if($clinic->canWrite())
+                    <a href="{{ route('app.records.create', ['clinic' => $clinic->slug, 'patient' => $patient->id]) }}"
                        wire:navigate
                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@
                         {{ __('records.new_record') }}
                     </a>
                 @else
-                    <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
+                    <x-upgrade-nudge type="button" :clinic-slug="$clinic->slug" />
                 @endif
             @endcan
         </div>
@@ -71,7 +71,7 @@
             {{-- Records List --}}
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
                 @forelse($records as $record)
-                    <a href="{{ route('app.records.show', ['clinic' => $currentClinic->slug, 'patient' => $patient->id, 'record' => $record->id]) }}"
+                    <a href="{{ route('app.records.show', ['clinic' => $clinic->slug, 'patient' => $patient->id, 'record' => $record->id]) }}"
                        wire:navigate
                        class="block p-4 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
                         <div class="flex items-start justify-between gap-3">
@@ -116,8 +116,8 @@
                         </svg>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ __('records.no_records') }}</p>
                         @can('records.create')
-                            @if($currentClinic->canWrite())
-                                <a href="{{ route('app.records.create', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+                            @if($clinic->canWrite())
+                                <a href="{{ route('app.records.create', ['clinic' => $clinic->slug, 'patient' => $patient->id]) }}"
                                    wire:navigate
                                    class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                                     {{ __('records.create_first') }} →

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\App\MedicalRecords;
 
+use App\Models\Clinic;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
 use Livewire\Attributes\Layout;
@@ -13,6 +14,8 @@ class Show extends Component
     public Patient $patient;
 
     public MedicalRecord $record;
+
+    public Clinic $clinic;
 
     public string $clinicSlug = '';
 
@@ -28,6 +31,7 @@ class Show extends Component
         }
 
         $this->clinicSlug = app('current_clinic')->slug;
+        $this->clinic = app('current_clinic');
         $this->patient = $patient;
         $this->record = $record->load(['doctor', 'appointment']);
     }

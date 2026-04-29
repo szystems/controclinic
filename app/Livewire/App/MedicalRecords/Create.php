@@ -3,6 +3,7 @@
 namespace App\Livewire\App\MedicalRecords;
 
 use App\Models\Appointment;
+use App\Models\Clinic;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
 use Livewire\Attributes\Layout;
@@ -12,6 +13,8 @@ use Livewire\Component;
 class Create extends Component
 {
     public Patient $patient;
+
+    public Clinic $clinic;
 
     public string $clinicSlug = '';
 
@@ -56,6 +59,7 @@ class Create extends Component
         abort_unless(auth()->user()->can('records.create'), 403);
 
         $this->patient = $patient;
+        $this->clinic = app('current_clinic');
         $this->clinicSlug = app('current_clinic')->slug;
 
         // Pre-fill from query string ?appointmentId=xxx

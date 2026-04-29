@@ -2,6 +2,7 @@
 
 namespace App\Livewire\App\MedicalRecords;
 
+use App\Models\Clinic;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
 use Livewire\Attributes\Layout;
@@ -13,6 +14,8 @@ class Edit extends Component
     public Patient $patient;
 
     public MedicalRecord $record;
+
+    public Clinic $clinic;
 
     public string $clinicSlug = '';
 
@@ -54,6 +57,7 @@ class Edit extends Component
         abort_unless(auth()->user()->can('records.edit'), 403);
 
         $this->clinicSlug = app('current_clinic')->slug;
+        $this->clinic = app('current_clinic');
 
         if ($record->status !== MedicalRecord::STATUS_DRAFT) {
             session()->flash('error', __('records.cannot_edit_finalized'));

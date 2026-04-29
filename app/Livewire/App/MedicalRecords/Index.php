@@ -2,6 +2,7 @@
 
 namespace App\Livewire\App\MedicalRecords;
 
+use App\Models\Clinic;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
 use Livewire\Attributes\Layout;
@@ -15,6 +16,8 @@ class Index extends Component
 
     public Patient $patient;
 
+    public Clinic $clinic;
+
     public string $typeFilter = '';
 
     public string $statusFilter = '';
@@ -25,6 +28,7 @@ class Index extends Component
         abort_unless(auth()->user()->can('records.view'), 403);
 
         $this->patient = $patient;
+        $this->clinic = app('current_clinic');
     }
 
     public function updating(): void

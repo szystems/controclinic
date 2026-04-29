@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between flex-wrap gap-3">
             <div>
-                <a href="{{ route('app.records.index', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+                <a href="{{ route('app.records.index', ['clinic' => $clinic->slug, 'patient' => $patient->id]) }}"
                    wire:navigate
                    class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
                     {{ __('records.back_to_records') }}
@@ -17,8 +17,8 @@
             <div class="flex items-center gap-2">
                 @if($record->status === \App\Models\MedicalRecord::STATUS_DRAFT)
                     @can('records.edit')
-                        @if($currentClinic->canWrite())
-                            <a href="{{ route('app.records.edit', ['clinic' => $currentClinic->slug, 'patient' => $patient->id, 'record' => $record->id]) }}"
+                        @if($clinic->canWrite())
+                            <a href="{{ route('app.records.edit', ['clinic' => $clinic->slug, 'patient' => $patient->id, 'record' => $record->id]) }}"
                                wire:navigate
                                class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-md hover:bg-indigo-700">
                                 {{ __('records.edit_record') }}
