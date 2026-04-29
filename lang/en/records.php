@@ -95,7 +95,9 @@ return [
     'deleted' => 'Record deleted.',
     'finalized' => 'Record finalized.',
 
-    'cannot_edit_finalized' => 'This record is finalized. Create a new "Amended" record to add changes.',    'finalized_notice' => 'This record is finalized and cannot be edited. To correct information, create a new amendment record.',    'permission_denied' => 'You don\'t have permission for this action.',
+    'cannot_edit_finalized' => 'This record is finalized and cannot be edited. Create a new record to register changes.',
+    'finalized_notice' => 'This record is finalized and is part of the immutable clinical history. To register corrections or new findings, create a new record.',
+    'permission_denied' => 'You don\'t have permission for this action.',
     'confidential_hidden' => 'This record is confidential.',
 
     'confirm_delete' => 'Delete this record? This action cannot be undone.',
