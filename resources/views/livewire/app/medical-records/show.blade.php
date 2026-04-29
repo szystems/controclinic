@@ -26,20 +26,27 @@
                         @endif
                     @endcan
                 @endif
-                @can('records.delete')
-                    <button type="button"
-                            wire:click="delete"
-                            wire:confirm="{{ __('records.confirm_delete') }}"
-                            class="inline-flex items-center px-3 py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 text-xs font-medium rounded-md hover:bg-rose-100 dark:hover:bg-rose-900/50">
-                        {{ __('general.delete') }}
-                    </button>
-                @endcan
             </div>
         </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            {{-- Action bar (delete needs wire:click, must live inside Livewire root) --}}
+            @can('records.delete')
+                <div class="flex justify-end">
+                    <button type="button"
+                            wire:click="delete"
+                            wire:confirm="{{ __('records.confirm_delete') }}"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 text-xs font-medium rounded-md hover:bg-rose-100 dark:hover:bg-rose-900/50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/>
+                        </svg>
+                        {{ __('general.delete') }}
+                    </button>
+                </div>
+            @endcan
 
             @if($record->status === \App\Models\MedicalRecord::STATUS_FINAL)
                 <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 text-sm rounded-lg p-3 flex items-start gap-3">
