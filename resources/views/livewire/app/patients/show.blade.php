@@ -310,7 +310,9 @@
                     @if($upcomingAppointments->count() > 0)
                     <div class="space-y-3">
                         @foreach($upcomingAppointments as $appointment)
-                        <div class="flex items-center space-x-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                        <a href="{{ route('app.appointments.show', ['clinic' => $currentClinic->slug, 'appointment' => $appointment->id]) }}"
+                           wire:navigate
+                           class="flex items-center space-x-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                             <div class="flex-shrink-0">
                                 <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex flex-col items-center justify-center">
                                     <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">{{ $appointment->appointment_date->format('d') }}</span>
@@ -325,7 +327,10 @@
                                     {{ $appointment->doctor->name ?? 'N/A' }}
                                 </p>
                             </div>
-                        </div>
+                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
                         @endforeach
                     </div>
                     @else
