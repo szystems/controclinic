@@ -123,4 +123,17 @@ return [
     // Límites
     'limit_reached' => 'Has alcanzado el límite de citas mensuales de tu plan',
     'consultation' => 'Consulta',
+
+    // Calendario (Fase 6)
+    'calendar_hint' => 'Vista visual de citas. Arrastra para reagendar.',
+    'list_view' => 'Lista',
+    'status_legend' => 'Estado',
+    'status_scheduled' => 'Programada',
+    'status_confirmed' => 'Confirmada',
+    'status_in_progress' => 'En curso',
+    'status_completed' => 'Completada',
+    'status_cancelled' => 'Cancelada',
+    'rescheduled' => 'Cita reagendada correctamente',
+    'no_patient' => '(Sin paciente)',
+    'not_found' => 'Cita no encontrada',
 ];

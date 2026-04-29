@@ -72,6 +72,21 @@ class Create extends Component
         $this->appointment_date = now()->toDateString();
         $this->duration_minutes = $clinic->settings['appointment_duration'] ?? 30;
 
+        // Pre-fill from calendar dateClick (?date=YYYY-MM-DD&time=HH:MM)
+        if (request()->filled('date')) {
+            try {
+                $this->appointment_date = Carbon::parse(request('date'))->toDateString();
+            } catch (\Throwable) {
+                // ignore invalid query value
+            }
+        }
+        if (request()->filled('time')) {
+            $time = request('time');
+            if (preg_match('/^\d{2}:\d{2}$/', $time)) {
+                $this->start_time = $time;
+            }
+        }
+
         // Pre-seleccionar doctor si solo hay uno
         $doctors = $this->doctors;
         if ($doctors->count() === 1) {

@@ -135,17 +135,19 @@
 
 ---
 
-### Fase 6 — Calendario Visual de Citas (UX)
-> **Por qué después:** la lista de citas funciona, el calendario es visual y de productividad. Requiere data ya estable.
+### Fase 6 — Calendario Visual de Citas (UX) ✅ COMPLETADA
+> FullCalendar v6 + Livewire. 246 tests / 558 asserts.
 
-- [ ] Componente Livewire `App\Livewire\App\Appointments\Calendar`
-- [ ] Vista mensual / semanal / diaria (toggle)
-- [ ] Drag & drop para reagendar (Alpine + emitir a backend)
-- [ ] Filtros por doctor (color por doctor)
-- [ ] Click en hueco vacío → modal con `Create`
-- [ ] Click en cita → modal con `Show`
-- [ ] Reemplazar la ruta placeholder `app.appointments.calendar`
-- [ ] Tests
+- [x] Componente Livewire `App\Livewire\App\Appointments\Calendar`
+- [x] Vista mensual / semanal / diaria / lista (toggle nativo de FullCalendar)
+- [x] Drag & drop para reagendar (eventDrop → `rescheduleEvent` con guard read-only + permiso)
+- [x] Filtros por doctor (color por doctor, chips toggle, hash estable)
+- [x] Click en hueco vacío → redirige a Create con `?date=YYYY-MM-DD&time=HH:MM`
+- [x] Click en cita → navega a Show vía `wire:navigate`
+- [x] Reemplazada la ruta placeholder `app.appointments.calendar`
+- [x] Tests Feature (9 tests: render, fetchEvents, multi-tenant, filtros, drag&drop, read-only, permisos)
+- [x] Locale español/inglés (FullCalendar locales + traducciones propias)
+- [x] Dark mode CSS para FullCalendar
 
 ---
 

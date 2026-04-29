@@ -123,4 +123,17 @@ return [
     // Limits
     'limit_reached' => 'You have reached your plan\'s monthly appointment limit',
     'consultation' => 'Consultation',
+
+    // Calendar (Phase 6)
+    'calendar_hint' => 'Visual appointment view. Drag to reschedule.',
+    'list_view' => 'List',
+    'status_legend' => 'Status',
+    'status_scheduled' => 'Scheduled',
+    'status_confirmed' => 'Confirmed',
+    'status_in_progress' => 'In progress',
+    'status_completed' => 'Completed',
+    'status_cancelled' => 'Cancelled',
+    'rescheduled' => 'Appointment rescheduled successfully',
+    'no_patient' => '(No patient)',
+    'not_found' => 'Appointment not found',
 ];

@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureOnboardingCompleted;
 use App\Http\Middleware\TenantMiddleware;
 use App\Livewire\Admin\Clinics\Show;
 use App\Livewire\Admin\Plans\Edit;
+use App\Livewire\App\Appointments\Calendar as AppointmentsCalendar;
 use App\Livewire\App\Appointments\Create as AppointmentsCreate;
 use App\Livewire\App\Appointments\Edit as AppointmentsEdit;
 use App\Livewire\App\Appointments\Index as AppointmentsIndex;
@@ -159,7 +160,7 @@ Route::prefix('app/{clinic}')
                 // Appointments
                 Route::prefix('appointments')->name('appointments.')->group(function () {
                     Route::get('/', AppointmentsIndex::class)->name('index');
-                    Route::get('/calendar', AppointmentsIndex::class)->name('calendar'); // TODO: Calendar component
+                    Route::get('/calendar', AppointmentsCalendar::class)->name('calendar');
 
                     // Write routes (require canWrite) — must come BEFORE /{appointment} catch-all
                     Route::middleware('can.write')->group(function () {
