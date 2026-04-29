@@ -366,6 +366,19 @@
                             @endcan
                         @endif
 
+                        {{-- Create medical record from this appointment --}}
+                        @can('records.create')
+                            @if($currentClinic->canWrite())
+                            <a href="{{ route('app.records.create', ['clinic' => $currentClinic->slug, 'patient' => $appointment->patient_id, 'appointment_id' => $appointment->id]) }}"
+                               class="w-full inline-flex justify-center items-center px-4 py-2 bg-emerald-600 border border-transparent rounded-lg font-medium text-xs text-white uppercase tracking-widest hover:bg-emerald-700 transition">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                {{ __('records.new_record') }}
+                            </a>
+                            @endif
+                        @endcan
+
                         {{-- Cancel --}}
                         @if($appointment->isCancellable())
                             @can('appointments.delete')

@@ -171,14 +171,26 @@
                         <h2 class="text-lg font-medium text-gray-900 dark:text-white">
                             {{ __('patients.recent_records') }}
                         </h2>
-                        <a href="#" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">
-                            {{ __('general.view_all') }}
-                        </a>
+                        <div class="flex items-center gap-3">
+                            @can('records.create')
+                                @if($currentClinic->canWrite())
+                                <a href="{{ route('app.records.create', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+                                   class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+                                    + {{ __('records.new_record') }}
+                                </a>
+                                @endif
+                            @endcan
+                            <a href="{{ route('app.records.index', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
+                               class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">
+                                {{ __('general.view_all') }}
+                            </a>
+                        </div>
                     </div>
                     @if($recentRecords->count() > 0)
                     <div class="space-y-4">
                         @foreach($recentRecords as $record)
-                        <div class="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                        <a href="{{ route('app.records.show', ['clinic' => $currentClinic->slug, 'patient' => $patient->id, 'record' => $record->id]) }}"
+                           class="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                             <div class="flex-shrink-0">
                                 <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
                                     <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,7 +206,7 @@
                                     {{ $record->doctor->name ?? 'N/A' }} · {{ $record->created_at->format('d/m/Y') }}
                                 </p>
                             </div>
-                        </div>
+                        </a>
                         @endforeach
                     </div>
                     @else

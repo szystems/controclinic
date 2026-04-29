@@ -13,6 +13,10 @@ use App\Livewire\App\Appointments\Show as AppointmentsShow;
 use App\Livewire\App\Billing\Index as BillingIndex;
 use App\Livewire\App\Dashboard;
 use App\Livewire\App\Invitations\Accept as InvitationAccept;
+use App\Livewire\App\MedicalRecords\Create as MedicalRecordsCreate;
+use App\Livewire\App\MedicalRecords\Edit as MedicalRecordsEdit;
+use App\Livewire\App\MedicalRecords\Index as MedicalRecordsIndex;
+use App\Livewire\App\MedicalRecords\Show as MedicalRecordsShow;
 use App\Livewire\App\Onboarding\Index;
 use App\Livewire\App\Patients\Create as PatientsCreate;
 use App\Livewire\App\Patients\Edit as PatientsEdit;
@@ -137,6 +141,19 @@ Route::prefix('app/{clinic}')
                     });
 
                     Route::get('/{patient}', PatientsShow::class)->name('show');
+                });
+
+                // Medical Records (nested under patients)
+                Route::prefix('patients/{patient}/records')->name('records.')->group(function () {
+                    Route::get('/', MedicalRecordsIndex::class)->name('index');
+
+                    // Write routes (require canWrite) — must come BEFORE /{record} catch-all
+                    Route::middleware('can.write')->group(function () {
+                        Route::get('/create', MedicalRecordsCreate::class)->name('create');
+                        Route::get('/{record}/edit', MedicalRecordsEdit::class)->name('edit');
+                    });
+
+                    Route::get('/{record}', MedicalRecordsShow::class)->name('show');
                 });
 
                 // Appointments

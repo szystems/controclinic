@@ -48,51 +48,71 @@
 
 ---
 
-### Fase 4 — Política de Acceso (Trial Expirado / Read-Only) 🔥 DESPUÉS DEL SPRINT
-> **Por qué después de Estabilización:** ya está documentada como ADR-008. Implementarla con la base limpia y los tests multi-tenant en su lugar.
+### Fase 4 — Política de Acceso (Trial Expirado / Read-Only) ✅ COMPLETADA (2026-04-28)
+> Implementación de ADR-008 (full / read_only / billing_only).
 
-#### 4.1 Modelo & lógica core
-- [ ] Añadir a `Clinic`:
-  - `accessLevel(): string` → `'full' | 'read_only' | 'billing_only' | 'blocked'`
-  - `isAccessible(): bool` (todo excepto `cancelled`)
-  - `isReadOnly(): bool` (trial expirado o suscripción inactiva con plan free)
-  - `canWrite(): bool` (inverso de read-only)
-- [ ] Mantener `isActive()` retrocompatible o reemplazar usos.
+#### 4.1 Modelo & lógica core ✅
+- [x] `Clinic::accessLevel()` → `full | read_only | billing_only`
+- [x] `Clinic::isAccessible() / canWrite() / isReadOnly() / isBillingOnly()`
+- [x] Constantes `ACCESS_FULL`, `ACCESS_READ_ONLY`, `ACCESS_BILLING_ONLY`
+- [x] `canAddPatient/Appointment/Doctor/Staff` short-circuit con `!canWrite()`
 
-#### 4.2 Middlewares
-- [ ] Modificar `TenantMiddleware`: 403 sólo para `cancelled` o si el usuario no pertenece. El resto pasa.
-- [ ] Crear `EnsureCanWrite` middleware: si `isReadOnly()` y la ruta es de escritura → redirige a `app.billing.index` con flash.
-- [ ] Modificar `CheckPlanLimits`: trial expirado en plan free → marca read-only y deja entrar al panel pero sólo a billing en vista de escritura.
-- [ ] Aplicar `EnsureCanWrite` a rutas Create/Edit de patients, appointments, staff, settings (en grupo).
+#### 4.2 Middlewares ✅
+- [x] `TenantMiddleware`: redirige a billing si `!isAccessible()` (sólo 403 si user no pertenece)
+- [x] `EnsureCanWrite` middleware (alias `can.write`) aplicado a Create/Edit/Settings
+- [x] `CheckPlanLimits` refactor: silent downgrade only (no más redirects)
 
-#### 4.3 UI / Experiencia
-- [ ] Componente Blade `x-account-status-banner` (persistente arriba del layout app):
-  - "Tu trial expiró el {fecha}. Actualiza tu plan para seguir creando registros."
-  - Botón "Ver planes" → billing.
-- [ ] Deshabilitar botones "Nuevo paciente / Nueva cita / Invitar staff" cuando read-only (visualmente atenuados con tooltip).
-- [ ] En el portal público `/c/{slug}`: si `isReadOnly()` → mostrar mensaje "Reservas temporalmente no disponibles" en lugar del wizard (el dueño no podría atender).
+#### 4.3 UI / Experiencia ✅
+- [x] `<x-account-status-banner>` global ámbar/rojo en layout app
+- [x] `<x-upgrade-nudge>` con tooltips contextuales (límite vs read-only)
+- [x] Plan badge color refleja accessLevel (verde/ámbar)
+- [x] Free cortesía (`is_manual_plan=true`) sin nags ni banners
+- [x] Portal público `/c/{slug}` muestra "Reservas no disponibles" si `!canWrite()`
 
-#### 4.4 Tests
-- [ ] Test cada estado: trial vigente, trial expirado, suspended, cancelled, plan pago activo, plan pago expirado.
-- [ ] Test que `EnsureCanWrite` redirige bien en cada Livewire de escritura.
-- [ ] Test del banner visible y portal público bloqueado en read-only.
+#### 4.4 Tests ✅
+- [x] `ClinicAccessLevelTest` (7 estados unitarios)
+- [x] `EnsureCanWriteTest` (6 escenarios feature)
+- [x] `PublicBookingAccessLevelTest` (3 escenarios)
+- [x] Adjustes en `CheckPlanLimitsTest` para nuevo flujo
+
+**Estado final Fase 4:** 227 tests / 511 asserts ✓ · Pint clean ✓ · PHPStan clean ✓
+**Commits:** `e95386f` + `b56b556` + `5cbb98a`
 
 ---
 
-### Fase 5 — Historial Médico (MedicalRecord CRUD) 🔥 SEGUNDA
-> **Por qué después:** es el siguiente módulo médico crítico (la app guarda pacientes y citas pero aún no consultas). Depende de tener el ciclo de cuenta estable.
+### Fase 5 — Historial Médico (MedicalRecord CRUD) ✅ COMPLETADA
+> Cierre Fase 5: 237 tests / 538 asserts — Pint OK — PHPStan OK.
 
-- [ ] Migración + modelo `MedicalRecord` (revisar lo existente, completar campos)
-- [ ] `App\Livewire\App\MedicalRecords\Index` (listado por paciente)
-- [ ] `App\Livewire\App\MedicalRecords\Create` (con plantilla SOAP: Subjetivo/Objetivo/Análisis/Plan)
-- [ ] `App\Livewire\App\MedicalRecords\Edit`
-- [ ] `App\Livewire\App\MedicalRecords\Show` (read-only para roles sin permisos de edición)
-- [ ] Asociar al `Appointment` (botón "Crear consulta" desde Show del appointment)
-- [ ] Permisos Spatie: `records.view`, `records.create`, `records.edit`, `records.delete`
-- [ ] Adjuntos: subir documentos/imágenes (storage local)
-- [ ] Activity Log + soft deletes
-- [ ] Traducciones records.php (ES/EN)
-- [ ] Tests Feature (CRUD + permisos + multi-tenant scope)
+#### 5.1 Backend
+- [x] Modelo `MedicalRecord` revisado (campos SOAP, vital_signs, diagnoses, prescriptions, soft deletes, activity log).
+- [x] `MedicalRecordFactory` con states (`draft`, `consultation`, `prescription`, `withVitalSigns`, `confidential`, `forPatient`, `forAppointment`).
+- [x] Permisos Spatie ya seedeados (`records.view/create/edit/delete/view_confidential`).
+- [x] Rutas anidadas `patients/{patient}/records/*` con write protegidas por `can.write`.
+
+#### 5.2 Livewire + UI
+- [x] `App\Livewire\App\MedicalRecords\Index` (filtros tipo/estado, oculta confidenciales sin permiso, paginación).
+- [x] `App\Livewire\App\MedicalRecords\Show` (tenant guard triple, bloqueo confidencial, delete con permiso).
+- [x] `App\Livewire\App\MedicalRecords\Create` (SOAP completo, vital signs, repeaters diagnóstico/prescripción, draft vs final).
+- [x] `App\Livewire\App\MedicalRecords\Edit` (sólo borradores, redirige a show si está finalizado).
+- [x] Vistas Blade con dark mode + traducciones ES/EN (`lang/{es,en}/records.php`).
+
+#### 5.3 Integración
+- [x] Botón "Nueva consulta" en `appointments/show` con `?appointment_id=` (sólo si `canWrite()`).
+- [x] Sección "Recent Records" en `patients/show` enlaza al historial completo y al show individual.
+- [x] Pre-fill automático de tipo/título cuando se crea desde una cita.
+
+#### 5.4 Tests (10 nuevos, todos verdes)
+- [x] Index renderiza con permiso, prohíbe sin permiso.
+- [x] Create persiste como draft y como final (con vital signs, diagnósticos, prescripciones).
+- [x] Show bloquea acceso cross-tenant y oculta confidenciales sin `view_confidential`.
+- [x] Edit sólo permitido en borradores (finalizados → redirect a show).
+- [x] Create/Edit bloqueados por `can.write` cuando la cuenta está read-only.
+- [x] Pre-fill desde appointment query param.
+- [x] Delete requiere permiso `records.delete`.
+
+---
+
+### Fase 5 — Historial Médico (MedicalRecord CRUD) — Plan detallado (referencia histórica)
 
 ---
 
