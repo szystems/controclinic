@@ -94,11 +94,86 @@
     </div>
 
     <style>
-        .fc-controclinic .fc-toolbar-title { font-size: 1.125rem; font-weight: 600; }
-        .fc-controclinic .fc-button-primary { background: #4f46e5; border-color: #4f46e5; }
-        .fc-controclinic .fc-button-primary:hover,
-        .fc-controclinic .fc-button-primary:not(:disabled).fc-button-active { background: #4338ca; border-color: #4338ca; }
+        /* Tipografía general escalada al tamaño de la app (text-sm Tailwind ~ 0.875rem) */
+        .fc-controclinic { font-size: 0.8125rem; }
+        .fc-controclinic .fc-toolbar { gap: 0.5rem; flex-wrap: wrap; }
+        .fc-controclinic .fc-toolbar-title { font-size: 1rem; font-weight: 600; }
+        .fc-controclinic .fc-col-header-cell-cushion { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; padding: 0.5rem 0.25rem; }
+        .fc-controclinic .fc-daygrid-day-number { font-size: 0.75rem; padding: 0.25rem 0.4rem; }
+        .fc-controclinic .fc-event { font-size: 0.7rem; line-height: 1.1rem; padding: 1px 4px; border-radius: 3px; }
+        .fc-controclinic .fc-list-event-title,
+        .fc-controclinic .fc-list-event-time { font-size: 0.8125rem; }
+
+        /* --- Botones: paleta variada --- */
+        /* Reset el morado por defecto de FC */
+        .fc-controclinic .fc-button-primary {
+            background: #ffffff;
+            border: 1px solid #d1d5db;        /* gray-300 */
+            color: #374151;                   /* gray-700 */
+            box-shadow: none;
+            text-transform: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
+            line-height: 1rem;
+        }
+        .fc-controclinic .fc-button-primary:hover {
+            background: #f3f4f6;              /* gray-100 */
+            border-color: #9ca3af;            /* gray-400 */
+            color: #111827;
+        }
+        .fc-controclinic .fc-button-primary:focus,
+        .fc-controclinic .fc-button-primary:focus-visible {
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.35);
+            outline: none;
+        }
+        .fc-controclinic .fc-button-primary:disabled {
+            background: #f9fafb;
+            color: #9ca3af;
+            border-color: #e5e7eb;
+        }
+        /* Estado activo (vista seleccionada): morado de marca */
+        .fc-controclinic .fc-button-primary:not(:disabled).fc-button-active,
+        .fc-controclinic .fc-button-primary:not(:disabled):active {
+            background: #4f46e5;              /* indigo-600 */
+            border-color: #4338ca;
+            color: #ffffff;
+        }
+        /* Botones prev/next: estilo icono */
+        .fc-controclinic .fc-prev-button,
+        .fc-controclinic .fc-next-button {
+            background: #eef2ff;              /* indigo-50 */
+            border-color: #c7d2fe;            /* indigo-200 */
+            color: #4338ca;                   /* indigo-700 */
+        }
+        .fc-controclinic .fc-prev-button:hover,
+        .fc-controclinic .fc-next-button:hover {
+            background: #e0e7ff;              /* indigo-100 */
+            border-color: #a5b4fc;
+            color: #3730a3;
+        }
+        /* Botón "Hoy": estilo verde para destacarlo como acción contextual */
+        .fc-controclinic .fc-today-button {
+            background: #ecfdf5;              /* emerald-50 */
+            border-color: #a7f3d0;            /* emerald-200 */
+            color: #047857;                   /* emerald-700 */
+            font-weight: 600;
+        }
+        .fc-controclinic .fc-today-button:hover {
+            background: #d1fae5;
+            border-color: #6ee7b7;
+            color: #065f46;
+        }
+        .fc-controclinic .fc-today-button:disabled {
+            background: #f3f4f6;
+            border-color: #e5e7eb;
+            color: #9ca3af;
+        }
+
+        /* Eventos cancelados visualmente atenuados */
         .fc-event-cancelled { opacity: 0.55; text-decoration: line-through; }
+
+        /* --- Dark mode --- */
         .dark .fc-controclinic { color: #e5e7eb; }
         .dark .fc-controclinic .fc-col-header-cell-cushion,
         .dark .fc-controclinic .fc-daygrid-day-number,
@@ -113,6 +188,43 @@
         .dark .fc-controclinic .fc-day-other,
         .dark .fc-controclinic .fc-list-event:hover td { background: #1f2937; }
         .dark .fc-controclinic .fc-day-today { background: rgba(79, 70, 229, 0.12) !important; }
+
+        .dark .fc-controclinic .fc-button-primary {
+            background: #374151;              /* gray-700 */
+            border-color: #4b5563;            /* gray-600 */
+            color: #e5e7eb;
+        }
+        .dark .fc-controclinic .fc-button-primary:hover {
+            background: #4b5563;
+            border-color: #6b7280;
+            color: #f9fafb;
+        }
+        .dark .fc-controclinic .fc-button-primary:not(:disabled).fc-button-active,
+        .dark .fc-controclinic .fc-button-primary:not(:disabled):active {
+            background: #6366f1;              /* indigo-500 */
+            border-color: #4f46e5;
+            color: #ffffff;
+        }
+        .dark .fc-controclinic .fc-prev-button,
+        .dark .fc-controclinic .fc-next-button {
+            background: #312e81;              /* indigo-900 */
+            border-color: #4338ca;
+            color: #c7d2fe;
+        }
+        .dark .fc-controclinic .fc-prev-button:hover,
+        .dark .fc-controclinic .fc-next-button:hover {
+            background: #3730a3;
+            color: #e0e7ff;
+        }
+        .dark .fc-controclinic .fc-today-button {
+            background: #064e3b;              /* emerald-900 */
+            border-color: #047857;
+            color: #6ee7b7;
+        }
+        .dark .fc-controclinic .fc-today-button:hover {
+            background: #065f46;
+            color: #a7f3d0;
+        }
     </style>
 
     <script>
