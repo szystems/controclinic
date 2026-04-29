@@ -116,6 +116,25 @@
 
 ---
 
+### 🔮 Fase futura: Flujo de enmienda formal de consultas
+> **Estado:** Diferido. El status `STATUS_AMENDED` ya existe en el modelo pero no se usa.
+> **Por qué se difirió:** Fase 5 priorizó CRUD básico. La enmienda es una funcionalidad médico-legal específica que merece diseño propio.
+>
+> **Lo que falta para activarlo:**
+> - [ ] Migración: agregar columna `amendment_of_id` (FK a `medical_records.id`, nullable) en `medical_records`.
+> - [ ] Modelo `MedicalRecord`: relación `amendmentOf()` y `amendments()` (hasMany inversa).
+> - [ ] UI: en `medical-records/show.blade.php` (consulta finalizada) → botón **"Crear enmienda"** que abra Create con datos pre-rellenados de la original y `amendment_of_id` seteado.
+> - [ ] `App\Livewire\App\MedicalRecords\Create`: aceptar parámetro `?amendment_of=` desde query string. Si está presente, marcar `status = STATUS_AMENDED` automáticamente al guardar y bloquear cambios al campo `record_type`.
+> - [ ] UI: en `show.blade.php` mostrar bloque "Enmiendas posteriores" listando `$record->amendments` con link.
+> - [ ] UI: en `index.blade.php` re-añadir `STATUS_AMENDED` al filtro (`recordStatuses()` en `App\Livewire\App\MedicalRecords\Index`).
+> - [ ] Badges visuales distintos para `amended` (ej. lila) y referencia visible al record original.
+> - [ ] Permiso nuevo `records.amend` (asignar a doctor + owner).
+> - [ ] Tests Feature: enmienda crea registro nuevo sin tocar original, link bidireccional, sólo permitido sobre `final`.
+>
+> **Archivo afectado actual:** `app/Livewire/App/MedicalRecords/Index.php` línea ~88 (filtro `STATUS_AMENDED` removido temporalmente con comentario).
+
+---
+
 ### Fase 6 — Calendario Visual de Citas (UX)
 > **Por qué después:** la lista de citas funciona, el calendario es visual y de productividad. Requiere data ya estable.
 

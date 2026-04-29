@@ -87,10 +87,12 @@ class Index extends Component
 
     private function recordStatuses(): array
     {
+        // STATUS_AMENDED is reserved for the future formal amendment flow
+        // (see .context/TASKS.md → "Fase futura: Flujo de enmienda formal").
+        // Hidden from filters until that workflow is implemented.
         return [
             MedicalRecord::STATUS_DRAFT,
             MedicalRecord::STATUS_FINAL,
-            MedicalRecord::STATUS_AMENDED,
         ];
     }
 }
