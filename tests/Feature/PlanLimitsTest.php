@@ -92,11 +92,19 @@ class PlanLimitsTest extends TestCase
 
     // ===== Clinic Model: canAddDoctor() =====
 
-    public function test_free_clinic_can_add_doctor_when_under_limit(): void
+    public function test_free_clinic_cannot_add_doctor_as_owner_occupies_slot(): void
     {
         [$clinic, $user] = $this->createClinicWithOwner('free');
 
-        // Free allows 1 doctor, owner is owner role not doctor
+        // Free plan: max_doctors=1, owner counts as practitioner slot — already at limit
+        $this->assertFalse($clinic->canAddDoctor());
+    }
+
+    public function test_group_clinic_can_add_doctor_when_under_limit(): void
+    {
+        [$clinic, $user] = $this->createClinicWithOwner('group');
+
+        // Group plan: max_doctors=5, only owner (1 practitioner) — under limit
         $this->assertTrue($clinic->canAddDoctor());
     }
 
@@ -106,6 +114,7 @@ class PlanLimitsTest extends TestCase
 
         User::factory()->doctor()->create(['clinic_id' => $clinic->id]);
 
+        // Owner (1) + doctor (1) = 2 practitioners, max_doctors=1
         $this->assertFalse($clinic->canAddDoctor());
     }
 

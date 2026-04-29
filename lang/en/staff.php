@@ -89,6 +89,7 @@ return [
     // Badge
     'you' => 'You',
     'owner_badge' => 'Owner',
+    'owner_role_locked' => 'The owner role cannot be changed.',
 
     // Permissions preview
     'permissions_title' => 'Permissions for this role',
@@ -106,4 +107,25 @@ return [
     'perm_manage_users' => 'Manage team',
     'perm_manage_billing' => 'Manage billing',
     'view_permissions' => 'View permissions',
+
+    // Fase 7: Ownership transfer & password reset
+    'force_password_reset' => 'Send reset link',
+    'force_reset_title' => 'Force password change',
+    'force_reset_description' => 'An email will be sent to this member with a secure one-time link. When clicked, they can set a new password. You will not see or change the password directly.',
+    'reset_link_sent' => 'Reset link sent',
+    'reset_link_failed' => 'Could not send the reset link. Please verify the member\'s email address is valid.',
+    'cannot_reset_self' => 'You cannot force reset your own password.',
+    'transfer_ownership' => 'Transfer Ownership',
+    'ownership_transferred' => 'Ownership transferred successfully.',
+    'transfer_confirm' => 'Are you sure you want to transfer ownership to this user? This action is irreversible.',
+    'transfer_confirm_yes' => 'Yes, transfer now',
+    'only_owner_can_transfer' => 'Only the current owner can transfer ownership.',
+    'cannot_transfer_to_self' => 'You cannot transfer ownership to yourself.',
+    'transfer_ownership_section' => 'Transfer Clinic Ownership',
+    'transfer_ownership_description' => 'Select an active team member to transfer clinic ownership to. This action is permanent and irreversible.',
+    'select_new_owner' => 'Select new owner',
+    'select_member' => '— Select member —',
+    'transfer_only_to_doctor' => 'You can only transfer ownership to a user with the Doctor role.',
+    'no_transfer_candidates' => 'There are no active doctors to transfer ownership to. Invite a doctor first.',
+    'transfer_select_first' => 'You must select a member before transferring.',
 ];

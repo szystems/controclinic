@@ -73,17 +73,27 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {{-- Role --}}
                     <div>
-                        <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            {{ __('staff.role') }} <span class="text-red-500">*</span>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            {{ __('staff.role') }}
                         </label>
-                        <select wire:model.live="role" id="role"
-                                class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="doctor">{{ __('staff.role_doctor') }}</option>
-                            <option value="assistant">{{ __('staff.role_assistant') }}</option>
-                            <option value="secretary">{{ __('staff.role_secretary') }}</option>
-                            <option value="receptionist">{{ __('staff.role_receptionist') }}</option>
-                        </select>
-                        @error('role') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        @if($member->isOwner())
+                            {{-- Owner: rol bloqueado, no editable --}}
+                            <div class="flex items-center gap-2 px-3 py-2 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700 rounded-lg">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
+                                    {{ __('staff.role_owner') }}
+                                </span>
+                                <span class="text-xs text-purple-600 dark:text-purple-400">{{ __('staff.owner_role_locked') }}</span>
+                            </div>
+                        @else
+                            <select wire:model.live="role" id="role"
+                                    class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="doctor">{{ __('staff.role_doctor') }}</option>
+                                <option value="assistant">{{ __('staff.role_assistant') }}</option>
+                                <option value="secretary">{{ __('staff.role_secretary') }}</option>
+                                <option value="receptionist">{{ __('staff.role_receptionist') }}</option>
+                            </select>
+                            @error('role') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        @endif
                     </div>
 
                     {{-- Status --}}
@@ -118,6 +128,57 @@
                                class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         @error('password_confirmation') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                     </div>
+
+                    {{-- Forzar reset de contraseña y transferir ownership --}}
+                    @php $authUser = auth()->user(); @endphp
+
+                    @if(($authUser->isOwner() || $authUser->isAdmin()) && $authUser->id !== $member->id)
+                        <div class="md:col-span-2">
+                            <div class="mt-2 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                                <p class="text-xs font-semibold text-amber-800 dark:text-amber-300 mb-0.5">{{ __('staff.force_reset_title') }}</p>
+                                <p class="text-xs text-amber-700 dark:text-amber-400 mb-3">{{ __('staff.force_reset_description') }}</p>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" wire:click="sendResetPasswordLink"
+                                            wire:loading.attr="disabled" wire:target="sendResetPasswordLink"
+                                            class="px-3 py-1.5 text-xs font-medium bg-amber-600 text-white rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 transition disabled:opacity-60">
+                                        <span wire:loading.remove wire:target="sendResetPasswordLink">{{ __('staff.force_password_reset') }}</span>
+                                        <span wire:loading wire:target="sendResetPasswordLink">{{ __('general.sending') }}...</span>
+                                    </button>
+                                    @if($resetLinkSent)
+                                        <span class="text-xs font-medium text-green-600 dark:text-green-400">&#10003; {{ __('staff.reset_link_sent') }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($authUser->isOwner() && $member->id !== $authUser->id && $member->clinic->owner_id === $authUser->id && $member->role === 'doctor')
+                        <div class="md:col-span-2 mt-4" x-data="{ confirming: false }">
+                            @if($ownershipTransferred)
+                                <span class="text-sm font-medium text-green-600 dark:text-green-400">&#10003; {{ __('staff.ownership_transferred') }}</span>
+                            @else
+                                <button type="button" x-show="!confirming" @click="confirming = true"
+                                        class="px-4 py-2 text-sm font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition">
+                                    {{ __('staff.transfer_ownership') }}
+                                </button>
+                                <div x-show="confirming" x-cloak
+                                     class="mt-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg">
+                                    <p class="text-sm font-semibold text-red-800 dark:text-red-300 mb-1">&#9888; {{ __('staff.transfer_ownership_section') }}</p>
+                                    <p class="text-sm text-red-600 dark:text-red-400 mb-3">{{ __('staff.transfer_confirm') }}</p>
+                                    <div class="flex gap-2">
+                                        <button type="button" wire:click="transferOwnership"
+                                                class="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                            {{ __('staff.transfer_confirm_yes') }}
+                                        </button>
+                                        <button type="button" @click="confirming = false"
+                                                class="px-4 py-2 text-sm font-medium bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                                            {{ __('general.cancel') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -162,6 +223,70 @@
                         @error('bio') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                     </div>
                 </div>
+            </div>
+            @endif
+
+            {{-- Transferir ownership desde el propio perfil del owner --}}
+            @if($member->isOwner() && auth()->id() === $member->id)
+            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 p-6">
+                <h2 class="text-lg font-semibold text-red-800 dark:text-red-300 mb-1 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    </svg>
+                    {{ __('staff.transfer_ownership_section') }}
+                </h2>
+                <p class="text-sm text-red-600 dark:text-red-400 mb-4">{{ __('staff.transfer_ownership_description') }}</p>
+
+                @php $candidates = $this->transferCandidates; @endphp
+
+                @if($candidates->isEmpty())
+                    <p class="text-sm text-red-500 dark:text-red-400 italic">{{ __('staff.no_transfer_candidates') }}</p>
+                @else
+                    <div x-data="{ confirming: false }">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-end gap-3" x-show="!confirming">
+                            <div class="flex-1">
+                                <label for="transferToId" class="block text-sm font-medium text-red-700 dark:text-red-300 mb-1">
+                                    {{ __('staff.select_new_owner') }}
+                                </label>
+                                <select wire:model="transferToId" id="transferToId"
+                                        class="block w-full border border-red-300 dark:border-red-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                    <option value="">{{ __('staff.select_member') }}</option>
+                                    @foreach($candidates as $candidate)
+                                        <option value="{{ $candidate->id }}">
+                                            {{ $candidate->name }} &mdash; {{ $candidate->email }} ({{ __('staff.role_' . $candidate->role) }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="button"
+                                    @click="$wire.transferToId ? confirming = true : null"
+                                    :disabled="!$wire.transferToId"
+                                    class="px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700 text-sm font-medium rounded-lg hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                {{ __('staff.transfer_ownership') }}
+                            </button>
+                        </div>
+
+                        <div x-show="confirming" x-cloak
+                             class="mt-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg">
+                            <p class="text-sm font-semibold text-red-800 dark:text-red-300 mb-1">&#9888; {{ __('staff.transfer_ownership_section') }}</p>
+                            <p class="text-sm text-red-600 dark:text-red-400 mb-3">{{ __('staff.transfer_confirm') }}</p>
+                            <div class="flex gap-2">
+                                <button type="button" wire:click="transferOwnership"
+                                        class="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                    {{ __('staff.transfer_confirm_yes') }}
+                                </button>
+                                <button type="button" @click="confirming = false"
+                                        class="px-4 py-2 text-sm font-medium bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                                    {{ __('general.cancel') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        @if($ownershipTransferred)
+                            <p class="mt-3 text-sm font-medium text-green-600 dark:text-green-400">&#10003; {{ __('staff.ownership_transferred') }}</p>
+                        @endif
+                    </div>
+                @endif
             </div>
             @endif
 

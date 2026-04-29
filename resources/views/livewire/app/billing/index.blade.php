@@ -75,7 +75,7 @@
                     $limits = $clinic->getPlanLimits();
                     $patientCount = $clinic->patients()->count();
                     $appointmentCount = $clinic->appointments()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
-                    $doctorCount = $clinic->doctors()->count();
+                    $doctorCount = $clinic->practitioners()->count();
                 @endphp
                 <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('billing.patients') }}</p>

@@ -62,7 +62,7 @@ class Dashboard extends Component
 
     public function getDoctorsCountProperty(): int
     {
-        return $this->clinic->doctors()->count();
+        return $this->clinic->practitioners()->count();
     }
 
     public function getStaffCountProperty(): int

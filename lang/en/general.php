@@ -30,6 +30,8 @@ return [
     'save' => 'Save',
     'save_changes' => 'Save Changes',
     'saving' => 'Saving',
+    'sending' => 'Sending',
+    'saved' => 'Saved.',
     'cancel' => 'Cancel',
     'search' => 'Search',
     'filter' => 'Filter',

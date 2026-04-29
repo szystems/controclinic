@@ -99,9 +99,8 @@ class Index extends Component
 
     public function getDoctorCountProperty(): int
     {
-        // Cuenta sólo doctores invitados (rol=doctor); el owner se muestra
-        // por separado en la tabla con badge "Propietario".
-        return $this->currentClinic->doctors()->count();
+        // Cuenta owner + doctores (practitioners) porque el owner ocupa un slot de doctor en el plan.
+        return $this->currentClinic->practitioners()->count();
     }
 
     public function getStaffCountProperty(): int

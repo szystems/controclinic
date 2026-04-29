@@ -89,6 +89,7 @@ return [
     // Badge
     'you' => 'Tú',
     'owner_badge' => 'Propietario',
+    'owner_role_locked' => 'El rol del propietario no se puede cambiar.',
 
     // Permissions preview
     'permissions_title' => 'Permisos de este rol',
@@ -106,4 +107,25 @@ return [
     'perm_manage_users' => 'Gestionar equipo',
     'perm_manage_billing' => 'Gestionar facturación',
     'view_permissions' => 'Ver permisos',
+
+    // Fase 7: Ownership transfer & password reset
+    'force_password_reset' => 'Enviar enlace de cambio',
+    'force_reset_title' => 'Forzar cambio de contraseña',
+    'force_reset_description' => 'Se enviará un email a este miembro con un enlace seguro de un solo uso. Al hacer clic, podrá establecer una nueva contraseña. Tú no verás ni cambiarás la contraseña directamente.',
+    'reset_link_sent' => 'Enlace de restablecimiento enviado',
+    'reset_link_failed' => 'No se pudo enviar el enlace. Verifica que el correo del miembro sea válido.',
+    'cannot_reset_self' => 'No puedes forzar el reset de tu propia contraseña.',
+    'transfer_ownership' => 'Transferir Propiedad',
+    'ownership_transferred' => 'Propiedad transferida correctamente.',
+    'transfer_confirm' => '¿Seguro que deseas transferir la propiedad a este usuario? Esta acción es irreversible.',
+    'transfer_confirm_yes' => 'Sí, transferir ahora',
+    'only_owner_can_transfer' => 'Solo el propietario actual puede transferir la propiedad.',
+    'cannot_transfer_to_self' => 'No puedes transferirte la propiedad a ti mismo.',
+    'transfer_ownership_section' => 'Transferir Propiedad de la Clínica',
+    'transfer_ownership_description' => 'Selecciona un miembro activo de tu equipo para transferirle la propiedad de la clínica. Esta acción es permanente e irreversible.',
+    'select_new_owner' => 'Seleccionar nuevo propietario',
+    'select_member' => '— Seleccionar miembro —',
+    'transfer_only_to_doctor' => 'Solo puedes transferir la propiedad a un usuario con rol Doctor.',
+    'no_transfer_candidates' => 'No hay doctores activos a quienes transferir la propiedad. Invita un doctor primero.',
+    'transfer_select_first' => 'Debes seleccionar un miembro antes de transferir.',
 ];

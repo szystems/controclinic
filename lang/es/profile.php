@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'Mi Perfil',
+    'personal_info' => 'Información Personal',
+    'professional_info' => 'Información Profesional',
+    'name' => 'Nombre',
+    'email' => 'Correo Electrónico',
+    'phone' => 'Teléfono',
+    'locale' => 'Idioma',
+    'timezone' => 'Zona Horaria',
+    'specialties' => 'Especialidades',
+    'license_number' => 'Número de Licencia',
+    'bio' => 'Biografía',
+    'updated_successfully' => 'Perfil actualizado exitosamente.',
+    'change_password' => 'Cambiar Contraseña',
+    'current_password' => 'Contraseña Actual',
+    'new_password' => 'Nueva Contraseña',
+    'password_confirmation' => 'Confirmar Nueva Contraseña',
+    'password_updated' => 'Contraseña actualizada exitosamente.',
+    'activity_log' => 'Registro de Actividad',
+    'activity_date' => 'Fecha',
+    'activity_event' => 'Evento',
+    'activity_changes' => 'Cambios',
+    'no_activity' => 'No hay actividad registrada.',
+];

@@ -53,7 +53,8 @@ class InvitationTest extends TestCase
 
     public function test_owner_can_send_invitation(): void
     {
-        [$clinic, $owner] = $this->createClinicWithOwner('solo');
+        // group plan: max_doctors=5, owner occupies 1 slot — still can invite
+        [$clinic, $owner] = $this->createClinicWithOwner('group');
 
         Livewire::actingAs($owner)
             ->test(Create::class, ['clinic' => $clinic])

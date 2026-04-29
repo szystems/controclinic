@@ -5,7 +5,7 @@
 ])
 
 @php
-    $clinic = app('current_clinic') ?? auth()->user()->clinic;
+    $clinic = (app()->bound('current_clinic') ? app('current_clinic') : null) ?? auth()->user()->clinic;
     $slug = $clinicSlug ?? $clinic?->slug ?? 'demo';
     $isOwner = auth()->user()->hasRole('owner');
     $billingRoute = route('app.billing.index', $slug);

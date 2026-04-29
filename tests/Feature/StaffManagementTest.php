@@ -149,7 +149,8 @@ class StaffManagementTest extends TestCase
 
     public function test_owner_can_invite_doctor(): void
     {
-        [$clinic, $owner] = $this->createClinicWithOwner('solo');
+        // Use group plan (max_doctors=5) since owner counts as practitioner, solo only allows 1
+        [$clinic, $owner] = $this->createClinicWithOwner('group');
 
         Livewire::actingAs($owner)
             ->test(Create::class, ['clinic' => $clinic])
@@ -457,12 +458,13 @@ class StaffManagementTest extends TestCase
 
     public function test_index_shows_usage_badges(): void
     {
-        [$clinic, $owner] = $this->createClinicWithOwner('solo');
+        // Group plan: max_doctors=5. Owner (1) + 1 doctor = 2 practitioners counted
+        [$clinic, $owner] = $this->createClinicWithOwner('group');
 
         $doctor = User::factory()->doctor()->create(['clinic_id' => $clinic->id]);
 
         Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic])
-            ->assertSee(__('staff.doctors_usage', ['current' => 1, 'max' => 1]));
+            ->assertSee(__('staff.doctors_usage', ['current' => 2, 'max' => 5]));
     }
 }

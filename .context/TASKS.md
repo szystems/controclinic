@@ -1,6 +1,6 @@
 # 📝 Tareas Pendientes
 
-> Actualizado: 2026-04-28
+> Actualizado: 2026-04-29
 > Enfoque: SaaS-First
 
 ---
@@ -151,13 +151,17 @@
 
 ---
 
-### Fase 7 — Perfil del Usuario + Transferencia de Ownership (Fase 3D)
-- [ ] Página `/app/{clinic}/profile` editable por cada usuario
-- [ ] Cambio de contraseña propia
-- [ ] Owner puede forzar reset de contraseña a un staff
-- [ ] Transferir ownership a otro usuario (con confirmación + email)
-- [ ] Historial de actividad por usuario (filtrar Activity Log por user_id)
-- [ ] Tests
+### Fase 7 — Perfil del Usuario + Transferencia de Ownership (Fase 3D) ✅ COMPLETADA (2026-04-29)
+- [x] Página `/app/{clinic}/profile` editable por cada usuario
+- [x] Cambio de contraseña propia
+- [x] Owner puede forzar reset de contraseña a un staff (con caja ámbar explicativa + manejo de errores SMTP)
+- [x] Transferir ownership a otro usuario (confirmación Alpine.js 2 pasos, solo a doctores)
+- [x] Historial de actividad por usuario (filtrar Activity Log por user_id)
+- [x] Owner cuenta como practitioner en límites del plan (dashboard, billing, staff)
+- [x] Seeder de roles/permisos idempotente (firstOrCreate)
+- [x] Tests: 254 tests / 575 asserts ✓
+
+**Estado final Fase 7:** 254 tests / 575 asserts ✓ · Pint clean ✓ · PHPStan clean ✓
 
 ---
 
@@ -236,3 +240,12 @@
 - **Decisiones arquitectónicas:** documentar en `.context/DECISIONS.md`.
 - **Cambios mayores:** actualizar `STATUS.md` con la fecha y los tests que pasan.
 - **Tests primero** en cada fase: definir los tests antes de implementar.
+
+- [ ] Implementar sidebar colapsable para la navegación principal, inspirado en el diseño y experiencia del proyecto szystems (`/home/szott/proyectos/szystems`).
+    - Sidebar debe permitir acceso directo a todos los módulos principales (Dashboard, Pacientes, Citas, Calendario visual, Staff, Reportes, Configuración, etc).
+    - Debe ser colapsable (iconos solo) y expandible (iconos + texto).
+    - Incluir agrupación de módulos secundarios (ej: "Módulos" con submenú).
+    - Soporte para dark mode y responsivo (mobile/desktop).
+    - Acceso rápido a perfil, ayuda y logout.
+    - Tomar como referencia la UX/UI de las capturas y el proyecto szystems para lograr una experiencia moderna y eficiente.
+    - No desarrollar aún, solo dejar planeado y priorizar después de la tarea de owner=doctor en plan solo.

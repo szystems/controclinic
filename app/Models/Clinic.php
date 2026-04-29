@@ -226,7 +226,8 @@ class Clinic extends Model
             return true;
         }
 
-        return $this->doctors()->count() < $limits['max_doctors'];
+        // El owner cuenta como doctor a efectos del límite del plan
+        return $this->practitioners()->count() < $limits['max_doctors'];
     }
 
     public function canAddStaff(): bool

@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'My Profile',
+    'personal_info' => 'Personal Information',
+    'professional_info' => 'Professional Information',
+    'name' => 'Name',
+    'email' => 'Email',
+    'phone' => 'Phone',
+    'locale' => 'Language',
+    'timezone' => 'Timezone',
+    'specialties' => 'Specialties',
+    'license_number' => 'License Number',
+    'bio' => 'Bio',
+    'updated_successfully' => 'Profile updated successfully.',
+    'change_password' => 'Change Password',
+    'current_password' => 'Current Password',
+    'new_password' => 'New Password',
+    'password_confirmation' => 'Confirm New Password',
+    'password_updated' => 'Password updated successfully.',
+    'activity_log' => 'Activity Log',
+    'activity_date' => 'Date',
+    'activity_event' => 'Event',
+    'activity_changes' => 'Changes',
+    'no_activity' => 'No activity recorded.',
+];

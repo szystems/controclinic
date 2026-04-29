@@ -184,6 +184,8 @@ Route::prefix('app/{clinic}')
                         Route::get('/{user}/edit', StaffEdit::class)->name('edit');
                     });
                 });
+                    // Perfil de usuario (tenantizado)
+                    Route::get('/profile', \App\Livewire\App\Profile\Index::class)->name('profile');
             });
         });
     });
