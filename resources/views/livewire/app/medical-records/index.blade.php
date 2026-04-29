@@ -106,6 +106,18 @@
                             <div class="text-right flex-shrink-0 text-xs text-gray-500 dark:text-gray-400">
                                 <div>{{ $record->created_at->isoFormat('LL') }}</div>
                                 <div class="mt-0.5">{{ $record->doctor?->name }}</div>
+                                @if($record->status === \App\Models\MedicalRecord::STATUS_DRAFT)
+                                    @can('records.edit')
+                                        @if($clinic->canWrite())
+                                            <a href="{{ route('app.records.edit', ['clinic' => $clinic->slug, 'patient' => $patient->id, 'record' => $record->id]) }}"
+                                               wire:navigate
+                                               onclick="event.stopPropagation()"
+                                               class="inline-block mt-1 text-indigo-600 dark:text-indigo-400 hover:underline">
+                                                {{ __('general.edit') }} →
+                                            </a>
+                                        @endif
+                                    @endcan
+                                @endif
                             </div>
                         </div>
                     </a>

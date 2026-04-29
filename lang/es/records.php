@@ -104,6 +104,7 @@ return [
 
     // Errors
     'cannot_edit_finalized' => 'Esta consulta está finalizada. Crea una nueva con estado "Modificado" para añadir cambios.',
+    'finalized_notice' => 'Esta consulta está finalizada y no puede editarse. Si necesitas corregir información, crea una nueva consulta de tipo enmienda.',
     'permission_denied' => 'No tienes permiso para esta acción.',
     'confidential_hidden' => 'Esta consulta es confidencial.',
 
