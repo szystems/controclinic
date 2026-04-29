@@ -23,6 +23,7 @@ use App\Livewire\App\Patients\Create as PatientsCreate;
 use App\Livewire\App\Patients\Edit as PatientsEdit;
 use App\Livewire\App\Patients\Index as PatientsIndex;
 use App\Livewire\App\Patients\Show as PatientsShow;
+use App\Livewire\App\Reports\Index as ReportsIndex;
 use App\Livewire\App\Settings\Index as SettingsIndex;
 use App\Livewire\App\Staff\Create as StaffCreate;
 use App\Livewire\App\Staff\Edit as StaffEdit;
@@ -184,8 +185,10 @@ Route::prefix('app/{clinic}')
                         Route::get('/{user}/edit', StaffEdit::class)->name('edit');
                     });
                 });
-                    // Perfil de usuario (tenantizado)
-                    Route::get('/profile', \App\Livewire\App\Profile\Index::class)->name('profile');
+                // Reportes
+                Route::get('/reports', ReportsIndex::class)->name('reports');
+                // Perfil de usuario (tenantizado)
+                Route::get('/profile', App\Livewire\App\Profile\Index::class)->name('profile');
             });
         });
     });

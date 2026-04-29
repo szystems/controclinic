@@ -1,10 +1,10 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-04-29
-> **Fase actual:** Fase 7 — Perfil + Ownership Transfer (✅ COMPLETADO)
-> **Próxima:** Fase 8 — Reportes / Dashboard Avanzado
+> **Fase actual:** Fase 8 — Reportes / Dashboard Avanzado (✅ COMPLETADO)
+> **Próxima:** Fase 3C — Permisos Personalizados
 > **Enfoque:** SaaS-First
-> **Métricas:** 254 tests / 575 asserts · Pint clean · PHPStan level 5 (con baseline)
+> **Métricas:** 268 tests / 595 asserts · Pint clean · PHPStan level 5 (con baseline)
 
 ---
 

@@ -28,6 +28,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'records.view', 'records.create', 'records.edit', 'records.delete', 'records.view_confidential',
             // Configuración
             'settings.view', 'settings.edit', 'users.manage', 'billing.manage',
+            // Reportes
+            'reports.view', 'reports.export',
         ];
 
         foreach ($permissions as $permission) {
@@ -47,6 +49,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'appointments.view', 'appointments.create', 'appointments.edit',
             'records.view', 'records.create', 'records.edit',
             'settings.view',
+            'reports.view',
         ]);
 
         // Asistente - Apoyo al doctor
@@ -77,6 +80,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'appointments.view', 'appointments.view_all',
             'settings.view', 'settings.edit',
             'users.manage', 'billing.manage',
+            'reports.view', 'reports.export',
         ]);
 
         $this->command->info('✅ Roles y permisos creados exitosamente');

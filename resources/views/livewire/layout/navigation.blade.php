@@ -63,6 +63,12 @@ new class extends Component
                         {{ __('general.staff') }}
                     </x-nav-link>
                     @endcan
+
+                    @can('reports.view')
+                    <x-nav-link :href="route('app.reports', $clinicSlug)" :active="request()->routeIs('app.reports')" wire:navigate>
+                        {{ __('general.reports') }}
+                    </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -198,6 +204,12 @@ new class extends Component
             @can('users.manage')
             <x-responsive-nav-link :href="route('app.staff.index', $clinicSlug)" :active="request()->routeIs('app.staff.*')" wire:navigate>
                 {{ __('general.staff') }}
+            </x-responsive-nav-link>
+            @endcan
+
+            @can('reports.view')
+            <x-responsive-nav-link :href="route('app.reports', $clinicSlug)" :active="request()->routeIs('app.reports')" wire:navigate>
+                {{ __('general.reports') }}
             </x-responsive-nav-link>
             @endcan
         </div>

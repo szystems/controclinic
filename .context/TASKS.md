@@ -165,14 +165,18 @@
 
 ---
 
-### Fase 8 — Reportes / Dashboard Avanzado
-- [ ] Reporte de citas por período (filtros: doctor, estado, tipo)
-- [ ] Reporte de pacientes nuevos por mes
-- [ ] Reporte de ingresos (cuando exista facturación de servicios)
-- [ ] Exportación a CSV / PDF
-- [ ] Gráficas en dashboard del owner (Chart.js o ApexCharts)
-- [ ] Permisos: `reports.view`, `reports.export`
-- [ ] Tests
+### Fase 8 — Reportes / Dashboard Avanzado ✅ COMPLETADA (2026-04-29)
+- [x] Reporte de citas por período (filtros: doctor, estado, tipo)
+- [x] Reporte de pacientes nuevos por mes
+- [x] Exportación a CSV (con BOM para Excel)
+- [x] Gráficas interactivas (Chart.js 4.5.1): citas por día, por estado, por tipo, pacientes por mes
+- [x] Permisos: `reports.view` (owner/doctor/admin), `reports.export` (owner/admin)
+- [x] Nav link condicional `@can('reports.view')` en desktop + responsive
+- [x] Traducciones ES/EN (`lang/{es,en}/reports.php`)
+- [x] 14 tests Feature: acceso, aislamiento tenant, filtros, export CSV, períodos
+- [x] 268 tests / 595 asserts ✓
+
+**Estado final Fase 8:** 268 tests / 595 asserts ✓ · Pint clean ✓ · PHPStan clean ✓
 
 ---
 

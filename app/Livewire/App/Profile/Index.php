@@ -4,31 +4,42 @@ namespace App\Livewire\App\Profile;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Livewire\Component;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-
-use Spatie\Activitylog\Models\Activity;
+use Livewire\Component;
 use Livewire\WithPagination;
+use Spatie\Activitylog\Models\Activity;
 
 class Index extends Component
 {
     use WithPagination;
 
     public User $user;
+
     public string $name = '';
+
     public string $email = '';
+
     public string $phone = '';
+
     public string $locale = '';
+
     public string $timezone = '';
+
     public string $avatar = '';
+
     public string $specialties = '';
+
     public string $bio = '';
+
     public string $license_number = '';
+
     public string $current_password = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public function mount()

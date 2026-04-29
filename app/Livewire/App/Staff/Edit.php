@@ -1,29 +1,42 @@
 <?php
+
 namespace App\Livewire\App\Staff;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
-use Illuminate\Support\Facades\Password as PasswordBroker;
-use Illuminate\Support\Facades\Gate;
 
 // ...el resto del código de la clase...
 
 class Edit extends Component
 {
     public User $member;
+
     public string $name = '';
+
     public string $email = '';
+
     public string $phone = '';
+
     public string $role = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
+
     public string $specialties = '';
+
     public string $license_number = '';
+
     public string $bio = '';
+
     public bool $is_active = true;
+
     public bool $resetLinkSent = false;
+
     public bool $ownershipTransferred = false;
+
     public string $transferToId = '';
 
     protected function rules(): array
@@ -41,6 +54,7 @@ class Edit extends Component
         if ($this->password) {
             $rules['password'] = ['confirmed', Password::defaults()];
         }
+
         return $rules;
     }
 
@@ -70,6 +84,7 @@ class Edit extends Component
     {
         if (! auth()->user()->can('users.manage')) {
             $this->dispatch('notify', type: 'error', message: __('general.unauthorized'));
+
             return;
         }
         // Si el miembro es owner, forzar que su rol siempre sea owner (no se puede cambiar)
@@ -85,6 +100,7 @@ class Edit extends Component
             ->exists();
         if ($exists) {
             $this->addError('email', __('staff.email_already_exists'));
+
             return;
         }
         // Check plan limits if role changed to doctor
@@ -92,6 +108,7 @@ class Edit extends Component
         if ($this->role === 'doctor' && $this->member->role !== 'doctor') {
             if (! $clinic->canAddDoctor()) {
                 $this->dispatch('notify', type: 'error', message: __('staff.doctor_limit_reached'));
+
                 return;
             }
         } elseif ($this->role !== 'doctor' && $this->member->role === 'doctor') {
@@ -99,6 +116,7 @@ class Edit extends Component
             if (! in_array($this->member->role, ['assistant', 'secretary', 'receptionist'])) {
                 if (! $clinic->canAddStaff()) {
                     $this->dispatch('notify', type: 'error', message: __('staff.staff_limit_reached'));
+
                     return;
                 }
             }
@@ -133,13 +151,15 @@ class Edit extends Component
     {
         // Solo owner o admin pueden forzar reset
         $user = auth()->user();
-        if (!($user->isOwner() || $user->isAdmin())) {
+        if (! ($user->isOwner() || $user->isAdmin())) {
             $this->dispatch('notify', type: 'error', message: __('general.unauthorized'));
+
             return;
         }
         // No permitir reset al owner a sí mismo
         if ($this->member->id === $user->id) {
             $this->dispatch('notify', type: 'error', message: __('staff.cannot_reset_self'));
+
             return;
         }
         try {
@@ -156,8 +176,9 @@ class Edit extends Component
         $user = auth()->user();
         $clinic = $this->member->clinic;
         // Solo el owner actual puede transferir ownership
-        if (!($user->isOwner() && $clinic->owner_id === $user->id)) {
+        if (! ($user->isOwner() && $clinic->owner_id === $user->id)) {
             $this->dispatch('notify', type: 'error', message: __('staff.only_owner_can_transfer'));
+
             return;
         }
 
@@ -165,6 +186,7 @@ class Edit extends Component
         if ($this->member->id === $user->id) {
             if (empty($this->transferToId)) {
                 $this->dispatch('notify', type: 'error', message: __('staff.transfer_select_first'));
+
                 return;
             }
             $target = User::where('clinic_id', $clinic->id)
@@ -174,6 +196,7 @@ class Edit extends Component
                 ->first();
             if (! $target) {
                 $this->dispatch('notify', type: 'error', message: __('general.unauthorized'));
+
                 return;
             }
         } else {
@@ -181,12 +204,14 @@ class Edit extends Component
             // Solo se puede transferir a un doctor
             if ($target->role !== 'doctor') {
                 $this->dispatch('notify', type: 'error', message: __('staff.transfer_only_to_doctor'));
+
                 return;
             }
         }
 
         if ($target->id === $user->id) {
             $this->dispatch('notify', type: 'error', message: __('staff.cannot_transfer_to_self'));
+
             return;
         }
 
