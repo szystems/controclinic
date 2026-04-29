@@ -124,6 +124,16 @@ class Clinic extends Model
         return $this->hasMany(User::class)->where('role', 'doctor');
     }
 
+    /**
+     * Practicantes médicos: doctores invitados + el owner si ejerce como médico.
+     * Útil para UI / selectores de doctor / calendario donde el owner típicamente atiende.
+     * Para validar límites del plan usa {@see canAddDoctor()} que sólo cuenta `role=doctor`.
+     */
+    public function practitioners(): HasMany
+    {
+        return $this->hasMany(User::class)->whereIn('role', ['doctor', 'owner']);
+    }
+
     public function staff(): HasMany
     {
         return $this->hasMany(User::class)->whereIn('role', ['assistant', 'secretary', 'receptionist']);

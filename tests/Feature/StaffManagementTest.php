@@ -94,13 +94,13 @@ class StaffManagementTest extends TestCase
             ->assertSee('Dr. Test');
     }
 
-    public function test_staff_index_does_not_show_owner(): void
+    public function test_staff_index_shows_owner(): void
     {
         [$clinic, $owner] = $this->createClinicWithOwner();
 
         Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic])
-            ->assertDontSee($owner->name);
+            ->assertSee($owner->name);
     }
 
     public function test_staff_index_search_filters_members(): void

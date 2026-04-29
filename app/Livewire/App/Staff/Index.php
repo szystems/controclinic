@@ -71,7 +71,6 @@ class Index extends Component
     {
         return User::query()
             ->where('clinic_id', $this->currentClinic->id)
-            ->where('role', '!=', 'owner')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%'.$this->search.'%')
@@ -84,6 +83,7 @@ class Index extends Component
             ->when($this->statusFilter !== '', function ($query) {
                 $query->where('is_active', $this->statusFilter === 'active');
             })
+            ->orderByRaw("CASE WHEN role = 'owner' THEN 0 ELSE 1 END") // owner siempre primero
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
     }
@@ -99,6 +99,8 @@ class Index extends Component
 
     public function getDoctorCountProperty(): int
     {
+        // Cuenta sólo doctores invitados (rol=doctor); el owner se muestra
+        // por separado en la tabla con badge "Propietario".
         return $this->currentClinic->doctors()->count();
     }
 

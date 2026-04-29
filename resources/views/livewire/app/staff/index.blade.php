@@ -308,7 +308,10 @@
                                                     @click.outside="showPerms = false"
                                                     type="button"
                                                     class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer transition
-                                                        {{ $member->role === 'doctor' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                                                        @if($member->role === 'owner') bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/60
+                                                        @elseif($member->role === 'doctor') bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60
+                                                        @else bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
+                                                        @endif">
                                                 {{ __('staff.role_' . $member->role) }}
                                                 <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -330,6 +333,12 @@
                                                 <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ __('staff.permissions_title') }}</p>
                                                 @php
                                                     $memberPerms = [
+                                                        'owner' => [
+                                                            __('staff.module_patients') => [__('staff.perm_view'), __('staff.perm_create'), __('staff.perm_edit')],
+                                                            __('staff.module_appointments') => [__('staff.perm_view'), __('staff.perm_create'), __('staff.perm_edit')],
+                                                            __('staff.module_records') => [__('staff.perm_view'), __('staff.perm_create'), __('staff.perm_edit')],
+                                                            __('staff.module_settings') => [__('staff.perm_view'), __('staff.perm_edit')],
+                                                        ],
                                                         'doctor' => [
                                                             __('staff.module_patients') => [__('staff.perm_view'), __('staff.perm_create'), __('staff.perm_edit')],
                                                             __('staff.module_appointments') => [__('staff.perm_view'), __('staff.perm_create'), __('staff.perm_edit')],
@@ -381,6 +390,21 @@
                                     @can('users.manage')
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end gap-2">
+                                            @if($member->isOwner())
+                                                {{-- Owner: sin acciones destructivas, sólo edit perfil --}}
+                                                <a href="{{ route('app.staff.edit', ['clinic' => $currentClinic->slug, 'user' => $member->id]) }}"
+                                                   wire:navigate
+                                                   class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                   title="{{ __('general.edit') }}">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                </a>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
+                                                      title="{{ __('staff.cannot_delete_owner') }}">
+                                                    {{ __('staff.owner_badge') }}
+                                                </span>
+                                            @else
                                             <a href="{{ route('app.staff.edit', ['clinic' => $currentClinic->slug, 'user' => $member->id]) }}"
                                                wire:navigate
                                                class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
@@ -412,6 +436,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                 </svg>
                                             </button>
+                                            @endif
                                             @endif
                                         </div>
                                     </td>
