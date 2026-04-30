@@ -44,15 +44,7 @@
                             mode: '{{ $branding_logo_url && !str_starts_with($branding_logo_url, "/storage/") ? "url" : "file" }}',
                             previewUrl: '{{ $branding_logo_url ?? "" }}'
                         }"
-                        x-init="
-                            const stop = e => e.preventDefault();
-                            document.addEventListener('dragover', stop);
-                            document.addEventListener('drop', stop);
-                            $cleanup(() => {
-                                document.removeEventListener('dragover', stop);
-                                document.removeEventListener('drop', stop);
-                            });
-                        "
+                    >
                     >
                         <x-input-label :value="__('admin.logo')" />
 
@@ -148,7 +140,7 @@
                             <x-text-input
                                 id="branding_logo_url"
                                 wire:model="branding_logo_url"
-                                type="url"
+                                type="text"
                                 class="mt-1 block w-full"
                                 placeholder="https://..."
                             />
