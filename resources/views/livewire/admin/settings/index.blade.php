@@ -1,4 +1,21 @@
 <div>
+    {{-- Bloquea que el navegador abra archivos arrastrados fuera de los drop zones --}}
+    @script
+        <script>
+            (function () {
+                if (window.__dropzoneGuardInstalled) return;
+                window.__dropzoneGuardInstalled = true;
+                const isInsideDropzone = (target) => target && target.closest && target.closest('[data-dropzone]');
+                window.addEventListener('dragover', (e) => {
+                    if (!isInsideDropzone(e.target)) e.preventDefault();
+                }, false);
+                window.addEventListener('drop', (e) => {
+                    if (!isInsideDropzone(e.target)) e.preventDefault();
+                }, false);
+            })();
+        </script>
+    @endscript
+
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('admin.platform_settings') }}
@@ -92,6 +109,7 @@
                         <div x-show="mode === 'file'" x-cloak>
                             <label
                                 for="logo_file_input"
+                                data-dropzone
                                 class="mt-1 flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition bg-gray-50 dark:bg-gray-800/50"
                                 x-on:dragover.prevent
                                 x-on:drop.prevent="
@@ -173,6 +191,7 @@
                         <div x-data="{ faviconPreview: null }">
                             <label
                                 for="favicon_file_input"
+                                data-dropzone
                                 class="mt-1 flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition bg-gray-50 dark:bg-gray-800/50"
                                 x-on:dragover.prevent
                                 x-on:drop.prevent="
