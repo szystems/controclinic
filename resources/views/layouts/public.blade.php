@@ -206,6 +206,44 @@
         </div>
     </footer>
 
+    <!-- Cookie Banner (GDPR mínimo) -->
+    <div
+        x-data="{ show: !localStorage.getItem('cookie_consent') }"
+        x-show="show"
+        x-cloak
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="translate-y-full opacity-0"
+        x-transition:enter-end="translate-y-0 opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="translate-y-0 opacity-100"
+        x-transition:leave-end="translate-y-full opacity-0"
+        class="fixed bottom-0 inset-x-0 z-50 p-4"
+    >
+        <div class="max-w-4xl mx-auto bg-gray-900 text-white rounded-xl shadow-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 sm:p-5">
+            <div class="flex-1 text-sm text-gray-300">
+                <span class="font-medium text-white">🍪 Cookies</span>
+                —
+                Usamos cookies esenciales para el funcionamiento del sitio. Al continuar navegando aceptas nuestra
+                <a href="{{ route('privacy') }}" class="underline text-indigo-400 hover:text-indigo-300">Política de Privacidad</a>.
+            </div>
+            <div class="flex gap-2 shrink-0">
+                <button
+                    type="button"
+                    x-on:click="localStorage.setItem('cookie_consent', '1'); show = false"
+                    class="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition"
+                >
+                    Aceptar
+                </button>
+                <a
+                    href="{{ route('privacy') }}"
+                    class="px-4 py-2 text-sm font-medium bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition"
+                >
+                    Más info
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- x-cloak style -->
     <style>
         [x-cloak] { display: none !important; }

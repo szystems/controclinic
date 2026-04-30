@@ -51,7 +51,7 @@
 - [x] **Fase 3C** — Permisos personalizados (UI Staff\Edit + `extraPermissions` array + `syncPermissions` + `PERMISSION_CATALOG` + 4 tests Feature) ✅ 2026-04-30
 - [x] **Hardening producción** — Webhook Paddle (`PADDLE_WEBHOOK_SECRET`), scheduler cron (`appointments:send-reminders`), rate limiters (`sensitive/global/api/webhook`), Policies (Patient, Appointment, MedicalRecord), SoftDeletes en todos los modelos core ✅ 2026-04-30
 - [x] **Fix crítico PDF/Livewire** — `TenantMiddleware` y `SetLocale` registrados como persistent middleware en `AppServiceProvider`; `Patients\Show::exportPdf` usa `$patient->clinic` como fallback. Todos los PDFs ahora funcionan en acciones Livewire. ✅ 2026-04-30
-- [ ] **Módulo Configuración General Admin (subset v1)** — solo Branding + Legal + Defaults + Feature flags (Pagos/SMTP en `.env` por ahora)
+- [x] **Módulo Configuración General Admin (subset v1)** — Branding (nombre, logo, favicon, color), Legal (URLs, email soporte), Defaults (locale, timezone, moneda), Feature flags. Dynamic branding en todos los layouts. ✅ 2026-04-30
 
 #### 0.2 Forward-Compat DB — Migraciones preventivas (ADITIVAS, nullable) ✅ 2026-04-30
 
@@ -83,17 +83,17 @@
 
 #### 0.3 Compliance mínimo v1.0
 - [ ] **2FA opcional** — habilitable por usuario (Laravel Fortify o paquete equivalente). Schema ya reservado en 0.2.
-- [ ] **Consentimiento Términos & Privacidad** al registrar — checkbox + timestamp guardado en `users.terms_accepted_at`
-- [ ] **Cookie banner** en portal público (GDPR mínimo)
+- [x] **Consentimiento Términos & Privacidad** al registrar — checkbox + timestamp guardado en `users.terms_accepted_at` (2026-05-01)
+- [x] **Cookie banner** en portal público (GDPR mínimo) (2026-05-01)
 - [ ] **Política de retención por defecto** documentada (ej. 5 años para historiales tras última cita)
 - [ ] **Export ZIP de data por clínica** — owner descarga su data completa (CSV/JSON) — feature simple en v1
 
 #### 0.4 Operación / DevOps mínimo
 - [ ] Backup automático diario (mysqldump → S3/storage cifrado)
-- [ ] Health check endpoint (`/health`) para uptime monitoring
+- [x] Health check endpoint (`/health`) para uptime monitoring (2026-05-01)
 - [ ] Logs estructurados (JSON) para producción
 - [ ] Sentry / Bugsnag / similar para errores en prod
-- [ ] Variables de entorno revisadas (`.env.production.example`)
+- [x] Variables de entorno revisadas (`.env.production.example`) (2026-05-01)
 - [ ] `php artisan optimize` en deploy
 - [ ] Documentación de deployment (Docker / VPS / similar)
 
@@ -189,7 +189,7 @@ viva ni rompe datos sensibles. Las migraciones del Bloque 0 son la "vacuna" para
 
 
 ---
-
+![![alt text](image-1.png)](image.png)
 ### � Plan v1.0 Preliminar (lanzamiento mínimo funcional)
 
 > **Objetivo:** dejar la aplicación lista para lanzar comercialmente con clínicas reales.

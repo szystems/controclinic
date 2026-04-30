@@ -22,4 +22,8 @@ return [
     'verification_sent' => 'A new verification link has been sent to your email.',
     'check_email' => 'Before continuing, please check your email for a verification link.',
     'resend_verification' => 'Resend Verification Email',
+    'terms_acceptance' => 'I have read and agree to the :terms and :privacy.',
+    'terms_link' => 'Terms and Conditions',
+    'privacy_link' => 'Privacy Policy',
+    'terms_required' => 'You must accept the Terms and Conditions to continue.',
 ];

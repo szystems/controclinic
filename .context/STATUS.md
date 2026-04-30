@@ -1,10 +1,20 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-04-30
-> **Fase actual:** v1.0 — Bloques 0.1 y 0.2 completados. Próximo: Módulo Admin Config General (Bloque 0.1 restante)
-> **Próxima:** Módulo Configuración General Admin (subset v1) usando `app_settings` ya disponible
+> **Última actualización:** 2026-05-01
+> **Fase actual:** v1.0 — Bloque 0 completado (health check, consentimiento, cookie banner, .env.production.example). Próximo: Bloque 1 Core App
 > **Enfoque:** SaaS-First
-> **Métricas:** 307 tests / 694 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+> **Métricas:** 332 tests / 759 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+
+---
+
+## ✅ Bloque 0.3 Compliance + 0.4 DevOps (2026-05-01) ✅
+
+- [x] `/health` endpoint — devuelve JSON con estado de DB, cache, storage, app, env. 200 ok / 503 degraded.
+- [x] Checkbox de consentimiento en formulario de registro (Términos + Privacidad). Guarda `terms_accepted_at` en users.
+- [x] Traducciones ES/EN: `terms_acceptance`, `terms_link`, `privacy_link`, `terms_required`
+- [x] Cookie banner en portal público (`/c/{slug}`) con Alpine.js + localStorage. GDPR mínimo.
+- [x] `.env.production.example` documentado con checklist de producción
+- [x] Suite completa: 332/332 verde
 
 ---
 

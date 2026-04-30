@@ -31,7 +31,55 @@ use App\Livewire\App\Staff\Edit as StaffEdit;
 use App\Livewire\App\Staff\Index as StaffIndex;
 use App\Livewire\Public\Booking;
 use App\Models\Plan;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+
+/*
+|--------------------------------------------------------------------------
+| Health Check
+|--------------------------------------------------------------------------
+*/
+Route::get('/health', function () {
+    $checks = [];
+    $status = 200;
+
+    // Database
+    try {
+        DB::connection()->getPdo();
+        $checks['database'] = 'ok';
+    } catch (Throwable $e) {
+        $checks['database'] = 'error';
+        $status = 503;
+    }
+
+    // Cache
+    try {
+        Cache::put('health_check', true, 5);
+        Cache::forget('health_check');
+        $checks['cache'] = 'ok';
+    } catch (Throwable $e) {
+        $checks['cache'] = 'error';
+        $status = 503;
+    }
+
+    // Storage
+    try {
+        Storage::disk('local')->put('.health', now()->toIso8601String());
+        Storage::disk('local')->delete('.health');
+        $checks['storage'] = 'ok';
+    } catch (Throwable $e) {
+        $checks['storage'] = 'error';
+        $status = 503;
+    }
+
+    $checks['app'] = config('app.name');
+    $checks['env'] = config('app.env');
+    $checks['status'] = $status === 200 ? 'healthy' : 'degraded';
+
+    return response()->json($checks, $status);
+})->name('health');
 
 /*
 |--------------------------------------------------------------------------

@@ -18,6 +18,7 @@ new #[Layout('layouts.guest')] class extends Component
     public string $password = '';
     public string $password_confirmation = '';
     public string $clinic_name = '';
+    public bool $terms_accepted = false;
 
     /**
      * Handle an incoming registration request.
@@ -29,6 +30,7 @@ new #[Layout('layouts.guest')] class extends Component
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'unique:clinics,email'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
             'clinic_name' => ['required', 'string', 'max:255', 'min:3'],
+            'terms_accepted' => ['accepted'],
         ]);
 
         $user = DB::transaction(function () use ($validated) {
@@ -60,6 +62,7 @@ new #[Layout('layouts.guest')] class extends Component
                 'clinic_id' => $clinic->id,
                 'role' => User::ROLE_OWNER,
                 'is_active' => true,
+                'terms_accepted_at' => now(),
             ]);
 
             // Assign owner role (Spatie)
@@ -129,6 +132,25 @@ new #[Layout('layouts.guest')] class extends Component
                 </svg>
                 {{ __('auth.free_plan_info') }}
             </p>
+        </div>
+
+        <!-- Terms & Privacy acceptance -->
+        <div class="mt-4">
+            <label class="flex items-start gap-3 cursor-pointer">
+                <input
+                    id="terms_accepted"
+                    type="checkbox"
+                    wire:model="terms_accepted"
+                    class="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500"
+                />
+                <span class="text-sm text-gray-600 dark:text-gray-400">
+                    {!! __('auth.terms_acceptance', [
+                        'terms' => '<a href="' . route('terms') . '" target="_blank" class="underline hover:text-gray-900 dark:hover:text-gray-100">' . __('auth.terms_link') . '</a>',
+                        'privacy' => '<a href="' . route('privacy') . '" target="_blank" class="underline hover:text-gray-900 dark:hover:text-gray-100">' . __('auth.privacy_link') . '</a>',
+                    ]) !!
+                </span>
+            </label>
+            <x-input-error :messages="$errors->get('terms_accepted')" class="mt-2" />
         </div>
 
         <div class="flex items-center justify-end mt-4">
