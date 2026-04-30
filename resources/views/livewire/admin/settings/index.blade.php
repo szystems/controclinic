@@ -168,29 +168,50 @@
                             </div>
                         @endif
 
-                        <label
-                            for="favicon_file_input"
-                            class="mt-1 flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition bg-gray-50 dark:bg-gray-800/50"
-                        >
-                            <div class="flex flex-col items-center text-gray-400 dark:text-gray-500">
-                                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                </svg>
-                                <span class="text-xs">{{ __('admin.favicon_drop_hint') }}</span>
-                                <span class="text-xs text-gray-400 mt-0.5">SVG, PNG, ICO · max 512 KB · recomendado 32×32 px</span>
+                        <div x-data="{ faviconPreview: null }">
+                            <label
+                                for="favicon_file_input"
+                                class="mt-1 flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition bg-gray-50 dark:bg-gray-800/50"
+                                x-on:dragover.prevent
+                                x-on:drop.prevent="
+                                    const file = $event.dataTransfer.files[0];
+                                    if (file) {
+                                        faviconPreview = URL.createObjectURL(file);
+                                        $refs.faviconInput.files = $event.dataTransfer.files;
+                                        $refs.faviconInput.dispatchEvent(new Event('change'));
+                                    }
+                                "
+                            >
+                                <template x-if="!faviconPreview">
+                                    <div class="flex flex-col items-center text-gray-400 dark:text-gray-500">
+                                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                        </svg>
+                                        <span class="text-xs">{{ __('admin.favicon_drop_hint') }}</span>
+                                        <span class="text-xs text-gray-400 mt-0.5">SVG, PNG, ICO · max 512 KB · recomendado 32×32 px</span>
+                                    </div>
+                                </template>
+                                <template x-if="faviconPreview">
+                                    <img :src="faviconPreview" class="max-h-16 max-w-full object-contain p-2" />
+                                </template>
+                                <input
+                                    id="favicon_file_input"
+                                    type="file"
+                                    wire:model="favicon_file"
+                                    accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon"
+                                    class="hidden"
+                                    x-ref="faviconInput"
+                                    x-on:change="
+                                        const file = $event.target.files[0];
+                                        if (file) faviconPreview = URL.createObjectURL(file);
+                                    "
+                                />
+                            </label>
+                            <div wire:loading wire:target="favicon_file" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                {{ __('admin.logo_uploading') }}
                             </div>
-                            <input
-                                id="favicon_file_input"
-                                type="file"
-                                wire:model="favicon_file"
-                                accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon"
-                                class="hidden"
-                            />
-                        </label>
-                        <div wire:loading wire:target="favicon_file" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            {{ __('admin.logo_uploading') }}
+                            <x-input-error :messages="$errors->get('favicon_file')" class="mt-2" />
                         </div>
-                        <x-input-error :messages="$errors->get('favicon_file')" class="mt-2" />
                     </div>
 
                     {{-- Primary Color --}}
