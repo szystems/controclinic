@@ -135,4 +135,7 @@ return [
     'transfer_only_to_doctor' => 'You can only transfer ownership to a user with the Doctor role.',
     'no_transfer_candidates' => 'There are no active doctors to transfer ownership to. Invite a doctor first.',
     'transfer_select_first' => 'You must select a member before transferring.',
+    'restore_role_permissions' => 'Restore role permissions',
+    'restore_permissions_confirm' => 'Are you sure? All extra permissions will be removed, leaving only the role defaults.',
+    'permissions_restored' => 'Permissions restored to role defaults.',
 ];

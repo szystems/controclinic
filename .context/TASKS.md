@@ -412,16 +412,16 @@ viva ni rompe datos sensibles. Las migraciones del Bloque 0 son la "vacuna" para
 
 ---
 
-### Fase 3C — Permisos Personalizados (Última)
+### Fase 3C — Permisos Personalizados (Última) ✅ COMPLETADA (2026-05-01)
 > **Por qué al final:** depende de tener todos los módulos definidos para saber qué permisos personalizar. Incluye los permisos nuevos de export/print definidos arriba.
 
-- [ ] UI en `Staff\Edit` con tabla de permisos agrupados por módulo (Pacientes, Citas, Historiales, Reportes, Config, Export)
-- [ ] Toggle on/off por permiso por usuario (Spatie direct permissions)
-- [ ] Botón "Restaurar permisos del rol"
-- [ ] Preview de capacidades del usuario
-- [ ] Activity Log de cambios de permisos
-- [ ] Traducciones permissions.php
-- [ ] Tests
+- [x] UI en `Staff\Edit` con tabla de permisos agrupados por módulo (Pacientes, Citas, Historiales, Reportes, Config, Export) (2026-05-01)
+- [x] Toggle on/off por permiso por usuario (Spatie direct permissions) (2026-05-01)
+- [x] Botón "Restaurar permisos del rol" con confirmación (2026-05-01)
+- [x] Preview de capacidades del usuario (`x-role-permissions-preview`) (2026-05-01)
+- [x] Activity Log de cambios de permisos (`permissions_updated`, `permissions_restored`) (2026-05-01)
+- [x] Traducciones `permissions.php` ES/EN con nombres legibles (2026-05-01)
+- [x] 7 tests Feature pasando (2026-05-01)
 
 ---
 

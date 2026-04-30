@@ -168,14 +168,55 @@ class Edit extends Component
             array_diff($this->extraPermissions, $rolePerms),
             $this->allCatalogPermissions()
         ));
+        $previousExtras = $this->member->getDirectPermissions()->pluck('name')->sort()->values()->all();
         $this->member->syncPermissions($extras);
         $this->extraPermissions = $extras;
+
+        // Activity Log si cambiaron los permisos directos
+        $newExtras = collect($extras)->sort()->values()->all();
+        if ($previousExtras !== $newExtras) {
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($this->member)
+                ->withProperties([
+                    'previous_permissions' => $previousExtras,
+                    'new_permissions' => $newExtras,
+                ])
+                ->log('permissions_updated');
+        }
+
         session()->flash('success', __('staff.updated_successfully'));
         $this->dispatch('notify', type: 'success', message: __('staff.updated_successfully'));
         $this->redirect(
             route('app.staff.index', $clinic->slug),
             navigate: true
         );
+    }
+
+    /** Restaura los permisos extra al estado base del rol (elimina todos los directos). */
+    public function restoreRolePermissions(): void
+    {
+        if (! auth()->user()->can('users.manage')) {
+            $this->dispatch('notify', type: 'error', message: __('general.unauthorized'));
+
+            return;
+        }
+        $previous = $this->member->getDirectPermissions()->pluck('name')->sort()->values()->all();
+        $this->member->syncPermissions([]);
+        $this->extraPermissions = [];
+
+        if ($previous) {
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($this->member)
+                ->withProperties([
+                    'previous_permissions' => $previous,
+                    'new_permissions' => [],
+                ])
+                ->log('permissions_restored');
+        }
+
+        $this->dispatch('notify', type: 'success', message: __('staff.permissions_restored'));
     }
 
     public function sendResetPasswordLink()

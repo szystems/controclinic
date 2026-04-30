@@ -107,4 +107,60 @@ class StaffCustomPermissionsTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->assertFalse($assistant->fresh()->can('records.view'));
     }
+
+    public function test_restore_role_permissions_removes_all_direct_permissions(): void
+    {
+        [$clinic, $owner] = $this->bootstrapClinic();
+        $assistant = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'assistant']);
+        $assistant->assignRole('assistant');
+        $assistant->givePermissionTo(['records.view', 'reports.view']);
+
+        $this->assertCount(2, $assistant->fresh()->getDirectPermissions());
+
+        Livewire::actingAs($owner)
+            ->test(StaffEdit::class, ['user' => $assistant])
+            ->call('restoreRolePermissions');
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->assertCount(0, $assistant->fresh()->getDirectPermissions());
+    }
+
+    public function test_restore_role_permissions_requires_users_manage_permission(): void
+    {
+        [$clinic, $owner] = $this->bootstrapClinic();
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
+        $doctor->assignRole('doctor');
+        $assistant = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'assistant']);
+        $assistant->assignRole('assistant');
+        $assistant->givePermissionTo('records.view');
+
+        // Doctor sin users.manage no puede restaurar permisos de otro
+        Livewire::actingAs($doctor)
+            ->test(StaffEdit::class, ['user' => $assistant])
+            ->call('restoreRolePermissions');
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        // El permiso debe seguir activo porque doctor no tiene users.manage
+        $this->assertCount(1, $assistant->fresh()->getDirectPermissions());
+    }
+
+    public function test_permission_change_is_logged_in_activity_log(): void
+    {
+        [$clinic, $owner] = $this->bootstrapClinic();
+        $assistant = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'assistant']);
+        $assistant->assignRole('assistant');
+
+        Livewire::actingAs($owner)
+            ->test(StaffEdit::class, ['user' => $assistant])
+            ->set('extraPermissions', ['records.view'])
+            ->call('save');
+
+        $this->assertDatabaseHas('activity_log', [
+            'log_name' => 'default',
+            'description' => 'permissions_updated',
+            'subject_type' => User::class,
+            'subject_id' => $assistant->id,
+            'causer_id' => $owner->id,
+        ]);
+    }
 }

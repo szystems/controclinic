@@ -188,11 +188,24 @@
             {{-- Permisos personalizados (extras) --}}
             @if(! $member->isOwner())
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div class="flex items-center gap-2 mb-3">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('staff.custom_permissions_title') }}</h2>
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('staff.custom_permissions_title') }}</h2>
+                    </div>
+                    @if(count($extraPermissions) > 0)
+                        <button type="button"
+                                wire:click="restoreRolePermissions"
+                                wire:confirm="{{ __('staff.restore_permissions_confirm') }}"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            {{ __('staff.restore_role_permissions') }}
+                        </button>
+                    @endif
                 </div>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">{{ __('staff.custom_permissions_note') }}</p>
 
@@ -212,7 +225,7 @@
                                                @disabled($isRolePerm)
                                                wire:model="extraPermissions"
                                                class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 disabled:opacity-60">
-                                        <span class="font-mono text-[11px] text-gray-700 dark:text-gray-200">{{ $perm }}</span>
+                                        <span class="text-[11px] text-gray-700 dark:text-gray-200">{{ __('permissions.'.$perm) }}</span>
                                         @if($isRolePerm)
                                             <span class="ml-auto text-[10px] text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">{{ __('staff.role_default') }}</span>
                                         @endif

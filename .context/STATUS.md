@@ -1,13 +1,32 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-01
-> **Fase actual:** v1.0 — Bloque 0 completado (health check, consentimiento, cookie banner, .env.production.example). Próximo: Bloque 1 Core App
+> **Fase actual:** v1.0 — Bloque 0 completado. Fase 3C (Permisos Personalizados) completada. Próximo: Bloque 1 Core App
 > **Enfoque:** SaaS-First
-> **Métricas:** 332 tests / 759 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+> **Métricas:** 335 tests / 763 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+
+## ✅ Fase 3C — Permisos Personalizados (2026-05-01) ✅
+
+- [x] `PERMISSION_CATALOG` en `Staff\Edit` agrupado por módulo (patients, appointments, records, settings, users, billing, reports)
+- [x] UI de toggles con indicador "rol" para permisos heredados (no editables)
+- [x] Botón "Restaurar permisos del rol" con confirmación (elimina todos los directos + Activity Log)
+- [x] `restoreRolePermissions()` method con Activity Log `permissions_restored`
+- [x] Activity Log `permissions_updated` en `save()` al cambiar permisos directos
+- [x] Nombres legibles de permisos via `lang/{es,en}/permissions.php` (en lugar de nombres técnicos)
+- [x] 7 tests Feature (asignar, heredados no duplicados, fuera de catálogo ignorados, revocar, restaurar, permisos insuficientes, activity log)
+- [x] Suite completa: 335/335 verde
 
 ---
 
-## ✅ Bloque 0.3 Compliance + 0.4 DevOps (2026-05-01) ✅
+## ✅ DevOps / Infraestructura (2026-05-01) ✅
+
+- [x] Canal `json` + `daily_json` en `config/logging.php` para logs estructurados en producción (Monolog `JsonFormatter`)
+- [x] `docker/deploy.sh` — script de deploy con mantenimiento, migrations, optimize, queue:restart, health check
+- [x] `.env.production.example` actualizado con `LOG_STACK=daily_json`
+
+---
+
+
 
 - [x] `/health` endpoint — devuelve JSON con estado de DB, cache, storage, app, env. 200 ok / 503 degraded.
 - [x] Checkbox de consentimiento en formulario de registro (Términos + Privacidad). Guarda `terms_accepted_at` en users.

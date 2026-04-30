@@ -135,4 +135,7 @@ return [
     'transfer_only_to_doctor' => 'Solo puedes transferir la propiedad a un usuario con rol Doctor.',
     'no_transfer_candidates' => 'No hay doctores activos a quienes transferir la propiedad. Invita un doctor primero.',
     'transfer_select_first' => 'Debes seleccionar un miembro antes de transferir.',
+    'restore_role_permissions' => 'Restaurar permisos del rol',
+    'restore_permissions_confirm' => '¿Estas seguro? Se eliminarán todos los permisos adicionales y se dejarán solo los del rol asignado.',
+    'permissions_restored' => 'Permisos restaurados al estado base del rol.',
 ];
