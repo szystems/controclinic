@@ -23,7 +23,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('records.field_record_type') }} *</label>
-                            <select wire:model="recordType" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm">
+                            <select wire:model.live="recordType" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm">
                                 @foreach($this->recordTypes as $type)
                                     <option value="{{ $type }}">{{ __('records.type_' . $type) }}</option>
                                 @endforeach
@@ -39,6 +39,7 @@
                 </section>
 
                 {{-- SOAP --}}
+                @if($recordType !== \App\Models\MedicalRecord::TYPE_PRESCRIPTION)
                 <section class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6">
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">{{ __('records.form_section_clinical') }}</h3>
                     <div class="space-y-4">
@@ -114,6 +115,7 @@
                         </div>
                     @endif
                 </section>
+                @endif
 
                 {{-- Prescriptions --}}
                 <section class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6">
