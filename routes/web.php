@@ -225,6 +225,7 @@ Route::prefix('admin')
         Route::get('/plans/{plan}/edit', Edit::class)->name('plans.edit');
         Route::get('/clinics', App\Livewire\Admin\Clinics\Index::class)->name('clinics.index');
         Route::get('/clinics/{clinic}', Show::class)->name('clinics.show');
+        Route::get('/settings', App\Livewire\Admin\Settings\Index::class)->name('settings');
     });
 
 require __DIR__.'/auth.php';

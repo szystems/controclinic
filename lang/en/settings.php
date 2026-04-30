@@ -22,6 +22,9 @@ return [
     'billing_saved' => 'Billing information saved successfully',
     'branding_saved' => 'Branding settings saved successfully',
     'logo_removed' => 'Logo removed successfully',
+    'legal_saved' => 'Legal settings saved successfully',
+    'defaults_saved' => 'Default settings saved successfully',
+    'features_saved' => 'Feature flags updated successfully',
 
     // General
     'general' => [

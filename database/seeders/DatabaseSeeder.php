@@ -22,5 +22,8 @@ class DatabaseSeeder extends Seeder
 
         // Crear clínica demo para desarrollo
         $this->call(DemoClinicSeeder::class);
+
+        // Configuración global de la plataforma
+        $this->call(AppSettingsSeeder::class);
     }
 }

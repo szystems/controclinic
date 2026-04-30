@@ -48,6 +48,10 @@
                                    class="{{ request()->routeIs('admin.plans.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
                                     {{ __('admin.plans') }}
                                 </a>
+                                <a href="{{ route('admin.settings') }}" wire:navigate
+                                   class="{{ request()->routeIs('admin.settings') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
+                                    {{ __('admin.settings') }}
+                                </a>
                             </div>
                         </div>
 
