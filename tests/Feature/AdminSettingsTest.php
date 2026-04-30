@@ -317,4 +317,72 @@ class AdminSettingsTest extends TestCase
         $newUrl = AppSetting::get('branding.logo_url');
         $this->assertStringStartsWith('/storage/branding/', $newUrl);
     }
+
+    // ==================== FAVICON ====================
+
+    public function test_favicon_png_upload_saves_url(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        $file = UploadedFile::fake()->image('icon.png', 32, 32);
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('branding_app_name', 'Demo')
+            ->set('favicon_file', $file)
+            ->call('saveBranding')
+            ->assertHasNoErrors();
+
+        $url = AppSetting::get('branding.favicon_url');
+        $this->assertNotNull($url);
+        $this->assertStringStartsWith('/storage/branding/', $url);
+    }
+
+    public function test_favicon_ico_upload_is_accepted(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        // .ico no es imagen estándar, creamos un fake con extensión ico
+        $file = UploadedFile::fake()->create('favicon.ico', 1, 'image/x-icon');
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('branding_app_name', 'Demo')
+            ->set('favicon_file', $file)
+            ->call('saveBranding')
+            ->assertHasNoErrors();
+    }
+
+    public function test_favicon_over_512kb_is_rejected(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        $file = UploadedFile::fake()->image('big-icon.png')->size(600); // 600 KB > 512 KB
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('favicon_file', $file)
+            ->call('saveBranding')
+            ->assertHasErrors(['favicon_file']);
+    }
+
+    public function test_remove_favicon_clears_setting_and_deletes_file(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        Storage::disk('public')->put('branding/favicon.png', 'fake-content');
+        AppSetting::set('branding.favicon_url', '/storage/branding/favicon.png');
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->call('removeFavicon')
+            ->assertHasNoErrors();
+
+        $this->assertNull(AppSetting::get('branding.favicon_url'));
+        Storage::disk('public')->assertMissing('branding/favicon.png');
+    }
 }

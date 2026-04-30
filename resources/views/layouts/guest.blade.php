@@ -7,6 +7,8 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        @include('partials._head-branding')
+
         <!-- Theme: apply before render to avoid flash -->
         <script>
             (function() {

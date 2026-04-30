@@ -22,6 +22,7 @@ return [
     'billing_saved' => 'Información de facturación guardada correctamente',
     'branding_saved' => 'Configuración de marca guardada correctamente',
     'logo_removed' => 'Logo eliminado correctamente',
+    'favicon_removed' => 'Favicon eliminado correctamente',
     'legal_saved' => 'Configuración legal guardada correctamente',
     'defaults_saved' => 'Valores por defecto guardados correctamente',
     'features_saved' => 'Funcionalidades actualizadas correctamente',

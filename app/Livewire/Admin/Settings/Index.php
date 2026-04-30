@@ -23,6 +23,11 @@ class Index extends Component
     /** @var TemporaryUploadedFile|null */
     public $logo_file = null;
 
+    public string $branding_favicon_url = '';
+
+    /** @var TemporaryUploadedFile|null */
+    public $favicon_file = null;
+
     // --- Legal ---
     public string $legal_terms_url = '';
 
@@ -54,6 +59,7 @@ class Index extends Component
 
         $this->branding_app_name = $settings['branding.app_name'] ?? 'ControClinic';
         $this->branding_logo_url = $settings['branding.logo_url'] ?? '';
+        $this->branding_favicon_url = $settings['branding.favicon_url'] ?? '';
         $this->branding_primary_color = $settings['branding.primary_color'] ?? '#2563eb';
 
         $this->legal_terms_url = $settings['legal.terms_url'] ?? '/terms';
@@ -80,8 +86,14 @@ class Index extends Component
                     $fail(__('validation.url', ['attribute' => $attribute]));
                 }
             }],
+            'branding_favicon_url' => ['nullable', 'max:500', function ($attribute, $value, $fail) {
+                if ($value && ! str_starts_with($value, '/storage/') && ! filter_var($value, FILTER_VALIDATE_URL)) {
+                    $fail(__('validation.url', ['attribute' => $attribute]));
+                }
+            }],
             'branding_primary_color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'logo_file' => 'nullable|file|mimes:svg,png|max:2048',
+            'favicon_file' => 'nullable|file|mimes:svg,png,ico|max:512',
         ]);
 
         $userId = Auth::id();
@@ -103,6 +115,20 @@ class Index extends Component
         AppSetting::set('branding.logo_url', $this->branding_logo_url ?: null, $userId);
         AppSetting::set('branding.primary_color', $this->branding_primary_color, $userId);
 
+        // Guardar favicon si se subió archivo
+        if ($this->favicon_file) {
+            $currentFavicon = AppSetting::get('branding.favicon_url');
+            if ($currentFavicon && str_starts_with($currentFavicon, '/storage/branding/')) {
+                Storage::disk('public')->delete('branding/'.basename($currentFavicon));
+            }
+
+            $path = $this->favicon_file->store('branding', 'public');
+            $this->branding_favicon_url = '/storage/'.$path;
+            $this->favicon_file = null;
+        }
+
+        AppSetting::set('branding.favicon_url', $this->branding_favicon_url ?: null, $userId);
+
         $this->dispatch('notify', type: 'success', message: __('settings.branding_saved'));
     }
 
@@ -118,6 +144,20 @@ class Index extends Component
         AppSetting::set('branding.logo_url', null, Auth::id());
 
         $this->dispatch('notify', type: 'success', message: __('settings.logo_removed'));
+    }
+
+    public function removeFavicon(): void
+    {
+        $current = AppSetting::get('branding.favicon_url');
+
+        if ($current && str_starts_with($current, '/storage/branding/')) {
+            Storage::disk('public')->delete('branding/'.basename($current));
+        }
+
+        $this->branding_favicon_url = '';
+        AppSetting::set('branding.favicon_url', null, Auth::id());
+
+        $this->dispatch('notify', type: 'success', message: __('settings.favicon_removed'));
     }
 
     public function saveLegal(): void

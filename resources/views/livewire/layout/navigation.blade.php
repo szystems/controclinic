@@ -99,7 +99,7 @@ new class extends Component
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('app.dashboard', $clinicSlug) }}" wire:navigate>
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                        <x-app-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
 
@@ -267,7 +267,7 @@ new class extends Component
             <!-- Drawer header -->
             <div class="flex items-center justify-between px-4 h-16 border-b border-gray-100 dark:border-gray-700 shrink-0">
                 <a href="{{ route('app.dashboard', $clinicSlug) }}" wire:navigate @click="open = false" class="flex items-center">
-                    <x-application-logo class="block h-8 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                    <x-app-logo class="block h-8 w-auto fill-current text-gray-800 dark:text-gray-200" />
                 </a>
                 <button @click="open = false"
                         aria-label="{{ __('general.close_menu') }}"

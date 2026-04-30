@@ -5,7 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>Admin - {{ config('app.name', 'ControClinic') }}</title>
+        <title>Admin — {{ \App\Models\AppSetting::get('branding.app_name', config('app.name', 'ControClinic')) }}</title>
+
+        @include('partials._head-branding')
 
         <script>
             (function() {
@@ -31,7 +33,12 @@
                     <div class="flex items-center justify-between h-16">
                         <div class="flex items-center">
                             <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2">
-                                <span class="text-xl font-bold text-white">ControClinic</span>
+                                @php $adminLogoUrl = \App\Models\AppSetting::get('branding.logo_url'); @endphp
+                                @if($adminLogoUrl)
+                                    <img src="{{ $adminLogoUrl }}" alt="{{ \App\Models\AppSetting::get('branding.app_name', config('app.name')) }}" class="h-7 w-auto object-contain" />
+                                @else
+                                    <span class="text-xl font-bold text-white">{{ \App\Models\AppSetting::get('branding.app_name', config('app.name', 'ControClinic')) }}</span>
+                                @endif
                                 <span class="px-2 py-0.5 text-xs font-medium bg-red-600 text-white rounded">ADMIN</span>
                             </a>
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'ControClinic' }} - Software para Clínicas Médicas</title>
+    <title>{{ $title ?? \App\Models\AppSetting::get('branding.app_name', 'ControClinic') }} - Software para Clínicas Médicas</title>
     <meta name="description" content="{{ $description ?? 'ControClinic es el software de gestión para clínicas médicas más fácil de usar. Agenda citas, gestiona pacientes y haz crecer tu práctica médica.' }}">
 
     <!-- Open Graph / Facebook -->
@@ -22,7 +22,7 @@
     <meta property="twitter:description" content="{{ $description ?? 'El software de gestión para clínicas médicas más fácil de usar.' }}">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    @include('partials._head-branding')
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

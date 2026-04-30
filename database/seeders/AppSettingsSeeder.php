@@ -33,6 +33,14 @@ class AppSettingsSeeder extends Seeder
             ],
             [
                 'group' => 'branding',
+                'key' => 'branding.favicon_url',
+                'value' => null,
+                'type' => 'string',
+                'is_public' => true,
+                'description' => 'URL del favicon/ícono de la plataforma (null = usa favicon.svg por defecto)',
+            ],
+            [
+                'group' => 'branding',
                 'key' => 'branding.primary_color',
                 'value' => '#2563eb',
                 'type' => 'string',
