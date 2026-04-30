@@ -167,6 +167,8 @@ return [
     'favicon' => 'Favicon / Icon',
     'favicon_help' => 'Icon shown in browser tab, bookmarks and mobile apps. Recommended 32×32 px.',
     'favicon_drop_hint' => 'Click to select icon',
+    'favicon_select_file' => 'Select icon file',
+    'favicon_selected' => 'File selected',
     'remove_favicon' => 'Remove favicon',
     'confirm_remove_favicon' => 'Remove the current favicon? The default icon will be used instead.',
     'primary_color' => 'Primary Color',

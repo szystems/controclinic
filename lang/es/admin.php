@@ -167,6 +167,8 @@ return [
     'favicon' => 'Favicon / Ícono',
     'favicon_help' => 'Ícono que aparece en el tab del navegador, marcadores y apps móviles. Recomendado 32×32 px.',
     'favicon_drop_hint' => 'Haz clic para seleccionar ícono',
+    'favicon_select_file' => 'Seleccionar archivo de ícono',
+    'favicon_selected' => 'Archivo seleccionado',
     'remove_favicon' => 'Eliminar favicon',
     'confirm_remove_favicon' => '¿Eliminar el favicon actual? Se volverá al ícono por defecto.',
     'primary_color' => 'Color Primario',

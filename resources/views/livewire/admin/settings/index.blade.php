@@ -62,7 +62,6 @@
                             previewUrl: '{{ $branding_logo_url ?? "" }}'
                         }"
                     >
-                    >
                         <x-input-label :value="__('admin.logo')" />
 
                         {{-- Logo actual (si existe) --}}
@@ -189,46 +188,37 @@
                         @endif
 
                         <div x-data="{ faviconPreview: null }">
-                            <label
-                                for="favicon_file_input"
-                                data-dropzone
-                                class="mt-1 flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition bg-gray-50 dark:bg-gray-800/50"
-                                x-on:dragover.prevent
-                                x-on:drop.prevent="
-                                    const file = $event.dataTransfer.files[0];
+                            <input
+                                id="favicon_file_input"
+                                type="file"
+                                accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon"
+                                class="hidden"
+                                x-ref="faviconInput"
+                                x-on:change="
+                                    const file = $event.target.files[0];
                                     if (file) {
                                         faviconPreview = URL.createObjectURL(file);
                                         @this.upload('favicon_file', file);
                                     }
                                 "
+                            />
+                            <button
+                                type="button"
+                                x-on:click="$refs.faviconInput.click()"
+                                class="mt-1 inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                             >
-                                <template x-if="!faviconPreview">
-                                    <div class="flex flex-col items-center text-gray-400 dark:text-gray-500">
-                                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                        </svg>
-                                        <span class="text-xs">{{ __('admin.favicon_drop_hint') }}</span>
-                                        <span class="text-xs text-gray-400 mt-0.5">SVG, PNG, ICO · max 512 KB · recomendado 32×32 px</span>
-                                    </div>
-                                </template>
-                                <template x-if="faviconPreview">
-                                    <img :src="faviconPreview" class="max-h-16 max-w-full object-contain p-2" />
-                                </template>
-                                <input
-                                    id="favicon_file_input"
-                                    type="file"
-                                    accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon"
-                                    class="hidden"
-                                    x-ref="faviconInput"
-                                    x-on:change="
-                                        const file = $event.target.files[0];
-                                        if (file) {
-                                            faviconPreview = URL.createObjectURL(file);
-                                            @this.upload('favicon_file', file);
-                                        }
-                                    "
-                                />
-                            </label>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                </svg>
+                                <span>{{ __('admin.favicon_select_file') }}</span>
+                            </button>
+                            <template x-if="faviconPreview">
+                                <div class="mt-2 inline-flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                    <img :src="faviconPreview" class="w-8 h-8 object-contain border border-gray-200 dark:border-gray-600 rounded p-0.5" />
+                                    <span>{{ __('admin.favicon_selected') }}</span>
+                                </div>
+                            </template>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">SVG, PNG, ICO · max 512 KB · recomendado 32×32 px</p>
                             <div wire:loading wire:target="favicon_file" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                 {{ __('admin.logo_uploading') }}
                             </div>
