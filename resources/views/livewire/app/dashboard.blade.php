@@ -33,7 +33,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {{-- Usage limit banner: only for FREE plan in FULL access (courtesy) reaching real usage limits.\n                 If access is read_only/billing_only the global x-account-status-banner already covers it. --}}
             @if($clinic->plan_type === 'free' && $clinic->accessLevel() === \App\Models\Clinic::ACCESS_FULL)
