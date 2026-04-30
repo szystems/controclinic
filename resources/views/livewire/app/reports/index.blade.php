@@ -1,4 +1,4 @@
-<div class="py-6" x-data="reportsPage()" x-init="init()" x-on:livewire-update.window="refreshCharts()">
+<div id="reports-root" class="py-6" x-data="reportsPage()" x-init="init()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Header --}}
@@ -7,25 +7,37 @@
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('reports.title') }}</h1>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('reports.subtitle') }}</p>
             </div>
-            @can('reports.export')
-            <button
-                wire:click="exportCsv"
-                wire:loading.attr="disabled"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition disabled:opacity-50">
-                <svg wire:loading.remove wire:target="exportCsv" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                <svg wire:loading wire:target="exportCsv" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                </svg>
-                {{ __('reports.export_csv') }}
-            </button>
-            @endcan
+            <div class="flex items-center gap-2 no-print">
+                <button
+                    type="button"
+                    onclick="printReportPdf()"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5m-12 0H5a2 2 0 00-2 2v6h4m10-8h1a2 2 0 012 2v6h-4m-10 0h12v3H6v-3z"/>
+                    </svg>
+                    {{ __('reports.print_pdf') }}
+                </button>
+
+                @can('reports.export')
+                <button
+                    wire:click="exportCsv"
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition disabled:opacity-50">
+                    <svg wire:loading.remove wire:target="exportCsv" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    <svg wire:loading wire:target="exportCsv" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                    {{ __('reports.export_csv') }}
+                </button>
+                @endcan
+            </div>
         </div>
 
         {{-- Filters --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6 no-print">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {{-- Period --}}
                 <div class="col-span-2 md:col-span-1 lg:col-span-2">
@@ -95,7 +107,7 @@
         </div>
 
         {{-- Loading overlay --}}
-        <div wire:loading.flex class="fixed inset-0 bg-black/10 z-50 items-center justify-center">
+        <div wire:loading.flex class="fixed inset-0 bg-black/10 z-50 items-center justify-center no-print">
             <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-xl flex items-center gap-3">
                 <svg class="h-5 w-5 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -189,18 +201,51 @@
             </div>
         </div>
 
+        {{-- Chart data as JSON for Alpine/JS --}}
+        <script id="chart-data" type="application/json">
+        {
+            "byDay":    @json(json_decode($appointmentsByDay)),
+            "byStatus": @json(json_decode($appointmentsByStatus)),
+            "byType":   @json(json_decode($appointmentsByType)),
+            "byMonth":  @json(json_decode($newPatientsByMonth))
+        }
+        </script>
     </div>
-</div>
 
-{{-- Chart data as JSON for Alpine to read --}}
-<script id="chart-data" type="application/json">
-{
-    "byDay":    @json(json_decode($appointmentsByDay)),
-    "byStatus": @json(json_decode($appointmentsByStatus)),
-    "byType":   @json(json_decode($appointmentsByType)),
-    "byMonth":  @json(json_decode($newPatientsByMonth))
+<style>
+@page {
+    size: A4 landscape;
+    margin: 10mm;
 }
-</script>
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    html,
+    body {
+        background: #ffffff !important;
+    }
+
+    #reports-root {
+        padding: 0 !important;
+    }
+
+    #reports-root .max-w-7xl {
+        max-width: none !important;
+        padding: 0 !important;
+    }
+
+    #reports-root .shadow-sm {
+        box-shadow: none !important;
+    }
+
+    #reports-root canvas {
+        max-height: 220px !important;
+    }
+}
+</style>
 
 <script>
 const STATUS_COLORS = {
@@ -354,6 +399,17 @@ function buildCharts() {
     }
 }
 
+function printReportPdf() {
+    // Ensure charts are in sync with latest filters before print dialog.
+    buildCharts();
+    requestAnimationFrame(() => {
+        setTimeout(() => window.print(), 150);
+    });
+}
+
+window.printReportPdf = printReportPdf;
+window.addEventListener('beforeprint', () => buildCharts());
+
 // Expose to Alpine
 window.reportsPage = function() {
     return {
@@ -366,4 +422,16 @@ window.reportsPage = function() {
         }
     };
 };
+
+document.addEventListener('livewire:init', () => {
+    // Livewire 3: redraw charts after each successful component commit.
+    Livewire.hook('commit', ({ component, succeed }) => {
+        succeed(() => {
+            if (component?.name?.includes('reports')) {
+                requestAnimationFrame(() => buildCharts());
+            }
+        });
+    });
+});
 </script>
+</div>

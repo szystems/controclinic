@@ -111,6 +111,7 @@ return [
     'view_full_calendar' => 'Ver calendario completo',
     'plan_usage' => 'Uso del Plan',
     'appointments_this_month' => 'Citas este mes',
+    'doctor' => 'Doctor',
     'doctors' => 'Doctores',
     'staff' => 'Personal',
     'upgrade_to_add_staff' => 'Mejora tu plan para agregar personal',

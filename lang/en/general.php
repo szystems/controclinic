@@ -112,6 +112,7 @@ return [
     'view_full_calendar' => 'View full calendar',
     'plan_usage' => 'Plan Usage',
     'appointments_this_month' => 'Appointments this month',
+    'doctor' => 'Doctor',
     'doctors' => 'Doctors',
     'staff' => 'Staff',
     'upgrade_to_add_staff' => 'Upgrade your plan to add staff',
