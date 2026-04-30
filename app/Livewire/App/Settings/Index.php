@@ -6,6 +6,8 @@ use App\Models\Clinic;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use ZipArchive;
 
 class Index extends Component
 {
@@ -369,6 +371,123 @@ class Index extends Component
         $settings = $this->clinic->settings ?? [];
         $settings = array_merge($settings, $newSettings);
         $this->clinic->update(['settings' => $settings]);
+    }
+
+    public function exportData(): StreamedResponse
+    {
+        abort_if(auth()->id() !== $this->clinic->owner_id, 403);
+
+        $clinic = $this->clinic;
+        $filename = 'datos-clinica-'.$clinic->slug.'-'.now()->format('Y-m-d').'.zip';
+        $tmpPath = storage_path('app/tmp/'.$filename);
+
+        if (! is_dir(storage_path('app/tmp'))) {
+            mkdir(storage_path('app/tmp'), 0755, true);
+        }
+
+        $zip = new ZipArchive;
+        $zip->open($tmpPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+        // --- Pacientes ---
+        $patientsRows = [['ID', 'Nombre', 'Apellido', 'Correo', 'Teléfono', 'Fecha de nacimiento', 'Registrado']];
+        $clinic->patients()->withTrashed()->get()
+            ->each(function ($p) use (&$patientsRows) {
+                $patientsRows[] = [
+                    $p->id,
+                    $p->first_name,
+                    $p->last_name,
+                    $p->email ?? '',
+                    $p->phone ?? '',
+                    $p->date_of_birth?->format('d/m/Y') ?? '',
+                    $p->created_at->format('d/m/Y H:i'),
+                ];
+            });
+        $zip->addFromString('pacientes.csv', $this->arrayToCsv($patientsRows));
+
+        // --- Citas ---
+        $apptRows = [['ID', 'Paciente', 'Doctor', 'Fecha', 'Hora inicio', 'Hora fin', 'Estado', 'Tipo', 'Notas']];
+        $clinic->appointments()->withTrashed()->with(['patient', 'doctor'])->get()
+            ->each(function ($a) use (&$apptRows) {
+                $apptRows[] = [
+                    $a->id,
+                    $a->patient?->full_name ?? '',
+                    $a->doctor?->name ?? '',
+                    $a->appointment_date?->format('d/m/Y') ?? '',
+                    $a->start_time ?? '',
+                    $a->end_time ?? '',
+                    $a->status,
+                    $a->type ?? '',
+                    $a->notes ?? '',
+                ];
+            });
+        $zip->addFromString('citas.csv', $this->arrayToCsv($apptRows));
+
+        // --- Historiales médicos ---
+        $recordRows = [['ID', 'Paciente', 'Doctor', 'Tipo', 'Estado', 'Fecha', 'Confidencial']];
+        $clinic->medicalRecords()->withTrashed()->with(['patient', 'doctor'])->get()
+            ->each(function ($r) use (&$recordRows) {
+                $recordRows[] = [
+                    $r->id,
+                    $r->patient?->full_name ?? '',
+                    $r->doctor?->name ?? '',
+                    $r->record_type,
+                    $r->status,
+                    $r->created_at->format('d/m/Y H:i'),
+                    $r->is_confidential ? 'Sí' : 'No',
+                ];
+            });
+        $zip->addFromString('historiales.csv', $this->arrayToCsv($recordRows));
+
+        // --- Staff ---
+        $staffRows = [['ID', 'Nombre', 'Correo', 'Rol', 'Estado', 'Registrado']];
+        $clinic->users()->withTrashed()->get()
+            ->each(function ($u) use (&$staffRows) {
+                $staffRows[] = [
+                    $u->id,
+                    $u->name,
+                    $u->email,
+                    $u->getRoleNames()->first() ?? '',
+                    $u->trashed() ? 'eliminado' : 'activo',
+                    $u->created_at->format('d/m/Y H:i'),
+                ];
+            });
+        $zip->addFromString('staff.csv', $this->arrayToCsv($staffRows));
+
+        // --- README ---
+        $readme = "ControClinic — Exportación de datos\n";
+        $readme .= "Clínica: {$clinic->name}\n";
+        $readme .= 'Generado: '.now()->format('d/m/Y H:i')." UTC\n\n";
+        $readme .= "Archivos incluidos:\n";
+        $readme .= "- pacientes.csv\n- citas.csv\n- historiales.csv\n- staff.csv\n";
+        $zip->addFromString('README.txt', $readme);
+
+        $zip->close();
+
+        $content = file_get_contents($tmpPath);
+        @unlink($tmpPath);
+
+        activity()->causedBy(auth()->user())
+            ->performedOn($clinic)
+            ->withProperties(['files' => ['pacientes.csv', 'citas.csv', 'historiales.csv', 'staff.csv']])
+            ->log('data_exported');
+
+        return response()->streamDownload(function () use ($content) {
+            echo $content;
+        }, $filename, ['Content-Type' => 'application/zip']);
+    }
+
+    private function arrayToCsv(array $rows): string
+    {
+        $output = "\xEF\xBB\xBF"; // UTF-8 BOM for Excel
+        $f = fopen('php://temp', 'r+');
+        foreach ($rows as $row) {
+            fputcsv($f, $row);
+        }
+        rewind($f);
+        $output .= stream_get_contents($f);
+        fclose($f);
+
+        return $output;
     }
 
     public function render()

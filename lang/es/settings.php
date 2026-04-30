@@ -104,4 +104,17 @@ return [
         'secondary_color' => 'Color secundario',
         'preview' => 'Vista previa',
     ],
+
+    'data' => [
+        'tab' => 'Exportar datos',
+        'title' => 'Exportar datos de la clínica',
+        'subtitle' => 'Descarga todos los datos de tu clínica en formato CSV dentro de un archivo ZIP.',
+        'info' => 'El archivo ZIP incluirá los siguientes archivos CSV con toda la información de tu clínica:',
+        'file_patients' => 'pacientes.csv — listado completo de pacientes',
+        'file_appointments' => 'citas.csv — historial de citas',
+        'file_records' => 'historiales.csv — resumen de historiales médicos',
+        'file_staff' => 'staff.csv — miembros del equipo',
+        'export_btn' => 'Descargar ZIP con datos',
+        'export_hint' => 'Solo el propietario de la clínica puede descargar los datos. La generación puede tardar unos segundos.',
+    ],
 ];

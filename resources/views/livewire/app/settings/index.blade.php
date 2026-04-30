@@ -45,6 +45,11 @@
                 <button wire:click="setTab('branding')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'branding' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
                     Marca
                 </button>
+                @if(auth()->id() === $clinic->owner_id)
+                <button wire:click="setTab('data')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'data' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
+                    {{ __('settings.data.tab') }}
+                </button>
+                @endif
             </nav>
         </div>
 
@@ -94,6 +99,15 @@
                         </svg>
                         Marca
                     </button>
+                    @if(auth()->id() === $clinic->owner_id)
+                    <button wire:click="setTab('data')"
+                            class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'data' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        {{ __('settings.data.tab') }}
+                    </button>
+                    @endif
                 </nav>
             </div>
 
@@ -626,6 +640,48 @@
                     @endif
 
                 </div>
+
+                    @if($activeTab === 'data' && auth()->id() === $clinic->owner_id)
+                    <div>
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('settings.data.title') }}</h2>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('settings.data.subtitle') }}</p>
+
+                        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                            <div class="flex">
+                                <svg class="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-700 dark:text-blue-300">{{ __('settings.data.info') }}</p>
+                                    <ul class="mt-2 text-sm text-blue-600 dark:text-blue-400 list-disc list-inside space-y-0.5">
+                                        <li>{{ __('settings.data.file_patients') }}</li>
+                                        <li>{{ __('settings.data.file_appointments') }}</li>
+                                        <li>{{ __('settings.data.file_records') }}</li>
+                                        <li>{{ __('settings.data.file_staff') }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <button wire:click="exportData"
+                                    wire:loading.attr="disabled"
+                                    wire:target="exportData"
+                                    class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
+                                <svg wire:loading.remove wire:target="exportData" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                <svg wire:loading wire:target="exportData" class="animate-spin w-4 h-4 mr-2 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ __('settings.data.export_btn') }}
+                            </button>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ __('settings.data.export_hint') }}</p>
+                        </div>
+                    </div>
+                    @endif
+
             </div>
         </div>
     </div>

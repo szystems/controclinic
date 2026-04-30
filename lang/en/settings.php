@@ -104,4 +104,17 @@ return [
         'secondary_color' => 'Secondary color',
         'preview' => 'Preview',
     ],
+
+    'data' => [
+        'tab' => 'Export data',
+        'title' => 'Export clinic data',
+        'subtitle' => 'Download all your clinic data as CSV files inside a ZIP archive.',
+        'info' => 'The ZIP file will include the following CSV files with all your clinic information:',
+        'file_patients' => 'patients.csv — full list of patients',
+        'file_appointments' => 'appointments.csv — appointment history',
+        'file_records' => 'records.csv — medical records summary',
+        'file_staff' => 'staff.csv — team members',
+        'export_btn' => 'Download ZIP with data',
+        'export_hint' => 'Only the clinic owner can download clinic data. Generation may take a few seconds.',
+    ],
 ];
