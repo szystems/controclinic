@@ -78,6 +78,14 @@ return [
 
     // Fechas
     'today' => 'Hoy',
+    'view_all' => 'Ver todas',
+    'last_14_days' => 'Últimos 14 días',
+    'upcoming_appointments' => 'Próximas citas',
+    'next_7_days' => 'Próximos 7 días',
+    'no_upcoming_appointments' => 'No hay citas programadas en los próximos 7 días.',
+    'birthdays_this_month' => 'Cumpleaños del mes',
+    'no_birthdays_this_month' => 'No hay cumpleaños este mes.',
+    'turns_age' => 'Cumple :age años',
     'tomorrow' => 'Mañana',
     'yesterday' => 'Ayer',
     'this_week' => 'Esta semana',

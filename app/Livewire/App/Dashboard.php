@@ -4,6 +4,8 @@ namespace App\Livewire\App;
 
 use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\Patient;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Dashboard extends Component
@@ -60,6 +62,73 @@ class Dashboard extends Component
             ->get();
     }
 
+    /**
+     * Próximas 5 citas (excluyendo hoy) en los próximos 7 días.
+     */
+    public function getUpcomingAppointmentsProperty()
+    {
+        $tomorrow = now()->addDay()->toDateString();
+        $weekAhead = now()->addDays(7)->toDateString();
+
+        return $this->clinic->appointments()
+            ->with(['patient', 'doctor'])
+            ->whereDate('appointment_date', '>=', $tomorrow)
+            ->whereDate('appointment_date', '<=', $weekAhead)
+            ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_CONFIRMED])
+            ->orderBy('appointment_date')
+            ->orderBy('start_time')
+            ->limit(5)
+            ->get();
+    }
+
+    /**
+     * Cumpleaños de pacientes en el mes actual (próximos primero, hasta 5).
+     */
+    public function getBirthdaysThisMonthProperty()
+    {
+        $month = now()->month;
+        $isMysql = DB::getDriverName() === 'mysql';
+        $monthExpr = $isMysql ? 'MONTH(birth_date)' : "CAST(strftime('%m', birth_date) AS INTEGER)";
+        $dayExpr = $isMysql ? 'DAY(birth_date)' : "CAST(strftime('%d', birth_date) AS INTEGER)";
+
+        $today = (int) now()->day;
+
+        return Patient::query()
+            ->where('clinic_id', $this->clinic->id)
+            ->whereNotNull('birth_date')
+            ->whereRaw("{$monthExpr} = ?", [$month])
+            ->orderByRaw("CASE WHEN {$dayExpr} >= ? THEN 0 ELSE 1 END", [$today])
+            ->orderByRaw($dayExpr)
+            ->limit(5)
+            ->get(['id', 'first_name', 'last_name', 'birth_date']);
+    }
+
+    /**
+     * Serie de citas creadas en los últimos 14 días (para sparkline).
+     *
+     * @return array{labels: array<int, string>, values: array<int, int>}
+     */
+    public function getLast14DaysSeriesProperty(): array
+    {
+        $start = now()->subDays(13)->startOfDay();
+        $rows = $this->clinic->appointments()
+            ->whereDate('appointment_date', '>=', $start->toDateString())
+            ->selectRaw('DATE(appointment_date) as day, count(*) as total')
+            ->groupBy('day')
+            ->pluck('total', 'day')
+            ->toArray();
+
+        $labels = [];
+        $values = [];
+        for ($i = 0; $i < 14; $i++) {
+            $d = $start->copy()->addDays($i);
+            $labels[] = $d->format('d/m');
+            $values[] = (int) ($rows[$d->toDateString()] ?? 0);
+        }
+
+        return ['labels' => $labels, 'values' => $values];
+    }
+
     public function getDoctorsCountProperty(): int
     {
         return $this->clinic->practitioners()->count();
@@ -112,6 +181,9 @@ class Dashboard extends Component
             'pendingToday' => $this->pendingToday,
             'completedToday' => $this->completedToday,
             'todaySchedule' => $this->todaySchedule,
+            'upcomingAppointments' => $this->upcomingAppointments,
+            'birthdaysThisMonth' => $this->birthdaysThisMonth,
+            'last14DaysSeries' => $this->last14DaysSeries,
             'usageStats' => $this->usageStats,
         ])->layout('layouts.app');
     }

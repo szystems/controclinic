@@ -79,6 +79,14 @@ return [
 
     // Dates
     'today' => 'Today',
+    'view_all' => 'View all',
+    'last_14_days' => 'Last 14 days',
+    'upcoming_appointments' => 'Upcoming appointments',
+    'next_7_days' => 'Next 7 days',
+    'no_upcoming_appointments' => 'No appointments scheduled in the next 7 days.',
+    'birthdays_this_month' => 'Birthdays this month',
+    'no_birthdays_this_month' => 'No birthdays this month.',
+    'turns_age' => 'Turns :age',
     'tomorrow' => 'Tomorrow',
     'yesterday' => 'Yesterday',
     'this_week' => 'This week',

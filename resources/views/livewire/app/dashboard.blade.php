@@ -87,10 +87,11 @@
             {{-- Stats Cards --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {{-- Pacientes --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <a href="{{ route('app.patients.index', $clinic->slug) }}" wire:navigate
+                   class="block bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md hover:-translate-y-0.5 transition group">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3 group-hover:scale-105 transition">
                                 <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
@@ -105,15 +106,19 @@
                                     </dd>
                                 </dl>
                             </div>
+                            <svg class="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 {{-- Citas Hoy --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <a href="{{ route('app.appointments.index', $clinic->slug) }}?date={{ now()->toDateString() }}" wire:navigate
+                   class="block bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md hover:-translate-y-0.5 transition group">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                            <div class="flex-shrink-0 bg-green-500 rounded-md p-3 group-hover:scale-105 transition">
                                 <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
@@ -128,15 +133,19 @@
                                     </dd>
                                 </dl>
                             </div>
+                            <svg class="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 {{-- Citas Pendientes --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <a href="{{ route('app.appointments.index', $clinic->slug) }}?status=scheduled&date={{ now()->toDateString() }}" wire:navigate
+                   class="block bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md hover:-translate-y-0.5 transition group">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3 group-hover:scale-105 transition">
                                 <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
@@ -151,15 +160,19 @@
                                     </dd>
                                 </dl>
                             </div>
+                            <svg class="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 {{-- Completadas Hoy --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <a href="{{ route('app.appointments.index', $clinic->slug) }}?status=completed&date={{ now()->toDateString() }}" wire:navigate
+                   class="block bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md hover:-translate-y-0.5 transition group">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                            <div class="flex-shrink-0 bg-purple-500 rounded-md p-3 group-hover:scale-105 transition">
                                 <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
@@ -174,9 +187,12 @@
                                     </dd>
                                 </dl>
                             </div>
+                            <svg class="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             {{-- Quick Actions --}}
@@ -260,6 +276,31 @@
                     </div>
                 </a>
             </div>
+
+            {{-- Reports quick action (only for users with permission) --}}
+            @can('reports.view')
+            <div class="grid grid-cols-1 mb-8">
+                <a href="{{ route('app.reports', $clinic->slug) }}" wire:navigate
+                   class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-800/50 overflow-hidden shadow-sm sm:rounded-lg p-5 hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-indigo-600 rounded-md p-3">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13M9 11V5h13m-13 6h13M3 5h2m-2 6h2m-2 6h2"/>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('reports.title') }}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">{{ __('reports.subtitle') }}</p>
+                            </div>
+                        </div>
+                        <svg class="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </a>
+            </div>
+            @endcan
 
             {{-- Usage Stats + Today's Schedule --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -392,37 +433,52 @@
                 {{-- Citas de Hoy --}}
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('appointments.todays_appointments') }}
-                        </h3>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ __('appointments.todays_appointments') }}
+                            </h3>
+                            <a href="{{ route('app.appointments.index', $clinic->slug) }}?date={{ now()->toDateString() }}" wire:navigate
+                               class="text-xs font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                                {{ __('general.view_all') }} →
+                            </a>
+                        </div>
+
+                        {{-- Sparkline: últimos 14 días --}}
+                        <div class="mb-4 pb-4 border-b border-gray-100 dark:border-gray-700">
+                            <p class="text-[11px] uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">{{ __('general.last_14_days') }}</p>
+                            <div class="relative h-12">
+                                <canvas id="dashboard-sparkline"></canvas>
+                            </div>
+                        </div>
 
                         @if($todaySchedule->count() > 0)
-                            <div class="space-y-3">
+                            <div class="space-y-2">
                                 @foreach($todaySchedule as $appointment)
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex items-center">
+                                    <a href="{{ route('app.appointments.show', [$clinic->slug, $appointment->id]) }}" wire:navigate
+                                       class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                        <div class="flex items-center min-w-0">
                                             <div class="flex-shrink-0">
                                                 <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-blue-500 text-white font-semibold">
                                                     {{ $appointment->patient->initials ?? 'XX' }}
                                                 </span>
                                             </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            <div class="ml-3 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
                                                     {{ $appointment->patient->full_name ?? __('patients.title') }}
                                                 </p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                    {{ $appointment->start_time ?? '00:00' }} - {{ $appointment->reason ?? __('appointments.consultation') }}
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                    {{ $appointment->start_time ?? '00:00' }} · {{ $appointment->reason ?? __('appointments.consultation') }}
                                                 </p>
                                             </div>
                                         </div>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                             {{ $appointment->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                                                ($appointment->status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
                                                ($appointment->status === 'in_progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
                                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200')) }}">
                                             {{ $appointment->status_label ?? $appointment->status }}
                                         </span>
-                                    </div>
+                                    </a>
                                 @endforeach
                             </div>
                         @else
@@ -438,6 +494,95 @@
                                     {{ __('appointments.new_appointment') }} →
                                 </a>
                             </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Próximas citas (7 días) + Cumpleaños del mes --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {{-- Upcoming appointments --}}
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ __('general.upcoming_appointments') }}
+                            </h3>
+                            <span class="text-xs text-gray-400 dark:text-gray-500">{{ __('general.next_7_days') }}</span>
+                        </div>
+
+                        @if($upcomingAppointments->count() > 0)
+                            <div class="space-y-2">
+                                @foreach($upcomingAppointments as $appt)
+                                    <a href="{{ route('app.appointments.show', [$clinic->slug, $appt->id]) }}" wire:navigate
+                                       class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                        <div class="flex items-center min-w-0">
+                                            <div class="flex-shrink-0 text-center w-12">
+                                                <p class="text-[10px] uppercase font-medium text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($appt->appointment_date)->isoFormat('ddd') }}</p>
+                                                <p class="text-lg font-bold text-gray-900 dark:text-white leading-none">{{ \Carbon\Carbon::parse($appt->appointment_date)->format('d') }}</p>
+                                            </div>
+                                            <div class="ml-3 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                    {{ $appt->patient->full_name ?? '—' }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                    {{ $appt->start_time ?? '—' }}
+                                                    @if($appt->doctor) · {{ $appt->doctor->name }} @endif
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <svg class="ml-2 h-4 w-4 text-gray-300 dark:text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-6">{{ __('general.no_upcoming_appointments') }}</p>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Birthdays this month --}}
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                🎂 {{ __('general.birthdays_this_month') }}
+                            </h3>
+                            <span class="text-xs text-gray-400 dark:text-gray-500">{{ now()->translatedFormat('F') }}</span>
+                        </div>
+
+                        @if($birthdaysThisMonth->count() > 0)
+                            <div class="space-y-2">
+                                @foreach($birthdaysThisMonth as $patient)
+                                    @php
+                                        $bd = \Carbon\Carbon::parse($patient->birth_date);
+                                        $isToday = $bd->day === now()->day;
+                                    @endphp
+                                    <a href="{{ route('app.patients.show', [$clinic->slug, $patient->id]) }}" wire:navigate
+                                       class="flex items-center justify-between p-3 rounded-lg transition
+                                       {{ $isToday ? 'bg-pink-50 dark:bg-pink-900/30 hover:bg-pink-100 dark:hover:bg-pink-900/50 border border-pink-200 dark:border-pink-800' : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600' }}">
+                                        <div class="flex items-center min-w-0">
+                                            <div class="flex-shrink-0 text-center w-12">
+                                                <p class="text-[10px] uppercase font-medium text-gray-500 dark:text-gray-400">{{ $bd->isoFormat('MMM') }}</p>
+                                                <p class="text-lg font-bold {{ $isToday ? 'text-pink-600 dark:text-pink-400' : 'text-gray-900 dark:text-white' }} leading-none">{{ $bd->format('d') }}</p>
+                                            </div>
+                                            <div class="ml-3 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                    {{ trim($patient->first_name.' '.$patient->last_name) }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ __('general.turns_age', ['age' => now()->year - $bd->year]) }}
+                                                    @if($isToday) · <span class="text-pink-600 dark:text-pink-400 font-medium">{{ __('general.today') }}</span> @endif
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-6">{{ __('general.no_birthdays_this_month') }}</p>
                         @endif
                     </div>
                 </div>
@@ -480,4 +625,47 @@
 
         </div>
     </div>
+
+    {{-- Sparkline data + renderer --}}
+    <script id="dashboard-sparkline-data" type="application/json">@json($last14DaysSeries)</script>
+    <script>
+        (function() {
+            function renderSparkline() {
+                const el = document.getElementById('dashboard-sparkline');
+                const dataEl = document.getElementById('dashboard-sparkline-data');
+                if (!el || !dataEl || !window.Chart) return;
+                if (el.__chart) { el.__chart.destroy(); }
+                let data;
+                try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+                el.__chart = new window.Chart(el, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.values,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99,102,241,0.18)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        animation: false,
+                        plugins: { legend: { display: false }, tooltip: {
+                            displayColors: false,
+                            callbacks: { title: (items) => items[0].label }
+                        } },
+                        scales: { x: { display: false }, y: { display: false, beginAtZero: true } },
+                        elements: { point: { hoverRadius: 3 } },
+                    }
+                });
+            }
+            // Try immediately and again on Livewire navigation
+            if (window.Chart) renderSparkline(); else setTimeout(renderSparkline, 300);
+            document.addEventListener('livewire:navigated', renderSparkline);
+        })();
+    </script>
 </div>
