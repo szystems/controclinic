@@ -74,6 +74,22 @@ class Create extends Component
                 $this->title = __('records.type_consultation').' — '.$appointment->appointment_date->isoFormat('LL');
             }
         }
+
+        // Pre-select prescription type from query string ?type=prescription
+        $requestedType = request()->query('type');
+        if ($requestedType === MedicalRecord::TYPE_PRESCRIPTION) {
+            $this->recordType = MedicalRecord::TYPE_PRESCRIPTION;
+            $this->title = __('records.type_prescription').' — '.now()->isoFormat('LL');
+            // Start with one empty prescription row to streamline UX
+            if (empty($this->prescriptions)) {
+                $this->prescriptions = [[
+                    'drug' => '',
+                    'dosage' => '',
+                    'duration' => '',
+                    'notes' => '',
+                ]];
+            }
+        }
     }
 
     public function addDiagnosis(): void

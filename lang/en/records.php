@@ -111,6 +111,7 @@ return [
     'prescription_footer_note' => 'This prescription is valid only with the signature of the attending physician. Consult them with any questions.',
     'no_prescriptions' => 'This record has no prescriptions registered.',
     'export_prescription' => 'Print Prescription',
+    'new_prescription' => 'New Prescription',
     'field_diagnoses' => 'Diagnoses',
     'field_prescriptions' => 'Prescriptions',
 ];

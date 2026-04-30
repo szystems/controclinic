@@ -120,6 +120,7 @@ return [
     'prescription_footer_note' => 'Esta receta es válida únicamente con la firma del médico tratante. Consúvelo ante cualquier duda.',
     'no_prescriptions' => 'Esta consulta no tiene prescripciones registradas.',
     'export_prescription' => 'Imprimir Receta',
+    'new_prescription' => 'Nueva Receta',
     'field_diagnoses' => 'Diagnósticos',
     'field_prescriptions' => 'Prescripciones',
 ];

@@ -187,6 +187,10 @@
                                    class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
                                     + {{ __('records.new_record') }}
                                 </a>
+                                <a href="{{ route('app.records.create', ['clinic' => $currentClinic->slug, 'patient' => $patient->id, 'type' => 'prescription']) }}"
+                                   class="inline-flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    ℞ {{ __('records.new_prescription') }}
+                                </a>
                                 @endif
                             @endcan
                             <a href="{{ route('app.records.index', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
