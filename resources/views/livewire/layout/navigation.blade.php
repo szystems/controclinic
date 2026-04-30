@@ -91,7 +91,7 @@ new class extends Component
 
 <nav x-data="{ open: false }"
      x-effect="document.body.classList.toggle('overflow-hidden', open)"
-     class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+     class="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-800/80 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
