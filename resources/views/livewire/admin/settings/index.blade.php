@@ -106,10 +106,7 @@
                                     const file = $event.dataTransfer.files[0];
                                     if (file) {
                                         previewUrl = URL.createObjectURL(file);
-                                        const dt = new DataTransfer();
-                                        dt.items.add(file);
-                                        $refs.logoInput.files = dt.files;
-                                        $refs.logoInput.dispatchEvent(new Event('change', { bubbles: true }));
+                                        @this.upload('logo_file', file);
                                     }
                                 "
                             >
@@ -128,13 +125,15 @@
                                 <input
                                     id="logo_file_input"
                                     type="file"
-                                    wire:model="logo_file"
                                     accept=".svg,.png,image/svg+xml,image/png"
                                     class="hidden"
                                     x-ref="logoInput"
                                     x-on:change="
                                         const file = $event.target.files[0];
-                                        if (file) previewUrl = URL.createObjectURL(file);
+                                        if (file) {
+                                            previewUrl = URL.createObjectURL(file);
+                                            @this.upload('logo_file', file);
+                                        }
                                     "
                                 />
                             </label>
@@ -188,10 +187,7 @@
                                     const file = $event.dataTransfer.files[0];
                                     if (file) {
                                         faviconPreview = URL.createObjectURL(file);
-                                        const dt = new DataTransfer();
-                                        dt.items.add(file);
-                                        $refs.faviconInput.files = dt.files;
-                                        $refs.faviconInput.dispatchEvent(new Event('change', { bubbles: true }));
+                                        @this.upload('favicon_file', file);
                                     }
                                 "
                             >
@@ -210,13 +206,15 @@
                                 <input
                                     id="favicon_file_input"
                                     type="file"
-                                    wire:model="favicon_file"
                                     accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon"
                                     class="hidden"
                                     x-ref="faviconInput"
                                     x-on:change="
                                         const file = $event.target.files[0];
-                                        if (file) faviconPreview = URL.createObjectURL(file);
+                                        if (file) {
+                                            faviconPreview = URL.createObjectURL(file);
+                                            @this.upload('favicon_file', file);
+                                        }
                                     "
                                 />
                             </label>
