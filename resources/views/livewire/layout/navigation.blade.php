@@ -121,7 +121,7 @@ new class extends Component
             </div>
 
             <!-- Settings Icon & User Dropdown -->
-            <div class="hidden lg:flex lg:items-center lg:ms-6 lg:gap-2">
+            <div class="hidden md:flex md:items-center md:ms-6 md:gap-2">
                 <!-- Theme Toggle -->
                 <button
                     x-data="{ dark: localStorage.getItem('theme') === 'dark' }"
@@ -228,7 +228,7 @@ new class extends Component
                         :aria-expanded="open.toString()"
                         aria-controls="mobile-drawer"
                         aria-label="{{ __('general.open_menu') }}"
-                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                        class="inline-flex items-center justify-center p-2 md:ms-1 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
