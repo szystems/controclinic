@@ -97,8 +97,7 @@
                                     const file = $event.dataTransfer.files[0];
                                     if (file) {
                                         previewUrl = URL.createObjectURL(file);
-                                        $refs.logoInput.files = $event.dataTransfer.files;
-                                        $refs.logoInput.dispatchEvent(new Event('change'));
+                                        @this.upload('logo_file', file);
                                     }
                                 "
                             >
@@ -177,8 +176,7 @@
                                     const file = $event.dataTransfer.files[0];
                                     if (file) {
                                         faviconPreview = URL.createObjectURL(file);
-                                        $refs.faviconInput.files = $event.dataTransfer.files;
-                                        $refs.faviconInput.dispatchEvent(new Event('change'));
+                                        @this.upload('favicon_file', file);
                                     }
                                 "
                             >
