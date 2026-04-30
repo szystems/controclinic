@@ -10,6 +10,7 @@ return [
     'patients' => 'Patients',
     'appointments' => 'Appointments',
     'calendar' => 'Calendar',
+    'use_clinic_default' => 'Use clinic default',
     'medical_records' => 'Medical Records',
     'records' => 'Medical Records',
     'settings' => 'Settings',

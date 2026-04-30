@@ -7,6 +7,7 @@ use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Index extends Component
@@ -137,12 +138,9 @@ class Index extends Component
         }
 
         // Use DATE() alias to get raw string keys, avoiding Eloquent date-cast objects as array keys
-        $data = Appointment::query()
-            ->withoutGlobalScope('clinic')
-            ->where('clinic_id', $this->clinic->id)
+        $data = $this->baseQuery()
             ->whereDate('appointment_date', '>=', $from->toDateString())
             ->whereDate('appointment_date', '<=', $to->toDateString())
-            ->when($this->doctorFilter, fn ($q) => $q->where('doctor_id', $this->doctorFilter))
             ->selectRaw('DATE(appointment_date) as day, count(*) as total')
             ->groupBy('day')
             ->orderBy('day')
@@ -167,10 +165,17 @@ class Index extends Component
     {
         $statuses = ['scheduled', 'confirmed', 'completed', 'cancelled', 'no_show', 'waiting', 'in_progress'];
 
-        $data = Appointment::query()
-            ->where('clinic_id', $this->clinic->id)
-            ->whereBetween('appointment_date', [$this->dateFrom, $this->dateTo])
-            ->when($this->doctorFilter, fn ($q) => $q->where('doctor_id', $this->doctorFilter))
+        $colors = [
+            'scheduled' => '#6366f1',
+            'confirmed' => '#3b82f6',
+            'waiting' => '#f59e0b',
+            'in_progress' => '#8b5cf6',
+            'completed' => '#10b981',
+            'cancelled' => '#ef4444',
+            'no_show' => '#6b7280',
+        ];
+
+        $data = $this->baseQuery()
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status')
@@ -178,14 +183,16 @@ class Index extends Component
 
         $labels = [];
         $values = [];
+        $bgColors = [];
         foreach ($statuses as $status) {
             if (isset($data[$status]) && $data[$status] > 0) {
-                $labels[] = $status;
+                $labels[] = __('reports.status_'.str_replace('_', '', $status));
                 $values[] = $data[$status];
+                $bgColors[] = $colors[$status] ?? '#9ca3af';
             }
         }
 
-        return json_encode(['labels' => $labels, 'values' => $values]);
+        return json_encode(['labels' => $labels, 'values' => $values, 'colors' => $bgColors]);
     }
 
     public function newPatientsByMonth(): string
@@ -195,12 +202,13 @@ class Index extends Component
             $months->push(Carbon::now()->subMonths($i));
         }
 
-        $isMysql = \Illuminate\Support\Facades\DB::getDriverName() === 'mysql';
+        $isMysql = DB::getDriverName() === 'mysql';
         $monthExpr = $isMysql
             ? "DATE_FORMAT(created_at, '%Y-%m')"
             : "strftime('%Y-%m', created_at)";
 
         $data = Patient::query()
+            ->withoutGlobalScope('clinic')
             ->where('clinic_id', $this->clinic->id)
             ->where('created_at', '>=', Carbon::now()->subMonths(5)->startOfMonth())
             ->selectRaw("{$monthExpr} as month, count(*) as total")
@@ -216,17 +224,19 @@ class Index extends Component
 
     public function appointmentsByType(): string
     {
-        $data = Appointment::query()
-            ->where('clinic_id', $this->clinic->id)
-            ->whereBetween('appointment_date', [$this->dateFrom, $this->dateTo])
-            ->when($this->doctorFilter, fn ($q) => $q->where('doctor_id', $this->doctorFilter))
+        $data = $this->baseQuery()
             ->selectRaw('appointment_type, count(*) as total')
             ->groupBy('appointment_type')
             ->pluck('total', 'appointment_type')
             ->toArray();
 
+        $labels = array_map(
+            fn ($t) => __('reports.type_'.str_replace('_', '', $t)),
+            array_keys($data)
+        );
+
         return json_encode([
-            'labels' => array_keys($data),
+            'labels' => $labels,
             'values' => array_values($data),
         ]);
     }
@@ -252,6 +262,15 @@ class Index extends Component
         return ['scheduled', 'walk_in', 'emergency', 'follow_up', 'telemedicine'];
     }
 
+    public function clearFilters(): void
+    {
+        $this->doctorFilter = '';
+        $this->statusFilter = '';
+        $this->typeFilter = '';
+        $this->period = 'this_month';
+        $this->applyPeriodDates();
+    }
+
     // ==================== EXPORT ====================
 
     public function exportCsv()
@@ -264,6 +283,26 @@ class Index extends Component
             ->orderBy('start_time')
             ->get();
 
+        // Pre-compute summary stats so the file is self-describing
+        $totals = [
+            'total' => $appointments->count(),
+            'completed' => $appointments->where('status', 'completed')->count(),
+            'cancelled' => $appointments->where('status', 'cancelled')->count(),
+            'no_show' => $appointments->where('status', 'no_show')->count(),
+        ];
+
+        $doctorName = $this->doctorFilter
+            ? optional(User::find($this->doctorFilter))->name ?? '—'
+            : __('reports.all_doctors');
+
+        $statusLabel = $this->statusFilter
+            ? __('reports.status_'.str_replace('_', '', $this->statusFilter))
+            : __('reports.all_statuses');
+
+        $typeLabel = $this->typeFilter
+            ? __('reports.type_'.str_replace('_', '', $this->typeFilter))
+            : __('reports.all_types');
+
         $filename = 'citas-'.$this->dateFrom.'-'.$this->dateTo.'.csv';
 
         $headers = [
@@ -271,11 +310,21 @@ class Index extends Component
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function () use ($appointments) {
+        $callback = function () use ($appointments, $totals, $doctorName, $statusLabel, $typeLabel) {
             $handle = fopen('php://output', 'w');
             // BOM for Excel UTF-8
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
+            // ── Filter header block ──
+            fputcsv($handle, [__('reports.title').' — '.$this->clinic->name]);
+            fputcsv($handle, [__('reports.generated_at'), now()->format('d/m/Y H:i')]);
+            fputcsv($handle, [__('reports.period'), $this->dateFrom.' → '.$this->dateTo]);
+            fputcsv($handle, [__('general.doctor'), $doctorName]);
+            fputcsv($handle, [__('general.status'), $statusLabel]);
+            fputcsv($handle, [__('appointments.type'), $typeLabel]);
+            fputcsv($handle, []);
+
+            // ── Column headers ──
             fputcsv($handle, [
                 __('reports.col_date'),
                 __('reports.col_time'),
@@ -293,12 +342,19 @@ class Index extends Component
                     $appointment->start_time,
                     $appointment->patient?->full_name ?? '—',
                     $appointment->doctor?->name ?? '—',
-                    $appointment->appointment_type,
-                    $appointment->status,
+                    __('reports.type_'.str_replace('_', '', $appointment->appointment_type)),
+                    __('reports.status_'.str_replace('_', '', $appointment->status)),
                     $appointment->duration_minutes,
                     $appointment->reason ?? '',
                 ]);
             }
+
+            // ── Summary footer ──
+            fputcsv($handle, []);
+            fputcsv($handle, [__('reports.total_appointments'), $totals['total']]);
+            fputcsv($handle, [__('reports.completed'), $totals['completed']]);
+            fputcsv($handle, [__('reports.cancelled'), $totals['cancelled']]);
+            fputcsv($handle, [__('reports.no_show'), $totals['no_show']]);
 
             fclose($handle);
         };

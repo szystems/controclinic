@@ -117,6 +117,7 @@ return [
     'cannot_reset_self' => 'You cannot force reset your own password.',
     'transfer_ownership' => 'Transfer Ownership',
     'ownership_transferred' => 'Ownership transferred successfully.',
+    'transfer_failed' => 'Could not transfer ownership. Please try again.',
     'transfer_confirm' => 'Are you sure you want to transfer ownership to this user? This action is irreversible.',
     'transfer_confirm_yes' => 'Yes, transfer now',
     'only_owner_can_transfer' => 'Only the current owner can transfer ownership.',

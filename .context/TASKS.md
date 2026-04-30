@@ -1,7 +1,27 @@
 # 📝 Tareas Pendientes
 
-> Actualizado: 2026-04-29
+> Actualizado: 2026-04-30
 > Enfoque: SaaS-First
+
+---
+
+## ✅ Hardening Fase 7/8 (2026-04-30) — COMPLETADO
+
+> Resultado de revisión de código de Fase 7 (Profile + Ownership Transfer) y Fase 8 (Reports). Aplicado en este sprint.
+
+### Fase 7
+- [x] A1 — `transferOwnership` atómico con `DB::transaction` + Activity Log explícito (`ownership_transferred` con properties detalladas) + manejo de excepciones.
+- [x] B1 — `locale`/`timezone` con `<select>` y validación `Rule::in` (en lugar de inputs de texto libres).
+- [x] B2 — Evento DOM `profile-updated` desde `updateProfile` para refrescar el nombre en la navbar sin recargar.
+- [x] B3 — Cambio de email envía `sendEmailVerificationNotification()` al nuevo correo además de invalidar `email_verified_at`.
+
+### Fase 8
+- [x] A2 — Métodos de gráfica unificados con `baseQuery()` (consistencia multi-tenant + filtros aplicados a todas las series).
+- [x] A3 — Labels de status/type traducidas; array `colors` emitido para JS.
+- [x] B4 — Export CSV con cabecera (clínica, generado_at, periodo, filtros) + filas traducidas + resumen final.
+- [x] C3 — Botón "Limpiar filtros" condicional + i18n (`reports.clear_filters`).
+
+**Validación:** 268/268 tests · Pint clean · `npm run build` OK.
 
 ---
 

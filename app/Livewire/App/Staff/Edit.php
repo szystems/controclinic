@@ -3,6 +3,7 @@
 namespace App\Livewire\App\Staff;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
@@ -215,16 +216,37 @@ class Edit extends Component
             return;
         }
 
-        // Cambiar owner_id en la clínica
-        $clinic->owner_id = $target->id;
-        $clinic->save();
-        // Actualizar roles
-        $user->role = 'doctor';
-        $user->save();
-        $user->syncRoles(['doctor']);
-        $target->role = 'owner';
-        $target->save();
-        $target->syncRoles(['owner']);
+        try {
+            DB::transaction(function () use ($clinic, $user, $target) {
+                // Cambiar owner_id en la clínica
+                $clinic->owner_id = $target->id;
+                $clinic->save();
+                // Actualizar roles
+                $user->role = 'doctor';
+                $user->save();
+                $user->syncRoles(['doctor']);
+                $target->role = 'owner';
+                $target->save();
+                $target->syncRoles(['owner']);
+
+                // Registro explícito en Activity Log
+                activity()
+                    ->causedBy($user)
+                    ->performedOn($clinic)
+                    ->withProperties([
+                        'previous_owner_id' => $user->id,
+                        'previous_owner_name' => $user->name,
+                        'new_owner_id' => $target->id,
+                        'new_owner_name' => $target->name,
+                    ])
+                    ->log('ownership_transferred');
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            $this->dispatch('notify', type: 'error', message: __('staff.transfer_failed'));
+
+            return;
+        }
 
         $this->ownershipTransferred = true;
         $this->dispatch('notify', type: 'success', message: __('staff.ownership_transferred'));

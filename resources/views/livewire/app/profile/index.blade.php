@@ -33,14 +33,23 @@
                         <label for="locale" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             {{ __('profile.locale') }}
                         </label>
-                        <input wire:model="locale" type="text" id="locale" class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <select wire:model="locale" id="locale" class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">{{ __('general.use_clinic_default') }}</option>
+                            <option value="es">Español</option>
+                            <option value="en">English</option>
+                        </select>
                         @error('locale') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             {{ __('profile.timezone') }}
                         </label>
-                        <input wire:model="timezone" type="text" id="timezone" class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <select wire:model="timezone" id="timezone" class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">{{ __('general.use_clinic_default') }}</option>
+                            @foreach(timezone_identifiers_list() as $tz)
+                                <option value="{{ $tz }}">{{ $tz }}</option>
+                            @endforeach
+                        </select>
                         @error('timezone') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                     </div>
                 </div>

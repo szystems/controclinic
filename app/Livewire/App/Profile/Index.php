@@ -62,18 +62,36 @@ class Index extends Component
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user->id)],
             'phone' => ['nullable', 'string', 'max:20'],
-            'locale' => ['nullable', 'string', 'max:10'],
-            'timezone' => ['nullable', 'string', 'max:64'],
+            'locale' => ['nullable', 'string', Rule::in(['', 'es', 'en'])],
+            'timezone' => ['nullable', 'string', Rule::in(array_merge([''], timezone_identifiers_list()))],
             'specialties' => ['nullable', 'string', 'max:500'],
             'bio' => ['nullable', 'string', 'max:2000'],
             'license_number' => ['nullable', 'string', 'max:100'],
         ]);
+
+        $emailChanged = $this->user->email !== $validated['email'];
+
         $this->user->fill($validated);
         $this->user->specialties = $this->specialties ? array_map('trim', explode(',', $this->specialties)) : null;
-        if ($this->user->isDirty('email')) {
+
+        if ($emailChanged) {
             $this->user->email_verified_at = null;
         }
+
         $this->user->save();
+
+        // Send verification link to the new email so the user knows what to do
+        if ($emailChanged) {
+            try {
+                $this->user->sendEmailVerificationNotification();
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        // Notify the navigation component so user name in nav updates immediately
+        $payload = json_encode(['name' => $this->user->name], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+        $this->js("window.dispatchEvent(new CustomEvent('profile-updated', {detail: {$payload}}));");
         $this->dispatch('notify', type: 'success', message: __('profile.updated_successfully'));
     }
 

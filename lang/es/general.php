@@ -10,6 +10,7 @@ return [
     'patients' => 'Pacientes',
     'appointments' => 'Citas',
     'calendar' => 'Calendario',
+    'use_clinic_default' => 'Usar valor por defecto de la clínica',
     'medical_records' => 'Historiales',
     'records' => 'Historiales',
     'settings' => 'Configuración',

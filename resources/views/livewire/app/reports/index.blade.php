@@ -104,6 +104,18 @@
                     </select>
                 </div>
             </div>
+
+            @if($doctorFilter || $statusFilter || $typeFilter || $period !== 'this_month')
+            <div class="mt-3 flex justify-end">
+                <button type="button" wire:click="clearFilters"
+                    class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    {{ __('reports.clear_filters') }}
+                </button>
+            </div>
+            @endif
         </div>
 
         {{-- Loading overlay --}}
@@ -402,7 +414,7 @@ function buildCharts() {
                 labels: data.byStatus.labels,
                 datasets: [{
                     data: data.byStatus.values,
-                    backgroundColor: data.byStatus.labels.map(l => STATUS_COLORS[l] || '#9ca3af'),
+                    backgroundColor: data.byStatus.colors || data.byStatus.labels.map(() => '#9ca3af'),
                     borderWidth: 2,
                     borderColor: isDark() ? '#1f2937' : '#ffffff',
                 }]

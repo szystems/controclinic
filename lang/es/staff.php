@@ -117,6 +117,7 @@ return [
     'cannot_reset_self' => 'No puedes forzar el reset de tu propia contraseña.',
     'transfer_ownership' => 'Transferir Propiedad',
     'ownership_transferred' => 'Propiedad transferida correctamente.',
+    'transfer_failed' => 'No se pudo transferir la propiedad. Inténtalo de nuevo.',
     'transfer_confirm' => '¿Seguro que deseas transferir la propiedad a este usuario? Esta acción es irreversible.',
     'transfer_confirm_yes' => 'Sí, transferir ahora',
     'only_owner_can_transfer' => 'Solo el propietario actual puede transferir la propiedad.',

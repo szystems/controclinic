@@ -56,6 +56,7 @@ return [
     'export_csv' => 'Exportar CSV',
     'print_pdf' => 'Imprimir PDF',
     'generated_at' => 'Generado el',
+    'clear_filters' => 'Limpiar filtros',
     'col_date' => 'Fecha',
     'col_time' => 'Hora',
     'col_patient' => 'Paciente',

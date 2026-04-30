@@ -1,10 +1,31 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-04-29
+> **Última actualización:** 2026-04-30
 > **Fase actual:** Sprint Print/Export — Impresión y reportes en módulos
 > **Próxima:** Fase 3C — Permisos Personalizados
 > **Enfoque:** SaaS-First
 > **Métricas:** 268 tests / 595 asserts · Pint clean · PHPStan level 5 (con baseline)
+
+---
+
+## 🛡️ Hardening Fase 7/8 (2026-04-30) ✅ COMPLETADO
+
+### Fase 7 — Profile + Ownership Transfer
+- [x] **A1**: `transferOwnership` envuelto en `DB::transaction` + entrada explícita en Activity Log (`ownership_transferred`) con properties `previous_owner_id/name`, `new_owner_id/name`. Manejo de excepciones con `report()` + notificación de error.
+- [x] **B1**: `locale` y `timezone` ahora son `<select>` (validación con `Rule::in`) con opción "Usar valor por defecto de la clínica".
+- [x] **B2**: `updateProfile` emite evento DOM `profile-updated` (vía `$this->js()`) para que la navbar actualice el nombre en vivo.
+- [x] **B3**: Cambio de email envía `sendEmailVerificationNotification()` al nuevo correo además de invalidar `email_verified_at`.
+
+### Fase 8 — Reports
+- [x] **A2**: Todos los métodos de gráfica usan `baseQuery()` unificado (`withoutGlobalScope('clinic')` + filtros) — consistencia con tests/multi-tenant.
+- [x] **A3**: Labels de gráficas (`appointmentsByStatus`/`Type`) traducidas; el array `colors` se emite junto al JSON para que el JS mantenga consistencia visual.
+- [x] **B4**: Export CSV incluye cabecera con clínica, generado_at, periodo y filtros aplicados (doctor/estado/tipo); valores traducidos; resumen final con totales.
+- [x] **C3**: Botón "Limpiar filtros" visible cuando hay filtros activos (`clearFilters()` + i18n).
+
+### Validación
+- [x] 268/268 tests pasando
+- [x] Pint clean
+- [x] `npm run build` OK
 
 ---
 
