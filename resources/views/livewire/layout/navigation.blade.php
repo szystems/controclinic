@@ -104,10 +104,17 @@ new class extends Component
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
                     @foreach ($primaryNav as $item)
-                        <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$item['active']()" wire:navigate>
-                            {{ $item['label'] }}
+                        @php $active = $item['active'](); @endphp
+                        <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$active" wire:navigate>
+                            <span class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    {!! $item['icon'] !!}
+                                </svg>
+                                <span>{{ $item['label'] }}</span>
+                            </span>
                         </x-nav-link>
                     @endforeach
                 </div>
