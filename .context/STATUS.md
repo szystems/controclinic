@@ -1,16 +1,16 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-01
-> **Fase actual:** Sprint Print/Export ✅ COMPLETADO — siguiente: Fase 3C
-> **Próxima:** Fase 3C — Permisos Personalizados → Hardening producción → 🚀 v1.0
+> **Fase actual:** v1.0 preliminar lista — hardening completado
+> **Próxima:** 🚀 Lanzamiento v1.0 + roadmap v2 (portal paciente, SMS, telemedicina)
 > **Enfoque:** SaaS-First
-> **Métricas:** 290 tests / 642 asserts · Pint clean · PHPStan level 5 (con baseline)
+> **Métricas:** 299 tests / 662 asserts · Pint clean · PHPStan level 5 (con baseline)
 
 ---
 
 ## 🎯 Plan v1.0 Preliminar (lanzamiento mínimo funcional)
 
-**Pendiente para considerar la app funcional y lanzable:**
+**Bloques bloqueantes para considerar la app lanzable:**
 
 1. **Sprint Print/Export (CSV + PDF)** ✅ COMPLETADO
    - ✅ Sprint A — PDF de reportes pulido
@@ -19,8 +19,12 @@
    - ✅ Sprint D — Historiales: PDF consulta individual (SOAP, signos vitales, diagnósticos, prescripciones, firmas) · respeta confidencialidad
    - ✅ Sprint E — Staff: PDF directorio interno (requiere `users.print`)
    - ✅ Permisos `*.export` y `*.print` por módulo en seeder
-2. **Fase 3C** — Permisos personalizados (UI toggles en Staff Edit) ← SIGUIENTE
-3. **Hardening producción**: Paddle webhook secret · cron scheduler · rate limit global · policies por modelo
+2. **Fase 3C** — Permisos personalizados (UI toggles en Staff Edit) ✅ COMPLETADO
+3. **Hardening producción** ✅ COMPLETADO
+   - ✅ Paddle webhook secret (PADDLE_WEBHOOK_SECRET en .env.example, validado por Cashier)
+   - ✅ Cron scheduler (`appointments:send-reminders` cada hora)
+   - ✅ Rate limiters globales: `api`, `global`, `sensitive`, `webhook`
+   - ✅ Policies por modelo: Patient, Appointment, MedicalRecord (tenant + permiso + confidencialidad)
 
 Con esos 3 bloques, la app es **lanzable como v1.0 preliminar**. El resto (portal paciente, SMS/WhatsApp, telemedicina, IA, mobile, API) es roadmap v2+.
 
