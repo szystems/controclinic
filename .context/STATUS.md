@@ -1,7 +1,7 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-04-29
-> **Fase actual:** Fase 8 — Reportes / Dashboard Avanzado (✅ COMPLETADO)
+> **Fase actual:** Sprint Print/Export — Impresión y reportes en módulos
 > **Próxima:** Fase 3C — Permisos Personalizados
 > **Enfoque:** SaaS-First
 > **Métricas:** 268 tests / 595 asserts · Pint clean · PHPStan level 5 (con baseline)
@@ -74,7 +74,7 @@
 - [x] Aplicado a botones, tabs, toggles
 
 ### Navegación ✅
-- [x] Nav links funcionales: Dashboard, Pacientes, Citas
+- [x] Nav links funcionales: Dashboard, Pacientes, Citas, Calendario, Personal, Reportes
 - [x] Icono de engranaje para Settings
 - [x] Menú móvil responsive con Settings
 - [x] Dropdown de usuario con logout

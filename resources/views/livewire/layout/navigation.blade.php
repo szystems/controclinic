@@ -54,8 +54,12 @@ new class extends Component
                         {{ __('general.patients') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('app.appointments.index', $clinicSlug)" :active="request()->routeIs('app.appointments.*')" wire:navigate>
+                    <x-nav-link :href="route('app.appointments.index', $clinicSlug)" :active="request()->routeIs('app.appointments.index') || request()->routeIs('app.appointments.show') || request()->routeIs('app.appointments.create') || request()->routeIs('app.appointments.edit')" wire:navigate>
                         {{ __('general.appointments') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('app.appointments.calendar', $clinicSlug)" :active="request()->routeIs('app.appointments.calendar')" wire:navigate>
+                        {{ __('general.calendar') }}
                     </x-nav-link>
 
                     @can('users.manage')
@@ -197,8 +201,12 @@ new class extends Component
                 {{ __('general.patients') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('app.appointments.index', $clinicSlug)" :active="request()->routeIs('app.appointments.*')" wire:navigate>
+            <x-responsive-nav-link :href="route('app.appointments.index', $clinicSlug)" :active="request()->routeIs('app.appointments.index') || request()->routeIs('app.appointments.show') || request()->routeIs('app.appointments.create') || request()->routeIs('app.appointments.edit')" wire:navigate>
                 {{ __('general.appointments') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('app.appointments.calendar', $clinicSlug)" :active="request()->routeIs('app.appointments.calendar')" wire:navigate>
+                {{ __('general.calendar') }}
             </x-responsive-nav-link>
 
             @can('users.manage')

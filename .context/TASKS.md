@@ -7,11 +7,46 @@
 
 ## 🔥 Prioridad Alta — PRÓXIMO SPRINT
 
-> Orden lógico: primero **estabilizar la base** (docs, seguridad, bugs latentes, DX), luego cerrar el ciclo de vida de la cuenta (Fase 4), después completar el flujo médico (historias clínicas), después UX (calendario, perfil) y finalmente personalización avanzada.
+---
+
+### 🖨️ Sprint Print/Export — Impresión y reportes en todos los módulos
+
+> **Por qué:** La página de Reportes ya tiene botón PDF, pero varios problemas de calidad. Además ningún otro módulo tiene opción de imprimir/exportar listados, lo cual es esencial en entornos clínicos.
+
+#### A — Arreglar impresión PDF de Reportes (mejoras de calidad)
+> **Estado actual:** Funcional pero con problemas visuales en algunos navegadores (nav visible pese al CSS, canvas→img frágil si Chart.js no cargó aún).
+- [ ] Garantizar ocultamiento del nav en todos los navegadores (Safari, Firefox, Chrome) con estrategia JS: `document.querySelectorAll('nav')` hidden before print + restore after
+- [ ] Mover la lógica de canvas→img a un timeout con `window.onbeforeprint` más robusto (verificar que charts ya están instanciados)
+- [ ] Cabecera del reporte PDF: mostrar logo de la clínica si está configurado
+- [ ] Ajustar layout de impresión: tarjetas de stats en 1 fila, gráficas en 2 columnas
+- [ ] Test manual en Chrome, Firefox, Safari
+
+#### B — Exportar/Imprimir en módulo Pacientes
+- [ ] Botón "Exportar CSV" en `Patients\Index` (nombre, email, teléfono, fecha nacimiento, fecha registro)
+- [ ] Botón "Imprimir listado" con vista imprimible (tabla sin nav, con cabecera clínica)
+- [ ] `@can('patients.export')` — añadir permiso al seeder (owner + admin)
+- [ ] Tests Feature: acceso al export, contenido del CSV, aislamiento tenant
+
+#### C — Exportar/Imprimir en módulo Citas
+- [ ] Botón "Exportar CSV" en `Appointments\Index` (filtros actuales aplicados: doctor, estado, tipo, período)
+- [ ] Botón "Imprimir listado" del día/semana (útil para recepción)
+- [ ] `@can('appointments.export')` — añadir permiso al seeder
+- [ ] Tests Feature: export con filtros, aislamiento tenant
+
+#### D — Imprimir en módulo Historiales Médicos
+- [ ] Botón "Imprimir consulta" en `MedicalRecords\Show` (vista PDF-friendly de la consulta: SOAP, diagnósticos, prescripciones, firmas)
+- [ ] Estilo de impresión: logo clínica, datos doctor, datos paciente, sello/fecha
+- [ ] `@can('records.print')` — sólo doctor/owner pueden imprimir historiales (privacidad)
+- [ ] NO incluir "Imprimir listado" (historial es información sensible, sólo individual)
+
+#### E — Imprimir en módulo Staff
+- [ ] Botón "Imprimir directorio" en `Staff\Index` (nombre, rol, email, especialidad)
+- [ ] Solo visible con `@can('users.manage')`
 
 ---
 
-### 🛡️ Sprint Estabilización 🔥 ANTES DE TODO
+### Fase 3C — Permisos Personalizados (Pendiente)
+> **Por qué al final:** depende de tener todos los módulos definidos para saber qué permisos personalizar.
 > **Por qué primero:** consolidar documentación, seguridad, bugs latentes y DX para que las próximas fases tengan una base limpia, testeada y observable. Sin esto, cada feature nueva acumula deuda técnica.
 
 #### Bloque A — Documentación y ADRs ✅
@@ -181,9 +216,9 @@
 ---
 
 ### Fase 3C — Permisos Personalizados (Última)
-> **Por qué al final:** depende de tener todos los módulos definidos para saber qué permisos personalizar.
+> **Por qué al final:** depende de tener todos los módulos definidos para saber qué permisos personalizar. Incluye los permisos nuevos de export/print definidos arriba.
 
-- [ ] UI en `Staff\Edit` con tabla de permisos agrupados por módulo (Pacientes, Citas, Historiales, Reportes, Config)
+- [ ] UI en `Staff\Edit` con tabla de permisos agrupados por módulo (Pacientes, Citas, Historiales, Reportes, Config, Export)
 - [ ] Toggle on/off por permiso por usuario (Spatie direct permissions)
 - [ ] Botón "Restaurar permisos del rol"
 - [ ] Preview de capacidades del usuario
