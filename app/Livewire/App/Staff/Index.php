@@ -6,6 +6,7 @@ use App\Mail\ClinicInvitationMail;
 use App\Models\Clinic;
 use App\Models\ClinicInvitation;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -216,5 +217,43 @@ class Index extends Component
             'members' => $this->members,
             'pendingInvitations' => $this->pendingInvitations,
         ])->layout('layouts.app');
+    }
+
+    public function exportPdf()
+    {
+        abort_unless(auth()->user()->can('users.print'), 403);
+
+        $members = User::query()
+            ->where('clinic_id', $this->currentClinic->id)
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%');
+                });
+            })
+            ->when($this->roleFilter, fn ($q) => $q->where('role', $this->roleFilter))
+            ->when($this->statusFilter !== '', fn ($q) => $q->where('is_active', $this->statusFilter === 'active'))
+            ->orderByRaw("CASE WHEN role = 'owner' THEN 0 ELSE 1 END")
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->limit(500)
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.staff.list', [
+            'clinic' => $this->currentClinic,
+            'members' => $members,
+            'filters' => [
+                'search' => $this->search,
+                'role' => $this->roleFilter,
+                'status' => $this->statusFilter,
+            ],
+        ])->setPaper('a4', 'portrait');
+
+        $filename = 'personal-'.now()->format('Ymd-His').'.pdf';
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 }
