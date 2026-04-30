@@ -1,10 +1,25 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-05-01
-> **Fase actual:** v1.0 preliminar lista — hardening completado
-> **Próxima:** 🚀 Lanzamiento v1.0 + roadmap v2 (portal paciente, SMS, telemedicina)
+> **Última actualización:** 2026-04-29
+> **Fase actual:** v1.0 lanzable + UX polish (Nav móvil A completada)
+> **Próxima:** Fase 3C (permisos personalizados) o Fase B Sidebar adaptable
 > **Enfoque:** SaaS-First
-> **Métricas:** 299 tests / 662 asserts · Pint clean · PHPStan level 5 (con baseline)
+> **Métricas:** 306 tests / 692 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+
+---
+
+## 📱 Nav móvil — Fase A (2026-04-29) ✅ COMPLETADA
+
+- [x] Drawer overlay slide-in desde la izquierda con backdrop oscuro (ya no empuja la página hacia abajo)
+- [x] Bloqueo de scroll de body cuando el drawer está abierto (`x-effect` + `overflow-hidden`)
+- [x] Íconos heroicons inline en cada item del drawer
+- [x] Agrupación por secciones: **Operación** (Panel/Pacientes/Citas/Calendario), **Equipo** (Personal/Reportes), **Cuenta** (Configuración/Perfil/Facturación/Cerrar Sesión)
+- [x] Active state reforzado: fondo índigo + ring + ícono coloreado
+- [x] Botones del drawer con `aria-label`, `role="dialog"`, `aria-modal`, cierre con tecla Escape y tap en backdrop
+- [x] Logout en móvil con tono rojo claro para diferenciarlo del resto
+- [x] i18n nuevas: `nav_main`, `nav_team`, `nav_account`, `open_menu`, `close_menu`
+- [x] Tests: `NavigationDrawerTest` (2 escenarios: rendering + permisos)
+- [x] Suite completa: 306/306 verde · build Vite OK
 
 ---
 

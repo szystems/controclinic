@@ -124,6 +124,13 @@ return [
     'light_mode' => 'Light mode',
     'dark_mode' => 'Dark mode',
 
+    // Mobile navigation
+    'open_menu' => 'Open menu',
+    'close_menu' => 'Close menu',
+    'nav_main' => 'Operations',
+    'nav_team' => 'Team',
+    'nav_account' => 'Account',
+
     // Dashboard
     'schedule_appointment' => 'Schedule a new appointment',
     'register_patient' => 'Register a new patient',

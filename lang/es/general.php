@@ -123,6 +123,13 @@ return [
     'light_mode' => 'Modo claro',
     'dark_mode' => 'Modo oscuro',
 
+    // Navegación móvil
+    'open_menu' => 'Abrir menú',
+    'close_menu' => 'Cerrar menú',
+    'nav_main' => 'Operación',
+    'nav_team' => 'Equipo',
+    'nav_account' => 'Cuenta',
+
     // Dashboard
     'schedule_appointment' => 'Agendar una nueva cita',
     'register_patient' => 'Registrar un nuevo paciente',

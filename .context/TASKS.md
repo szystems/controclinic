@@ -316,11 +316,22 @@
 - **Cambios mayores:** actualizar `STATUS.md` con la fecha y los tests que pasan.
 - **Tests primero** en cada fase: definir los tests antes de implementar.
 
-- [ ] Implementar sidebar colapsable para la navegación principal, inspirado en el diseño y experiencia del proyecto szystems (`/home/szott/proyectos/szystems`).
-    - Sidebar debe permitir acceso directo a todos los módulos principales (Dashboard, Pacientes, Citas, Calendario visual, Staff, Reportes, Configuración, etc).
-    - Debe ser colapsable (iconos solo) y expandible (iconos + texto).
-    - Incluir agrupación de módulos secundarios (ej: "Módulos" con submenú).
-    - Soporte para dark mode y responsivo (mobile/desktop).
-    - Acceso rápido a perfil, ayuda y logout.
-    - Tomar como referencia la UX/UI de las capturas y el proyecto szystems para lograr una experiencia moderna y eficiente.
-    - No desarrollar aún, solo dejar planeado y priorizar después de la tarea de owner=doctor en plan solo.
+### 📱 Navegación móvil — Fase A ✅ COMPLETADA (2026-04-29)
+- [x] Drawer overlay slide-in con backdrop (ya no empuja la página)
+- [x] Bloqueo de scroll del body con drawer abierto
+- [x] Íconos heroicons en cada item del drawer
+- [x] Secciones agrupadas: Operación / Equipo / Cuenta
+- [x] Active state reforzado (fondo + ring + ícono coloreado)
+- [x] a11y: role=dialog, aria-modal, Escape cierra, focus en X, aria-label
+- [x] i18n: `nav_main`, `nav_team`, `nav_account`, `open_menu`, `close_menu`
+- [x] Tests: `NavigationDrawerTest` (rendering + permisos por rol)
+
+### 🧭 Navegación — Fase B (sidebar adaptable, diferida)
+> **Disparador**: cuando agreguemos el módulo nº 8 (Inventario, Mensajería, Recetas QR…) o el primero con sub-secciones. Hoy con 6 módulos la topbar es suficiente.
+
+- [ ] Sidebar colapsable en desktop ≥ `lg` (240px expandido / 64px solo iconos)
+- [ ] Preferencia colapsado/expandido persistida por usuario en `localStorage`
+- [ ] Submenús anidados ("Clínica → Pacientes/Citas/Historiales", "Operación → Personal/Inventario", "Análisis → Reportes/Métricas")
+- [ ] Topbar reducida (búsqueda global, idioma, tema, avatar)
+- [ ] Reusa el mismo árbol de navegación que el drawer móvil (Fase A)
+- [ ] Inspiración UX: proyecto `szystems` (`/home/szott/proyectos/szystems`)
