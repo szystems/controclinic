@@ -132,4 +132,8 @@ return [
     // Empty States
     'no_patients' => 'No hay pacientes',
     'no_patients_description' => 'Comienza agregando tu primer paciente',
+    'list_title' => 'Listado de Pacientes',
+    'patient_card' => 'Ficha del Paciente',
+    'born' => 'Nacido',
+    'recent_appointments' => 'Citas recientes',
 ];

@@ -3,6 +3,7 @@
 namespace App\Livewire\App\Patients;
 
 use App\Models\Patient;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 
 class Show extends Component
@@ -76,6 +77,32 @@ class Show extends Component
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
+    }
+
+    public function exportPdf()
+    {
+        abort_unless(auth()->user()->can('patients.print'), 403);
+
+        $appointments = $this->patient->appointments()
+            ->with('doctor')
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->limit(20)
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.patients.show', [
+            'clinic' => app('current_clinic'),
+            'patient' => $this->patient,
+            'appointments' => $appointments,
+        ])->setPaper('a4', 'portrait');
+
+        $filename = 'paciente-'.preg_replace('/[^A-Za-z0-9_-]/', '_', strtolower(trim($this->patient->first_name.'-'.$this->patient->last_name))).'.pdf';
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 
     public function render()

@@ -59,6 +59,13 @@ return [
 
     'active' => 'Active',
     'inactive' => 'Inactive',
+    'years' => 'years',
+    'page' => 'Page',
+    'generated_with' => 'Generated with',
+    'total' => 'Total',
+    'export_csv' => 'Export CSV',
+    'export_pdf' => 'Export PDF',
+    'print' => 'Print',
     'pending' => 'Pending',
     'completed' => 'Completed',
     'cancelled' => 'Cancelled',
