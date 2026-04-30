@@ -152,4 +152,50 @@ class MedicalRecordsExportTest extends TestCase
             ->call('exportPrescriptionPdf')
             ->assertForbidden();
     }
+
+    public function test_prescription_pdf_filename_includes_type_patient_and_date(): void
+    {
+        [$clinic, $doctor] = $this->makeClinicWithUser('doctor');
+        [$patient, $record] = $this->makeRecord($clinic, [
+            'doctor_id' => $doctor->id,
+            'record_type' => MedicalRecord::TYPE_PRESCRIPTION,
+            'prescriptions' => [
+                ['drug' => 'Omeprazol 20mg', 'dosage' => '1 cap c/12h', 'duration' => '14 días', 'notes' => null],
+            ],
+        ]);
+        $patient->forceFill(['first_name' => 'Ariadna', 'last_name' => 'Brito'])->save();
+        $record->forceFill(['created_at' => '2026-04-30 10:00:00'])->save();
+
+        $this->actingAs($doctor);
+        $component = new RecordShow;
+        $component->mount($patient->fresh(), $record->fresh());
+        $response = $component->exportPrescriptionPdf();
+
+        $disposition = $response->headers->get('content-disposition');
+        $this->assertNotNull($disposition);
+        $this->assertStringContainsString('receta', $disposition);
+        $this->assertStringContainsString('ariadna-brito', $disposition);
+        $this->assertStringContainsString('30-04-2026', $disposition);
+    }
+
+    public function test_record_pdf_filename_uses_type_label_for_consultation(): void
+    {
+        [$clinic, $doctor] = $this->makeClinicWithUser('doctor');
+        [$patient, $record] = $this->makeRecord($clinic, [
+            'doctor_id' => $doctor->id,
+            'record_type' => MedicalRecord::TYPE_CONSULTATION,
+        ]);
+        $patient->forceFill(['first_name' => 'Ariadna', 'last_name' => 'Brito'])->save();
+        $record->forceFill(['created_at' => '2026-04-30 10:00:00'])->save();
+
+        $this->actingAs($doctor);
+        $component = new RecordShow;
+        $component->mount($patient->fresh(), $record->fresh());
+        $response = $component->exportPdf();
+
+        $disposition = $response->headers->get('content-disposition');
+        $this->assertNotNull($disposition);
+        $this->assertStringContainsString('ariadna-brito', $disposition);
+        $this->assertStringContainsString('30-04-2026', $disposition);
+    }
 }

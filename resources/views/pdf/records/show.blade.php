@@ -10,7 +10,7 @@
         border-radius: 4px; margin-bottom: 10px;
     }
     .patient-banner .name { font-size: 14px; font-weight: 700; }
-    .patient-banner .meta { font-size: 9px; opacity: 0.9; margin-top: 2px; }
+    .patient-banner .banner-meta { font-size: 9px; opacity: 0.9; margin-top: 2px; color: rgba(255, 255, 255, 0.88); }
 
     .record-meta { background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; }
     .record-meta .row { display: table; width: 100%; }
@@ -32,7 +32,7 @@
 @section('content')
     <div class="patient-banner">
         <div class="name">{{ $patient->first_name }} {{ $patient->last_name }}</div>
-        <div class="meta">
+        <div class="banner-meta">
             @if($patient->medical_record_number) {{ __('patients.medical_record') }}: {{ $patient->medical_record_number }} @endif
             @if($patient->birth_date) · {{ \Carbon\Carbon::parse($patient->birth_date)->age }} {{ __('general.years') }} @endif
             @if($patient->gender) · {{ __('patients.'.$patient->gender) }} @endif
@@ -47,6 +47,9 @@
             </div>
             <div class="col"><strong>{{ __('records.created_by') }}:</strong>
                 {{ $record->doctor?->name ?? '—' }}
+                @if($record->doctor?->license_number)
+                    <span class="muted">· {{ __('staff.license_number') }}: {{ $record->doctor->license_number }}</span>
+                @endif
             </div>
             <div class="col"><strong>{{ __('records.field_status') }}:</strong>
                 {{ __('records.status_'.$record->status) }}
@@ -165,6 +168,9 @@
         <div class="signature">
             <div class="line"></div>
             {{ $record->doctor?->name ?? '' }}
+            @if($record->doctor?->license_number)
+                <div>{{ __('staff.license_number') }}: {{ $record->doctor->license_number }}</div>
+            @endif
             <div>{{ __('appointments.doctor') }}</div>
         </div>
         <div class="signature">

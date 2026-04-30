@@ -41,7 +41,7 @@ return [
     'select_role' => 'Seleccionar rol',
     'specialties' => 'Especialidades',
     'specialties_placeholder' => 'Ej: Cardiología, Pediatría',
-    'license_number' => 'Número de Licencia',
+    'license_number' => 'No. de colegiado / cédula',
     'license_placeholder' => 'Ej: COL-12345',
     'bio' => 'Biografía',
     'bio_placeholder' => 'Breve descripción profesional...',

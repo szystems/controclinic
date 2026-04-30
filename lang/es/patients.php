@@ -34,6 +34,7 @@ return [
     'age' => 'Edad',
     'years' => 'años',
     'gender' => 'Género',
+    'patient_information' => 'Datos del paciente',
     'years_old' => 'años',
 
     // Género

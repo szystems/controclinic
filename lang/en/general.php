@@ -66,6 +66,7 @@ return [
     'total' => 'Total',
     'export_csv' => 'Export CSV',
     'export_pdf' => 'Export PDF',
+    'download_pdf' => 'Download PDF',
     'print' => 'Print',
     'pending' => 'Pending',
     'completed' => 'Completed',

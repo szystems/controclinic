@@ -68,7 +68,7 @@
                         <label for="license_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             {{ __('profile.license_number') }}
                         </label>
-                        <input wire:model="license_number" type="text" id="license_number" class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <input wire:model="license_number" type="text" id="license_number" placeholder="{{ __('profile.license_placeholder') }}" class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         @error('license_number') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                     </div>
                     <div class="md:col-span-2">

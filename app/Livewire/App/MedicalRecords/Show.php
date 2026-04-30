@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -59,6 +60,21 @@ class Show extends Component
         return view('livewire.app.medical-records.show');
     }
 
+    private function buildRecordPdfFilename(?string $forcedType = null): string
+    {
+        $type = $forcedType ?: $this->record->record_type;
+        $typeLabel = __('records.type_'.$type);
+        $typeSlug = Str::slug($typeLabel ?: $type);
+
+        $patientSlug = Str::slug(trim(
+            ($this->patient->first_name ?? '').' '.($this->patient->last_name ?? '')
+        )) ?: 'paciente';
+
+        $date = optional($this->record->created_at)->format('d-m-Y') ?: now()->format('d-m-Y');
+
+        return $typeSlug.'-'.$patientSlug.'-'.$date.'.pdf';
+    }
+
     public function exportPdf()
     {
         abort_unless(auth()->user()->can('records.print'), 403);
@@ -73,15 +89,9 @@ class Show extends Component
             'record' => $this->record,
         ])->setPaper('a4', 'portrait');
 
-        $patientSlug = preg_replace('/\s+/', '-', strtolower(trim(
-            ($this->patient->first_name ?? '').' '.($this->patient->last_name ?? '')
-        ))) ?: 'paciente';
-
-        $filename = 'consulta-'.optional($this->record->created_at)->format('Ymd').'-'.$patientSlug.'.pdf';
-
         return response()->streamDownload(
             fn () => print ($pdf->output()),
-            $filename,
+            $this->buildRecordPdfFilename(),
             ['Content-Type' => 'application/pdf']
         );
     }
@@ -104,15 +114,9 @@ class Show extends Component
             'record' => $this->record,
         ])->setPaper('a4', 'portrait');
 
-        $patientSlug = preg_replace('/\s+/', '-', strtolower(trim(
-            ($this->patient->first_name ?? '').' '.($this->patient->last_name ?? '')
-        ))) ?: 'paciente';
-
-        $filename = 'receta-'.optional($this->record->created_at)->format('Ymd').'-'.$patientSlug.'.pdf';
-
         return response()->streamDownload(
             fn () => print ($pdf->output()),
-            $filename,
+            $this->buildRecordPdfFilename(MedicalRecord::TYPE_PRESCRIPTION),
             ['Content-Type' => 'application/pdf']
         );
     }

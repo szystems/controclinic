@@ -27,15 +27,22 @@
             padding-bottom: 8px;
             margin-bottom: 12px;
         }
-        .header-left, .header-right {
+        .header-left, .header-center, .header-right {
             display: table-cell;
             vertical-align: middle;
+        }
+        .header-left {
+            width: 140px;
+        }
+        .header-center {
+            text-align: center;
+            padding: 0 14px;
         }
         .header-right { text-align: right; font-size: 9px; color: #6b7280; }
         .header .clinic-name { font-size: 14px; font-weight: 700; color: #111827; }
         .header .clinic-subtitle { font-size: 10px; color: #6b7280; margin-top: 2px; }
         .header .clinic-contact { font-size: 9px; color: #9ca3af; margin-top: 1px; }
-        .header img.logo { height: 38px; width: auto; max-width: 130px; vertical-align: middle; margin-right: 8px; }
+        .header img.logo { height: 38px; width: auto; max-width: 130px; vertical-align: middle; }
 
         .footer {
             position: fixed;
@@ -139,15 +146,15 @@
             @if($logoPath)
                 <img class="logo" src="{{ $logoPath }}" alt="">
             @endif
-            <span style="display:inline-block;vertical-align:middle;">
-                <span class="clinic-name">{{ $clinic->name ?? config('app.name') }}</span>
-                @if(!empty($title))
-                    <div class="clinic-subtitle">{{ $title }}</div>
-                @endif
-                @if($contact)
-                    <div class="clinic-contact">{{ $contact }}</div>
-                @endif
-            </span>
+        </div>
+        <div class="header-center">
+            <div class="clinic-name">{{ $clinic->name ?? config('app.name') }}</div>
+            @if(!empty($title))
+                <div class="clinic-subtitle">{{ $title }}</div>
+            @endif
+            @if($contact)
+                <div class="clinic-contact">{{ $contact }}</div>
+            @endif
         </div>
         <div class="header-right">
             <div><strong>{{ now()->format('d/m/Y H:i') }}</strong></div>

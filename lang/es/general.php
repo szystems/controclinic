@@ -57,6 +57,7 @@ return [
     'total' => 'Total',
     'export_csv' => 'Exportar CSV',
     'export_pdf' => 'Exportar PDF',
+    'download_pdf' => 'Descargar PDF',
     'print' => 'Imprimir',
     'pending' => 'Pendiente',
     'completed' => 'Completado',

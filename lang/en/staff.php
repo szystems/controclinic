@@ -41,7 +41,7 @@ return [
     'select_role' => 'Select role',
     'specialties' => 'Specialties',
     'specialties_placeholder' => 'E.g: Cardiology, Pediatrics',
-    'license_number' => 'License Number',
+    'license_number' => 'Registration / License Number',
     'license_placeholder' => 'E.g: MD-12345',
     'bio' => 'Bio',
     'bio_placeholder' => 'Brief professional description...',

@@ -6,13 +6,14 @@
 @push('styles')
 <style>
     .rx-symbol {
-        font-size: 56px;
+        font-size: 46px;
         font-weight: 700;
         color: #4f46e5;
         line-height: 1;
         margin: 0;
         padding: 0;
-        font-family: serif;
+        font-family: DejaVu Sans, sans-serif;
+        letter-spacing: -1px;
     }
     .doctor-block {
         background: #eef2ff;
@@ -88,6 +89,13 @@
         color: #4b5563;
         margin-bottom: 6px;
     }
+    .patient-title {
+        font-size: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
 </style>
 @endpush
 
@@ -117,12 +125,13 @@
                 @endif
             </div>
             <div style="display: table-cell; vertical-align: middle; text-align: right; width: 80px;">
-                <div class="rx-symbol">℞</div>
+                <div class="rx-symbol">Rx</div>
             </div>
         </div>
     </div>
 
     {{-- Patient row --}}
+    <div class="patient-title">{{ __('patients.patient_information') }}</div>
     <div class="patient-row">
         <div>
             <div class="lbl">{{ __('patients.full_name') }}</div>
