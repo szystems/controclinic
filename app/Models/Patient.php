@@ -48,6 +48,11 @@ class Patient extends Model
         'preferences',
         'is_active',
         'last_visit_at',
+        'internal_notes',
+        'portal_user_id',
+        'external_id',
+        'consent_signed_at',
+        'marketing_opt_in',
     ];
 
     protected $casts = [
@@ -57,6 +62,8 @@ class Patient extends Model
         'preferences' => 'array',
         'is_active' => 'boolean',
         'last_visit_at' => 'datetime',
+        'consent_signed_at' => 'datetime',
+        'marketing_opt_in' => 'boolean',
     ];
 
     // ==================== ACTIVITY LOG ====================

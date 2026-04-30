@@ -48,6 +48,17 @@ class Appointment extends Model
         'resources',
         'is_recurring',
         'recurring_pattern_id',
+        'branch_id',
+        'consultation_price',
+        'consultation_discount',
+        'is_billable',
+        'confirmation_token',
+        'confirmed_via',
+        'telemedicine_link',
+        'telemedicine_provider',
+        'pre_consultation_form_id',
+        'parent_appointment_id',
+        'created_via',
     ];
 
     protected $casts = [
@@ -64,6 +75,9 @@ class Appointment extends Model
         'reminder_sent_at' => 'datetime',
         'resources' => 'array',
         'is_recurring' => 'boolean',
+        'consultation_price' => 'decimal:2',
+        'consultation_discount' => 'decimal:2',
+        'is_billable' => 'boolean',
     ];
 
     // Status constants

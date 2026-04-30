@@ -47,6 +47,9 @@ class Clinic extends Model
         'max_staff',
         'storage_used_bytes',
         'max_storage_bytes',
+        'parent_clinic_id',
+        'legal_entity_id',
+        'data_retention_years',
     ];
 
     protected $casts = [
@@ -62,6 +65,7 @@ class Clinic extends Model
         'max_staff' => 'integer',
         'storage_used_bytes' => 'integer',
         'max_storage_bytes' => 'integer',
+        'data_retention_years' => 'integer',
     ];
 
     /**

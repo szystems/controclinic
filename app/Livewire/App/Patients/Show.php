@@ -91,7 +91,7 @@ class Show extends Component
             ->get();
 
         $pdf = Pdf::loadView('pdf.patients.show', [
-            'clinic' => app('current_clinic'),
+            'clinic' => $this->patient->clinic,
             'patient' => $this->patient,
             'appointments' => $appointments,
         ])->setPaper('a4', 'portrait');

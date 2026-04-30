@@ -18,6 +18,7 @@ return [
     'reports' => 'Reports',
     'users' => 'Users',
     'profile' => 'Profile',
+    'signed_in_as' => 'Signed in as',
     'logout' => 'Logout',
     'login' => 'Login',
     'register' => 'Register',

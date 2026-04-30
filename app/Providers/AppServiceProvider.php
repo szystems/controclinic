@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\TenantMiddleware;
 use App\Listeners\PaddleEventListener;
 use App\Models\Clinic;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +38,14 @@ class AppServiceProvider extends ServiceProvider
 
         // Paddle webhook event listeners
         Event::subscribe(PaddleEventListener::class);
+
+        // Livewire persistent middleware: garantiza que TenantMiddleware y SetLocale
+        // se re-ejecuten en cada POST /livewire/update, manteniendo `current_clinic`
+        // bindeado y el locale correcto durante hidrataciones y acciones (exportPdf, etc.).
+        Livewire::addPersistentMiddleware([
+            TenantMiddleware::class,
+            SetLocale::class,
+        ]);
 
         // ==================== RATE LIMITERS ====================
         // Limita endpoints sensibles globalmente. Aplicar con middleware('throttle:<name>').

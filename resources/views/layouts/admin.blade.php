@@ -91,10 +91,41 @@
                                 </div>
                             </div>
 
-                            <a href="{{ route('dashboard') }}" class="text-sm text-gray-400 hover:text-white transition">
+                            {{-- Volver a la clínica de pruebas --}}
+                            @if(auth()->user()->clinic)
+                            <a href="{{ route('app.dashboard', auth()->user()->clinic->slug) }}"
+                               class="text-sm text-gray-400 hover:text-white transition whitespace-nowrap">
                                 ← {{ __('admin.back_to_app') }}
                             </a>
-                            <span class="text-sm text-gray-400">{{ auth()->user()->name }}</span>
+                            @endif
+
+                            {{-- User menu con logout --}}
+                            <div x-data="{ open: false }" class="relative">
+                                <button x-on:click="open = !open"
+                                        class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition px-2 py-1 rounded-md hover:bg-gray-700">
+                                    <div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                    <span class="hidden md:inline">{{ auth()->user()->name }}</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div x-show="open" x-on:click.away="open = false" x-transition
+                                     class="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-700 rounded-md shadow-lg ring-1 ring-black/5 z-50 py-1">
+                                    <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-600">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('general.signed_in_as') }}</p>
+                                        <p class="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">{{ auth()->user()->email }}</p>
+                                    </div>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit"
+                                                class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                                            {{ __('general.logout') }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

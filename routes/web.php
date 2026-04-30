@@ -4,6 +4,7 @@ use App\Http\Middleware\CheckPlanLimits;
 use App\Http\Middleware\EnsureIsAdmin;
 use App\Http\Middleware\EnsureOnboardingCompleted;
 use App\Http\Middleware\TenantMiddleware;
+use App\Livewire\Actions\Logout;
 use App\Livewire\Admin\Clinics\Show;
 use App\Livewire\Admin\Plans\Edit;
 use App\Livewire\App\Appointments\Calendar as AppointmentsCalendar;
@@ -86,6 +87,12 @@ Route::get('/invitation/{token}', InvitationAccept::class)
     ->middleware('throttle:10,1')
     ->name('invitations.accept');
 
+Route::post('logout', function () {
+    (new Logout)();
+
+    return redirect('/');
+})->middleware('auth')->name('logout');
+
 /*
 |--------------------------------------------------------------------------
 | Auth Routes (Login/Register handled by Breeze)
@@ -93,6 +100,12 @@ Route::get('/invitation/{token}', InvitationAccept::class)
 */
 Route::get('dashboard', function () {
     $user = auth()->user();
+
+    // Super admins van directo al panel de administración de ControClinic
+    if ($user->is_super_admin) {
+        return redirect()->route('admin.dashboard');
+    }
+
     $clinic = $user->clinic;
 
     // User has no clinic — shouldn't happen after new registration, but handle gracefully

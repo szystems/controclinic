@@ -40,6 +40,12 @@ class MedicalRecord extends Model
         'visible_to_roles',
         'status',
         'finalized_at',
+        'amendment_of_id',
+        'template_id',
+        'signed_at',
+        'signature_hash',
+        'ai_generated',
+        'ai_metadata',
     ];
 
     protected $casts = [
@@ -50,6 +56,9 @@ class MedicalRecord extends Model
         'visible_to_roles' => 'array',
         'is_confidential' => 'boolean',
         'finalized_at' => 'datetime',
+        'signed_at' => 'datetime',
+        'ai_generated' => 'boolean',
+        'ai_metadata' => 'array',
     ];
 
     // Record types

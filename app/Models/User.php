@@ -51,8 +51,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_active',
         'is_super_admin',
         'two_factor_enabled',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
         'last_login_at',
         'last_login_ip',
+        'signature_path',
+        'last_seen_at',
+        'preferences',
+        'terms_accepted_at',
     ];
 
     /**
@@ -61,6 +68,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -73,10 +82,16 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'specialties' => 'array',
             'working_hours' => 'array',
+            'preferences' => 'array',
             'is_active' => 'boolean',
             'is_super_admin' => 'boolean',
             'two_factor_enabled' => 'boolean',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted',
+            'two_factor_confirmed_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'last_seen_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
         ];
     }
 

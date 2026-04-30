@@ -71,6 +71,19 @@ class RoutesTest extends TestCase
         $response->assertRedirect(route('register'));
     }
 
+    public function test_super_admin_dashboard_redirects_to_admin(): void
+    {
+        $clinic = Clinic::factory()->onboarded()->create();
+        $admin = User::factory()->owner()->create([
+            'clinic_id' => $clinic->id,
+            'is_super_admin' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->get('/dashboard');
+
+        $response->assertRedirect(route('admin.dashboard'));
+    }
+
     public function test_billing_route_exists(): void
     {
         $clinic = Clinic::factory()->onboarded()->create();

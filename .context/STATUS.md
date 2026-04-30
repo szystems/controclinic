@@ -1,14 +1,39 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-04-29
-> **Fase actual:** v1.0 lanzable + UX polish (Nav móvil A completada)
-> **Próxima:** Fase 3C (permisos personalizados) o Fase B Sidebar adaptable
+> **Última actualización:** 2026-04-30
+> **Fase actual:** v1.0 — Bloques 0.1 y 0.2 completados. Próximo: Módulo Admin Config General (Bloque 0.1 restante)
+> **Próxima:** Módulo Configuración General Admin (subset v1) usando `app_settings` ya disponible
 > **Enfoque:** SaaS-First
-> **Métricas:** 306 tests / 692 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+> **Métricas:** 307 tests / 694 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
 
 ---
 
-## 📱 Nav móvil — Fase A (2026-04-29) ✅ COMPLETADA
+## 🧱 Bloque 0.2 Forward-Compat DB (2026-04-30) ✅
+
+- [x] 7 migraciones aditivas aplicadas (todas reversibles, validado con rollback + migrate)
+- [x] `clinics`: `parent_clinic_id`, `legal_entity_id`, `data_retention_years`
+- [x] `users`: 2FA (`two_factor_secret/recovery_codes/confirmed_at` encrypted+hidden), `signature_path`, `last_seen_at`, `preferences`, `terms_accepted_at`
+- [x] `patients`: `internal_notes`, `portal_user_id`, `external_id`, `consent_signed_at`, `marketing_opt_in`
+- [x] `appointments`: `branch_id`, `consultation_price/discount`, `is_billable`, `confirmation_token`, `confirmed_via`, `telemedicine_link/provider`, `pre_consultation_form_id`, `parent_appointment_id`, `created_via`
+- [x] `medical_records`: `amendment_of_id`, `template_id`, `signed_at`, `signature_hash`, `ai_generated`, `ai_metadata`
+- [x] Tabla nueva `app_settings` (key-value global de plataforma)
+- [x] Tablas nuevas `tags` + `taggables` (sistema polimorfo de etiquetas)
+- [x] Modelos `User/Clinic/Patient/Appointment/MedicalRecord` actualizados (fillable + casts)
+- [x] Ruta `logout` POST nombrada agregada (necesaria para `layouts/admin.blade.php`)
+- [x] Cero impacto en data viva. Tests 307/307 verde.
+
+---
+
+## � Fix crítico PDF/Livewire (2026-04-30) ✅
+
+- [x] `TenantMiddleware` + `SetLocale` registrados como persistent middleware en `AppServiceProvider`
+- [x] Todos los `exportPdf` en Livewire ahora funcionan correctamente (no más `Target class [current_clinic] does not exist`)
+- [x] `Patients\Show::exportPdf` usa `$patient->clinic` como defense-in-depth
+- [x] 29/29 tests PDF/Export/Print pasando
+
+---
+
+## �📱 Nav móvil — Fase A (2026-04-29) ✅ COMPLETADA
 
 - [x] Drawer overlay slide-in desde la izquierda con backdrop oscuro (ya no empuja la página hacia abajo)
 - [x] Bloqueo de scroll de body cuando el drawer está abierto (`x-effect` + `overflow-hidden`)

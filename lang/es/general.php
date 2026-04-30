@@ -18,6 +18,7 @@ return [
     'reports' => 'Reportes',
     'users' => 'Usuarios',
     'profile' => 'Perfil',
+    'signed_in_as' => 'Conectado como',
     'logout' => 'Cerrar Sesión',
     'login' => 'Iniciar Sesión',
     'register' => 'Registrarse',
