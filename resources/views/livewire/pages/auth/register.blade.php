@@ -25,13 +25,18 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function register(): void
     {
-        $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'unique:clinics,email'],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-            'clinic_name' => ['required', 'string', 'max:255', 'min:3'],
-            'terms_accepted' => ['accepted'],
-        ]);
+        $validated = $this->validate(
+            [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'unique:clinics,email'],
+                'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+                'clinic_name' => ['required', 'string', 'max:255', 'min:3'],
+                'terms_accepted' => ['accepted'],
+            ],
+            [
+                'terms_accepted.accepted' => __('auth.terms_required'),
+            ]
+        );
 
         $user = DB::transaction(function () use ($validated) {
             // Generate unique slug from clinic name
@@ -147,7 +152,7 @@ new #[Layout('layouts.guest')] class extends Component
                     {!! __('auth.terms_acceptance', [
                         'terms' => '<a href="' . route('terms') . '" target="_blank" class="underline hover:text-gray-900 dark:hover:text-gray-100">' . __('auth.terms_link') . '</a>',
                         'privacy' => '<a href="' . route('privacy') . '" target="_blank" class="underline hover:text-gray-900 dark:hover:text-gray-100">' . __('auth.privacy_link') . '</a>',
-                    ]) !!
+                    ]) !!}
                 </span>
             </label>
             <x-input-error :messages="$errors->get('terms_accepted')" class="mt-2" />

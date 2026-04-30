@@ -219,15 +219,22 @@
                                 @foreach($perms as $perm)
                                     @php $isRolePerm = in_array($perm, $rolePermissions); @endphp
                                     <label class="flex items-center gap-2 px-3 py-2 rounded-md border {{ $isRolePerm ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' : 'bg-gray-50 dark:bg-gray-700/40 border-gray-200 dark:border-gray-600' }} text-xs">
-                                        <input type="checkbox"
-                                               value="{{ $perm }}"
-                                               @checked($isRolePerm || in_array($perm, $extraPermissions))
-                                               @disabled($isRolePerm)
-                                               wire:model="extraPermissions"
-                                               class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 disabled:opacity-60">
+                                        @if($isRolePerm)
+                                            {{-- Permiso heredado del rol: siempre activo, no editable --}}
+                                            <input type="checkbox"
+                                                   checked
+                                                   disabled
+                                                   class="rounded border-emerald-400 dark:border-emerald-600 text-emerald-600 opacity-70 cursor-not-allowed">
+                                        @else
+                                            {{-- Permiso extra editable --}}
+                                            <input type="checkbox"
+                                                   value="{{ $perm }}"
+                                                   wire:model="extraPermissions"
+                                                   class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                                        @endif
                                         <span class="text-[11px] text-gray-700 dark:text-gray-200">{{ __('permissions.'.$perm) }}</span>
                                         @if($isRolePerm)
-                                            <span class="ml-auto text-[10px] text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">{{ __('staff.role_default') }}</span>
+                                            <span class="ml-auto text-[10px] text-emerald-700 dark:text-emerald-300 uppercase tracking-wide font-medium">{{ __('staff.role_default') }}</span>
                                         @endif
                                     </label>
                                 @endforeach
