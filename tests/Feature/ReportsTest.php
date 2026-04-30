@@ -144,7 +144,6 @@ class ReportsTest extends TestCase
         // Owner clinic should see 0 appointments
         $component = Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic]);
-
         $component->assertViewHas('totalAppointments', 0);
     }
 
@@ -172,10 +171,10 @@ class ReportsTest extends TestCase
             'status' => 'cancelled',
         ]);
 
+        // Use default period (this_month), filter by completed status
         $component = Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic])
             ->set('statusFilter', 'completed');
-
         $component->assertViewHas('totalAppointments', 1);
     }
 
@@ -203,10 +202,10 @@ class ReportsTest extends TestCase
             'status' => 'completed',
         ]);
 
+        // Filter by specific doctor — should see only 1 appointment
         $component = Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic])
             ->set('doctorFilter', (string) $doctor->id);
-
         $component->assertViewHas('totalAppointments', 1);
     }
 

@@ -7,7 +7,6 @@ use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
 use Carbon\Carbon;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class Index extends Component
@@ -62,8 +61,10 @@ class Index extends Component
     private function baseQuery()
     {
         $query = Appointment::query()
+            ->withoutGlobalScope('clinic')
             ->where('clinic_id', $this->clinic->id)
-            ->whereBetween('appointment_date', [$this->dateFrom, $this->dateTo]);
+            ->whereDate('appointment_date', '>=', $this->dateFrom)
+            ->whereDate('appointment_date', '<=', $this->dateTo);
 
         if ($this->doctorFilter) {
             $query->where('doctor_id', $this->doctorFilter);
@@ -82,41 +83,36 @@ class Index extends Component
 
     // ==================== SUMMARY STATS ====================
 
-    #[Computed]
     public function totalAppointments(): int
     {
         return $this->baseQuery()->count();
     }
 
-    #[Computed]
     public function completedAppointments(): int
     {
         return $this->baseQuery()->where('status', 'completed')->count();
     }
 
-    #[Computed]
     public function cancelledAppointments(): int
     {
         return $this->baseQuery()->where('status', 'cancelled')->count();
     }
 
-    #[Computed]
     public function noShowAppointments(): int
     {
         return $this->baseQuery()->where('status', 'no_show')->count();
     }
 
-    #[Computed]
     public function completionRate(): float
     {
-        if ($this->totalAppointments === 0) {
+        $total = $this->totalAppointments();
+        if ($total === 0) {
             return 0;
         }
 
-        return round(($this->completedAppointments / $this->totalAppointments) * 100, 1);
+        return round(($this->completedAppointments() / $total) * 100, 1);
     }
 
-    #[Computed]
     public function newPatients(): int
     {
         return Patient::query()
@@ -130,7 +126,6 @@ class Index extends Component
 
     // ==================== CHART DATA ====================
 
-    #[Computed]
     public function appointmentsByDay(): string
     {
         $from = Carbon::parse($this->dateFrom);
@@ -165,7 +160,6 @@ class Index extends Component
         return json_encode(['labels' => $labels, 'values' => $values]);
     }
 
-    #[Computed]
     public function appointmentsByStatus(): string
     {
         $statuses = ['scheduled', 'confirmed', 'completed', 'cancelled', 'no_show', 'waiting', 'in_progress'];
@@ -191,7 +185,6 @@ class Index extends Component
         return json_encode(['labels' => $labels, 'values' => $values]);
     }
 
-    #[Computed]
     public function newPatientsByMonth(): string
     {
         $months = collect();
@@ -199,10 +192,15 @@ class Index extends Component
             $months->push(Carbon::now()->subMonths($i));
         }
 
+        $isMysql = \Illuminate\Support\Facades\DB::getDriverName() === 'mysql';
+        $monthExpr = $isMysql
+            ? "DATE_FORMAT(created_at, '%Y-%m')"
+            : "strftime('%Y-%m', created_at)";
+
         $data = Patient::query()
             ->where('clinic_id', $this->clinic->id)
             ->where('created_at', '>=', Carbon::now()->subMonths(5)->startOfMonth())
-            ->selectRaw("strftime('%Y-%m', created_at) as month, count(*) as total")
+            ->selectRaw("{$monthExpr} as month, count(*) as total")
             ->groupBy('month')
             ->pluck('total', 'month')
             ->toArray();
@@ -213,7 +211,6 @@ class Index extends Component
         return json_encode(['labels' => $labels, 'values' => $values]);
     }
 
-    #[Computed]
     public function appointmentsByType(): string
     {
         $data = Appointment::query()
@@ -233,7 +230,6 @@ class Index extends Component
 
     // ==================== FILTERS ====================
 
-    #[Computed]
     public function doctors()
     {
         return User::where('clinic_id', $this->clinic->id)
@@ -309,18 +305,20 @@ class Index extends Component
 
     public function render()
     {
+        // Call methods directly so values are always evaluated with the
+        // current filter state in this render cycle.
         return view('livewire.app.reports.index', [
-            'totalAppointments' => $this->totalAppointments,
-            'completedAppointments' => $this->completedAppointments,
-            'cancelledAppointments' => $this->cancelledAppointments,
-            'noShowAppointments' => $this->noShowAppointments,
-            'completionRate' => $this->completionRate,
-            'newPatients' => $this->newPatients,
-            'appointmentsByDay' => $this->appointmentsByDay,
-            'appointmentsByStatus' => $this->appointmentsByStatus,
-            'appointmentsByType' => $this->appointmentsByType,
-            'newPatientsByMonth' => $this->newPatientsByMonth,
-            'doctors' => $this->doctors,
+            'totalAppointments' => $this->totalAppointments(),
+            'completedAppointments' => $this->completedAppointments(),
+            'cancelledAppointments' => $this->cancelledAppointments(),
+            'noShowAppointments' => $this->noShowAppointments(),
+            'completionRate' => $this->completionRate(),
+            'newPatients' => $this->newPatients(),
+            'appointmentsByDay' => $this->appointmentsByDay(),
+            'appointmentsByStatus' => $this->appointmentsByStatus(),
+            'appointmentsByType' => $this->appointmentsByType(),
+            'newPatientsByMonth' => $this->newPatientsByMonth(),
+            'doctors' => $this->doctors(),
         ])->layout('layouts.app', [
             'header' => __('reports.title'),
         ]);
