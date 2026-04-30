@@ -238,11 +238,12 @@ new class extends Component
         </div>
     </div>
 
-    <!-- Mobile Drawer (overlay slide-in) -->
+    <!-- Mobile Drawer (overlay slide-in, teleported to body to escape sticky stacking context) -->
+    <template x-teleport="body">
     <div x-cloak
          x-show="open"
          x-transition.opacity
-         class="fixed inset-0 z-40 lg:hidden"
+         class="fixed inset-0 z-50 lg:hidden"
          @keydown.escape.window="open = false"
          id="mobile-drawer"
          role="dialog"
@@ -418,4 +419,5 @@ new class extends Component
             </div>
         </aside>
     </div>
+    </template>
 </nav>
