@@ -1,10 +1,10 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-04-30
-> **Fase actual:** Sprint Print/Export (CSV + PDF) — camino crítico hacia v1.0 preliminar
+> **Última actualización:** 2026-05-01
+> **Fase actual:** Sprint Print/Export ✅ COMPLETADO — siguiente: Fase 3C
 > **Próxima:** Fase 3C — Permisos Personalizados → Hardening producción → 🚀 v1.0
 > **Enfoque:** SaaS-First
-> **Métricas:** 268 tests / 595 asserts · Pint clean · PHPStan level 5 (con baseline)
+> **Métricas:** 290 tests / 642 asserts · Pint clean · PHPStan level 5 (con baseline)
 
 ---
 
@@ -12,14 +12,14 @@
 
 **Pendiente para considerar la app funcional y lanzable:**
 
-1. **Sprint Print/Export (CSV + PDF)** ← EN CURSO
-   - PDF de reportes pulido (logo, layout, nav hidden cross-browser)
-   - Pacientes: CSV + PDF (listado + ficha individual)
-   - Citas: CSV + PDF (agenda + comprobante individual)
-   - Historiales: PDF consulta individual (con SOAP, prescripciones, firma)
-   - Staff: PDF directorio interno
-   - Permisos: `*.export` y `*.print` por módulo
-2. **Fase 3C** — Permisos personalizados (UI toggles en Staff Edit)
+1. **Sprint Print/Export (CSV + PDF)** ✅ COMPLETADO
+   - ✅ Sprint A — PDF de reportes pulido
+   - ✅ Sprint B — Pacientes: CSV + PDF (listado + ficha individual)
+   - ✅ Sprint C — Citas: CSV + PDF (agenda + comprobante individual)
+   - ✅ Sprint D — Historiales: PDF consulta individual (SOAP, signos vitales, diagnósticos, prescripciones, firmas) · respeta confidencialidad
+   - ✅ Sprint E — Staff: PDF directorio interno (requiere `users.print`)
+   - ✅ Permisos `*.export` y `*.print` por módulo en seeder
+2. **Fase 3C** — Permisos personalizados (UI toggles en Staff Edit) ← SIGUIENTE
 3. **Hardening producción**: Paddle webhook secret · cron scheduler · rate limit global · policies por modelo
 
 Con esos 3 bloques, la app es **lanzable como v1.0 preliminar**. El resto (portal paciente, SMS/WhatsApp, telemedicina, IA, mobile, API) es roadmap v2+.
