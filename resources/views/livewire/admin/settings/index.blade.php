@@ -38,18 +38,113 @@
                         <x-input-error :messages="$errors->get('branding_app_name')" class="mt-2" />
                     </div>
 
-                    {{-- Logo URL --}}
-                    <div>
-                        <x-input-label for="branding_logo_url" :value="__('admin.logo_url')" />
-                        <x-text-input
-                            id="branding_logo_url"
-                            wire:model="branding_logo_url"
-                            type="url"
-                            class="mt-1 block w-full"
-                            placeholder="https://..."
-                        />
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.logo_url_help') }}</p>
-                        <x-input-error :messages="$errors->get('branding_logo_url')" class="mt-2" />
+                    {{-- Logo: upload o URL --}}
+                    <div
+                        x-data="{
+                            mode: '{{ $branding_logo_url && !str_starts_with($branding_logo_url, "/storage/") ? "url" : "file" }}',
+                            previewUrl: '{{ $branding_logo_url ?? "" }}'
+                        }"
+                    >
+                        <x-input-label :value="__('admin.logo')" />
+
+                        {{-- Logo actual (si existe) --}}
+                        @if($branding_logo_url)
+                            <div class="mt-2 mb-3 flex items-center gap-4">
+                                <div class="flex-shrink-0 w-20 h-20 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg flex items-center justify-center overflow-hidden p-2">
+                                    <img src="{{ $branding_logo_url }}" alt="Logo actual" class="max-w-full max-h-full object-contain" />
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('admin.current_logo') }}</p>
+                                    <button
+                                        type="button"
+                                        wire:click="removeLogo"
+                                        wire:confirm="{{ __('admin.confirm_remove_logo') }}"
+                                        class="text-xs text-red-600 dark:text-red-400 hover:underline"
+                                    >
+                                        {{ __('admin.remove_logo') }}
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Tabs URL / Subir archivo --}}
+                        <div class="flex gap-4 mb-3 border-b border-gray-200 dark:border-gray-700">
+                            <button
+                                type="button"
+                                x-on:click="mode = 'file'"
+                                :class="mode === 'file' ? 'border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                                class="pb-2 text-sm font-medium transition"
+                            >
+                                {{ __('admin.logo_upload_file') }}
+                            </button>
+                            <button
+                                type="button"
+                                x-on:click="mode = 'url'"
+                                :class="mode === 'url' ? 'border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                                class="pb-2 text-sm font-medium transition"
+                            >
+                                {{ __('admin.logo_use_url') }}
+                            </button>
+                        </div>
+
+                        {{-- Panel: subir archivo --}}
+                        <div x-show="mode === 'file'" x-cloak>
+                            <label
+                                for="logo_file_input"
+                                class="mt-1 flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition bg-gray-50 dark:bg-gray-800/50"
+                                x-on:dragover.prevent
+                                x-on:drop.prevent="
+                                    const file = $event.dataTransfer.files[0];
+                                    if (file) {
+                                        previewUrl = URL.createObjectURL(file);
+                                        $refs.logoInput.files = $event.dataTransfer.files;
+                                        $refs.logoInput.dispatchEvent(new Event('change'));
+                                    }
+                                "
+                            >
+                                <template x-if="!previewUrl">
+                                    <div class="flex flex-col items-center text-gray-400 dark:text-gray-500">
+                                        <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span class="text-xs">{{ __('admin.logo_drop_hint') }}</span>
+                                        <span class="text-xs text-gray-400 mt-0.5">SVG, PNG · max 2 MB</span>
+                                    </div>
+                                </template>
+                                <template x-if="previewUrl">
+                                    <img :src="previewUrl" class="max-h-20 max-w-full object-contain p-2" />
+                                </template>
+                                <input
+                                    id="logo_file_input"
+                                    type="file"
+                                    wire:model="logo_file"
+                                    accept=".svg,.png,image/svg+xml,image/png"
+                                    class="hidden"
+                                    x-ref="logoInput"
+                                    x-on:change="
+                                        const file = $event.target.files[0];
+                                        if (file) previewUrl = URL.createObjectURL(file);
+                                    "
+                                />
+                            </label>
+                            <div wire:loading wire:target="logo_file" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                {{ __('admin.logo_uploading') }}
+                            </div>
+                            <x-input-error :messages="$errors->get('logo_file')" class="mt-2" />
+                        </div>
+
+                        {{-- Panel: URL manual --}}
+                        <div x-show="mode === 'url'" x-cloak>
+                            <x-text-input
+                                id="branding_logo_url"
+                                wire:model="branding_logo_url"
+                                type="url"
+                                class="mt-1 block w-full"
+                                placeholder="https://..."
+                            />
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.logo_url_help') }}</p>
+                            <x-input-error :messages="$errors->get('branding_logo_url')" class="mt-2" />
+                        </div>
                     </div>
 
                     {{-- Primary Color --}}

@@ -7,6 +7,8 @@ use App\Models\AppSetting;
 use App\Models\Clinic;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -226,5 +228,93 @@ class AdminSettingsTest extends TestCase
         $this->assertTrue((bool) AppSetting::get('features.maintenance_mode'));
         $this->assertTrue((bool) AppSetting::get('features.ai_enabled'));
         $this->assertFalse((bool) AppSetting::get('features.registration_open'));
+    }
+
+    // ==================== LOGO UPLOAD ====================
+
+    public function test_save_branding_accepts_png_logo_upload(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        $file = UploadedFile::fake()->image('logo.png', 200, 200);
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('logo_file', $file)
+            ->call('saveBranding')
+            ->assertHasNoErrors(['logo_file']);
+
+        $storedUrl = AppSetting::get('branding.logo_url');
+        $this->assertStringStartsWith('/storage/branding/', $storedUrl);
+        Storage::disk('public')->assertExists('branding/'.basename($storedUrl));
+    }
+
+    public function test_save_branding_rejects_non_image_file(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        $file = UploadedFile::fake()->create('malware.php', 100, 'application/x-php');
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('logo_file', $file)
+            ->call('saveBranding')
+            ->assertHasErrors(['logo_file']);
+    }
+
+    public function test_save_branding_rejects_oversized_file(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        // 3 MB > límite de 2 MB
+        $file = UploadedFile::fake()->image('big-logo.png')->size(3000);
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('logo_file', $file)
+            ->call('saveBranding')
+            ->assertHasErrors(['logo_file']);
+    }
+
+    public function test_remove_logo_clears_setting(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        // Simular un logo ya guardado como archivo local
+        Storage::disk('public')->put('branding/logo.png', 'fake-content');
+        AppSetting::set('branding.logo_url', '/storage/branding/logo.png');
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->call('removeLogo')
+            ->assertHasNoErrors();
+
+        $this->assertNull(AppSetting::get('branding.logo_url'));
+        Storage::disk('public')->assertMissing('branding/logo.png');
+    }
+
+    public function test_uploading_new_logo_removes_old_local_file(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        Storage::disk('public')->put('branding/old-logo.png', 'old-content');
+        AppSetting::set('branding.logo_url', '/storage/branding/old-logo.png');
+
+        $newFile = UploadedFile::fake()->image('new-logo.png', 100, 100);
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('logo_file', $newFile)
+            ->call('saveBranding')
+            ->assertHasNoErrors();
+
+        Storage::disk('public')->assertMissing('branding/old-logo.png');
+        $newUrl = AppSetting::get('branding.logo_url');
+        $this->assertStringStartsWith('/storage/branding/', $newUrl);
     }
 }

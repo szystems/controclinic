@@ -4,16 +4,24 @@ namespace App\Livewire\Admin\Settings;
 
 use App\Models\AppSetting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 
 class Index extends Component
 {
+    use WithFileUploads;
+
     // --- Branding ---
     public string $branding_app_name = '';
 
     public string $branding_logo_url = '';
 
     public string $branding_primary_color = '';
+
+    /** @var TemporaryUploadedFile|null */
+    public $logo_file = null;
 
     // --- Legal ---
     public string $legal_terms_url = '';
@@ -67,17 +75,49 @@ class Index extends Component
     {
         $this->validate([
             'branding_app_name' => 'required|string|max:60',
-            'branding_logo_url' => 'nullable|url|max:500',
+            'branding_logo_url' => ['nullable', 'max:500', function ($attribute, $value, $fail) {
+                if ($value && ! str_starts_with($value, '/storage/') && ! filter_var($value, FILTER_VALIDATE_URL)) {
+                    $fail(__('validation.url', ['attribute' => $attribute]));
+                }
+            }],
             'branding_primary_color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'logo_file' => 'nullable|file|mimes:svg,png|max:2048',
         ]);
 
         $userId = Auth::id();
+
+        // Si se subió un archivo, tiene prioridad sobre la URL manual
+        if ($this->logo_file) {
+            // Eliminar logo anterior si era un archivo local
+            $current = AppSetting::get('branding.logo_url');
+            if ($current && str_starts_with($current, '/storage/branding/')) {
+                Storage::disk('public')->delete('branding/'.basename($current));
+            }
+
+            $path = $this->logo_file->store('branding', 'public');
+            $this->branding_logo_url = '/storage/'.$path;
+            $this->logo_file = null;
+        }
 
         AppSetting::set('branding.app_name', $this->branding_app_name, $userId);
         AppSetting::set('branding.logo_url', $this->branding_logo_url ?: null, $userId);
         AppSetting::set('branding.primary_color', $this->branding_primary_color, $userId);
 
         $this->dispatch('notify', type: 'success', message: __('settings.branding_saved'));
+    }
+
+    public function removeLogo(): void
+    {
+        $current = AppSetting::get('branding.logo_url');
+
+        if ($current && str_starts_with($current, '/storage/branding/')) {
+            Storage::disk('public')->delete('branding/'.basename($current));
+        }
+
+        $this->branding_logo_url = '';
+        AppSetting::set('branding.logo_url', null, Auth::id());
+
+        $this->dispatch('notify', type: 'success', message: __('settings.logo_removed'));
     }
 
     public function saveLegal(): void
