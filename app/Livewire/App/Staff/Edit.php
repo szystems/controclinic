@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 // ...el resto del código de la clase...
 
@@ -39,6 +40,23 @@ class Edit extends Component
     public bool $ownershipTransferred = false;
 
     public string $transferToId = '';
+
+    /** Direct (extra) permissions assigned beyond role-inherited ones. */
+    public array $extraPermissions = [];
+
+    /**
+     * Catalog of all manageable permissions grouped by module.
+     * Used to render toggles in the Edit view.
+     */
+    public const PERMISSION_CATALOG = [
+        'patients' => ['patients.view', 'patients.create', 'patients.edit', 'patients.delete', 'patients.view_all', 'patients.export', 'patients.print'],
+        'appointments' => ['appointments.view', 'appointments.create', 'appointments.edit', 'appointments.delete', 'appointments.view_all', 'appointments.export', 'appointments.print'],
+        'records' => ['records.view', 'records.create', 'records.edit', 'records.delete', 'records.view_confidential', 'records.print'],
+        'settings' => ['settings.view', 'settings.edit'],
+        'users' => ['users.manage', 'users.print'],
+        'billing' => ['billing.manage'],
+        'reports' => ['reports.view', 'reports.export'],
+    ];
 
     protected function rules(): array
     {
@@ -79,6 +97,8 @@ class Edit extends Component
         $this->license_number = $user->license_number ?? '';
         $this->bio = $user->bio ?? '';
         $this->is_active = $user->is_active;
+        // Cargar permisos directos (extra), excluyendo los heredados del rol.
+        $this->extraPermissions = $user->getDirectPermissions()->pluck('name')->toArray();
     }
 
     public function save(): void
@@ -140,6 +160,16 @@ class Edit extends Component
         $this->member->update($data);
         // Sync role
         $this->member->syncRoles([$this->role]);
+        // Sync direct (extra) permissions — limpia los que ya vienen del rol para no duplicar.
+        $rolePerms = $this->member->getRoleNames()
+            ->flatMap(fn ($r) => Role::findByName($r)->permissions->pluck('name'))
+            ->all();
+        $extras = array_values(array_intersect(
+            array_diff($this->extraPermissions, $rolePerms),
+            $this->allCatalogPermissions()
+        ));
+        $this->member->syncPermissions($extras);
+        $this->extraPermissions = $extras;
         session()->flash('success', __('staff.updated_successfully'));
         $this->dispatch('notify', type: 'success', message: __('staff.updated_successfully'));
         $this->redirect(
@@ -265,7 +295,23 @@ class Edit extends Component
 
     public function render()
     {
-        return view('livewire.app.staff.edit')
-            ->layout('layouts.app');
+        return view('livewire.app.staff.edit', [
+            'permissionCatalog' => self::PERMISSION_CATALOG,
+            'rolePermissions' => $this->rolePermissions(),
+        ])->layout('layouts.app');
+    }
+
+    /** Permisos asociados al rol actualmente seleccionado en el formulario. */
+    public function rolePermissions(): array
+    {
+        $role = Role::where('name', $this->role)->first();
+
+        return $role ? $role->permissions->pluck('name')->all() : [];
+    }
+
+    /** Lista plana de todos los permisos definidos en el catálogo. */
+    private function allCatalogPermissions(): array
+    {
+        return array_merge(...array_values(self::PERMISSION_CATALOG));
     }
 }

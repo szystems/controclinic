@@ -185,6 +185,46 @@
             {{-- Permissions Preview --}}
             <x-role-permissions-preview :role="$role" />
 
+            {{-- Permisos personalizados (extras) --}}
+            @if(! $member->isOwner())
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('staff.custom_permissions_title') }}</h2>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">{{ __('staff.custom_permissions_note') }}</p>
+
+                <div class="space-y-4">
+                    @foreach($permissionCatalog as $module => $perms)
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                {{ __('staff.module_'.$module) }}
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                @foreach($perms as $perm)
+                                    @php $isRolePerm = in_array($perm, $rolePermissions); @endphp
+                                    <label class="flex items-center gap-2 px-3 py-2 rounded-md border {{ $isRolePerm ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' : 'bg-gray-50 dark:bg-gray-700/40 border-gray-200 dark:border-gray-600' }} text-xs">
+                                        <input type="checkbox"
+                                               value="{{ $perm }}"
+                                               @checked($isRolePerm || in_array($perm, $extraPermissions))
+                                               @disabled($isRolePerm)
+                                               wire:model="extraPermissions"
+                                               class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 disabled:opacity-60">
+                                        <span class="font-mono text-[11px] text-gray-700 dark:text-gray-200">{{ $perm }}</span>
+                                        @if($isRolePerm)
+                                            <span class="ml-auto text-[10px] text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">{{ __('staff.role_default') }}</span>
+                                        @endif
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             {{-- Professional Info (shown for doctors) --}}
             @if($role === 'doctor')
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
