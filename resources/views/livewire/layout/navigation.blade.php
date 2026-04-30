@@ -104,7 +104,7 @@ new class extends Component
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-6 lg:-my-px lg:ms-10 lg:flex">
                     @foreach ($primaryNav as $item)
                         @php $active = $item['active'](); @endphp
                         <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$active" wire:navigate>
@@ -121,7 +121,7 @@ new class extends Component
             </div>
 
             <!-- Settings Icon & User Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6 sm:gap-2">
+            <div class="hidden lg:flex lg:items-center lg:ms-6 lg:gap-2">
                 <!-- Theme Toggle -->
                 <button
                     x-data="{ dark: localStorage.getItem('theme') === 'dark' }"
@@ -223,7 +223,7 @@ new class extends Component
             </div>
 
             <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <div class="-me-2 flex items-center lg:hidden">
                 <button @click="open = true"
                         :aria-expanded="open.toString()"
                         aria-controls="mobile-drawer"
@@ -241,7 +241,7 @@ new class extends Component
     <div x-cloak
          x-show="open"
          x-transition.opacity
-         class="fixed inset-0 z-40 sm:hidden"
+         class="fixed inset-0 z-40 lg:hidden"
          @keydown.escape.window="open = false"
          id="mobile-drawer"
          role="dialog"
