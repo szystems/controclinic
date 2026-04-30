@@ -29,39 +29,74 @@
 
 ---
 
-### 🖨️ Sprint Print/Export — Impresión y reportes en todos los módulos
+### � Plan v1.0 Preliminar (lanzamiento mínimo funcional)
 
-> **Por qué:** La página de Reportes ya tiene botón PDF, pero varios problemas de calidad. Además ningún otro módulo tiene opción de imprimir/exportar listados, lo cual es esencial en entornos clínicos.
+> **Objetivo:** dejar la aplicación lista para lanzar comercialmente con clínicas reales.
+>
+> **3 bloques bloqueantes:**
+> 1. Sprint Print/Export (CSV + PDF) ← EN CURSO
+> 2. Fase 3C — Permisos personalizados
+> 3. Hardening producción (Paddle webhook, cron, rate limiting global, policies)
+>
+> Todo lo demás (portal paciente, SMS, telemedicina, IA, mobile, API) es **roadmap v2+**.
 
-#### A — Arreglar impresión PDF de Reportes (mejoras de calidad)
-> **Estado actual:** Funcional pero con problemas visuales en algunos navegadores (nav visible pese al CSS, canvas→img frágil si Chart.js no cargó aún).
-- [ ] Garantizar ocultamiento del nav en todos los navegadores (Safari, Firefox, Chrome) con estrategia JS: `document.querySelectorAll('nav')` hidden before print + restore after
-- [ ] Mover la lógica de canvas→img a un timeout con `window.onbeforeprint` más robusto (verificar que charts ya están instanciados)
-- [ ] Cabecera del reporte PDF: mostrar logo de la clínica si está configurado
-- [ ] Ajustar layout de impresión: tarjetas de stats en 1 fila, gráficas en 2 columnas
+---
+
+### 🖨️ Sprint Print/Export — CSV + PDF en todos los módulos
+
+> **Estrategia técnica:**
+> - **CSV**: datos crudos, una fila por registro, BOM UTF-8 para Excel. Útil para análisis y migración.
+> - **PDF**: vista formateada con logo de la clínica, listo para imprimir/firmar/compartir.
+> - **Stack:** `barryvdh/laravel-dompdf` para PDFs formateados. Para reportes con gráficas se mantiene `window.print()` + canvas→img (ya implementado).
+> - **Permisos nuevos:** `patients.export`, `patients.print`, `appointments.export`, `appointments.print`, `records.print`, `users.print`. Reasignados al seeder (owner + admin para export, doctor también para records.print).
+> - **Layout PDF compartido:** componente Blade `<x-pdf.layout>` con header (logo + nombre clínica), footer (paginación + fecha generado) y traducciones.
+
+#### A — Pulir PDF de Reportes
+> Funcional pero con problemas visuales y robustez en algunos navegadores.
+- [ ] JS `window.onbeforeprint` que oculte `<nav>`, banners y restaure al `onafterprint` (cross-browser, no depende sólo de `@media print`)
+- [ ] Verificar que charts ya están instanciados antes de canvas→img (esperar `Chart.instances` ready)
+- [ ] Cabecera del reporte: logo de la clínica si está configurado (`clinic.branding.logo`)
+- [ ] Layout impresión: tarjetas de stats en 1 fila, gráficas en 2 columnas
 - [ ] Test manual en Chrome, Firefox, Safari
 
-#### B — Exportar/Imprimir en módulo Pacientes
-- [ ] Botón "Exportar CSV" en `Patients\Index` (nombre, email, teléfono, fecha nacimiento, fecha registro)
-- [ ] Botón "Imprimir listado" con vista imprimible (tabla sin nav, con cabecera clínica)
-- [ ] `@can('patients.export')` — añadir permiso al seeder (owner + admin)
-- [ ] Tests Feature: acceso al export, contenido del CSV, aislamiento tenant
+#### B — Módulo Pacientes
+- [ ] Botón **"Exportar CSV"** en `Patients\Index` con filtros aplicados (id, nombre, email, teléfono, fecha nacimiento, edad, género, fecha registro)
+- [ ] Botón **"Imprimir/PDF listado"** → DomPDF con tabla limpia, logo clínica, filtros aplicados visibles, paginación
+- [ ] Botón **"PDF Ficha"** en `Patients\Show` → ficha del paciente (datos personales + historial de citas resumido + alergias/condiciones)
+- [ ] Permisos: `patients.export` (CSV), `patients.print` (PDF) → owner + admin + doctor
+- [ ] Tests Feature: acceso, contenido, aislamiento tenant, filtros aplicados
 
-#### C — Exportar/Imprimir en módulo Citas
-- [ ] Botón "Exportar CSV" en `Appointments\Index` (filtros actuales aplicados: doctor, estado, tipo, período)
-- [ ] Botón "Imprimir listado" del día/semana (útil para recepción)
-- [ ] `@can('appointments.export')` — añadir permiso al seeder
-- [ ] Tests Feature: export con filtros, aislamiento tenant
+#### C — Módulo Citas
+- [ ] Botón **"Exportar CSV"** en `Appointments\Index` con filtros (doctor, estado, tipo, período)
+- [ ] Botón **"Imprimir/PDF agenda"** del día/semana → PDF formato agenda (útil para recepción): hora, paciente, doctor, motivo
+- [ ] Botón **"PDF Comprobante"** en `Appointments\Show` → comprobante para el paciente (datos cita, dirección clínica, instrucciones)
+- [ ] Permisos: `appointments.export`, `appointments.print` → owner + admin + secretary + receptionist
+- [ ] Tests Feature: export con filtros, comprobante individual, aislamiento tenant
 
-#### D — Imprimir en módulo Historiales Médicos
-- [ ] Botón "Imprimir consulta" en `MedicalRecords\Show` (vista PDF-friendly de la consulta: SOAP, diagnósticos, prescripciones, firmas)
-- [ ] Estilo de impresión: logo clínica, datos doctor, datos paciente, sello/fecha
-- [ ] `@can('records.print')` — sólo doctor/owner pueden imprimir historiales (privacidad)
-- [ ] NO incluir "Imprimir listado" (historial es información sensible, sólo individual)
+#### D — Módulo Historial Médico (sólo PDF, sensible)
+- [ ] Botón **"PDF Consulta"** en `MedicalRecords\Show` → vista PDF clínica:
+  - Logo + datos clínica
+  - Datos doctor (nombre, especialidad, licencia)
+  - Datos paciente (nombre, edad, género, ID)
+  - SOAP completo (subjective, objective, assessment, plan)
+  - Vital signs en tabla
+  - Diagnósticos con códigos CIE
+  - Prescripciones con dosis e instrucciones
+  - Firma digital (nombre + fecha)
+- [ ] Permiso `records.print` → solo doctor + owner (privacidad médica)
+- [ ] NO incluir export CSV ni listado masivo (cada consulta sólo individual)
+- [ ] Tests Feature: acceso por permiso, contenido del PDF, confidenciales bloqueados
 
-#### E — Imprimir en módulo Staff
-- [ ] Botón "Imprimir directorio" en `Staff\Index` (nombre, rol, email, especialidad)
-- [ ] Solo visible con `@can('users.manage')`
+#### E — Módulo Staff
+- [ ] Botón **"PDF Directorio"** en `Staff\Index` → directorio interno (nombre, rol, email, teléfono, especialidad)
+- [ ] Solo visible con `@can('users.manage')` o nuevo `users.print`
+- [ ] NO incluir CSV (datos internos sensibles, no requiere análisis)
+
+#### Cierre del Sprint
+- [ ] Actualizar permisos en `RolesAndPermissionsSeeder`
+- [ ] Migración para que `Spatie\Permission` registre los nuevos permisos
+- [ ] i18n ES/EN: claves para botones, headers PDF, leyendas
+- [ ] Validación: 268 → ~290+ tests, Pint clean, build OK
 
 ---
 

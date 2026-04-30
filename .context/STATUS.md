@@ -1,10 +1,30 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-04-30
-> **Fase actual:** Sprint Print/Export — Impresión y reportes en módulos
-> **Próxima:** Fase 3C — Permisos Personalizados
+> **Fase actual:** Sprint Print/Export (CSV + PDF) — camino crítico hacia v1.0 preliminar
+> **Próxima:** Fase 3C — Permisos Personalizados → Hardening producción → 🚀 v1.0
 > **Enfoque:** SaaS-First
 > **Métricas:** 268 tests / 595 asserts · Pint clean · PHPStan level 5 (con baseline)
+
+---
+
+## 🎯 Plan v1.0 Preliminar (lanzamiento mínimo funcional)
+
+**Pendiente para considerar la app funcional y lanzable:**
+
+1. **Sprint Print/Export (CSV + PDF)** ← EN CURSO
+   - PDF de reportes pulido (logo, layout, nav hidden cross-browser)
+   - Pacientes: CSV + PDF (listado + ficha individual)
+   - Citas: CSV + PDF (agenda + comprobante individual)
+   - Historiales: PDF consulta individual (con SOAP, prescripciones, firma)
+   - Staff: PDF directorio interno
+   - Permisos: `*.export` y `*.print` por módulo
+2. **Fase 3C** — Permisos personalizados (UI toggles en Staff Edit)
+3. **Hardening producción**: Paddle webhook secret · cron scheduler · rate limit global · policies por modelo
+
+Con esos 3 bloques, la app es **lanzable como v1.0 preliminar**. El resto (portal paciente, SMS/WhatsApp, telemedicina, IA, mobile, API) es roadmap v2+.
+
+**Stack PDF elegido:** `barryvdh/laravel-dompdf` para documentos formateados (sin dependencia de Chrome). Para reportes con gráficas se mantiene `window.print()` + canvas→img.
 
 ---
 

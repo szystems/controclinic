@@ -278,15 +278,39 @@
         @endif
 
         {{-- Print-only report header --}}
+        @php
+            $clinicLogo = $clinic->branding['logo'] ?? null;
+            $clinicLogoUrl = $clinicLogo ? asset('storage/'.ltrim($clinicLogo, '/')) : null;
+            $clinicContact = collect([$clinic->phone ?? null, $clinic->email ?? null])->filter()->implode(' · ');
+            $clinicAddress = $clinic->address ?? null;
+            $activeFilters = [];
+            if ($doctorFilter) {
+                $doc = collect($doctors)->firstWhere('id', (int) $doctorFilter);
+                $activeFilters[] = __('general.doctor').': '.($doc->name ?? $doctorFilter);
+            }
+            if ($statusFilter) { $activeFilters[] = __('general.status').': '.__('reports.status_'.$statusFilter); }
+            if ($typeFilter) { $activeFilters[] = __('appointments.type').': '.__('reports.type_'.str_replace('_', '', $typeFilter)); }
+        @endphp
         <div id="print-report-header" class="hidden">
-            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #4f46e5;padding-bottom:10px;margin-bottom:18px;">
-                <div>
-                    <div style="font-size:20px;font-weight:700;color:#111827;">{{ $clinic->name }}</div>
-                    <div style="font-size:13px;color:#6b7280;margin-top:2px;">{{ __('reports.title') }} — {{ __('reports.subtitle') }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #4f46e5;padding-bottom:10px;margin-bottom:14px;gap:12px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    @if($clinicLogoUrl)
+                        <img src="{{ $clinicLogoUrl }}" alt="{{ $clinic->name }}" style="height:48px;width:auto;max-width:160px;object-fit:contain;">
+                    @endif
+                    <div>
+                        <div style="font-size:18px;font-weight:700;color:#111827;line-height:1.2;">{{ $clinic->name }}</div>
+                        <div style="font-size:12px;color:#6b7280;margin-top:2px;">{{ __('reports.title') }} — {{ __('reports.subtitle') }}</div>
+                        @if($clinicContact)
+                            <div style="font-size:10px;color:#9ca3af;margin-top:1px;">{{ $clinicContact }}</div>
+                        @endif
+                    </div>
                 </div>
-                <div style="text-align:right;font-size:12px;color:#6b7280;">
-                    <div>{{ $dateFrom }} – {{ $dateTo }}</div>
+                <div style="text-align:right;font-size:11px;color:#6b7280;line-height:1.5;">
+                    <div><strong>{{ $dateFrom }}</strong> – <strong>{{ $dateTo }}</strong></div>
                     <div>{{ __('reports.generated_at') }}: {{ now()->format('d/m/Y H:i') }}</div>
+                    @if(count($activeFilters))
+                        <div style="font-size:10px;color:#9ca3af;margin-top:2px;max-width:300px;">{{ __('reports.filters') }}: {{ implode(' · ', $activeFilters) }}</div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -360,11 +384,17 @@
         gap: 8px !important;
     }
 
-    /* ── Charts grid: 3 equal columns ── */
+    /* ── Charts grid: 2 equal columns (mejor lectura en A4 landscape) ── */
     #reports-root .lg\\:grid-cols-3 {
         display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
     }
+
+    /* Top doctors table on print: keep together */
+    table { font-size: 10px !important; }
+    h1 { font-size: 16px !important; }
+    h2 { font-size: 11px !important; }
 
     /* ── Chart canvas/images height ── */
     #reports-root canvas,
@@ -704,14 +734,52 @@ function restoreCanvases() {
     _printReplacements = [];
 }
 
-window.addEventListener('beforeprint', canvasesToImages);
-window.addEventListener('afterprint', restoreCanvases);
+// ── JS-driven hide/restore of layout chrome ──
+// Some browsers (notably Safari) ignore @media print on attribute selectors.
+// We force visibility off via inline style and restore after print.
+let _hiddenForPrint = [];
+function hideForPrint() {
+    if (_hiddenForPrint.length > 0) return;
+    const selectors = [
+        'nav',
+        '[class*="account-status"]',
+        '[class*="upgrade-nudge"]',
+        '[role="alert"]',
+        '#reports-root .no-print',
+    ];
+    document.querySelectorAll(selectors.join(',')).forEach(el => {
+        _hiddenForPrint.push({ el, prev: el.style.display });
+        el.style.display = 'none';
+    });
+}
+function restoreAfterPrint() {
+    _hiddenForPrint.forEach(({ el, prev }) => { el.style.display = prev || ''; });
+    _hiddenForPrint = [];
+}
 
-function printReportPdf() {
+window.addEventListener('beforeprint', () => { canvasesToImages(); hideForPrint(); });
+window.addEventListener('afterprint', () => { restoreCanvases(); restoreAfterPrint(); });
+
+// Ensure Chart.js is loaded and visible charts are instantiated before printing
+function whenChartsReady(maxWaitMs = 1500) {
+    return new Promise(resolve => {
+        const start = Date.now();
+        (function check() {
+            const chartsCount = Object.values(charts).filter(Boolean).length;
+            if (window.Chart && chartsCount > 0) return resolve(true);
+            if (Date.now() - start > maxWaitMs) return resolve(false);
+            setTimeout(check, 80);
+        })();
+    });
+}
+
+async function printReportPdf() {
+    await whenChartsReady();
     canvasesToImages();
-    // Give the browser one frame to actually paint the inserted <img> tags.
+    hideForPrint();
+    // Give the browser two frames to actually paint the inserted <img> tags.
     requestAnimationFrame(() => requestAnimationFrame(() => {
-        setTimeout(() => window.print(), 50);
+        setTimeout(() => window.print(), 100);
     }));
 }
 
