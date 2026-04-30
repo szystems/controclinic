@@ -210,22 +210,56 @@
             "byMonth":  @json(json_decode($newPatientsByMonth))
         }
         </script>
+
+        {{-- Print-only report header --}}
+        <div id="print-report-header" class="hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #4f46e5;padding-bottom:10px;margin-bottom:18px;">
+                <div>
+                    <div style="font-size:20px;font-weight:700;color:#111827;">{{ app('current_clinic')->name }}</div>
+                    <div style="font-size:13px;color:#6b7280;margin-top:2px;">{{ __('reports.title') }} — {{ __('reports.subtitle') }}</div>
+                </div>
+                <div style="text-align:right;font-size:12px;color:#6b7280;">
+                    <div>{{ $dateFrom }} – {{ $dateTo }}</div>
+                    <div>{{ __('reports.generated_at') }}: {{ now()->format('d/m/Y H:i') }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 
 <style>
 @page {
     size: A4 landscape;
-    margin: 10mm;
+    margin: 12mm 10mm;
 }
 
 @media print {
+    /* ── Hide layout chrome ── */
+    nav,
+    .account-status-banner,
+    [class*="bg-amber-50"] {
+        display: none !important;
+    }
+    /* Fixed-position elements (toasts, loading overlay, etc.) */
+    .fixed, [class*="fixed"] {
+        display: none !important;
+    }
+
+    /* ── Hide interactive elements ── */
     .no-print {
         display: none !important;
     }
 
-    html,
-    body {
+    /* ── Page background ── */
+    html, body {
         background: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* ── Remove outer layout spacing ── */
+    body > div.min-h-screen {
+        background: #ffffff !important;
+        min-height: unset !important;
     }
 
     #reports-root {
@@ -235,14 +269,50 @@
     #reports-root .max-w-7xl {
         max-width: none !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
 
-    #reports-root .shadow-sm {
+    /* ── Show print-only header ── */
+    #print-report-header {
+        display: block !important;
+    }
+
+    /* ── Cards: no shadows, preserve borders ── */
+    .shadow-sm {
         box-shadow: none !important;
     }
+    .rounded-xl {
+        border-radius: 6px !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
 
-    #reports-root canvas {
-        max-height: 220px !important;
+    /* ── Stat cards: force 3-col grid on print ── */
+    #reports-root .grid.grid-cols-2 {
+        display: grid !important;
+        grid-template-columns: repeat(6, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    /* ── Charts grid: 3 equal columns ── */
+    #reports-root .lg\\:grid-cols-3 {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    /* ── Chart canvas/images height ── */
+    #reports-root canvas,
+    #reports-root .chart-print-img {
+        max-height: 200px !important;
+        height: 200px !important;
+    }
+
+    /* ── Chart containers: fixed height so images fit ── */
+    #reports-root .h-48 {
+        height: 200px !important;
+    }
+    #reports-root .h-52 {
+        height: 200px !important;
     }
 }
 </style>
@@ -399,16 +469,42 @@ function buildCharts() {
     }
 }
 
-function printReportPdf() {
-    // Ensure charts are in sync with latest filters before print dialog.
+// ── Canvas → Image conversion for print ──────────────────────────
+let _printReplacements = [];
+
+function canvasesToImages() {
+    if (_printReplacements.length > 0) return; // already converted
     buildCharts();
-    requestAnimationFrame(() => {
-        setTimeout(() => window.print(), 150);
+    document.querySelectorAll('#reports-root canvas').forEach(canvas => {
+        const chart = Object.values(charts).find(c => c?.canvas === canvas);
+        if (!chart) return;
+        const img = new Image();
+        img.src = chart.toBase64Image('image/png', 1);
+        img.className = 'chart-print-img';
+        img.style.cssText = `width:100%;height:${canvas.offsetHeight || 200}px;display:block;object-fit:contain;`;
+        canvas.parentNode.insertBefore(img, canvas);
+        canvas.style.display = 'none';
+        _printReplacements.push({ canvas, img });
     });
 }
 
+function restoreCanvases() {
+    _printReplacements.forEach(({ canvas, img }) => {
+        canvas.style.display = '';
+        img.remove();
+    });
+    _printReplacements = [];
+}
+
+window.addEventListener('beforeprint', canvasesToImages);
+window.addEventListener('afterprint', restoreCanvases);
+
+function printReportPdf() {
+    canvasesToImages();
+    requestAnimationFrame(() => setTimeout(() => window.print(), 100));
+}
+
 window.printReportPdf = printReportPdf;
-window.addEventListener('beforeprint', () => buildCharts());
 
 // Expose to Alpine
 window.reportsPage = function() {

@@ -55,6 +55,7 @@ return [
     // Export
     'export_csv' => 'Export CSV',
     'print_pdf' => 'Print PDF',
+    'generated_at' => 'Generated at',
     'col_date' => 'Date',
     'col_time' => 'Time',
     'col_patient' => 'Patient',
