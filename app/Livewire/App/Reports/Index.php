@@ -59,13 +59,20 @@ class Index extends Component
 
     // ==================== BASE QUERY ====================
 
-    private function baseQuery()
+    /**
+     * Build base query honoring tenant + active filters.
+     * If $previousPeriod is true, swap dateFrom/dateTo for the equivalent prior window
+     * (same length, immediately preceding the current range).
+     */
+    private function baseQuery(bool $previousPeriod = false)
     {
+        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->dateFrom, $this->dateTo];
+
         $query = Appointment::query()
             ->withoutGlobalScope('clinic')
             ->where('clinic_id', $this->clinic->id)
-            ->whereDate('appointment_date', '>=', $this->dateFrom)
-            ->whereDate('appointment_date', '<=', $this->dateTo);
+            ->whereDate('appointment_date', '>=', $from)
+            ->whereDate('appointment_date', '<=', $to);
 
         if ($this->doctorFilter) {
             $query->where('doctor_id', $this->doctorFilter);
@@ -80,6 +87,35 @@ class Index extends Component
         }
 
         return $query;
+    }
+
+    /**
+     * Return [from, to] for the period immediately preceding the current one,
+     * with the same number of days (inclusive).
+     */
+    private function previousPeriodRange(): array
+    {
+        $from = Carbon::parse($this->dateFrom);
+        $to = Carbon::parse($this->dateTo);
+        $days = $from->diffInDays($to) + 1;
+
+        $prevTo = $from->copy()->subDay();
+        $prevFrom = $prevTo->copy()->subDays($days - 1);
+
+        return [$prevFrom->toDateString(), $prevTo->toDateString()];
+    }
+
+    /**
+     * Compute % delta from previous to current. Returns null when previous is 0
+     * (so we can show "—" instead of a misleading number).
+     */
+    private function deltaPercent(int|float $current, int|float $previous): ?float
+    {
+        if ($previous === 0 || $previous === 0.0) {
+            return null;
+        }
+
+        return round((($current - $previous) / $previous) * 100, 1);
     }
 
     // ==================== SUMMARY STATS ====================
@@ -123,6 +159,104 @@ class Index extends Component
                 $this->dateTo.' 23:59:59',
             ])
             ->count();
+    }
+
+    /**
+     * Average completed appointment duration in minutes (current period).
+     */
+    public function averageDuration(): int
+    {
+        $avg = $this->baseQuery()
+            ->where('status', 'completed')
+            ->avg('duration_minutes');
+
+        return (int) round($avg ?? 0);
+    }
+
+    /**
+     * KPIs for the previous period (same length immediately before).
+     * Used to show deltas next to current KPIs.
+     */
+    public function previousStats(): array
+    {
+        $prev = $this->baseQuery(previousPeriod: true);
+        $total = (clone $prev)->count();
+        $completed = (clone $prev)->where('status', 'completed')->count();
+        $cancelled = (clone $prev)->where('status', 'cancelled')->count();
+        $noShow = (clone $prev)->where('status', 'no_show')->count();
+        $rate = $total > 0 ? round(($completed / $total) * 100, 1) : 0.0;
+
+        // New patients in previous range
+        [$pFrom, $pTo] = $this->previousPeriodRange();
+        $newPatients = Patient::query()
+            ->where('clinic_id', $this->clinic->id)
+            ->whereBetween('created_at', [$pFrom.' 00:00:00', $pTo.' 23:59:59'])
+            ->count();
+
+        return [
+            'total' => $total,
+            'completed' => $completed,
+            'cancelled' => $cancelled,
+            'no_show' => $noShow,
+            'rate' => $rate,
+            'new_patients' => $newPatients,
+        ];
+    }
+
+    /**
+     * Compute deltas (% change) for each KPI vs previous period.
+     * Returns null when previous value was zero to avoid misleading %.
+     *
+     * @return array<string, float|null>
+     */
+    public function deltas(): array
+    {
+        $prev = $this->previousStats();
+
+        return [
+            'total' => $this->deltaPercent($this->totalAppointments(), $prev['total']),
+            'completed' => $this->deltaPercent($this->completedAppointments(), $prev['completed']),
+            'cancelled' => $this->deltaPercent($this->cancelledAppointments(), $prev['cancelled']),
+            'no_show' => $this->deltaPercent($this->noShowAppointments(), $prev['no_show']),
+            'rate' => $this->deltaPercent($this->completionRate(), $prev['rate']),
+            'new_patients' => $this->deltaPercent($this->newPatients(), $prev['new_patients']),
+        ];
+    }
+
+    /**
+     * Top doctors by appointment volume in the current filtered period.
+     * Returns max 5 rows: [name, total, completed, completion_rate].
+     *
+     * @return array<int, array{id:int,name:string,total:int,completed:int,rate:float}>
+     */
+    public function topDoctors(): array
+    {
+        $rows = $this->baseQuery()
+            ->whereNotNull('doctor_id')
+            ->selectRaw('doctor_id, count(*) as total, sum(case when status = ? then 1 else 0 end) as completed', ['completed'])
+            ->groupBy('doctor_id')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $names = User::whereIn('id', $rows->pluck('doctor_id'))->pluck('name', 'id');
+
+        return $rows->map(function ($r) use ($names) {
+            $total = (int) $r->total;
+            $completed = (int) $r->completed;
+
+            return [
+                'id' => (int) $r->doctor_id,
+                'name' => $names[$r->doctor_id] ?? '—',
+                'total' => $total,
+                'completed' => $completed,
+                'rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0.0,
+            ];
+        })->all();
     }
 
     // ==================== CHART DATA ====================
@@ -373,6 +507,9 @@ class Index extends Component
             'noShowAppointments' => $this->noShowAppointments(),
             'completionRate' => $this->completionRate(),
             'newPatients' => $this->newPatients(),
+            'averageDuration' => $this->averageDuration(),
+            'deltas' => $this->deltas(),
+            'topDoctors' => $this->topDoctors(),
             'appointmentsByDay' => $this->appointmentsByDay(),
             'appointmentsByStatus' => $this->appointmentsByStatus(),
             'appointmentsByType' => $this->appointmentsByType(),

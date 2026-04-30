@@ -135,31 +135,54 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('reports.total_appointments') }}</p>
                 <p class="mt-1 text-3xl font-bold text-gray-900 dark:text-white">{{ $totalAppointments }}</p>
+                <div class="mt-1">@include('livewire.app.reports._delta', ['delta' => $deltas['total']])</div>
             </div>
             {{-- Completed --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('reports.completed') }}</p>
                 <p class="mt-1 text-3xl font-bold text-green-600 dark:text-green-400">{{ $completedAppointments }}</p>
+                <div class="mt-1">@include('livewire.app.reports._delta', ['delta' => $deltas['completed']])</div>
             </div>
             {{-- Cancelled --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('reports.cancelled') }}</p>
                 <p class="mt-1 text-3xl font-bold text-red-500 dark:text-red-400">{{ $cancelledAppointments }}</p>
+                <div class="mt-1">@include('livewire.app.reports._delta', ['delta' => $deltas['cancelled'], 'invert' => true])</div>
             </div>
             {{-- No show --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('reports.no_show') }}</p>
                 <p class="mt-1 text-3xl font-bold text-amber-500 dark:text-amber-400">{{ $noShowAppointments }}</p>
+                <div class="mt-1">@include('livewire.app.reports._delta', ['delta' => $deltas['no_show'], 'invert' => true])</div>
             </div>
             {{-- Completion rate --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('reports.completion_rate') }}</p>
                 <p class="mt-1 text-3xl font-bold text-primary">{{ $completionRate }}%</p>
+                <div class="mt-1">@include('livewire.app.reports._delta', ['delta' => $deltas['rate']])</div>
             </div>
             {{-- New patients --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('reports.new_patients') }}</p>
                 <p class="mt-1 text-3xl font-bold text-blue-600 dark:text-blue-400">{{ $newPatients }}</p>
+                <div class="mt-1">@include('livewire.app.reports._delta', ['delta' => $deltas['new_patients']])</div>
+            </div>
+        </div>
+
+        {{-- Secondary KPI row --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('reports.avg_duration') }}</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ $averageDuration }} <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ __('reports.minutes') }}</span>
+                </p>
+                <p class="mt-0.5 text-[11px] text-gray-400 dark:text-gray-500">{{ __('reports.avg_duration_help') }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:col-span-2">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{{ __('reports.previous_period_compare') }}</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                    {{ __('reports.previous_period_help') }}
+                </p>
             </div>
         </div>
 
@@ -222,6 +245,37 @@
             "byMonth":  @json(json_decode($newPatientsByMonth))
         }
         </script>
+
+        {{-- Top Doctors --}}
+        @if(count($topDoctors) > 0)
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
+            <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{{ __('reports.top_doctors') }}</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                            <th class="text-left font-medium py-2 pr-4">#</th>
+                            <th class="text-left font-medium py-2 pr-4">{{ __('general.doctor') }}</th>
+                            <th class="text-right font-medium py-2 pr-4">{{ __('reports.total_appointments') }}</th>
+                            <th class="text-right font-medium py-2 pr-4">{{ __('reports.completed') }}</th>
+                            <th class="text-right font-medium py-2">{{ __('reports.completion_rate') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($topDoctors as $i => $doc)
+                        <tr class="border-b border-gray-100 dark:border-gray-700/50 last:border-b-0">
+                            <td class="py-2 pr-4 text-gray-500 dark:text-gray-400">{{ $i + 1 }}</td>
+                            <td class="py-2 pr-4 font-medium text-gray-900 dark:text-white">{{ $doc['name'] }}</td>
+                            <td class="py-2 pr-4 text-right tabular-nums text-gray-700 dark:text-gray-200">{{ $doc['total'] }}</td>
+                            <td class="py-2 pr-4 text-right tabular-nums text-green-600 dark:text-green-400">{{ $doc['completed'] }}</td>
+                            <td class="py-2 text-right tabular-nums font-medium text-primary">{{ $doc['rate'] }}%</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
 
         {{-- Print-only report header --}}
         <div id="print-report-header" class="hidden">
@@ -396,6 +450,7 @@ function buildCharts() {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
+                animation: false,
                 plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
                 scales: {
                     x: { grid: { color: grid }, ticks: { color: text, maxTicksLimit: 10 } },
@@ -421,6 +476,7 @@ function buildCharts() {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
+                animation: false,
                 cutout: '65%',
                 plugins: {
                     legend: { position: 'bottom', labels: { color: text, boxWidth: 10, padding: 10, font: { size: 11 } } }
@@ -445,6 +501,7 @@ function buildCharts() {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
+                animation: false,
                 cutout: '65%',
                 plugins: {
                     legend: { position: 'bottom', labels: { color: text, boxWidth: 10, padding: 10, font: { size: 11 } } }
@@ -471,6 +528,7 @@ function buildCharts() {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
+                animation: false,
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { grid: { display: false }, ticks: { color: text } },
@@ -486,12 +544,25 @@ let _printReplacements = [];
 
 function canvasesToImages() {
     if (_printReplacements.length > 0) return; // already converted
-    buildCharts();
+    // Reuse existing charts if available, else build them now (sync, animation:false)
+    if (Object.keys(charts).length === 0) {
+        buildCharts();
+    } else {
+        // Force a synchronous redraw to make sure pixels are on the canvas
+        Object.values(charts).forEach(c => { try { c?.update('none'); } catch (e) {} });
+    }
     document.querySelectorAll('#reports-root canvas').forEach(canvas => {
         const chart = Object.values(charts).find(c => c?.canvas === canvas);
         if (!chart) return;
+        let dataUrl;
+        try {
+            dataUrl = chart.toBase64Image('image/png', 1);
+        } catch (e) {
+            return;
+        }
+        if (!dataUrl || dataUrl.length < 200) return;
         const img = new Image();
-        img.src = chart.toBase64Image('image/png', 1);
+        img.src = dataUrl;
         img.className = 'chart-print-img';
         img.style.cssText = `width:100%;height:${canvas.offsetHeight || 200}px;display:block;object-fit:contain;`;
         canvas.parentNode.insertBefore(img, canvas);
@@ -512,8 +583,15 @@ window.addEventListener('beforeprint', canvasesToImages);
 window.addEventListener('afterprint', restoreCanvases);
 
 function printReportPdf() {
-    canvasesToImages();
-    requestAnimationFrame(() => setTimeout(() => window.print(), 100));
+    if (Object.keys(charts).length === 0) {
+        buildCharts();
+    }
+    // Wait two animation frames so the browser has actually painted the canvas,
+    // then convert canvases to images and trigger print.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        canvasesToImages();
+        setTimeout(() => window.print(), 150);
+    }));
 }
 
 window.printReportPdf = printReportPdf;

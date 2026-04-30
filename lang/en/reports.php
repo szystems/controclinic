@@ -28,6 +28,12 @@ return [
     'cancelled' => 'Cancelled',
     'no_show' => 'No Show',
     'completion_rate' => 'Completion rate',
+    'avg_duration' => 'Average duration',
+    'avg_duration_help' => 'Average minutes for completed appointments.',
+    'minutes' => 'min',
+    'previous_period_compare' => 'Comparison with previous period',
+    'previous_period_help' => 'Each KPI shows the percentage change vs. the same number of days immediately before. Green arrow means improvement, red means worsening. Cancellations and no-shows are inverted (going down is better).',
+    'top_doctors' => 'Top doctors',
     'new_patients' => 'New patients',
 
     // Charts

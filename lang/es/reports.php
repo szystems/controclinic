@@ -28,6 +28,12 @@ return [
     'cancelled' => 'Canceladas',
     'no_show' => 'No asistió',
     'completion_rate' => 'Tasa de completado',
+    'avg_duration' => 'Duración media',
+    'avg_duration_help' => 'Promedio de minutos en citas completadas.',
+    'minutes' => 'min',
+    'previous_period_compare' => 'Comparativa con periodo anterior',
+    'previous_period_help' => 'Cada KPI muestra el cambio porcentual frente al mismo número de días inmediatamente anterior. Una flecha verde indica mejora, roja indica deterioro. Las cancelaciones y ausencias se invierten (bajar es mejor).',
+    'top_doctors' => 'Top doctores',
     'new_patients' => 'Pacientes nuevos',
 
     // Charts
