@@ -44,6 +44,15 @@
                             mode: '{{ $branding_logo_url && !str_starts_with($branding_logo_url, "/storage/") ? "url" : "file" }}',
                             previewUrl: '{{ $branding_logo_url ?? "" }}'
                         }"
+                        x-init="
+                            const stop = e => e.preventDefault();
+                            document.addEventListener('dragover', stop);
+                            document.addEventListener('drop', stop);
+                            $cleanup(() => {
+                                document.removeEventListener('dragover', stop);
+                                document.removeEventListener('drop', stop);
+                            });
+                        "
                     >
                         <x-input-label :value="__('admin.logo')" />
 
@@ -97,7 +106,10 @@
                                     const file = $event.dataTransfer.files[0];
                                     if (file) {
                                         previewUrl = URL.createObjectURL(file);
-                                        @this.upload('logo_file', file);
+                                        const dt = new DataTransfer();
+                                        dt.items.add(file);
+                                        $refs.logoInput.files = dt.files;
+                                        $refs.logoInput.dispatchEvent(new Event('change', { bubbles: true }));
                                     }
                                 "
                             >
@@ -176,7 +188,10 @@
                                     const file = $event.dataTransfer.files[0];
                                     if (file) {
                                         faviconPreview = URL.createObjectURL(file);
-                                        @this.upload('favicon_file', file);
+                                        const dt = new DataTransfer();
+                                        dt.items.add(file);
+                                        $refs.faviconInput.files = dt.files;
+                                        $refs.faviconInput.dispatchEvent(new Event('change', { bubbles: true }));
                                     }
                                 "
                             >
