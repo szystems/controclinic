@@ -104,16 +104,16 @@ new class extends Component
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden space-x-6 lg:-my-px lg:ms-10 lg:flex">
+                <div class="hidden space-x-1 lg:space-x-6 md:-my-px md:ms-6 lg:ms-10 md:flex">
                     @foreach ($primaryNav as $item)
                         @php $active = $item['active'](); @endphp
-                        <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$active" wire:navigate>
-                            <span class="inline-flex items-center gap-1.5">
-                                <svg class="w-4 h-4 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
+                        <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$active" wire:navigate :title="$item['label']">
+                            <span class="inline-flex items-center gap-1.5 px-2 lg:px-0">
+                                <svg class="w-5 h-5 lg:w-4 lg:h-4 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     {!! $item['icon'] !!}
                                 </svg>
-                                <span>{{ $item['label'] }}</span>
+                                <span class="hidden lg:inline">{{ $item['label'] }}</span>
                             </span>
                         </x-nav-link>
                     @endforeach
@@ -132,7 +132,7 @@ new class extends Component
                         document.documentElement.classList.toggle('dark', dark);
                         $wire.updateTheme(theme);
                     "
-                    class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    class="inline-flex items-center justify-center p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                     :title="dark ? '{{ __('general.light_mode') }}' : '{{ __('general.dark_mode') }}'"
                 >
                     <!-- Sun icon (shown in dark mode) -->
@@ -223,7 +223,7 @@ new class extends Component
             </div>
 
             <!-- Hamburger -->
-            <div class="-me-2 flex items-center lg:hidden">
+            <div class="-me-2 flex items-center md:hidden">
                 <button @click="open = true"
                         :aria-expanded="open.toString()"
                         aria-controls="mobile-drawer"
