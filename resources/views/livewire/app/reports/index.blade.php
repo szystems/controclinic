@@ -215,7 +215,7 @@
         <div id="print-report-header" class="hidden">
             <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #4f46e5;padding-bottom:10px;margin-bottom:18px;">
                 <div>
-                    <div style="font-size:20px;font-weight:700;color:#111827;">{{ app('current_clinic')->name }}</div>
+                    <div style="font-size:20px;font-weight:700;color:#111827;">{{ $clinic->name }}</div>
                     <div style="font-size:13px;color:#6b7280;margin-top:2px;">{{ __('reports.title') }} — {{ __('reports.subtitle') }}</div>
                 </div>
                 <div style="text-align:right;font-size:12px;color:#6b7280;">
@@ -510,7 +510,13 @@ window.printReportPdf = printReportPdf;
 window.reportsPage = function() {
     return {
         init() {
-            buildCharts();
+            // Chart.js (app.js) is a module — may load slightly after Alpine init.
+            // Try immediately; if Chart is not ready yet, retry once after short delay.
+            if (window.Chart) {
+                buildCharts();
+            } else {
+                setTimeout(() => buildCharts(), 300);
+            }
         },
         refreshCharts() {
             // Livewire has re-rendered — rebuild charts from fresh JSON

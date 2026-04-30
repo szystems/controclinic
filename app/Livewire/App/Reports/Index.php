@@ -136,14 +136,17 @@ class Index extends Component
             $from = $to->copy()->subDays(89);
         }
 
+        // Use DATE() alias to get raw string keys, avoiding Eloquent date-cast objects as array keys
         $data = Appointment::query()
+            ->withoutGlobalScope('clinic')
             ->where('clinic_id', $this->clinic->id)
-            ->whereBetween('appointment_date', [$from->toDateString(), $to->toDateString()])
+            ->whereDate('appointment_date', '>=', $from->toDateString())
+            ->whereDate('appointment_date', '<=', $to->toDateString())
             ->when($this->doctorFilter, fn ($q) => $q->where('doctor_id', $this->doctorFilter))
-            ->selectRaw('appointment_date, count(*) as total')
-            ->groupBy('appointment_date')
-            ->orderBy('appointment_date')
-            ->pluck('total', 'appointment_date')
+            ->selectRaw('DATE(appointment_date) as day, count(*) as total')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('total', 'day')
             ->toArray();
 
         // Fill all days in range
