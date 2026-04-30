@@ -4,6 +4,7 @@ namespace App\Livewire\App\Appointments;
 
 use App\Models\Appointment;
 use App\Models\Clinic;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 
 class Show extends Component
@@ -145,5 +146,27 @@ class Show extends Component
     {
         return view('livewire.app.appointments.show')
             ->layout('layouts.app');
+    }
+
+    public function exportPdf()
+    {
+        abort_unless(auth()->user()->can('appointments.print'), 403);
+
+        $pdf = Pdf::loadView('pdf.appointments.show', [
+            'clinic' => $this->currentClinic,
+            'appointment' => $this->appointment,
+        ])->setPaper('a4', 'portrait');
+
+        $patientSlug = preg_replace('/\s+/', '-', strtolower(trim(
+            ($this->appointment->patient?->first_name ?? '').' '.($this->appointment->patient?->last_name ?? '')
+        ))) ?: 'paciente';
+
+        $filename = 'cita-'.$this->appointment->appointment_date?->format('Ymd').'-'.$patientSlug.'.pdf';
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 }

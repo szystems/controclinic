@@ -366,6 +366,17 @@
                             @endcan
                         @endif
 
+                        {{-- PDF Voucher --}}
+                        @can('appointments.print')
+                        <button type="button" wire:click="exportPdf"
+                                class="w-full inline-flex justify-center items-center px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-xs text-gray-700 dark:text-gray-200 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                            <svg class="w-4 h-4 mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+                            </svg>
+                            PDF
+                        </button>
+                        @endcan
+
                         {{-- Create medical record from this appointment --}}
                         @can('records.create')
                             @if($currentClinic->canWrite())

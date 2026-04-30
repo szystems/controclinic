@@ -128,6 +128,11 @@ return [
     'calendar_hint' => 'Vista visual de citas. Arrastra para reagendar.',
     'list_view' => 'Lista',
     'status_legend' => 'Estado',
+
+    // Comprobante / Lista PDF
+    'appointment_voucher' => 'Comprobante de Cita',
+    'voucher_note' => 'Por favor presente este comprobante el día de la cita. Si requiere reprogramar, contacte a la clínica con anticipación.',
+    'agenda_title' => 'Agenda de Citas',
     'status_scheduled' => 'Programada',
     'status_confirmed' => 'Confirmada',
     'status_in_progress' => 'En curso',

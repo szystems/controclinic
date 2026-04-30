@@ -60,6 +60,7 @@ return [
     'active' => 'Active',
     'inactive' => 'Inactive',
     'years' => 'years',
+    'name' => 'Name',
     'page' => 'Page',
     'generated_with' => 'Generated with',
     'total' => 'Total',

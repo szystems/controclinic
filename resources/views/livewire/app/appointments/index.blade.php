@@ -10,8 +10,38 @@
                     {{ __('appointments.todays_appointments') }}: {{ $appointments->where('appointment_date', today())->count() }}
                 </p>
             </div>
-            @can('appointments.create')
+            @canany(['appointments.create', 'appointments.export', 'appointments.print'])
             <div class="mt-4 sm:mt-0 flex space-x-2">
+                @canany(['appointments.export', 'appointments.print'])
+                <div x-data="{ open: false }" class="relative" @click.outside="open = false">
+                    <button type="button" @click="open = !open"
+                            class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg font-semibold text-xs text-gray-700 dark:text-gray-200 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        {{ __('general.export') }}
+                        <svg class="w-3 h-3 ml-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div x-show="open" x-transition x-cloak
+                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black/5 z-20 overflow-hidden">
+                        @can('appointments.export')
+                        <button type="button" wire:click="exportCsv" @click="open = false"
+                                class="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <svg class="w-4 h-4 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+                            {{ __('general.export_csv') }}
+                        </button>
+                        @endcan
+                        @can('appointments.print')
+                        <button type="button" wire:click="exportPdf" @click="open = false"
+                                class="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <svg class="w-4 h-4 mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+                            {{ __('general.export_pdf') }}
+                        </button>
+                        @endcan
+                    </div>
+                </div>
+                @endcanany
+                @can('appointments.create')
                 @if($currentClinic->canAddAppointmentThisMonth())
                     <a href="{{ route('app.appointments.create', ['clinic' => $currentClinic->slug]) }}"
                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
@@ -23,8 +53,9 @@
                 @else
                     <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
                 @endif
+                @endcan
             </div>
-            @endcan
+            @endcanany
         </div>
 
         {{-- Flash Messages --}}

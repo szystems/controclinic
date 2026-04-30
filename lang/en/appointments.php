@@ -128,6 +128,11 @@ return [
     'calendar_hint' => 'Visual appointment view. Drag to reschedule.',
     'list_view' => 'List',
     'status_legend' => 'Status',
+
+    // Voucher / PDF list
+    'appointment_voucher' => 'Appointment Voucher',
+    'voucher_note' => 'Please bring this voucher to your appointment. If you need to reschedule, contact the clinic in advance.',
+    'agenda_title' => 'Appointments Agenda',
     'status_scheduled' => 'Scheduled',
     'status_confirmed' => 'Confirmed',
     'status_in_progress' => 'In progress',

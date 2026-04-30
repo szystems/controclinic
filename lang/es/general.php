@@ -51,6 +51,7 @@ return [
     'active' => 'Activo',
     'inactive' => 'Inactivo',
     'years' => 'años',
+    'name' => 'Nombre',
     'page' => 'Página',
     'generated_with' => 'Generado con',
     'total' => 'Total',

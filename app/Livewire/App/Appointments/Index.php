@@ -5,6 +5,8 @@ namespace App\Livewire\App\Appointments;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -252,5 +254,131 @@ class Index extends Component
                 Appointment::STATUS_NO_SHOW => __('appointments.status_no_show'),
             ],
         ])->layout('layouts.app');
+    }
+
+    /**
+     * Build the filtered appointment query (without pagination) — shared by exports.
+     */
+    private function buildExportQuery()
+    {
+        return Appointment::query()
+            ->forClinic($this->currentClinic->id)
+            ->with(['patient', 'doctor'])
+            ->when($this->search, function ($query) {
+                $query->whereHas('patient', function ($q) {
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('phone', 'like', '%'.$this->search.'%');
+                });
+            })
+            ->when($this->status, fn ($query) => $query->where('status', $this->status))
+            ->when($this->doctorId, fn ($query) => $query->where('doctor_id', $this->doctorId))
+            ->when($this->dateFilter, fn ($query) => $query->forDate($this->dateFilter))
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('start_time', 'asc');
+    }
+
+    private function activeFiltersText(): string
+    {
+        $parts = [];
+        if ($this->search) {
+            $parts[] = __('general.search').': "'.$this->search.'"';
+        }
+        if ($this->status) {
+            $parts[] = __('appointments.status').': '.__('appointments.status_'.$this->status);
+        }
+        if ($this->doctorId) {
+            $doctor = User::find($this->doctorId);
+            if ($doctor) {
+                $parts[] = __('appointments.doctor').': '.$doctor->name;
+            }
+        }
+        if ($this->dateFilter) {
+            $parts[] = __('appointments.date').': '.Carbon::parse($this->dateFilter)->format('d/m/Y');
+        }
+
+        return implode(' · ', $parts);
+    }
+
+    public function exportCsv()
+    {
+        abort_unless(auth()->user()->can('appointments.export'), 403);
+
+        $appointments = $this->buildExportQuery()->get();
+        $filtersText = $this->activeFiltersText();
+        $filename = 'citas-'.now()->format('Ymd-His').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ];
+
+        $clinic = $this->currentClinic;
+
+        $callback = function () use ($appointments, $filtersText, $clinic) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($handle, [__('appointments.title').' — '.$clinic->name]);
+            fputcsv($handle, [__('reports.generated_at'), now()->format('d/m/Y H:i')]);
+            if ($filtersText) {
+                fputcsv($handle, [__('reports.filters'), $filtersText]);
+            }
+            fputcsv($handle, [__('general.total'), $appointments->count()]);
+            fputcsv($handle, []);
+
+            fputcsv($handle, [
+                __('appointments.date'),
+                __('appointments.start_time'),
+                __('appointments.end_time'),
+                __('appointments.patient'),
+                __('patients.medical_record_number'),
+                __('patients.phone'),
+                __('appointments.doctor'),
+                __('appointments.type'),
+                __('appointments.status'),
+                __('appointments.room'),
+                __('appointments.reason'),
+            ]);
+
+            foreach ($appointments as $a) {
+                fputcsv($handle, [
+                    $a->appointment_date?->format('Y-m-d'),
+                    $a->start_time?->format('H:i'),
+                    $a->end_time?->format('H:i'),
+                    trim(($a->patient?->first_name ?? '').' '.($a->patient?->last_name ?? '')),
+                    $a->patient?->medical_record_number,
+                    $a->patient?->phone,
+                    $a->doctor?->name,
+                    $a->appointment_type ? __('appointments.'.$a->appointment_type) : '',
+                    __('appointments.status_'.$a->status),
+                    $a->room,
+                    $a->reason,
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportPdf()
+    {
+        abort_unless(auth()->user()->can('appointments.print'), 403);
+
+        $appointments = $this->buildExportQuery()->limit(500)->get();
+
+        $pdf = Pdf::loadView('pdf.appointments.list', [
+            'clinic' => $this->currentClinic,
+            'appointments' => $appointments,
+            'filtersText' => $this->activeFiltersText(),
+        ])->setPaper('a4', 'landscape');
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            'citas-'.now()->format('Ymd-His').'.pdf',
+            ['Content-Type' => 'application/pdf']
+        );
     }
 }
