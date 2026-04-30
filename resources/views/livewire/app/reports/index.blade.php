@@ -540,26 +540,151 @@ function buildCharts() {
 }
 
 // ── Canvas → Image conversion for print ──────────────────────────
+// Strategy: render each chart on an OFFSCREEN canvas with fixed dimensions
+// (independent from responsive viewport changes during print preview).
 let _printReplacements = [];
+
+function chartConfigFor(chartKey, data) {
+    const text = '#374151';
+    const grid = 'rgba(0,0,0,0.08)';
+    const ChartJs = window.Chart;
+    if (!ChartJs) return null;
+
+    if (chartKey === 'byDay' && data.byDay?.labels?.length) {
+        return {
+            type: 'line',
+            data: {
+                labels: data.byDay.labels,
+                datasets: [{
+                    label: '',
+                    data: data.byDay.values,
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99,102,241,0.20)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: data.byDay.labels.length > 30 ? 0 : 3,
+                    pointBackgroundColor: '#6366f1',
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: false, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: grid }, ticks: { color: text, maxTicksLimit: 10 } },
+                    y: { grid: { color: grid }, ticks: { color: text, stepSize: 1, precision: 0 }, beginAtZero: true }
+                }
+            }
+        };
+    }
+    if (chartKey === 'byStatus' && data.byStatus?.labels?.length) {
+        return {
+            type: 'doughnut',
+            data: {
+                labels: data.byStatus.labels,
+                datasets: [{
+                    data: data.byStatus.values,
+                    backgroundColor: data.byStatus.colors || data.byStatus.labels.map(() => '#9ca3af'),
+                    borderWidth: 2, borderColor: '#ffffff',
+                }]
+            },
+            options: {
+                responsive: false, maintainAspectRatio: false, animation: false,
+                cutout: '65%',
+                plugins: { legend: { position: 'bottom', labels: { color: text, boxWidth: 10, padding: 8, font: { size: 11 } } } }
+            }
+        };
+    }
+    if (chartKey === 'byType' && data.byType?.labels?.length) {
+        return {
+            type: 'doughnut',
+            data: {
+                labels: data.byType.labels,
+                datasets: [{
+                    data: data.byType.values,
+                    backgroundColor: TYPE_COLORS,
+                    borderWidth: 2, borderColor: '#ffffff',
+                }]
+            },
+            options: {
+                responsive: false, maintainAspectRatio: false, animation: false,
+                cutout: '65%',
+                plugins: { legend: { position: 'bottom', labels: { color: text, boxWidth: 10, padding: 8, font: { size: 11 } } } }
+            }
+        };
+    }
+    if (chartKey === 'byMonth' && data.byMonth?.labels?.length) {
+        return {
+            type: 'bar',
+            data: {
+                labels: data.byMonth.labels,
+                datasets: [{
+                    label: '',
+                    data: data.byMonth.values,
+                    backgroundColor: 'rgba(59,130,246,0.7)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: false, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: text } },
+                    y: { grid: { color: grid }, ticks: { color: text, stepSize: 1, precision: 0 }, beginAtZero: true }
+                }
+            }
+        };
+    }
+    return null;
+}
+
+/**
+ * Render a chart on an offscreen canvas (fixed size, no responsive resize)
+ * and return its dataURL — completely independent from the visible chart.
+ */
+function renderOffscreen(chartKey, width = 900, height = 320) {
+    const data = getChartData();
+    if (!data) return null;
+    const cfg = chartConfigFor(chartKey, data);
+    if (!cfg) return null;
+
+    const off = document.createElement('canvas');
+    off.width = width;
+    off.height = height;
+    // Paint white background first so PNG isn't transparent
+    const ctx = off.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    let dataUrl = null;
+    try {
+        const c = new window.Chart(off, cfg);
+        c.update('none');
+        c.draw();
+        dataUrl = off.toDataURL('image/png');
+        c.destroy();
+    } catch (e) {
+        console.warn('Offscreen render failed for', chartKey, e);
+        return null;
+    }
+    return dataUrl;
+}
+
+const CANVAS_TO_KEY = {
+    chartByDay: { key: 'byDay', w: 1400, h: 360 },
+    chartByStatus: { key: 'byStatus', w: 600, h: 480 },
+    chartByType: { key: 'byType', w: 600, h: 480 },
+    chartPatientsByMonth: { key: 'byMonth', w: 600, h: 360 },
+};
 
 function canvasesToImages() {
     if (_printReplacements.length > 0) return; // already converted
-    // Reuse existing charts if available, else build them now (sync, animation:false)
-    if (Object.keys(charts).length === 0) {
-        buildCharts();
-    } else {
-        // Force a synchronous redraw to make sure pixels are on the canvas
-        Object.values(charts).forEach(c => { try { c?.update('none'); } catch (e) {} });
-    }
     document.querySelectorAll('#reports-root canvas').forEach(canvas => {
-        const chart = Object.values(charts).find(c => c?.canvas === canvas);
-        if (!chart) return;
-        let dataUrl;
-        try {
-            dataUrl = chart.toBase64Image('image/png', 1);
-        } catch (e) {
-            return;
-        }
+        const meta = CANVAS_TO_KEY[canvas.id];
+        if (!meta) return;
+        const dataUrl = renderOffscreen(meta.key, meta.w, meta.h);
         if (!dataUrl || dataUrl.length < 200) return;
         const img = new Image();
         img.src = dataUrl;
@@ -583,14 +708,10 @@ window.addEventListener('beforeprint', canvasesToImages);
 window.addEventListener('afterprint', restoreCanvases);
 
 function printReportPdf() {
-    if (Object.keys(charts).length === 0) {
-        buildCharts();
-    }
-    // Wait two animation frames so the browser has actually painted the canvas,
-    // then convert canvases to images and trigger print.
+    canvasesToImages();
+    // Give the browser one frame to actually paint the inserted <img> tags.
     requestAnimationFrame(() => requestAnimationFrame(() => {
-        canvasesToImages();
-        setTimeout(() => window.print(), 150);
+        setTimeout(() => window.print(), 50);
     }));
 }
 
