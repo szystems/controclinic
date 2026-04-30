@@ -36,6 +36,15 @@
             {{-- Action bar (delete needs wire:click, must live inside Livewire root) --}}
             <div class="flex justify-end gap-2">
                 @can('records.print')
+                    @if(! empty($record->prescriptions))
+                        <button type="button" wire:click="exportPrescriptionPdf"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-xs font-medium rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            ℞ {{ __('records.export_prescription') }}
+                        </button>
+                    @endif
                     <button type="button" wire:click="exportPdf"
                             class="inline-flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-xs font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600">
                         <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">

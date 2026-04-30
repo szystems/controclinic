@@ -102,4 +102,15 @@ return [
 
     'confirm_delete' => 'Delete this record? This action cannot be undone.',
     'confirm_finalize' => 'Finalize the record? Once finalized it cannot be edited.',
+
+    // Prescription PDF
+    'prescription_pdf_title' => 'Medical Prescription',
+    'prescription_pdf_subtitle' => 'Official medical document',
+    'prescription_indication' => 'Indications',
+    'prescription_issued_at' => 'Issued',
+    'prescription_footer_note' => 'This prescription is valid only with the signature of the attending physician. Consult them with any questions.',
+    'no_prescriptions' => 'This record has no prescriptions registered.',
+    'export_prescription' => 'Print Prescription',
+    'field_diagnoses' => 'Diagnoses',
+    'field_prescriptions' => 'Prescriptions',
 ];

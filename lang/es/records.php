@@ -111,4 +111,15 @@ return [
     // Confirm
     'confirm_delete' => '¿Eliminar esta consulta? Esta acción no se puede deshacer.',
     'confirm_finalize' => '¿Finalizar la consulta? Una vez finalizada no podrá editarse.',
+
+    // Prescription PDF
+    'prescription_pdf_title' => 'Receta Médica',
+    'prescription_pdf_subtitle' => 'Documento médico oficial',
+    'prescription_indication' => 'Indicaciones',
+    'prescription_issued_at' => 'Expedida',
+    'prescription_footer_note' => 'Esta receta es válida únicamente con la firma del médico tratante. Consúvelo ante cualquier duda.',
+    'no_prescriptions' => 'Esta consulta no tiene prescripciones registradas.',
+    'export_prescription' => 'Imprimir Receta',
+    'field_diagnoses' => 'Diagnósticos',
+    'field_prescriptions' => 'Prescripciones',
 ];

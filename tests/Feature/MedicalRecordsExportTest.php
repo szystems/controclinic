@@ -104,4 +104,52 @@ class MedicalRecordsExportTest extends TestCase
             ->get("/app/{$clinic->slug}/patients/{$patient->id}/records/{$record->id}")
             ->assertForbidden();
     }
+
+    public function test_doctor_can_export_prescription_pdf(): void
+    {
+        [$clinic, $doctor] = $this->makeClinicWithUser('doctor');
+        [$patient, $record] = $this->makeRecord($clinic, [
+            'doctor_id' => $doctor->id,
+            'prescriptions' => [
+                ['drug' => 'Omeprazol 20mg', 'dosage' => '1 cap c/12h', 'duration' => '14 días', 'notes' => 'Antes del desayuno'],
+                ['drug' => 'Paracetamol 500mg', 'dosage' => '1 tab c/8h', 'duration' => '5 días', 'notes' => null],
+            ],
+        ]);
+
+        Livewire::actingAs($doctor)
+            ->test(RecordShow::class, ['patient' => $patient, 'record' => $record])
+            ->call('exportPrescriptionPdf')
+            ->assertFileDownloaded(null, null, 'application/pdf');
+    }
+
+    public function test_export_prescription_pdf_aborts_when_no_prescriptions(): void
+    {
+        [$clinic, $doctor] = $this->makeClinicWithUser('doctor');
+        [$patient, $record] = $this->makeRecord($clinic, [
+            'doctor_id' => $doctor->id,
+            'prescriptions' => [],
+        ]);
+
+        Livewire::actingAs($doctor)
+            ->test(RecordShow::class, ['patient' => $patient, 'record' => $record])
+            ->call('exportPrescriptionPdf')
+            ->assertStatus(404);
+    }
+
+    public function test_doctor_without_print_permission_cannot_export_prescription_pdf(): void
+    {
+        [$clinic, $doctor] = $this->makeClinicWithUser('doctor');
+        $doctor->roles->first()->revokePermissionTo('records.print');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        [$patient, $record] = $this->makeRecord($clinic, [
+            'doctor_id' => $doctor->id,
+            'prescriptions' => [['drug' => 'Test', 'dosage' => '1x', 'duration' => '1d', 'notes' => null]],
+        ]);
+
+        Livewire::actingAs($doctor->fresh())
+            ->test(RecordShow::class, ['patient' => $patient, 'record' => $record])
+            ->call('exportPrescriptionPdf')
+            ->assertForbidden();
+    }
 }

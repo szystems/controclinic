@@ -32,6 +32,7 @@ return [
     'phone_secondary' => 'Teléfono Secundario',
     'birth_date' => 'Fecha de Nacimiento',
     'age' => 'Edad',
+    'years' => 'años',
     'gender' => 'Género',
     'years_old' => 'años',
 

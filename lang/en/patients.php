@@ -32,6 +32,7 @@ return [
     'phone_secondary' => 'Secondary Phone',
     'birth_date' => 'Date of Birth',
     'age' => 'Age',
+    'years' => 'years',
     'gender' => 'Gender',
     'years_old' => 'years old',
 
