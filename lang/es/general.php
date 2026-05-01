@@ -16,6 +16,7 @@ return [
     'settings' => 'Configuración',
     'billing' => 'Facturación',
     'reports' => 'Reportes',
+    'audit_log' => 'Auditoría',
     'users' => 'Usuarios',
     'profile' => 'Perfil',
     'signed_in_as' => 'Conectado como',

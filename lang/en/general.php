@@ -16,6 +16,7 @@ return [
     'settings' => 'Settings',
     'billing' => 'Billing',
     'reports' => 'Reports',
+    'audit_log' => 'Audit Log',
     'users' => 'Users',
     'profile' => 'Profile',
     'signed_in_as' => 'Signed in as',

@@ -33,6 +33,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'settings.view', 'settings.edit', 'users.manage', 'users.print', 'billing.manage',
             // Reportes
             'reports.view', 'reports.export',
+            // Auditoría
+            'audit.view',
         ];
 
         foreach ($permissions as $permission) {
@@ -89,6 +91,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'settings.view', 'settings.edit',
             'users.manage', 'users.print', 'billing.manage',
             'reports.view', 'reports.export',
+            'audit.view',
         ]);
 
         $this->command->info('✅ Roles y permisos creados exitosamente');

@@ -24,6 +24,7 @@ use App\Livewire\App\Patients\Create as PatientsCreate;
 use App\Livewire\App\Patients\Edit as PatientsEdit;
 use App\Livewire\App\Patients\Index as PatientsIndex;
 use App\Livewire\App\Patients\Show as PatientsShow;
+use App\Livewire\App\AuditLog\Index as AuditLogIndex;
 use App\Livewire\App\Reports\Index as ReportsIndex;
 use App\Livewire\App\Settings\Index as SettingsIndex;
 use App\Livewire\App\Staff\Create as StaffCreate;
@@ -248,6 +249,8 @@ Route::prefix('app/{clinic}')
                 });
                 // Reportes
                 Route::get('/reports', ReportsIndex::class)->name('reports');
+                // Registro de auditoría (owner y admin)
+                Route::middleware('can:audit.view')->get('/audit-log', AuditLogIndex::class)->name('audit-log');
                 // Perfil de usuario (tenantizado)
                 Route::get('/profile', App\Livewire\App\Profile\Index::class)->name('profile');
             });
