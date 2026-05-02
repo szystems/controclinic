@@ -65,7 +65,7 @@ class Create extends Component
     {
         $this->currentClinic = $clinic;
         $this->issued_at = now()->toDateString();
-        $this->currency = 'USD';
+        $this->currency = $clinic->currency ?: 'USD';
 
         $defaultPrice = (float) ($clinic->settings['default_consultation_price'] ?? 0);
         $defaultTaxRate = (float) ($clinic->settings['tax_rate'] ?? 0);
@@ -77,8 +77,7 @@ class Create extends Component
             $this->patient_id = $appt->patient_id;
             $this->doctor_id = $appt->doctor_id ?? '';
             $this->patientName = $appt->patient->full_name ?? '';
-
-            $defaultPrice = (float) ($clinic->settings['default_consultation_price'] ?? 0);
+            $this->patientSearch = $this->patientName;
         }
 
         $this->items = [
@@ -113,15 +112,44 @@ class Create extends Component
 
     public function getItemsSubtotalProperty(): float
     {
-        $total = 0.0;
+        return $this->getBreakdownProperty()['total'];
+    }
+
+    public function getBreakdownProperty(): array
+    {
+        $subtotal = 0.0;
+        $discount = 0.0;
+        $tax = 0.0;
+
         foreach ($this->items as $item) {
-            $base = (float) ($item['unit_price'] ?? 0) * (float) ($item['quantity'] ?? 1);
-            $net = $base - (float) ($item['discount_amount'] ?? 0);
-            $tax = $net * ((float) ($item['tax_rate'] ?? 0) / 100);
-            $total += round($net + $tax, 2);
+            $qty = (float) ($item['quantity'] ?? 1);
+            $price = (float) ($item['unit_price'] ?? 0);
+            $base = $qty * $price;
+            $disc = (float) ($item['discount_amount'] ?? 0);
+            $rate = (float) ($item['tax_rate'] ?? 0);
+            $net = max($base - $disc, 0);
+            $itemTax = round($net * ($rate / 100), 2);
+
+            $subtotal += round($base, 2);
+            $discount += round($disc, 2);
+            $tax += $itemTax;
         }
 
-        return round($total, 2);
+        $total = round($subtotal - $discount + $tax, 2);
+
+        return [
+            'subtotal' => round($subtotal, 2),
+            'discount' => round($discount, 2),
+            'tax' => round($tax, 2),
+            'total' => $total,
+        ];
+    }
+
+    public function clearPatient(): void
+    {
+        $this->patient_id = '';
+        $this->patientName = null;
+        $this->patientSearch = '';
     }
 
     public function searchPatients(): array
@@ -137,11 +165,17 @@ class Create extends Component
             ->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             })
             ->limit(10)
-            ->get(['id', 'first_name', 'last_name'])
-            ->map(fn ($p) => ['id' => $p->id, 'full_name' => $p->first_name.' '.$p->last_name])
+            ->get(['id', 'first_name', 'last_name', 'email', 'phone'])
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'full_name' => $p->first_name.' '.$p->last_name,
+                'email' => $p->email,
+                'phone' => $p->phone,
+            ])
             ->toArray();
     }
 
@@ -151,6 +185,7 @@ class Create extends Component
         $this->patientName = $name;
         $this->patientSearch = $name;
         $this->showPatientDropdown = false;
+        $this->resetErrorBag('patient_id');
     }
 
     public function save(): void
