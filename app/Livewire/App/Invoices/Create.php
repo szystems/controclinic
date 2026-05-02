@@ -71,6 +71,9 @@ class Create extends Component
         $defaultPrice = (float) ($clinic->settings['default_consultation_price'] ?? 0);
         $defaultTaxRate = (float) ($clinic->settings['tax_rate'] ?? 0);
 
+        // Fallback: query string ?appointment=UUID no se inyecta automáticamente en Livewire 3
+        $appointment = $appointment ?: request()->query('appointment');
+
         // Si viene de una cita, prellena datos
         if ($appointment) {
             $appt = Appointment::where('clinic_id', $clinic->id)->findOrFail($appointment);
@@ -79,6 +82,8 @@ class Create extends Component
             $this->doctor_id = $appt->doctor_id ? (string) $appt->doctor_id : null;
             $this->patientName = $appt->patient->full_name ?? '';
             $this->patientSearch = $this->patientName;
+            $this->patientEmail = $appt->patient->email ?? null;
+            $this->patientPhone = $appt->patient->phone ?? null;
 
             // Usar precio de la cita si está definido
             if ($appt->consultation_price !== null) {
