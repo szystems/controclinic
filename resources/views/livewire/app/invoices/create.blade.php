@@ -1,5 +1,5 @@
 <div class="py-6">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {{-- Header --}}
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center space-x-4">
@@ -9,7 +9,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                 </a>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('invoices.new_invoice') }}</h1>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('invoices.new_invoice') }}</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('invoices.currency') }}: <span class="font-mono font-semibold">{{ $currency }}</span></p>
+                </div>
             </div>
             @if($appointmentId)
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
@@ -21,43 +24,41 @@
 
         <form wire:submit="save" class="space-y-6">
             {{-- Encabezado --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <h2 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">{{ __('invoices.invoice_details') }}</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {{-- Paciente --}}
-                    <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('invoices.patient') }} <span class="text-red-500">*</span></label>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-5">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('invoices.invoice_details') }}</h2>
 
-                        @if($patient_id && $patientName)
-                            {{-- Paciente seleccionado: chip --}}
-                            <div class="flex items-center justify-between px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold">
-                                        {{ strtoupper(substr($patientName, 0, 1)) }}
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $patientName }}</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('invoices.patient') }} #{{ substr($patient_id, 0, 8) }}</p>
-                                    </div>
+                {{-- Paciente --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('invoices.patient') }} <span class="text-red-500">*</span></label>
+
+                    @if($patient_id && $patientName)
+                        <div class="flex items-center justify-between px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold">
+                                    {{ strtoupper(substr($patientName, 0, 1)) }}
                                 </div>
-                                @if(!$appointmentId)
-                                    <button type="button" wire:click="clearPatient"
-                                            class="text-gray-400 hover:text-red-600 transition" title="{{ __('general.clear') ?? 'Limpiar' }}">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                @endif
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $patientName }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('invoices.patient') }} #{{ substr($patient_id, 0, 8) }}</p>
+                                </div>
                             </div>
-                        @else
-                            {{-- Buscador --}}
-                            <div class="relative" x-data="{ open: false }" @keydown.escape="open = false">
-                                <div class="relative">
-                                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
-                                    <input type="text" wire:model.live.debounce.300ms="patientSearch"
-                                           @focus="open = true" @click.outside="open = false"
-                                           placeholder="{{ __('patients.search_placeholder') }}"
-                                           class="w-full pl-9 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"/>
-                                </div>
-                                @if(strlen($patientSearch) >= 2)
+                            @if(!$appointmentId)
+                                <button type="button" wire:click="clearPatient"
+                                        class="text-gray-400 hover:text-red-600 transition" title="{{ __('general.cancel') }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            @endif
+                        </div>
+                    @else
+                        <div class="relative" x-data="{ open: false }" @keydown.escape="open = false">
+                            <div class="relative">
+                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+                                <input type="text" wire:model.live.debounce.300ms="patientSearch"
+                                       @focus="open = true" @click.outside="open = false"
+                                       placeholder="{{ __('patients.search_placeholder') }}"
+                                       class="w-full pl-9 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"/>
+                            </div>
+                            @if(strlen($patientSearch) >= 2)
                                 <div x-show="open" x-cloak x-transition.opacity
                                      class="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
                                     @forelse($patients as $patient)
@@ -78,56 +79,50 @@
                                         <p class="px-4 py-3 text-sm text-gray-500">{{ __('general.no_results') }}</p>
                                     @endforelse
                                 </div>
-                                @else
-                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('invoices.patient_search_hint') ?? 'Escribe al menos 2 caracteres para buscar.' }}</p>
-                                @endif
-                            </div>
-                        @endif
-                        @error('patient_id') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                    </div>
+                            @endif
+                        </div>
+                    @endif
+                    @error('patient_id') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
 
-                    {{-- Doctor --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('invoices.doctor') }}</label>
+                {{-- Doctor --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('invoices.doctor') }}</label>
+                    @if($doctors->isEmpty())
+                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">{{ __('invoices.no_doctors') ?? 'No hay doctores registrados en la clínica.' }}</p>
+                    @else
                         <select wire:model="doctor_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="">— {{ __('general.optional') }} —</option>
+                            <option value="">— {{ __('general.optional') ?? 'Opcional' }} —</option>
                             @foreach($doctors as $doc)
                                 <option value="{{ $doc->id }}">{{ $doc->name }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    @endif
+                    @error('doctor_id') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
 
-                    {{-- Moneda --}}
+                {{-- Fechas --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('invoices.currency') ?? 'Moneda' }}</label>
-                        <input type="text" wire:model="currency" maxlength="3"
-                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 uppercase"/>
-                        @error('currency') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                    </div>
-
-                    {{-- Fecha emisión --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('invoices.issued_at') }} <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('invoices.issued_at') }} <span class="text-red-500">*</span></label>
                         <input type="date" wire:model="issued_at"
                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"/>
                         @error('issued_at') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
-
-                    {{-- Fecha límite --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('invoices.due_at') }}</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('invoices.due_at') }}</label>
                         <input type="date" wire:model="due_at"
                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"/>
                         @error('due_at') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
+                </div>
 
-                    {{-- Notas --}}
-                    <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('invoices.notes') }}</label>
-                        <textarea wire:model="notes" rows="2"
-                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 text-sm"></textarea>
-                        @error('notes') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                    </div>
+                {{-- Notas --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('invoices.notes') }}</label>
+                    <textarea wire:model="notes" rows="2"
+                              class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 text-sm"></textarea>
+                    @error('notes') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -136,7 +131,7 @@
                 <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                     <div>
                         <h2 class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('invoices.items') }}</h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ count($items) }} {{ trans_choice('invoices.items_count', count($items)) ?? 'líneas' }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ count($items) }} {{ __('invoices.items') }}</p>
                     </div>
                     <button type="button" wire:click="addItem"
                             class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50">
@@ -160,67 +155,83 @@
                             $net = max($base - $disc, 0);
                             $itemTotal = round($net + ($net * $rate / 100), 2);
                         @endphp
-                        <div class="p-4 sm:p-5 hover:bg-gray-50/50 dark:hover:bg-gray-900/20" wire:key="item-{{ $i }}">
-                            <div class="flex items-start justify-between mb-3">
-                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-300">{{ $i + 1 }}</span>
+                        <div class="p-5 space-y-4 hover:bg-gray-50/50 dark:hover:bg-gray-900/20" wire:key="item-{{ $i }}">
+                            {{-- Header de la línea --}}
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-xs font-semibold text-indigo-700 dark:text-indigo-300">{{ $i + 1 }}</span>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('invoices.item') ?? 'Línea' }} #{{ $i + 1 }}</span>
+                                </div>
                                 @if(count($items) > 1)
                                     <button type="button" wire:click="removeItem({{ $i }})"
-                                            class="text-gray-400 hover:text-red-600 p-1 transition" title="{{ __('general.remove') ?? 'Eliminar' }}">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+                                            class="inline-flex items-center text-xs text-red-600 hover:text-red-800 font-medium">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+                                        {{ __('invoices.remove_item') }}
                                     </button>
                                 @endif
                             </div>
-                            <div class="grid grid-cols-12 gap-3">
-                                <div class="col-span-12 sm:col-span-3">
-                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('invoices.item_type') }}</label>
-                                    <select wire:model="items.{{ $i }}.type"
-                                            class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                        @foreach($itemTypes as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
+
+                            {{-- Tipo --}}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_type') }}</label>
+                                <select wire:model="items.{{ $i }}.type"
+                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    @foreach($itemTypes as $key => $label)
+                                        <option value="{{ $key }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Descripción --}}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_description') }} <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="items.{{ $i }}.description"
+                                       placeholder="{{ __('invoices.item_description') }}"
+                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                                @error("items.{$i}.description") <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Cantidad --}}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_quantity') }}</label>
+                                <input type="number" wire:model.live.debounce.500ms="items.{{ $i }}.quantity" step="0.01" min="0.01"
+                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                            </div>
+
+                            {{-- Precio unitario --}}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_unit_price') }}</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono text-gray-500 dark:text-gray-400">{{ $currency }}</span>
+                                    <input type="number" wire:model.live.debounce.500ms="items.{{ $i }}.unit_price" step="0.01" min="0"
+                                           class="w-full pl-14 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
                                 </div>
-                                <div class="col-span-12 sm:col-span-9">
-                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('invoices.item_description') }} <span class="text-red-500">*</span></label>
-                                    <input type="text" wire:model="items.{{ $i }}.description"
-                                           class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
-                                    @error("items.{$i}.description") <p class="mt-0.5 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Descuento --}}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_discount') }}</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono text-gray-500 dark:text-gray-400">{{ $currency }}</span>
+                                    <input type="number" wire:model.live.debounce.500ms="items.{{ $i }}.discount_amount" step="0.01" min="0"
+                                           class="w-full pl-14 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
                                 </div>
-                                <div class="col-span-6 sm:col-span-2">
-                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('invoices.item_quantity') }}</label>
-                                    <input type="number" wire:model.live.debounce.300ms="items.{{ $i }}.quantity" step="0.01" min="0.01"
-                                           class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                            </div>
+
+                            {{-- Impuesto --}}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_tax_rate') }}</label>
+                                <div class="relative">
+                                    <input type="number" wire:model.live.debounce.500ms="items.{{ $i }}.tax_rate" step="0.01" min="0" max="100"
+                                           class="w-full pr-8 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400">%</span>
                                 </div>
-                                <div class="col-span-6 sm:col-span-3">
-                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('invoices.item_unit_price') }}</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">{{ $currency }}</span>
-                                        <input type="number" wire:model.live.debounce.300ms="items.{{ $i }}.unit_price" step="0.01" min="0"
-                                               class="w-full pl-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
-                                    </div>
-                                </div>
-                                <div class="col-span-6 sm:col-span-3">
-                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('invoices.item_discount') ?? 'Descuento' }}</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">{{ $currency }}</span>
-                                        <input type="number" wire:model.live.debounce.300ms="items.{{ $i }}.discount_amount" step="0.01" min="0"
-                                               class="w-full pl-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
-                                    </div>
-                                </div>
-                                <div class="col-span-6 sm:col-span-2">
-                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('invoices.item_tax_rate') }}</label>
-                                    <div class="relative">
-                                        <input type="number" wire:model.live.debounce.300ms="items.{{ $i }}.tax_rate" step="0.01" min="0" max="100"
-                                               class="w-full pr-7 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">%</span>
-                                    </div>
-                                </div>
-                                <div class="col-span-12 sm:col-span-2">
-                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('invoices.item_total') ?? 'Total línea' }}</label>
-                                    <div class="px-3 py-2 bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-semibold text-gray-900 dark:text-white">
-                                        {{ number_format($itemTotal, 2) }}
-                                    </div>
-                                </div>
+                            </div>
+
+                            {{-- Total línea (read-only) --}}
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('invoices.item_total') }}</span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-white font-mono">{{ $currency }} {{ number_format($itemTotal, 2) }}</span>
                             </div>
                         </div>
                     @endforeach
@@ -233,23 +244,23 @@
                         <dl class="w-full sm:w-72 space-y-1.5 text-sm">
                             <div class="flex justify-between">
                                 <dt class="text-gray-500 dark:text-gray-400">{{ __('invoices.subtotal') }}</dt>
-                                <dd class="text-gray-900 dark:text-white">{{ $currency }} {{ number_format($b['subtotal'], 2) }}</dd>
+                                <dd class="text-gray-900 dark:text-white font-mono">{{ $currency }} {{ number_format($b['subtotal'], 2) }}</dd>
                             </div>
                             @if($b['discount'] > 0)
                             <div class="flex justify-between">
                                 <dt class="text-gray-500 dark:text-gray-400">{{ __('invoices.discount') }}</dt>
-                                <dd class="text-rose-600 dark:text-rose-400">− {{ $currency }} {{ number_format($b['discount'], 2) }}</dd>
+                                <dd class="text-rose-600 dark:text-rose-400 font-mono">− {{ $currency }} {{ number_format($b['discount'], 2) }}</dd>
                             </div>
                             @endif
                             @if($b['tax'] > 0)
                             <div class="flex justify-between">
                                 <dt class="text-gray-500 dark:text-gray-400">{{ __('invoices.tax') }}</dt>
-                                <dd class="text-gray-900 dark:text-white">{{ $currency }} {{ number_format($b['tax'], 2) }}</dd>
+                                <dd class="text-gray-900 dark:text-white font-mono">{{ $currency }} {{ number_format($b['tax'], 2) }}</dd>
                             </div>
                             @endif
                             <div class="flex justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <dt class="font-semibold text-gray-900 dark:text-white">{{ __('invoices.total') }}</dt>
-                                <dd class="font-bold text-base text-gray-900 dark:text-white">{{ $currency }} {{ number_format($b['total'], 2) }}</dd>
+                                <dd class="font-bold text-base text-gray-900 dark:text-white font-mono">{{ $currency }} {{ number_format($b['total'], 2) }}</dd>
                             </div>
                         </dl>
                     </div>

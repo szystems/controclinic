@@ -22,7 +22,7 @@ class Create extends Component
     // Encabezado
     public string $patient_id = '';
 
-    public string $doctor_id = '';
+    public ?string $doctor_id = null;
 
     public string $issued_at = '';
 
@@ -49,7 +49,6 @@ class Create extends Component
             'doctor_id' => ['nullable', 'exists:users,id'],
             'issued_at' => ['required', 'date'],
             'due_at' => ['nullable', 'date', 'after_or_equal:issued_at'],
-            'currency' => ['required', 'string', 'size:3'],
             'notes' => ['nullable', 'string', 'max:2000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.type' => ['required', 'in:consultation,procedure,medication,lab,other'],
@@ -75,7 +74,7 @@ class Create extends Component
             $appt = Appointment::where('clinic_id', $clinic->id)->findOrFail($appointment);
             $this->appointmentId = $appt->id;
             $this->patient_id = $appt->patient_id;
-            $this->doctor_id = $appt->doctor_id ?? '';
+            $this->doctor_id = $appt->doctor_id ? (string) $appt->doctor_id : null;
             $this->patientName = $appt->patient->full_name ?? '';
             $this->patientSearch = $this->patientName;
         }
@@ -206,7 +205,7 @@ class Create extends Component
                 'invoice_number' => $number,
                 'issued_at' => $validated['issued_at'],
                 'due_at' => $validated['due_at'] ?: null,
-                'currency' => $validated['currency'],
+                'currency' => $this->currency,
                 'notes' => $validated['notes'] ?: null,
                 'status' => Invoice::STATUS_PENDING,
                 'subtotal' => 0,
