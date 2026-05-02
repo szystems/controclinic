@@ -132,26 +132,10 @@ new class extends Component
                         <x-app-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
-
-                <!-- Desktop Navigation Links -->
-                <div class="hidden space-x-0 md:space-x-1 2xl:space-x-6 md:-my-px md:ms-3 lg:ms-6 2xl:ms-10 md:flex">
-                    @foreach ($primaryNav as $item)
-                        @php $active = $item['active'](); @endphp
-                        <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$active" wire:navigate :title="$item['label']">
-                            <span class="inline-flex flex-col items-center gap-0.5 px-2 2xl:flex-row 2xl:gap-1.5 2xl:px-0">
-                                <svg class="w-5 h-5 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
-                                     fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    {!! $item['icon'] !!}
-                                </svg>
-                                <span class="text-[10px] leading-none font-medium whitespace-nowrap 2xl:text-sm 2xl:leading-normal">{{ $item['label'] }}</span>
-                            </span>
-                        </x-nav-link>
-                    @endforeach
-                </div>
             </div>
 
             <!-- Settings Icon & User Dropdown -->
-            <div class="hidden md:flex md:items-center md:ms-2 lg:ms-6 md:gap-0.5 lg:gap-2 shrink-0">
+            <div class="hidden md:flex md:items-center md:gap-1 lg:gap-2 shrink-0">
                 <!-- Global Search Trigger -->
                 <button
                     type="button"
@@ -288,6 +272,27 @@ new class extends Component
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
+            </div>
+        </div>
+
+        <!-- Desktop Module Navigation Row (md+) -->
+        <div class="hidden md:flex md:items-stretch md:justify-center border-t border-gray-100 dark:border-gray-700/60 -mt-px">
+            <div class="flex flex-wrap items-stretch justify-center gap-x-1 lg:gap-x-2 2xl:gap-x-4">
+                @foreach ($primaryNav as $item)
+                    @php $active = $item['active'](); @endphp
+                    <a href="{{ route($item['route'], $clinicSlug) }}" wire:navigate
+                       title="{{ $item['label'] }}"
+                       class="group relative inline-flex flex-col items-center justify-center px-3 lg:px-4 py-2 min-w-[64px] lg:min-w-[76px] border-b-2 transition
+                              {{ $active
+                                    ? 'border-indigo-500 text-indigo-700 dark:text-indigo-300'
+                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600' }}">
+                        <svg class="w-5 h-5 lg:w-[22px] lg:h-[22px] shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300' }}"
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            {!! $item['icon'] !!}
+                        </svg>
+                        <span class="mt-0.5 text-[11px] lg:text-xs leading-tight font-medium whitespace-nowrap">{{ $item['label'] }}</span>
+                    </a>
+                @endforeach
             </div>
         </div>
     </div>
