@@ -101,6 +101,7 @@ class Show extends Component
 
         $paymentMethods = InvoiceService::paymentMethods();
 
-        return view('livewire.app.invoices.show', compact('paymentMethods'));
+        return view('livewire.app.invoices.show', compact('paymentMethods'))
+            ->layout('layouts.app');
     }
 }

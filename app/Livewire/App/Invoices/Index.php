@@ -73,7 +73,8 @@ class Index extends Component
             ->when($this->search, function ($q) {
                 $q->where(function ($q2) {
                     $q2->where('invoice_number', 'like', "%{$this->search}%")
-                        ->orWhereHas('patient', fn ($p) => $p->where('full_name', 'like', "%{$this->search}%"));
+                        ->orWhereHas('patient', fn ($p) => $p->where('first_name', 'like', "%{$this->search}%")
+                            ->orWhere('last_name', 'like', "%{$this->search}%"));
                 });
             })
             ->when($this->status, fn ($q) => $q->where('status', $this->status))
@@ -99,6 +100,7 @@ class Index extends Component
             Invoice::STATUS_CANCELLED,
         ];
 
-        return view('livewire.app.invoices.index', compact('invoices', 'doctors', 'statuses'));
+        return view('livewire.app.invoices.index', compact('invoices', 'doctors', 'statuses'))
+            ->layout('layouts.app');
     }
 }

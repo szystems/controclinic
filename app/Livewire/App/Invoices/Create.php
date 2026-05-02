@@ -130,11 +130,18 @@ class Create extends Component
             return [];
         }
 
+        $search = $this->patientSearch;
+
         return Patient::query()
             ->where('clinic_id', $this->currentClinic->id)
-            ->where('full_name', 'like', "%{$this->patientSearch}%")
+            ->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
             ->limit(10)
-            ->get(['id', 'full_name'])
+            ->get(['id', 'first_name', 'last_name'])
+            ->map(fn ($p) => ['id' => $p->id, 'full_name' => $p->first_name.' '.$p->last_name])
             ->toArray();
     }
 
@@ -217,6 +224,7 @@ class Create extends Component
 
         $itemTypes = InvoiceService::itemTypes();
 
-        return view('livewire.app.invoices.create', compact('doctors', 'patients', 'itemTypes'));
+        return view('livewire.app.invoices.create', compact('doctors', 'patients', 'itemTypes'))
+            ->layout('layouts.app');
     }
 }
