@@ -46,7 +46,11 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $patientName }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">#{{ substr($patient_id, 0, 8) }}</p>
+                                    @if($patientEmail || $patientPhone)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ implode(' · ', array_filter([$patientEmail ?? '', $patientPhone ?? ''])) }}
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
                             @if(!$appointmentId)
@@ -79,7 +83,7 @@
                                      class="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-y-auto">
                                     @forelse($patients as $patient)
                                         <button type="button"
-                                                wire:click="selectPatient('{{ $patient['id'] }}', @js($patient['full_name']))"
+                                                wire:click="selectPatient('{{ $patient['id'] }}', @js($patient['full_name']), @js($patient['email'] ?? ''), @js($patient['phone'] ?? ''))"
                                                 @click="open = false"
                                                 class="w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
                                             <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $patient['full_name'] }}</p>

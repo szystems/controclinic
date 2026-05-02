@@ -41,6 +41,8 @@ class Create extends Component
     public bool $showPatientDropdown = false;
 
     public ?string $patientName = null;
+    public ?string $patientEmail = null;
+    public ?string $patientPhone = null;
 
     protected function rules(): array
     {
@@ -148,6 +150,8 @@ class Create extends Component
     {
         $this->patient_id = '';
         $this->patientName = null;
+        $this->patientEmail = null;
+        $this->patientPhone = null;
         $this->patientSearch = '';
     }
 
@@ -178,10 +182,12 @@ class Create extends Component
             ->toArray();
     }
 
-    public function selectPatient(string $id, string $name): void
+    public function selectPatient(string $id, string $name, ?string $email = null, ?string $phone = null): void
     {
         $this->patient_id = $id;
         $this->patientName = $name;
+        $this->patientEmail = $email;
+        $this->patientPhone = $phone;
         $this->patientSearch = $name;
         $this->showPatientDropdown = false;
         $this->resetErrorBag('patient_id');
