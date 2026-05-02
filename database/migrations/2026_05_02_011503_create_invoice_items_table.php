@@ -14,7 +14,7 @@ return new class extends Migration
 
             $table->unsignedSmallInteger('order')->default(0);
             $table->enum('type', ['consultation', 'procedure', 'medication', 'lab', 'other'])
-                  ->default('consultation');
+                ->default('consultation');
             $table->string('description');
             $table->decimal('quantity', 10, 2)->default(1);
             $table->decimal('unit_price', 12, 2)->default(0);

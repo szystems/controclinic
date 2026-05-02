@@ -121,5 +121,8 @@
         </div>
 
         @include('livewire.app.profile.activity-log', ['activities' => $activities])
+
+        {{-- 2FA Management --}}
+        <livewire:profile.two-factor />
     </div>
 </div>

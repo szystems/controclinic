@@ -112,7 +112,7 @@
 - [x] **Audit log UI** — listar `activity_log` por clínica/usuario con filtros (índices ya reservados) ✅ 2026-05-01
 - [x] **Conflicto de horarios** — validación en backend al crear/reagendar cita (Create, Edit y Calendar drag&drop)
 - [ ] **Vista calendario semanal multi-doctor** — extender FullCalendar con resourceTimeline
-- [ ] **Módulo Facturación v1 (MVP)** — tablas `invoices`, `invoice_items`, `invoice_payments` (ya diseñadas en backlog); usa campos `consultation_price` ya reservados en `appointments`
+- [x] **Módulo Facturación v1 (MVP)** — tablas `invoices`, `invoice_items`, `invoice_payments` (ya diseñadas en backlog); usa campos `consultation_price` ya reservados en `appointments`
 - [x] **Notas internas y comentarios en cita** — `patients.internal_notes` en Edit/Show (solo staff autorizado) + tabla `appointment_comments` con sección en `Appointments/Show` (añadir/eliminar)
 - [x] **Dashboard del doctor personalizado** — vista filtrada por `doctor_id = auth()->id()` (badge en header, `isPersonalizedForDoctor`, `appointmentsBaseQuery()` con filtro condicional)
 
@@ -606,20 +606,20 @@ invoice_payments
 
 #### Tareas técnicas (alto nivel)
 
-- [ ] Migraciones: `invoices`, `invoice_items`, `invoice_payments`, `service_catalog`
-- [ ] Modelos con `BelongsToClinic`, scopes, `casts`, totales calculados
-- [ ] Servicio `InvoiceService` (cálculo de totales, generación de número, transacciones)
-- [ ] Permisos Spatie: `invoices.view|create|update|delete|export|record_payment`
-- [ ] Settings de clínica (extender `clinics.settings` JSON o tabla nueva)
+- [x] Migraciones: `invoices`, `invoice_items`, `invoice_payments`
+- [x] Modelos con `BelongsToClinic`, scopes, `casts`, totales calculados
+- [x] Servicio `InvoiceService` (cálculo de totales, generación de número, transacciones)
+- [x] Permisos Spatie: `invoices.view|create|edit|delete|export|record_payment`
+- [x] Settings de clínica (billing_enabled, invoice_prefix, tax_rate, default_consultation_price, etc.)
 - [ ] Campos `consultation_price`, `consultation_discount`, `is_billable` en `appointments`
-- [ ] Livewire: `App\Invoices\Index`, `Create`, `Show`, `RecordPayment`
-- [ ] PDF de factura/comprobante (DomPDF) — plantilla i18n
+- [x] Livewire: `App\Invoices\Index`, `Create`, `Show` (con modal de pago)
+- [x] PDF de factura/comprobante (DomPDF) — plantilla i18n
 - [ ] Reportes: ingresos por clínica, por doctor, por método de pago, por periodo
-- [ ] Activity Log en cada cambio de estado y pago
-- [ ] Tests Feature (creación, cálculo, pagos parciales, PDF, permisos, multi-tenant)
-- [ ] i18n `lang/{es,en}/billing.php`, `invoices.php`
-- [ ] Toggle `billing_enabled` y onboarding de configuración inicial
-- [ ] Documentación: política de no-factura-electrónica-oficial en v1
+- [x] Activity Log en Invoice (LogsActivity con logFillable)
+- [x] Tests Feature (15 tests: creación, cálculo, pagos parciales, PDF, permisos, multi-tenant)
+- [x] i18n `lang/{es,en}/invoices.php` (70+ claves)
+- [ ] Toggle `billing_enabled` en Settings UI
+- [x] Documentación: política de no-factura-electrónica-oficial en v1
 
 #### Consideraciones internacionales
 

@@ -1,11 +1,26 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-05-01
-> **Fase actual:** v1.1 — Bloque 1 en progreso. Etiquetas ✅, Audit Log UI ✅, Conflicto de horarios ✅, Dashboard doctor personalizado ✅, Notas internas + comentarios de cita ✅, Formato de fecha por clínica ✅, UX mobile listados ✅, **Bloqueo de horarios del doctor ✅**
+> **Última actualización:** 2026-05-12
+> **Fase actual:** v1.3 — 2FA Opcional (TOTP) ✅
 > **Enfoque:** SaaS-First
-> **Métricas:** 378 tests / 826 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+> **Métricas:** 424 tests / 922 asserts · Pint clean · npm build OK
 
-## ✅ Bloque 1 — Features completadas (2026-05-12)
+## ✅ v1.3 — 2FA Opcional con TOTP (2026-05-12)
+
+- [x] Middleware `EnsureTwoFactorAuthenticated` → redirige al challenge si 2FA activo y no verificado en sesión
+- [x] Volt page `two-factor-challenge`: código TOTP + recovery codes de un solo uso
+- [x] Livewire `Profile\TwoFactor`: setup (QR + clave manual), confirmación, recuperación, deshabilitar con contraseña
+- [x] Recuperación: 8 códigos `XXXXX-XXXXX`, invalidación individual al usar
+- [x] Integración en perfil de usuario (`app/profile`)
+- [x] Middleware aplicado a rutas `dashboard`, `profile`, `app/{clinic}` (no en challenge → evita bucle)
+- [x] `bootstrap/app.php` alias `2fa`
+- [x] Traducciones ES/EN (28 claves `2fa_*`)
+- [x] 15 tests Feature `TwoFactorTest.php` (42 assertions)
+- [x] Suite completa: 424/424 verde
+
+---
+
+## ✅ v1.2 — Módulo Facturación v1 (2026-05-02)
 
 ### Bloqueo de horarios del doctor ✅ (2026-05-01)
 - Tabla `doctor_unavailabilities` (UUID, soft deletes, índice compuesto clinic+doctor+fechas)

@@ -86,6 +86,16 @@ new class extends Component
         ];
     }
 
+    if (auth()->user()->can('invoices.view')) {
+        $primaryNav[] = [
+            'route' => 'app.invoices.index',
+            'active' => fn () => request()->routeIs('app.invoices.*'),
+            'label' => __('invoices.title'),
+            'group' => 'main',
+            'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>',
+        ];
+    }
+
     if (auth()->user()->can('audit.view')) {
         $primaryNav[] = [
             'route' => 'app.audit-log',

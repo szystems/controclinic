@@ -2,6 +2,7 @@
 
 namespace App\Livewire\App\Invoices;
 
+use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -9,76 +10,85 @@ use App\Models\Patient;
 use App\Models\User;
 use App\Services\InvoiceService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class Create extends Component
 {
-    public Clinic  $currentClinic;
+    public Clinic $currentClinic;
+
     public ?string $appointmentId = null;
 
     // Encabezado
-    public string $patient_id  = '';
-    public string $doctor_id   = '';
-    public string $issued_at   = '';
-    public string $due_at      = '';
-    public string $currency    = 'USD';
-    public string $notes       = '';
+    public string $patient_id = '';
+
+    public string $doctor_id = '';
+
+    public string $issued_at = '';
+
+    public string $due_at = '';
+
+    public string $currency = 'USD';
+
+    public string $notes = '';
 
     // Ítems dinámicos
     public array $items = [];
 
     // Búsqueda de paciente
-    public string $patientSearch        = '';
-    public bool   $showPatientDropdown  = false;
-    public ?string $patientName         = null;
+    public string $patientSearch = '';
+
+    public bool $showPatientDropdown = false;
+
+    public ?string $patientName = null;
 
     protected function rules(): array
     {
         return [
-            'patient_id'        => ['required', 'exists:patients,id'],
-            'doctor_id'         => ['nullable', 'exists:users,id'],
-            'issued_at'         => ['required', 'date'],
-            'due_at'            => ['nullable', 'date', 'after_or_equal:issued_at'],
-            'currency'          => ['required', 'string', 'size:3'],
-            'notes'             => ['nullable', 'string', 'max:2000'],
-            'items'             => ['required', 'array', 'min:1'],
-            'items.*.type'        => ['required', 'in:consultation,procedure,medication,lab,other'],
+            'patient_id' => ['required', 'exists:patients,id'],
+            'doctor_id' => ['nullable', 'exists:users,id'],
+            'issued_at' => ['required', 'date'],
+            'due_at' => ['nullable', 'date', 'after_or_equal:issued_at'],
+            'currency' => ['required', 'string', 'size:3'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.type' => ['required', 'in:consultation,procedure,medication,lab,other'],
             'items.*.description' => ['required', 'string', 'max:500'],
-            'items.*.quantity'    => ['required', 'numeric', 'min:0.01'],
-            'items.*.unit_price'  => ['required', 'numeric', 'min:0'],
+            'items.*.quantity' => ['required', 'numeric', 'min:0.01'],
+            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.discount_amount' => ['nullable', 'numeric', 'min:0'],
-            'items.*.tax_rate'    => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'items.*.tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
     }
 
     public function mount(Clinic $clinic, ?string $appointment = null): void
     {
         $this->currentClinic = $clinic;
-        $this->issued_at     = now()->toDateString();
-        $this->currency      = 'USD';
+        $this->issued_at = now()->toDateString();
+        $this->currency = 'USD';
 
-        $defaultPrice   = (float) ($clinic->settings['default_consultation_price'] ?? 0);
+        $defaultPrice = (float) ($clinic->settings['default_consultation_price'] ?? 0);
         $defaultTaxRate = (float) ($clinic->settings['tax_rate'] ?? 0);
 
         // Si viene de una cita, prellena datos
         if ($appointment) {
-            $appt = \App\Models\Appointment::where('clinic_id', $clinic->id)->findOrFail($appointment);
+            $appt = Appointment::where('clinic_id', $clinic->id)->findOrFail($appointment);
             $this->appointmentId = $appt->id;
-            $this->patient_id    = $appt->patient_id;
-            $this->doctor_id     = $appt->doctor_id ?? '';
-            $this->patientName   = $appt->patient->full_name ?? '';
+            $this->patient_id = $appt->patient_id;
+            $this->doctor_id = $appt->doctor_id ?? '';
+            $this->patientName = $appt->patient->full_name ?? '';
 
             $defaultPrice = (float) ($clinic->settings['default_consultation_price'] ?? 0);
         }
 
         $this->items = [
             [
-                'type'             => InvoiceItem::TYPE_CONSULTATION,
-                'description'      => __('invoices.item_type_consultation'),
-                'quantity'         => 1,
-                'unit_price'       => $defaultPrice,
-                'discount_amount'  => 0,
-                'tax_rate'         => $defaultTaxRate,
+                'type' => InvoiceItem::TYPE_CONSULTATION,
+                'description' => __('invoices.item_type_consultation'),
+                'quantity' => 1,
+                'unit_price' => $defaultPrice,
+                'discount_amount' => 0,
+                'tax_rate' => $defaultTaxRate,
             ],
         ];
     }
@@ -86,12 +96,12 @@ class Create extends Component
     public function addItem(): void
     {
         $this->items[] = [
-            'type'            => InvoiceItem::TYPE_OTHER,
-            'description'     => '',
-            'quantity'        => 1,
-            'unit_price'      => 0,
+            'type' => InvoiceItem::TYPE_OTHER,
+            'description' => '',
+            'quantity' => 1,
+            'unit_price' => 0,
             'discount_amount' => 0,
-            'tax_rate'        => (float) ($this->currentClinic->settings['tax_rate'] ?? 0),
+            'tax_rate' => (float) ($this->currentClinic->settings['tax_rate'] ?? 0),
         ];
     }
 
@@ -106,10 +116,11 @@ class Create extends Component
         $total = 0.0;
         foreach ($this->items as $item) {
             $base = (float) ($item['unit_price'] ?? 0) * (float) ($item['quantity'] ?? 1);
-            $net  = $base - (float) ($item['discount_amount'] ?? 0);
-            $tax  = $net * ((float) ($item['tax_rate'] ?? 0) / 100);
+            $net = $base - (float) ($item['discount_amount'] ?? 0);
+            $tax = $net * ((float) ($item['tax_rate'] ?? 0) / 100);
             $total += round($net + $tax, 2);
         }
+
         return round($total, 2);
     }
 
@@ -118,6 +129,7 @@ class Create extends Component
         if (strlen($this->patientSearch) < 2) {
             return [];
         }
+
         return Patient::query()
             ->where('clinic_id', $this->currentClinic->id)
             ->where('full_name', 'like', "%{$this->patientSearch}%")
@@ -128,10 +140,10 @@ class Create extends Component
 
     public function selectPatient(string $id, string $name): void
     {
-        $this->patient_id           = $id;
-        $this->patientName          = $name;
-        $this->patientSearch        = $name;
-        $this->showPatientDropdown  = false;
+        $this->patient_id = $id;
+        $this->patientName = $name;
+        $this->patientSearch = $name;
+        $this->showPatientDropdown = false;
     }
 
     public function save(): void
@@ -141,38 +153,38 @@ class Create extends Component
 
         DB::transaction(function () use ($validated) {
             $service = app(InvoiceService::class);
-            $number  = $service->nextInvoiceNumber($this->currentClinic);
+            $number = $service->nextInvoiceNumber($this->currentClinic);
 
             $invoice = Invoice::create([
-                'clinic_id'      => $this->currentClinic->id,
-                'patient_id'     => $validated['patient_id'],
-                'doctor_id'      => $validated['doctor_id'] ?: null,
+                'clinic_id' => $this->currentClinic->id,
+                'patient_id' => $validated['patient_id'],
+                'doctor_id' => $validated['doctor_id'] ?: null,
                 'appointment_id' => $this->appointmentId,
-                'created_by'     => auth()->id(),
+                'created_by' => auth()->id(),
                 'invoice_number' => $number,
-                'issued_at'      => $validated['issued_at'],
-                'due_at'         => $validated['due_at'] ?: null,
-                'currency'       => $validated['currency'],
-                'notes'          => $validated['notes'] ?: null,
-                'status'         => Invoice::STATUS_PENDING,
-                'subtotal'       => 0,
-                'discount_amount'=> 0,
-                'tax_amount'     => 0,
-                'total'          => 0,
-                'paid_amount'    => 0,
+                'issued_at' => $validated['issued_at'],
+                'due_at' => $validated['due_at'] ?: null,
+                'currency' => $validated['currency'],
+                'notes' => $validated['notes'] ?: null,
+                'status' => Invoice::STATUS_PENDING,
+                'subtotal' => 0,
+                'discount_amount' => 0,
+                'tax_amount' => 0,
+                'total' => 0,
+                'paid_amount' => 0,
             ]);
 
             foreach ($validated['items'] as $order => $itemData) {
                 $item = new InvoiceItem([
-                    'invoice_id'      => $invoice->id,
-                    'order'           => $order + 1,
-                    'type'            => $itemData['type'],
-                    'description'     => $itemData['description'],
-                    'quantity'        => $itemData['quantity'],
-                    'unit_price'      => $itemData['unit_price'],
+                    'invoice_id' => $invoice->id,
+                    'order' => $order + 1,
+                    'type' => $itemData['type'],
+                    'description' => $itemData['description'],
+                    'quantity' => $itemData['quantity'],
+                    'unit_price' => $itemData['unit_price'],
                     'discount_amount' => $itemData['discount_amount'] ?? 0,
-                    'tax_rate'        => $itemData['tax_rate'] ?? 0,
-                    'total'           => 0,
+                    'tax_rate' => $itemData['tax_rate'] ?? 0,
+                    'total' => 0,
                 ]);
                 $item->total = $item->calculateTotal();
                 $item->save();
@@ -181,15 +193,15 @@ class Create extends Component
             $service->recalculate($invoice);
 
             $this->redirect(route('app.invoices.show', [
-                'clinic'   => $this->currentClinic->slug,
-                'invoice'  => $invoice->id,
+                'clinic' => $this->currentClinic->slug,
+                'invoice' => $invoice->id,
             ]), navigate: true);
         });
 
         session()->flash('success', __('invoices.invoice_created'));
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         $this->authorize('invoices.create');
 

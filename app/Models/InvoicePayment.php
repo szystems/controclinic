@@ -15,11 +15,15 @@ class InvoicePayment extends Model
 
     public $incrementing = false;
 
-    const METHOD_CASH      = 'cash';
-    const METHOD_CARD      = 'card';
-    const METHOD_TRANSFER  = 'transfer';
+    const METHOD_CASH = 'cash';
+
+    const METHOD_CARD = 'card';
+
+    const METHOD_TRANSFER = 'transfer';
+
     const METHOD_INSURANCE = 'insurance';
-    const METHOD_OTHER     = 'other';
+
+    const METHOD_OTHER = 'other';
 
     protected $fillable = [
         'invoice_id',
@@ -33,7 +37,7 @@ class InvoicePayment extends Model
     ];
 
     protected $casts = [
-        'amount'  => 'decimal:2',
+        'amount' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
 
@@ -49,6 +53,6 @@ class InvoicePayment extends Model
 
     public function getMethodLabelAttribute(): string
     {
-        return __('invoices.payment_method_' . $this->method);
+        return __('invoices.payment_method_'.$this->method);
     }
 }

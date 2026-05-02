@@ -16,7 +16,7 @@ return new class extends Migration
             $table->decimal('amount', 12, 2);
             $table->string('currency', 3)->default('USD');
             $table->enum('method', ['cash', 'card', 'transfer', 'insurance', 'other'])
-                  ->default('cash');
+                ->default('cash');
             $table->string('reference')->nullable();  // nº transacción, voucher
             $table->text('notes')->nullable();
             $table->datetime('paid_at');

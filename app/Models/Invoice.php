@@ -20,11 +20,16 @@ class Invoice extends Model
 
     public $incrementing = false;
 
-    const STATUS_DRAFT     = 'draft';
-    const STATUS_PENDING   = 'pending';
-    const STATUS_PARTIAL   = 'partial';
-    const STATUS_PAID      = 'paid';
-    const STATUS_REFUNDED  = 'refunded';
+    const STATUS_DRAFT = 'draft';
+
+    const STATUS_PENDING = 'pending';
+
+    const STATUS_PARTIAL = 'partial';
+
+    const STATUS_PAID = 'paid';
+
+    const STATUS_REFUNDED = 'refunded';
+
     const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
@@ -47,13 +52,13 @@ class Invoice extends Model
     ];
 
     protected $casts = [
-        'issued_at'       => 'date',
-        'due_at'          => 'date',
-        'subtotal'        => 'decimal:2',
+        'issued_at' => 'date',
+        'due_at' => 'date',
+        'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',
-        'tax_amount'      => 'decimal:2',
-        'total'           => 'decimal:2',
-        'paid_amount'     => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'total' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -121,18 +126,18 @@ class Invoice extends Model
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
-            self::STATUS_DRAFT     => 'gray',
-            self::STATUS_PENDING   => 'yellow',
-            self::STATUS_PARTIAL   => 'orange',
-            self::STATUS_PAID      => 'green',
-            self::STATUS_REFUNDED  => 'blue',
+            self::STATUS_DRAFT => 'gray',
+            self::STATUS_PENDING => 'yellow',
+            self::STATUS_PARTIAL => 'orange',
+            self::STATUS_PAID => 'green',
+            self::STATUS_REFUNDED => 'blue',
             self::STATUS_CANCELLED => 'red',
-            default                => 'gray',
+            default => 'gray',
         };
     }
 
     public function getStatusLabelAttribute(): string
     {
-        return __('invoices.status_' . $this->status);
+        return __('invoices.status_'.$this->status);
     }
 }

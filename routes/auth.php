@@ -32,4 +32,9 @@ Route::middleware('auth')->group(function () {
 
     Volt::route('confirm-password', 'pages.auth.confirm-password')
         ->name('password.confirm');
+
+    // Two-Factor Authentication challenge (must NOT have 2fa middleware — that would loop)
+    Volt::route('two-factor-challenge', 'pages.auth.two-factor-challenge')
+        ->middleware('throttle:10,1')
+        ->name('two-factor.challenge');
 });

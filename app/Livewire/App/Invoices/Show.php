@@ -5,29 +5,36 @@ namespace App\Livewire\App\Invoices;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class Show extends Component
 {
-    public Clinic  $currentClinic;
+    public Clinic $currentClinic;
+
     public Invoice $invoice;
 
     // Estado del modal de pago
-    public bool   $showPaymentModal   = false;
-    public string $pay_amount         = '';
-    public string $pay_method         = 'cash';
-    public string $pay_reference      = '';
-    public string $pay_notes          = '';
-    public string $pay_date           = '';
+    public bool $showPaymentModal = false;
+
+    public string $pay_amount = '';
+
+    public string $pay_method = 'cash';
+
+    public string $pay_reference = '';
+
+    public string $pay_notes = '';
+
+    public string $pay_date = '';
 
     protected function paymentRules(): array
     {
         return [
-            'pay_amount'    => ['required', 'numeric', 'min:0.01'],
-            'pay_method'    => ['required', 'in:cash,card,transfer,insurance,other'],
+            'pay_amount' => ['required', 'numeric', 'min:0.01'],
+            'pay_method' => ['required', 'in:cash,card,transfer,insurance,other'],
             'pay_reference' => ['nullable', 'string', 'max:255'],
-            'pay_notes'     => ['nullable', 'string', 'max:500'],
-            'pay_date'      => ['required', 'date'],
+            'pay_notes' => ['nullable', 'string', 'max:500'],
+            'pay_date' => ['required', 'date'],
         ];
     }
 
@@ -36,18 +43,18 @@ class Show extends Component
         abort_unless($invoice->clinic_id === $clinic->id, 404);
 
         $this->currentClinic = $clinic;
-        $this->invoice       = $invoice;
-        $this->pay_date      = now()->toDateString();
+        $this->invoice = $invoice;
+        $this->pay_date = now()->toDateString();
     }
 
     public function openPaymentModal(): void
     {
         $this->authorize('invoices.record_payment');
         $this->reset(['pay_amount', 'pay_method', 'pay_reference', 'pay_notes']);
-        $this->pay_date         = now()->toDateString();
-        $this->pay_method       = 'cash';
-        $balance                = (float) $this->invoice->balance;
-        $this->pay_amount       = $balance > 0 ? (string) $balance : '';
+        $this->pay_date = now()->toDateString();
+        $this->pay_method = 'cash';
+        $balance = (float) $this->invoice->balance;
+        $this->pay_amount = $balance > 0 ? (string) $balance : '';
         $this->showPaymentModal = true;
     }
 
@@ -64,12 +71,12 @@ class Show extends Component
 
         app(InvoiceService::class)->recordPayment($this->invoice, [
             'recorded_by' => auth()->id(),
-            'amount'      => $validated['pay_amount'],
-            'currency'    => $this->invoice->currency,
-            'method'      => $validated['pay_method'],
-            'reference'   => $validated['pay_reference'] ?: null,
-            'notes'       => $validated['pay_notes'] ?: null,
-            'paid_at'     => $validated['pay_date'],
+            'amount' => $validated['pay_amount'],
+            'currency' => $this->invoice->currency,
+            'method' => $validated['pay_method'],
+            'reference' => $validated['pay_reference'] ?: null,
+            'notes' => $validated['pay_notes'] ?: null,
+            'paid_at' => $validated['pay_date'],
         ]);
 
         $this->invoice->refresh();
@@ -86,7 +93,7 @@ class Show extends Component
         session()->flash('success', __('invoices.invoice_cancelled'));
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         $this->authorize('invoices.view');
 

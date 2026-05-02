@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('due_at')->nullable();
 
             $table->enum('status', ['draft', 'pending', 'partial', 'paid', 'refunded', 'cancelled'])
-                  ->default('pending');
+                ->default('pending');
 
             // Totales calculados (desnormalizados para performance)
             $table->decimal('subtotal', 12, 2)->default(0);

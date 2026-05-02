@@ -5,6 +5,7 @@ namespace App\Livewire\App\Invoices;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,18 +15,22 @@ class Index extends Component
 
     public Clinic $currentClinic;
 
-    public string $search      = '';
-    public string $status      = '';
-    public string $doctorId    = '';
-    public string $dateFrom    = '';
-    public string $dateTo      = '';
+    public string $search = '';
+
+    public string $status = '';
+
+    public string $doctorId = '';
+
+    public string $dateFrom = '';
+
+    public string $dateTo = '';
 
     protected $queryString = [
-        'search'   => ['except' => ''],
-        'status'   => ['except' => ''],
+        'search' => ['except' => ''],
+        'status' => ['except' => ''],
         'doctorId' => ['except' => ''],
         'dateFrom' => ['except' => ''],
-        'dateTo'   => ['except' => ''],
+        'dateTo' => ['except' => ''],
     ];
 
     public function mount(Clinic $clinic): void
@@ -33,13 +38,32 @@ class Index extends Component
         $this->currentClinic = $clinic;
     }
 
-    public function updatingSearch(): void  { $this->resetPage(); }
-    public function updatingStatus(): void  { $this->resetPage(); }
-    public function updatingDoctorId(): void { $this->resetPage(); }
-    public function updatingDateFrom(): void { $this->resetPage(); }
-    public function updatingDateTo(): void  { $this->resetPage(); }
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
 
-    public function render(): \Illuminate\View\View
+    public function updatingStatus(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDoctorId(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateFrom(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateTo(): void
+    {
+        $this->resetPage();
+    }
+
+    public function render(): View
     {
         $this->authorize('invoices.view');
 
@@ -49,13 +73,13 @@ class Index extends Component
             ->when($this->search, function ($q) {
                 $q->where(function ($q2) {
                     $q2->where('invoice_number', 'like', "%{$this->search}%")
-                       ->orWhereHas('patient', fn ($p) => $p->where('full_name', 'like', "%{$this->search}%"));
+                        ->orWhereHas('patient', fn ($p) => $p->where('full_name', 'like', "%{$this->search}%"));
                 });
             })
             ->when($this->status, fn ($q) => $q->where('status', $this->status))
             ->when($this->doctorId, fn ($q) => $q->where('doctor_id', $this->doctorId))
             ->when($this->dateFrom, fn ($q) => $q->whereDate('issued_at', '>=', $this->dateFrom))
-            ->when($this->dateTo,   fn ($q) => $q->whereDate('issued_at', '<=', $this->dateTo))
+            ->when($this->dateTo, fn ($q) => $q->whereDate('issued_at', '<=', $this->dateTo))
             ->orderByDesc('issued_at')
             ->orderByDesc('created_at')
             ->paginate(15);

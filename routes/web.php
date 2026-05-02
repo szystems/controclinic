@@ -17,6 +17,7 @@ use App\Livewire\App\AuditLog\Index as AuditLogIndex;
 use App\Livewire\App\Billing\Index as BillingIndex;
 use App\Livewire\App\Dashboard;
 use App\Livewire\App\Invitations\Accept as InvitationAccept;
+use App\Livewire\App\Invoices\Create;
 use App\Livewire\App\MedicalRecords\Create as MedicalRecordsCreate;
 use App\Livewire\App\MedicalRecords\Edit as MedicalRecordsEdit;
 use App\Livewire\App\MedicalRecords\Index as MedicalRecordsIndex;
@@ -33,7 +34,10 @@ use App\Livewire\App\Staff\Create as StaffCreate;
 use App\Livewire\App\Staff\Edit as StaffEdit;
 use App\Livewire\App\Staff\Index as StaffIndex;
 use App\Livewire\Public\Booking;
+use App\Models\Clinic;
+use App\Models\Invoice;
 use App\Models\Plan;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -180,16 +184,16 @@ Route::get('dashboard', function () {
     // Redirect to clinic dashboard (onboarding middleware will intercept if needed)
     return redirect()->route('app.dashboard', $clinic->slug);
 })
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', '2fa'])
     ->name('dashboard');
 
 Route::view('profile', 'profile')
-    ->middleware(['auth'])
+    ->middleware(['auth', '2fa'])
     ->name('profile');
 
 // Clinic App Routes
 Route::prefix('app/{clinic}')
-    ->middleware(['auth', 'verified', TenantMiddleware::class])
+    ->middleware(['auth', 'verified', '2fa', TenantMiddleware::class])
     ->name('app.')
     ->group(function () {
         // Onboarding (accessible before onboarding is completed)
@@ -274,12 +278,13 @@ Route::prefix('app/{clinic}')
                 // Facturación (invoices)
                 Route::middleware('can:invoices.view')->prefix('invoices')->name('invoices.')->group(function () {
                     Route::get('/', App\Livewire\App\Invoices\Index::class)->name('index');
-                    Route::middleware('can:invoices.create')->get('/create', App\Livewire\App\Invoices\Create::class)->name('create');
+                    Route::middleware('can:invoices.create')->get('/create', Create::class)->name('create');
                     Route::get('/{invoice}', App\Livewire\App\Invoices\Show::class)->name('show');
-                    Route::middleware('can:invoices.print')->get('/{invoice}/pdf', function (\App\Models\Clinic $clinic, \App\Models\Invoice $invoice) {
+                    Route::middleware('can:invoices.print')->get('/{invoice}/pdf', function (Clinic $clinic, Invoice $invoice) {
                         abort_unless($invoice->clinic_id === $clinic->id, 404);
                         $invoice->loadMissing(['patient', 'doctor', 'items', 'payments']);
-                        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', compact('invoice', 'clinic'));
+                        $pdf = Pdf::loadView('pdf.invoice', compact('invoice', 'clinic'));
+
                         return $pdf->stream("factura-{$invoice->invoice_number}.pdf");
                     })->name('pdf');
                 });

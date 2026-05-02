@@ -18,13 +18,13 @@ class InvoiceService
     {
         return DB::transaction(function () use ($clinic) {
             $settings = $clinic->settings ?? [];
-            $prefix   = $settings['invoice_prefix'] ?? 'INV-';
-            $next     = (int) ($settings['next_invoice_number'] ?? 1);
+            $prefix = $settings['invoice_prefix'] ?? 'INV-';
+            $next = (int) ($settings['next_invoice_number'] ?? 1);
 
-            $number = $prefix . str_pad($next, 6, '0', STR_PAD_LEFT);
+            $number = $prefix.str_pad($next, 6, '0', STR_PAD_LEFT);
 
             // Incrementar el contador en la clínica
-            $updated  = $settings;
+            $updated = $settings;
             $updated['next_invoice_number'] = $next + 1;
             $clinic->update(['settings' => $updated]);
 
@@ -40,15 +40,15 @@ class InvoiceService
     {
         $invoice->loadMissing('items');
 
-        $subtotal  = 0.0;
-        $discount  = 0.0;
-        $tax       = 0.0;
+        $subtotal = 0.0;
+        $discount = 0.0;
+        $tax = 0.0;
 
         foreach ($invoice->items as $item) {
-            $base      = (float) $item->unit_price * (float) $item->quantity;
-            $itemDisc  = (float) $item->discount_amount;
-            $net       = $base - $itemDisc;
-            $itemTax   = $net * ((float) $item->tax_rate / 100);
+            $base = (float) $item->unit_price * (float) $item->quantity;
+            $itemDisc = (float) $item->discount_amount;
+            $net = $base - $itemDisc;
+            $itemTax = $net * ((float) $item->tax_rate / 100);
             $itemTotal = round($net + $itemTax, 2);
 
             // Actualizar total de la línea si cambió
@@ -58,16 +58,16 @@ class InvoiceService
 
             $subtotal += $base;
             $discount += $itemDisc;
-            $tax      += $itemTax;
+            $tax += $itemTax;
         }
 
         $total = round($subtotal - $discount + $tax, 2);
 
         $invoice->update([
-            'subtotal'        => round($subtotal, 2),
+            'subtotal' => round($subtotal, 2),
             'discount_amount' => round($discount, 2),
-            'tax_amount'      => round($tax, 2),
-            'total'           => $total,
+            'tax_amount' => round($tax, 2),
+            'total' => $total,
         ]);
     }
 
@@ -82,14 +82,14 @@ class InvoiceService
             $paid = (float) $invoice->payments()->sum('amount');
 
             $status = match (true) {
-                $paid <= 0              => Invoice::STATUS_PENDING,
+                $paid <= 0 => Invoice::STATUS_PENDING,
                 $paid < (float) $invoice->total => Invoice::STATUS_PARTIAL,
-                default                 => Invoice::STATUS_PAID,
+                default => Invoice::STATUS_PAID,
             };
 
             $invoice->update([
                 'paid_amount' => round($paid, 2),
-                'status'      => $status,
+                'status' => $status,
             ]);
         });
     }
@@ -113,10 +113,10 @@ class InvoiceService
     {
         return [
             InvoiceItem::TYPE_CONSULTATION => __('invoices.item_type_consultation'),
-            InvoiceItem::TYPE_PROCEDURE    => __('invoices.item_type_procedure'),
-            InvoiceItem::TYPE_MEDICATION   => __('invoices.item_type_medication'),
-            InvoiceItem::TYPE_LAB          => __('invoices.item_type_lab'),
-            InvoiceItem::TYPE_OTHER        => __('invoices.item_type_other'),
+            InvoiceItem::TYPE_PROCEDURE => __('invoices.item_type_procedure'),
+            InvoiceItem::TYPE_MEDICATION => __('invoices.item_type_medication'),
+            InvoiceItem::TYPE_LAB => __('invoices.item_type_lab'),
+            InvoiceItem::TYPE_OTHER => __('invoices.item_type_other'),
         ];
     }
 
@@ -126,11 +126,11 @@ class InvoiceService
     public static function paymentMethods(): array
     {
         return [
-            'cash'      => __('invoices.payment_method_cash'),
-            'card'      => __('invoices.payment_method_card'),
-            'transfer'  => __('invoices.payment_method_transfer'),
+            'cash' => __('invoices.payment_method_cash'),
+            'card' => __('invoices.payment_method_card'),
+            'transfer' => __('invoices.payment_method_transfer'),
             'insurance' => __('invoices.payment_method_insurance'),
-            'other'     => __('invoices.payment_method_other'),
+            'other' => __('invoices.payment_method_other'),
         ];
     }
 }

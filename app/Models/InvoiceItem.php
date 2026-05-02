@@ -16,10 +16,14 @@ class InvoiceItem extends Model
     public $incrementing = false;
 
     const TYPE_CONSULTATION = 'consultation';
-    const TYPE_PROCEDURE    = 'procedure';
-    const TYPE_MEDICATION   = 'medication';
-    const TYPE_LAB          = 'lab';
-    const TYPE_OTHER        = 'other';
+
+    const TYPE_PROCEDURE = 'procedure';
+
+    const TYPE_MEDICATION = 'medication';
+
+    const TYPE_LAB = 'lab';
+
+    const TYPE_OTHER = 'other';
 
     protected $fillable = [
         'invoice_id',
@@ -34,11 +38,11 @@ class InvoiceItem extends Model
     ];
 
     protected $casts = [
-        'quantity'        => 'decimal:2',
-        'unit_price'      => 'decimal:2',
+        'quantity' => 'decimal:2',
+        'unit_price' => 'decimal:2',
         'discount_amount' => 'decimal:2',
-        'tax_rate'        => 'decimal:2',
-        'total'           => 'decimal:2',
+        'tax_rate' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
 
     public function invoice(): BelongsTo
@@ -48,7 +52,7 @@ class InvoiceItem extends Model
 
     public function getTypeLabelAttribute(): string
     {
-        return __('invoices.item_type_' . $this->type);
+        return __('invoices.item_type_'.$this->type);
     }
 
     /**
@@ -57,9 +61,9 @@ class InvoiceItem extends Model
      */
     public function calculateTotal(): float
     {
-        $base    = (float) $this->unit_price * (float) $this->quantity;
-        $net     = $base - (float) $this->discount_amount;
-        $tax     = $net * ((float) $this->tax_rate / 100);
+        $base = (float) $this->unit_price * (float) $this->quantity;
+        $net = $base - (float) $this->discount_amount;
+        $tax = $net * ((float) $this->tax_rate / 100);
 
         return round($net + $tax, 2);
     }

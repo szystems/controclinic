@@ -8,7 +8,6 @@ use App\Livewire\App\Invoices\Show as InvoicesShow;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
-use App\Models\InvoicePayment;
 use App\Models\Patient;
 use App\Models\User;
 use App\Services\InvoiceService;
@@ -23,12 +22,12 @@ class InvoicesTest extends TestCase
     private function createClinicWithOwner(): array
     {
         $clinic = Clinic::factory()->onboarded()->create();
-        $owner  = User::factory()->owner()->create(['clinic_id' => $clinic->id]);
+        $owner = User::factory()->owner()->create(['clinic_id' => $clinic->id]);
 
         // Enable billing in settings
-        $settings              = $clinic->settings ?? [];
+        $settings = $clinic->settings ?? [];
         $settings['billing_enabled'] = true;
-        $settings['invoice_prefix']  = 'TEST-';
+        $settings['invoice_prefix'] = 'TEST-';
         $settings['next_invoice_number'] = 1;
         $clinic->update(['settings' => $settings]);
 
@@ -50,29 +49,29 @@ class InvoicesTest extends TestCase
     private function createInvoice(Clinic $clinic, Patient $patient, array $overrides = []): Invoice
     {
         $invoice = Invoice::create(array_merge([
-            'clinic_id'       => $clinic->id,
-            'patient_id'      => $patient->id,
-            'invoice_number'  => 'TEST-000001',
-            'issued_at'       => now()->toDateString(),
-            'currency'        => 'USD',
-            'status'          => Invoice::STATUS_PENDING,
-            'subtotal'        => 100.00,
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'invoice_number' => 'TEST-000001',
+            'issued_at' => now()->toDateString(),
+            'currency' => 'USD',
+            'status' => Invoice::STATUS_PENDING,
+            'subtotal' => 100.00,
             'discount_amount' => 0,
-            'tax_amount'      => 0,
-            'total'           => 100.00,
-            'paid_amount'     => 0,
+            'tax_amount' => 0,
+            'total' => 100.00,
+            'paid_amount' => 0,
         ], $overrides));
 
         InvoiceItem::create([
-            'invoice_id'      => $invoice->id,
-            'order'           => 1,
-            'type'            => InvoiceItem::TYPE_CONSULTATION,
-            'description'     => 'Consulta',
-            'quantity'        => 1,
-            'unit_price'      => 100.00,
+            'invoice_id' => $invoice->id,
+            'order' => 1,
+            'type' => InvoiceItem::TYPE_CONSULTATION,
+            'description' => 'Consulta',
+            'quantity' => 1,
+            'unit_price' => 100.00,
             'discount_amount' => 0,
-            'tax_rate'        => 0,
-            'total'           => 100.00,
+            'tax_rate' => 0,
+            'total' => 100.00,
         ]);
 
         return $invoice;
@@ -121,9 +120,9 @@ class InvoicesTest extends TestCase
 
     public function test_index_does_not_show_other_clinic_invoices(): void
     {
-        [$clinic, $owner]      = $this->createClinicWithOwner();
-        [$clinic2, $owner2]    = $this->createClinicWithOwner();
-        $patient2              = $this->createPatient($clinic2);
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        [$clinic2, $owner2] = $this->createClinicWithOwner();
+        $patient2 = $this->createPatient($clinic2);
         $this->createInvoice($clinic2, $patient2, ['invoice_number' => 'ALIEN-999']);
 
         Livewire::actingAs($owner)
@@ -150,7 +149,7 @@ class InvoicesTest extends TestCase
             ->call('save');
 
         $this->assertDatabaseHas('invoices', [
-            'clinic_id'  => $clinic->id,
+            'clinic_id' => $clinic->id,
             'patient_id' => $patient->id,
         ]);
         $this->assertDatabaseHas('invoice_items', ['description' => 'Consulta general']);
@@ -218,10 +217,10 @@ class InvoicesTest extends TestCase
 
     public function test_show_aborts_for_other_clinic_invoice(): void
     {
-        [$clinic, $owner]   = $this->createClinicWithOwner();
+        [$clinic, $owner] = $this->createClinicWithOwner();
         [$clinic2, $owner2] = $this->createClinicWithOwner();
-        $patient2           = $this->createPatient($clinic2);
-        $invoice2           = $this->createInvoice($clinic2, $patient2, ['invoice_number' => 'ALIEN-001']);
+        $patient2 = $this->createPatient($clinic2);
+        $invoice2 = $this->createInvoice($clinic2, $patient2, ['invoice_number' => 'ALIEN-001']);
 
         Livewire::actingAs($owner)
             ->test(InvoicesShow::class, ['clinic' => $clinic, 'invoice' => $invoice2])
