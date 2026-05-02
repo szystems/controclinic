@@ -99,4 +99,9 @@ return [
     'pdf_issued_by' => 'Emitido por',
     'pdf_patient' => 'Paciente',
     'pdf_payment_history' => 'Historial de Pagos',
+
+    // UI extras
+    'item' => 'Línea',
+    'no_doctors' => 'No hay doctores registrados en la clínica.',
+    'from_appointment' => 'Desde cita',
 ];

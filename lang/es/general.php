@@ -36,6 +36,7 @@ return [
     'sending' => 'Enviando',
     'saved' => 'Guardado.',
     'cancel' => 'Cancelar',
+    'optional' => 'Opcional',
     'search' => 'Buscar',
     'filter' => 'Filtrar',
     'export' => 'Exportar',

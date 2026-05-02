@@ -99,4 +99,9 @@ return [
     'pdf_issued_by' => 'Issued by',
     'pdf_patient' => 'Patient',
     'pdf_payment_history' => 'Payment History',
+
+    // UI extras
+    'item' => 'Line',
+    'no_doctors' => 'No doctors registered in this clinic.',
+    'from_appointment' => 'From appointment',
 ];

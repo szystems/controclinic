@@ -52,7 +52,9 @@
                     @else
                         <div class="relative" x-data="{ open: false }" @keydown.escape="open = false">
                             <div class="relative">
-                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+                                </div>
                                 <input type="text" wire:model.live.debounce.300ms="patientSearch"
                                        @focus="open = true" @click.outside="open = false"
                                        placeholder="{{ __('patients.search_placeholder') }}"
@@ -202,7 +204,9 @@
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_unit_price') }}</label>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono text-gray-500 dark:text-gray-400">{{ $currency }}</span>
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <span class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ $currency }}</span>
+                                    </div>
                                     <input type="number" wire:model.live.debounce.500ms="items.{{ $i }}.unit_price" step="0.01" min="0"
                                            class="w-full pl-14 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
                                 </div>
@@ -212,7 +216,9 @@
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('invoices.item_discount') }}</label>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono text-gray-500 dark:text-gray-400">{{ $currency }}</span>
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <span class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ $currency }}</span>
+                                    </div>
                                     <input type="number" wire:model.live.debounce.500ms="items.{{ $i }}.discount_amount" step="0.01" min="0"
                                            class="w-full pl-14 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
                                 </div>
@@ -224,7 +230,9 @@
                                 <div class="relative">
                                     <input type="number" wire:model.live.debounce.500ms="items.{{ $i }}.tax_rate" step="0.01" min="0" max="100"
                                            class="w-full pr-8 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400">%</span>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">%</span>
+                                    </div>
                                 </div>
                             </div>
 

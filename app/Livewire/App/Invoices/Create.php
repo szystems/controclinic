@@ -248,7 +248,7 @@ class Create extends Component
 
         $doctors = User::query()
             ->where('clinic_id', $this->currentClinic->id)
-            ->whereHas('roles', fn ($q) => $q->where('name', 'doctor'))
+            ->whereIn('role', ['doctor', 'owner'])
             ->orderBy('name')
             ->get();
 
