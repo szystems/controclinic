@@ -105,4 +105,6 @@ return [
     'no_doctors' => 'No doctors registered in this clinic.',
     'from_appointment' => 'From appointment',
     'patient_search_hint' => 'Type at least 2 characters to search',
+    'create_invoice' => 'Create invoice',
+    'view_invoice' => 'View invoice',
 ];

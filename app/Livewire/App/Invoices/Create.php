@@ -79,6 +79,16 @@ class Create extends Component
             $this->doctor_id = $appt->doctor_id ? (string) $appt->doctor_id : null;
             $this->patientName = $appt->patient->full_name ?? '';
             $this->patientSearch = $this->patientName;
+
+            // Usar precio de la cita si está definido
+            if ($appt->consultation_price !== null) {
+                $defaultPrice = (float) $appt->consultation_price;
+            }
+        }
+
+        $defaultDiscount = 0;
+        if (isset($appt) && $appt->consultation_discount !== null) {
+            $defaultDiscount = (float) $appt->consultation_discount;
         }
 
         $this->items = [
@@ -87,7 +97,7 @@ class Create extends Component
                 'description' => __('invoices.item_type_consultation'),
                 'quantity' => 1,
                 'unit_price' => $defaultPrice,
-                'discount_amount' => 0,
+                'discount_amount' => $defaultDiscount,
                 'tax_rate' => $defaultTaxRate,
             ],
         ];

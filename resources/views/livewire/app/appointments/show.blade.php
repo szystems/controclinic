@@ -619,6 +619,34 @@
                             @endif
                         @endcan
 
+                        {{-- Facturar esta cita --}}
+                        @if($currentClinic->billingEnabled() && $appointment->is_billable)
+                            @can('invoices.create')
+                            @if($currentClinic->canWrite())
+                            @php
+                                $existingInvoice = $appointment->invoice ?? null;
+                            @endphp
+                            @if($existingInvoice)
+                            <a href="{{ route('app.invoices.show', ['clinic' => $currentClinic->slug, 'invoice' => $existingInvoice->id]) }}"
+                               class="w-full inline-flex justify-center items-center px-4 py-2 bg-emerald-700 border border-transparent rounded-lg font-medium text-xs text-white uppercase tracking-widest hover:bg-emerald-800 transition">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+                                </svg>
+                                {{ __('invoices.view_invoice') }}
+                            </a>
+                            @else
+                            <a href="{{ route('app.invoices.create', ['clinic' => $currentClinic->slug, 'appointment' => $appointment->id]) }}"
+                               class="w-full inline-flex justify-center items-center px-4 py-2 bg-emerald-600 border border-transparent rounded-lg font-medium text-xs text-white uppercase tracking-widest hover:bg-emerald-700 transition">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+                                </svg>
+                                {{ __('invoices.create_invoice') }}
+                            </a>
+                            @endif
+                            @endif
+                            @endcan
+                        @endif
+
                         {{-- Cancel --}}
                         @if($appointment->isCancellable())
                             @can('appointments.delete')
