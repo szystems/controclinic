@@ -566,6 +566,23 @@
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('settings.billing.description') }}</p>
                         </div>
                         <div class="p-6 space-y-6">
+                            {{-- billing_enabled toggle --}}
+                            <div class="flex items-start gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ __('settings.billing.billing_enabled') }}</p>
+                                    <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('settings.billing.billing_enabled_hint') }}</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    :aria-checked="$wire.billing_enabled ? 'true' : 'false'"
+                                    wire:click="$toggle('billing_enabled')"
+                                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 {{ $billing_enabled ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600' }}"
+                                >
+                                    <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $billing_enabled ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                                </button>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="tax_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.billing.tax_id') }}</label>

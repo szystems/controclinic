@@ -91,6 +91,9 @@ return [
     'billing' => [
         'title' => 'Datos de Facturación',
         'description' => 'Información fiscal para facturas y documentos legales',
+        'billing_enabled' => 'Módulo de facturación',
+        'billing_enabled_label' => 'Habilitar facturación y cobros de consultas',
+        'billing_enabled_hint' => 'Activa el módulo de comprobantes e ingresos para tu clínica. Cuando está desactivado, no se muestran opciones de precio ni cobros.',
         'tax_id' => 'NIT / RFC / Identificación fiscal',
         'legal_name' => 'Razón social',
         'address' => 'Dirección fiscal',

@@ -91,6 +91,9 @@ return [
     'billing' => [
         'title' => 'Billing Information',
         'description' => 'Tax information for invoices and legal documents',
+        'billing_enabled' => 'Billing module',
+        'billing_enabled_label' => 'Enable billing and consultation payments',
+        'billing_enabled_hint' => 'Activates the invoicing and revenue module for your clinic. When disabled, no pricing or payment options are shown.',
         'tax_id' => 'Tax ID / VAT Number',
         'legal_name' => 'Legal name',
         'address' => 'Billing address',
