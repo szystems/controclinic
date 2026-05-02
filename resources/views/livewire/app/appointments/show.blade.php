@@ -180,6 +180,54 @@
                             </div>
                             @endif
                         </dl>
+
+                        {{-- Billing info --}}
+                        @if($currentClinic->billingEnabled() && ($appointment->consultation_price !== null || $appointment->is_billable))
+                        <div class="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ __('appointments.billing_section') }}</span>
+                            </div>
+                            <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                @if($appointment->consultation_price !== null)
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('appointments.consultation_price') }}</dt>
+                                    <dd class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                                        {{ $currentClinic->currency ?? 'USD' }} {{ number_format($appointment->consultation_price, 2) }}
+                                    </dd>
+                                </div>
+                                @endif
+                                @if($appointment->consultation_discount && $appointment->consultation_discount > 0)
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('appointments.consultation_discount') }}</dt>
+                                    <dd class="mt-1 text-sm font-semibold text-red-600 dark:text-red-400">
+                                        - {{ $currentClinic->currency ?? 'USD' }} {{ number_format($appointment->consultation_discount, 2) }}
+                                    </dd>
+                                </div>
+                                @if($appointment->consultation_price !== null)
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('invoices.total') }}</dt>
+                                    <dd class="mt-1 text-sm font-bold text-gray-900 dark:text-white">
+                                        {{ $currentClinic->currency ?? 'USD' }} {{ number_format(max(0, $appointment->consultation_price - $appointment->consultation_discount), 2) }}
+                                    </dd>
+                                </div>
+                                @endif
+                                @endif
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('appointments.is_billable') }}</dt>
+                                    <dd class="mt-1">
+                                        @if($appointment->is_billable)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">✓ {{ __('appointments.is_billable_hint') }}</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">—</span>
+                                        @endif
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
