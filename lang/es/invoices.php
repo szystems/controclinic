@@ -104,4 +104,5 @@ return [
     'item' => 'Línea',
     'no_doctors' => 'No hay doctores registrados en la clínica.',
     'from_appointment' => 'Desde cita',
+    'patient_search_hint' => 'Escribe al menos 2 caracteres para buscar',
 ];
