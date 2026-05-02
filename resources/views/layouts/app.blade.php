@@ -143,5 +143,10 @@
                 </div>
             </template>
         </div>
+
+        {{-- Global Search Modal (Cmd+K / Ctrl+K) --}}
+        @if($clinic)
+            <livewire:app.global-search :clinic="$clinic" />
+        @endif
     </body>
 </html>

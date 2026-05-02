@@ -2,6 +2,7 @@
 
 namespace App\Livewire\App\Appointments;
 
+use App\Jobs\SendAppointmentNotification;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\User;
@@ -237,6 +238,27 @@ class Index extends Component
 
         $appointment->markAsNoShow();
         session()->flash('success', __('appointments.appointment_updated'));
+    }
+
+    public function sendEmailReminder(string $id): void
+    {
+        $appointment = Appointment::with('patient')->findOrFail($id);
+
+        if (! auth()->user()->can('appointments.edit')) {
+            session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        if (! $appointment->patient?->email) {
+            session()->flash('error', __('appointments.reminder_no_email'));
+
+            return;
+        }
+
+        SendAppointmentNotification::dispatch($appointment->id, SendAppointmentNotification::TYPE_REMINDER);
+
+        session()->flash('success', __('appointments.reminder_sent'));
     }
 
     public function render()

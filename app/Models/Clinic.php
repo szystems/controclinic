@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -156,6 +157,11 @@ class Clinic extends Model
     public function medicalRecords(): HasMany
     {
         return $this->hasMany(MedicalRecord::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 
     public function invitations(): HasMany
@@ -353,6 +359,43 @@ class Clinic extends Model
         return url("/app/{$this->slug}");
     }
 
+    // ==================== DATE / TIME FORMATTING ====================
+
+    /**
+     * PHP date format configured by the clinic (e.g. 'd/m/Y', 'Y-m-d', 'm/d/Y').
+     */
+    public function dateFormat(): string
+    {
+        return $this->settings['date_format'] ?? 'd/m/Y';
+    }
+
+    /**
+     * Returns the PHP time format string according to the clinic's setting.
+     */
+    public function timeFormat(): string
+    {
+        return ($this->settings['time_format'] ?? '24h') === '12h' ? 'g:i A' : 'H:i';
+    }
+
+    /**
+     * Format a date (or datetime) using the clinic's configured date format.
+     * If $withTime is true, appends the time using the clinic's time format.
+     * Returns '-' for null values.
+     */
+    public function formatDate(mixed $date, bool $withTime = false): string
+    {
+        if ($date === null) {
+            return '-';
+        }
+
+        $carbon = $date instanceof Carbon ? $date : Carbon::parse($date);
+        $format = $withTime
+            ? $this->dateFormat().' '.$this->timeFormat()
+            : $this->dateFormat();
+
+        return $carbon->format($format);
+    }
+
     /**
      * Get default settings for new clinic
      */
@@ -370,6 +413,20 @@ class Clinic extends Model
             'require_booking_confirmation' => true,
             'send_reminders' => true,
             'reminder_hours_before' => 24,
+            // Facturación
+            'billing_enabled' => false,
+            'invoice_prefix' => 'INV-',
+            'next_invoice_number' => 1,
+            'tax_rate' => 0,
+            'tax_label' => 'IVA',
+            'tax_included_in_price' => false,
+            'default_consultation_price' => 0,
+            'invoice_footer_text' => '',
         ];
+    }
+
+    public function billingEnabled(): bool
+    {
+        return (bool) ($this->settings['billing_enabled'] ?? false);
     }
 }

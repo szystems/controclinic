@@ -96,6 +96,16 @@ new class extends Component
         ];
     }
 
+    if (auth()->user()->can('schedule.manage')) {
+        $primaryNav[] = [
+            'route' => 'app.schedule',
+            'active' => fn () => request()->routeIs('app.schedule'),
+            'label' => __('schedule.title'),
+            'group' => 'account',
+            'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>',
+        ];
+    }
+
     $groupedNav = collect($primaryNav)->groupBy('group');
 @endphp
 
@@ -114,16 +124,16 @@ new class extends Component
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden space-x-1 lg:space-x-6 md:-my-px md:ms-6 lg:ms-10 md:flex">
+                <div class="hidden space-x-0 lg:space-x-1 xl:space-x-6 md:-my-px md:ms-3 lg:ms-6 xl:ms-10 md:flex">
                     @foreach ($primaryNav as $item)
                         @php $active = $item['active'](); @endphp
                         <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$active" wire:navigate :title="$item['label']">
-                            <span class="inline-flex items-center gap-1.5 px-2 lg:px-0">
-                                <svg class="w-5 h-5 lg:w-4 lg:h-4 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
+                            <span class="inline-flex items-center gap-1.5 px-1.5 lg:px-2 xl:px-0">
+                                <svg class="w-5 h-5 xl:w-4 xl:h-4 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     {!! $item['icon'] !!}
                                 </svg>
-                                <span class="hidden lg:inline">{{ $item['label'] }}</span>
+                                <span class="hidden xl:inline">{{ $item['label'] }}</span>
                             </span>
                         </x-nav-link>
                     @endforeach
@@ -131,7 +141,19 @@ new class extends Component
             </div>
 
             <!-- Settings Icon & User Dropdown -->
-            <div class="hidden md:flex md:items-center md:ms-6 md:gap-2">
+            <div class="hidden md:flex md:items-center md:ms-2 lg:ms-6 md:gap-0.5 lg:gap-2 shrink-0">
+                <!-- Global Search Trigger -->
+                <button
+                    type="button"
+                    @click="$dispatch('open-global-search')"
+                    class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    title="{{ __('search.title') }} (Ctrl+K)"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </button>
+
                 <!-- Theme Toggle -->
                 <button
                     x-data="{ dark: localStorage.getItem('theme') === 'dark' }"
@@ -190,8 +212,8 @@ new class extends Component
                 <!-- User Dropdown -->
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150 max-w-[140px] lg:max-w-none">
+                            <div x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name" class="truncate whitespace-nowrap"></div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -235,6 +257,18 @@ new class extends Component
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center md:hidden">
+                {{-- Mobile search button --}}
+                <button
+                    type="button"
+                    @click="$dispatch('open-global-search')"
+                    aria-label="{{ __('search.title') }}"
+                    class="me-1 inline-flex items-center justify-center p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition"
+                >
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </button>
+
                 <button @click="open = true"
                         :aria-expanded="open.toString()"
                         aria-controls="mobile-drawer"

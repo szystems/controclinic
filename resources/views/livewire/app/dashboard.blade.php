@@ -1,9 +1,19 @@
 <div>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('general.dashboard') }} - {{ $clinic->name }}
-            </h2>
+            <div class="flex items-center gap-3">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    {{ __('general.dashboard') }} - {{ $clinic->name }}
+                </h2>
+                @if($isPersonalizedForDoctor)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        {{ __('general.doctor_view_notice') }}
+                    </span>
+                @endif
+            </div>
             <div class="flex items-center gap-2">
                 @php
                     $isCourtesyFree = $clinic->plan_type === 'free' && $clinic->is_manual_plan;

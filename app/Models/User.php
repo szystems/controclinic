@@ -127,6 +127,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(MedicalRecord::class, 'doctor_id');
     }
 
+    public function unavailabilities(): HasMany
+    {
+        return $this->hasMany(DoctorUnavailability::class, 'doctor_id');
+    }
+
     // ==================== ACCESSORS ====================
 
     public function getInitialsAttribute(): string

@@ -50,6 +50,8 @@ return [
         'currency' => 'Moneda',
         'date_format' => 'Formato de fecha',
         'time_format' => 'Formato de hora',
+        'phone_country_code' => 'Código de país por defecto (teléfono)',
+        'phone_country_code_hint' => 'Código telefónico internacional que se usará por defecto al registrar nuevos pacientes.',
     ],
 
     // Appointments

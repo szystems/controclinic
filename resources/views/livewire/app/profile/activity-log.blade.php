@@ -12,7 +12,7 @@
             <tbody>
                 @forelse ($activities as $activity)
                     <tr class="bg-white dark:bg-gray-800">
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $activity->created_at->format('Y-m-d H:i') }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $currentClinic->formatDate($activity->created_at, true) }}</td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $activity->description }}</td>
                         <td class="px-4 py-2 whitespace-pre-line text-sm text-gray-900 dark:text-gray-100">
                             @if($activity->properties && $activity->properties->has('attributes'))

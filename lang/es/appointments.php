@@ -32,6 +32,7 @@ return [
     // Estados
     'status' => 'Estado',
     'status_scheduled' => 'Programada',
+    'scheduled_by' => 'Programada por',
     'status_confirmed' => 'Confirmada',
     'status_waiting' => 'En Espera',
     'status_in_progress' => 'En Consulta',
@@ -141,4 +142,30 @@ return [
     'rescheduled' => 'Cita reagendada correctamente',
     'no_patient' => '(Sin paciente)',
     'not_found' => 'Cita no encontrada',
+    'internal_comments' => 'Comentarios Internos',
+    'no_comments' => 'No hay comentarios aún.',
+    'add_comment' => 'Agregar',
+    'add_comment_placeholder' => 'Escribe un comentario interno...',
+    'comment_added' => 'Comentario agregado',
+    'comment_deleted' => 'Comentario eliminado',
+    'confirm_delete_comment' => '¿Eliminar este comentario?',
+
+    // Recordatorios manuales
+    'send_email_reminder' => 'Enviar recordatorio por correo',
+    'send_whatsapp_reminder' => 'Recordatorio por WhatsApp',
+    'confirm_send_reminder' => '¿Enviar recordatorio de cita al paciente por correo?',
+    'reminder_sent' => 'Recordatorio enviado correctamente',
+    'reminder_no_email' => 'El paciente no tiene correo registrado',
+    'whatsapp_reminder_message' => 'Hola :patient, te recordamos tu cita con :doctor el :date a las :time en :clinic. ¡Te esperamos!',
+
+    // Confirmación por link
+    'confirmed_via_link' => 'Confirmada por el paciente',
+
+    // Explicaciones de flujo para la interfaz
+    'create_staff_hint' => 'Las citas creadas desde aquí quedan <strong>confirmadas automáticamente</strong>. El email que recibirá el paciente incluirá un enlace para cancelar si lo necesita.',
+    'created_via_staff' => 'Creada por el equipo',
+    'created_via_public' => 'Reservada online por el paciente',
+    'status_hint_scheduled_public' => 'Esta cita fue reservada por el paciente en el portal. Se le envió un email con un enlace para confirmarla o cancelarla.',
+    'status_hint_confirmed_staff' => 'Cita confirmada. Fue agendada directamente por el equipo de la clínica.',
+    'status_hint_confirmed_link' => 'El paciente confirmó su asistencia desde el enlace enviado por email.',
 ];

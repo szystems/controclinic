@@ -307,7 +307,7 @@
                 </div>
                 <div style="text-align:right;font-size:11px;color:#6b7280;line-height:1.5;">
                     <div><strong>{{ $dateFrom }}</strong> – <strong>{{ $dateTo }}</strong></div>
-                    <div>{{ __('reports.generated_at') }}: {{ now()->format('d/m/Y H:i') }}</div>
+                    <div>{{ __('reports.generated_at') }}: {{ $clinic->formatDate(now(), true) }}</div>
                     @if(count($activeFilters))
                         <div style="font-size:10px;color:#9ca3af;margin-top:2px;max-width:300px;">{{ __('reports.filters') }}: {{ implode(' · ', $activeFilters) }}</div>
                     @endif

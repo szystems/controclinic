@@ -49,16 +49,19 @@ class UserFactory extends Factory
 
     public function owner(): static
     {
-        return $this->state(fn () => ['role' => 'owner']);
+        return $this->state(fn () => ['role' => 'owner'])
+            ->afterCreating(fn ($user) => $user->assignRole('owner'));
     }
 
     public function doctor(): static
     {
-        return $this->state(fn () => ['role' => 'doctor']);
+        return $this->state(fn () => ['role' => 'doctor'])
+            ->afterCreating(fn ($user) => $user->assignRole('doctor'));
     }
 
     public function assistant(): static
     {
-        return $this->state(fn () => ['role' => 'assistant']);
+        return $this->state(fn () => ['role' => 'assistant'])
+            ->afterCreating(fn ($user) => $user->assignRole('assistant'));
     }
 }

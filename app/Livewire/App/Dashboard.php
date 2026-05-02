@@ -5,6 +5,7 @@ namespace App\Livewire\App;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -17,6 +18,33 @@ class Dashboard extends Component
         $this->clinic = $clinic;
     }
 
+    /**
+     * Returns true when the current user is a pure doctor (not owner/admin).
+     * In this mode, appointment stats are scoped to the doctor's own schedule.
+     */
+    public function getIsPersonalizedForDoctorProperty(): bool
+    {
+        $user = Auth::user();
+
+        return $user
+            && $user->hasRole('doctor')
+            && ! $user->hasAnyRole(['owner', 'admin']);
+    }
+
+    /**
+     * Base query for appointment stats — scoped to doctor when personalised.
+     */
+    private function appointmentsBaseQuery()
+    {
+        $query = Appointment::query()->forClinic($this->clinic->id);
+
+        if ($this->isPersonalizedForDoctor) {
+            $query->where('doctor_id', Auth::id());
+        }
+
+        return $query;
+    }
+
     public function getPatientsCountProperty(): int
     {
         return $this->clinic->patients()->count();
@@ -24,7 +52,7 @@ class Dashboard extends Component
 
     public function getAppointmentsThisMonthProperty(): int
     {
-        return $this->clinic->appointments()
+        return $this->appointmentsBaseQuery()
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
@@ -32,32 +60,32 @@ class Dashboard extends Component
 
     public function getTodayAppointmentsProperty(): int
     {
-        return $this->clinic->appointments()
-            ->where('appointment_date', now()->toDateString())
+        return $this->appointmentsBaseQuery()
+            ->whereDate('appointment_date', now()->toDateString())
             ->count();
     }
 
     public function getPendingTodayProperty(): int
     {
-        return $this->clinic->appointments()
-            ->where('appointment_date', now()->toDateString())
+        return $this->appointmentsBaseQuery()
+            ->whereDate('appointment_date', now()->toDateString())
             ->where('status', Appointment::STATUS_SCHEDULED)
             ->count();
     }
 
     public function getCompletedTodayProperty(): int
     {
-        return $this->clinic->appointments()
-            ->where('appointment_date', now()->toDateString())
+        return $this->appointmentsBaseQuery()
+            ->whereDate('appointment_date', now()->toDateString())
             ->where('status', Appointment::STATUS_COMPLETED)
             ->count();
     }
 
     public function getTodayScheduleProperty()
     {
-        return $this->clinic->appointments()
+        return $this->appointmentsBaseQuery()
             ->with('patient')
-            ->where('appointment_date', now()->toDateString())
+            ->whereDate('appointment_date', now()->toDateString())
             ->orderBy('start_time')
             ->get();
     }
@@ -70,7 +98,7 @@ class Dashboard extends Component
         $tomorrow = now()->addDay()->toDateString();
         $weekAhead = now()->addDays(7)->toDateString();
 
-        return $this->clinic->appointments()
+        return $this->appointmentsBaseQuery()
             ->with(['patient', 'doctor'])
             ->whereDate('appointment_date', '>=', $tomorrow)
             ->whereDate('appointment_date', '<=', $weekAhead)
@@ -111,7 +139,7 @@ class Dashboard extends Component
     public function getLast14DaysSeriesProperty(): array
     {
         $start = now()->subDays(13)->startOfDay();
-        $rows = $this->clinic->appointments()
+        $rows = $this->appointmentsBaseQuery()
             ->whereDate('appointment_date', '>=', $start->toDateString())
             ->selectRaw('DATE(appointment_date) as day, count(*) as total')
             ->groupBy('day')
@@ -185,6 +213,7 @@ class Dashboard extends Component
             'birthdaysThisMonth' => $this->birthdaysThisMonth,
             'last14DaysSeries' => $this->last14DaysSeries,
             'usageStats' => $this->usageStats,
+            'isPersonalizedForDoctor' => $this->isPersonalizedForDoctor,
         ])->layout('layouts.app');
     }
 }

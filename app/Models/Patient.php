@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -28,7 +29,9 @@ class Patient extends Model
         'last_name',
         'email',
         'phone',
+        'phone_country_code',
         'phone_secondary',
+        'phone_country_code_secondary',
         'birth_date',
         'gender',
         'id_type',
@@ -98,6 +101,18 @@ class Patient extends Model
         return $this->hasMany(MedicalRecord::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function tags(): MorphToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable')
+            ->withPivot('tagged_by', 'tagged_at')
+            ->orderBy('name');
+    }
+
     // ==================== ACCESSORS ====================
 
     public function getFullNameAttribute(): string
@@ -132,6 +147,11 @@ class Patient extends Model
     public function scopeForDoctor($query, int $doctorId)
     {
         return $query->where('primary_doctor_id', $doctorId);
+    }
+
+    public function scopeWithTag($query, int $tagId)
+    {
+        return $query->whereHas('tags', fn ($q) => $q->where('tags.id', $tagId));
     }
 
     public function scopeSearch($query, string $search)

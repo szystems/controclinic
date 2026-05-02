@@ -5,6 +5,7 @@ namespace App\Livewire\Public;
 use App\Jobs\SendAppointmentNotification;
 use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\DoctorUnavailability;
 use App\Models\Patient;
 use App\Models\User;
 use Carbon\Carbon;
@@ -190,6 +191,27 @@ class Booking extends Component
             if (! $conflict) {
                 $available[] = $time;
             }
+        }
+
+        // Subtract slots blocked by doctor unavailabilities
+        $unavailabilities = DoctorUnavailability::query()
+            ->where('clinic_id', $this->clinic->id)
+            ->where('doctor_id', $this->doctor_id)
+            ->forDate($date->toDateString())
+            ->get();
+
+        if ($unavailabilities->isNotEmpty()) {
+            $available = array_values(array_filter($available, function (string $time) use ($unavailabilities, $date, $duration) {
+                $slotStart = Carbon::parse($date->toDateString().' '.$time);
+                $slotEnd = $slotStart->copy()->addMinutes($duration);
+                foreach ($unavailabilities as $block) {
+                    if ($block->blocksSlot($date->toDateString(), $time, $slotEnd->format('H:i'))) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }));
         }
 
         return $available;
@@ -400,6 +422,7 @@ class Booking extends Component
                     'end_time' => $endTime,
                     'duration_minutes' => $duration,
                     'status' => $status,
+                    'created_via' => 'public',
                     'reason' => $this->reason ?: null,
                     'notes' => '[Public booking] '.($this->email ?: $this->phone),
                 ]);

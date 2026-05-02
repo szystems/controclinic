@@ -174,4 +174,9 @@ return [
 
     // Email
     'thanks' => 'Thanks',
+
+    // Doctor personalized dashboard
+    'my_schedule' => 'My schedule',
+    'doctor_view_notice' => 'Showing my appointments',
+    'deleted_user' => 'Deleted user',
 ];

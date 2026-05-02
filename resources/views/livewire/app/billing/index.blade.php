@@ -40,9 +40,9 @@
                     @if ($this->isSubscribed && $this->subscription)
                         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                             @if ($this->subscription->onGracePeriod())
-                                {{ __('billing.cancels_at', ['date' => $this->subscription->ends_at->format('d/m/Y')]) }}
+                                {{ __('billing.cancels_at', ['date' => $currentClinic->formatDate($this->subscription->ends_at)]) }}
                             @else
-                                {{ __('billing.renews_at', ['date' => $this->subscription->ends_at?->format('d/m/Y') ?? '—']) }}
+                                {{ __('billing.renews_at', ['date' => $this->subscription->ends_at ? $currentClinic->formatDate($this->subscription->ends_at) : '—']) }}
                             @endif
                         </p>
                     @endif
@@ -203,7 +203,7 @@
                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                 @foreach ($transactions as $transaction)
                                     <tr>
-                                        <td class="py-3 px-4 text-gray-900 dark:text-white">{{ $transaction->billed_at?->format('d/m/Y') }}</td>
+                                        <td class="py-3 px-4 text-gray-900 dark:text-white">{{ $transaction->billed_at ? $currentClinic->formatDate($transaction->billed_at) : '—' }}</td>
                                         <td class="py-3 px-4 text-gray-600 dark:text-gray-400">{{ $transaction->invoice_number ?? '—' }}</td>
                                         <td class="py-3 px-4">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium

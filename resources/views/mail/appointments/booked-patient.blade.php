@@ -28,6 +28,20 @@
 {{ __('appointments_mail.booked_patient_confirmed_note') }}
 @endif
 
+@if($appointment->confirmation_token)
+@if($appointment->status === 'scheduled')
+<x-mail::table>
+| | |
+|:---:|:---:|
+| <x-mail::button :url="route('appointment.confirm', $appointment->confirmation_token)" color="success">{{ __('appointments_mail.btn_confirm') }}</x-mail::button> | <x-mail::button :url="route('appointment.cancel', $appointment->confirmation_token)" color="error">{{ __('appointments_mail.btn_cancel') }}</x-mail::button> |
+</x-mail::table>
+@else
+<x-mail::button :url="route('appointment.cancel', $appointment->confirmation_token)" color="error">
+{{ __('appointments_mail.btn_cancel') }}
+</x-mail::button>
+@endif
+@endif
+
 @if($clinic->address || $clinic->phone)
 **{{ __('appointments_mail.clinic_info') }}:**
 {{ $clinic->name }}

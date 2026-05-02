@@ -19,7 +19,11 @@ class Edit extends Component
 
     public string $phone = '';
 
+    public string $phone_country_code = '502';
+
     public string $phone_secondary = '';
+
+    public string $phone_country_code_secondary = '';
 
     public ?string $birth_date = null;
 
@@ -67,6 +71,8 @@ class Edit extends Component
 
     public string $notes = '';
 
+    public string $internal_notes = '';
+
     public function mount(Patient $patient): void
     {
         // Tenant isolation
@@ -79,7 +85,9 @@ class Edit extends Component
         $this->last_name = $patient->last_name;
         $this->email = $patient->email ?? '';
         $this->phone = $patient->phone ?? '';
+        $this->phone_country_code = $patient->phone_country_code ?? ($patient->clinic->settings['phone_country_code'] ?? '502');
         $this->phone_secondary = $patient->phone_secondary ?? '';
+        $this->phone_country_code_secondary = $patient->phone_country_code_secondary ?? ($patient->clinic->settings['phone_country_code'] ?? '502');
         $this->birth_date = $patient->birth_date?->format('Y-m-d');
         $this->gender = $patient->gender ?? '';
         $this->id_type = $patient->id_type ?? '';
@@ -95,6 +103,7 @@ class Edit extends Component
         $this->current_medications = $patient->current_medications ?? '';
         $this->primary_doctor_id = $patient->primary_doctor_id;
         $this->notes = $patient->notes ?? '';
+        $this->internal_notes = $patient->internal_notes ?? '';
 
         // Emergency contact
         $emergencyContacts = $patient->emergency_contacts ?? [];
@@ -138,6 +147,7 @@ class Edit extends Component
             'insurance_policy_number' => ['nullable', 'string', 'max:100'],
             'primary_doctor_id' => ['nullable', 'exists:users,id'],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'internal_notes' => ['nullable', 'string', 'max:5000'],
         ];
     }
 
@@ -166,7 +176,9 @@ class Edit extends Component
             'last_name' => $this->last_name,
             'email' => $this->email ?: null,
             'phone' => $this->phone,
+            'phone_country_code' => $this->phone_country_code ?: null,
             'phone_secondary' => $this->phone_secondary ?: null,
+            'phone_country_code_secondary' => $this->phone_country_code_secondary ?: null,
             'birth_date' => $this->birth_date ?: null,
             'gender' => $this->gender ?: null,
             'id_type' => $this->id_type ?: null,
@@ -192,6 +204,7 @@ class Edit extends Component
                 'policy_number' => $this->insurance_policy_number,
             ] : null,
             'notes' => $this->notes ?: null,
+            'internal_notes' => $this->internal_notes ?: null,
         ]);
 
         session()->flash('success', __('patients.updated_successfully'));

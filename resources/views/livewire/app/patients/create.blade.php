@@ -83,25 +83,23 @@
                     </div>
 
                     {{-- Phone --}}
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            {{ __('patients.phone') }} <span class="text-red-500">*</span>
-                        </label>
-                        <input wire:model="phone" type="tel" id="phone"
-                               class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('phone') border-red-500 @enderror">
-                        @error('phone')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <x-phone-input
+                        :label="__('patients.phone')"
+                        name="phone"
+                        code-name="phone_country_code"
+                        :value="$phone"
+                        :code-value="$phone_country_code"
+                        :default-code="$currentClinic->settings['phone_country_code'] ?? '502'"
+                        :required="true" />
 
                     {{-- Secondary Phone --}}
-                    <div>
-                        <label for="phone_secondary" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            {{ __('patients.phone_secondary') }}
-                        </label>
-                        <input wire:model="phone_secondary" type="tel" id="phone_secondary"
-                               class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    </div>
+                    <x-phone-input
+                        :label="__('patients.phone_secondary')"
+                        name="phone_secondary"
+                        code-name="phone_country_code_secondary"
+                        :value="$phone_secondary"
+                        :code-value="$phone_country_code_secondary"
+                        :default-code="$currentClinic->settings['phone_country_code'] ?? '502'" />
 
                     {{-- Birth Date --}}
                     <div>

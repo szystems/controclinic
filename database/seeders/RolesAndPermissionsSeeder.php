@@ -35,6 +35,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'reports.view', 'reports.export',
             // Auditoría
             'audit.view',
+            // Etiquetas
+            'tags.manage',
+            // Bloqueo de horarios
+            'schedule.manage',
+            // Facturación
+            'invoices.view', 'invoices.create', 'invoices.edit', 'invoices.delete',
+            'invoices.record_payment', 'invoices.export', 'invoices.print',
         ];
 
         foreach ($permissions as $permission) {
@@ -57,6 +64,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'records.view', 'records.create', 'records.edit', 'records.print',
             'settings.view',
             'reports.view',
+            'tags.manage',
+            'schedule.manage',
+            'invoices.view', 'invoices.create', 'invoices.edit',
+            'invoices.record_payment', 'invoices.export', 'invoices.print',
         ]);
 
         // Asistente - Apoyo al doctor
@@ -66,6 +77,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'patients.print',
             'appointments.view', 'appointments.create', 'appointments.edit',
             'appointments.print',
+            'tags.manage',
+            'schedule.manage',
+            'invoices.view', 'invoices.create', 'invoices.edit',
+            'invoices.record_payment', 'invoices.print',
         ]);
 
         // Secretaria - Gestión de citas
@@ -74,6 +89,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'patients.view', 'patients.create', 'patients.print',
             'appointments.view', 'appointments.create', 'appointments.edit', 'appointments.view_all',
             'appointments.export', 'appointments.print',
+            'invoices.view', 'invoices.create', 'invoices.edit',
+            'invoices.record_payment', 'invoices.print',
         ]);
 
         // Recepcionista - Check-in básico

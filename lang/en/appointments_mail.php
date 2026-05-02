@@ -47,4 +47,21 @@ return [
     'label_cancellation_reason' => 'Cancellation reason',
     'clinic_info' => 'Clinic information',
     'cancellation_note' => 'If you cannot attend, please cancel in advance by contacting the clinic.',
+
+    // Confirmation/cancellation link buttons
+    'btn_confirm' => 'Confirm my appointment',
+    'btn_cancel' => 'Cancel my appointment',
+    'cancel_via_link' => 'Cancelled by patient from email',
+
+    // Response pages
+    'confirm_page_title' => 'Appointment confirmed!',
+    'confirm_page_message' => 'Your attendance has been registered. We look forward to seeing you on the date and time indicated.',
+    'confirm_page_note' => 'If you need to cancel or reschedule, please contact the clinic directly.',
+    'cancel_page_title' => 'Appointment cancelled',
+    'cancel_page_message' => 'Your appointment has been successfully cancelled. We are sorry we could not assist you.',
+    'cancel_page_note' => 'If you wish to book a new appointment, please contact the clinic.',
+    'invalid_token_title' => 'Invalid link',
+    'invalid_token_message' => 'This link is no longer valid or has expired. Please contact the clinic for more information.',
+    'already_cancelled_title' => 'This appointment is already cancelled',
+    'already_cancelled_message' => 'This appointment was already cancelled. If you need to book a new one, please contact the clinic.',
 ];

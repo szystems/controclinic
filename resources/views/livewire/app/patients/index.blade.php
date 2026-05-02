@@ -120,6 +120,21 @@
                         <option value="inactive">{{ __('patients.inactive') }}</option>
                     </select>
                 </div>
+
+                {{-- Tag Filter --}}
+                @if($clinicTags->count() > 0)
+                <div>
+                    <label for="filterTag" class="sr-only">{{ __('patients.filter_by_tag') }}</label>
+                    <select wire:model.live="filterTag"
+                            id="filterTag"
+                            class="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="">{{ __('patients.all_tags') }}</option>
+                        @foreach($clinicTags as $tag)
+                        <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -174,7 +189,7 @@
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($patients as $patient)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" @click="window.location.href='{{ route('app.patients.show', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}'">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
@@ -191,6 +206,13 @@
                                         @if($patient->birth_date)
                                         <div class="text-sm text-gray-500 dark:text-gray-400">
                                             {{ $patient->age }} {{ __('patients.years_old') }}
+                                        </div>
+                                        @endif
+                                        @if($patient->tags->count())
+                                        <div class="flex flex-wrap gap-1 mt-1">
+                                            @foreach($patient->tags as $tag)
+                                            <span class="{{ $tag->badge_classes }} px-1.5 py-0 rounded-full text-xs font-medium">{{ $tag->name }}</span>
+                                            @endforeach
                                         </div>
                                         @endif
                                     </div>
@@ -222,7 +244,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end space-x-2">
+                                <div class="flex items-center justify-end space-x-2" @click.stop>
                                     <a href="{{ route('app.patients.show', ['clinic' => $currentClinic->slug, 'patient' => $patient->id]) }}"
                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
                                        title="{{ __('general.view') }}">

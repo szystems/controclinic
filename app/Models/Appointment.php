@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -18,6 +20,15 @@ class Appointment extends Model
     use BelongsToClinic, HasFactory, HasUuids, LogsActivity, SoftDeletes;
 
     protected $keyType = 'string';
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $appointment) {
+            if (empty($appointment->confirmation_token)) {
+                $appointment->confirmation_token = Str::random(64);
+            }
+        });
+    }
 
     public $incrementing = false;
 
@@ -136,6 +147,11 @@ class Appointment extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(AppointmentComment::class)->orderBy('created_at');
     }
 
     // ==================== ACCESSORS ====================

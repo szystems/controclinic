@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppointmentConfirmationController;
 use App\Http\Middleware\CheckPlanLimits;
 use App\Http\Middleware\EnsureIsAdmin;
 use App\Http\Middleware\EnsureOnboardingCompleted;
@@ -12,6 +13,7 @@ use App\Livewire\App\Appointments\Create as AppointmentsCreate;
 use App\Livewire\App\Appointments\Edit as AppointmentsEdit;
 use App\Livewire\App\Appointments\Index as AppointmentsIndex;
 use App\Livewire\App\Appointments\Show as AppointmentsShow;
+use App\Livewire\App\AuditLog\Index as AuditLogIndex;
 use App\Livewire\App\Billing\Index as BillingIndex;
 use App\Livewire\App\Dashboard;
 use App\Livewire\App\Invitations\Accept as InvitationAccept;
@@ -24,8 +26,8 @@ use App\Livewire\App\Patients\Create as PatientsCreate;
 use App\Livewire\App\Patients\Edit as PatientsEdit;
 use App\Livewire\App\Patients\Index as PatientsIndex;
 use App\Livewire\App\Patients\Show as PatientsShow;
-use App\Livewire\App\AuditLog\Index as AuditLogIndex;
 use App\Livewire\App\Reports\Index as ReportsIndex;
+use App\Livewire\App\Schedule\Index as ScheduleIndex;
 use App\Livewire\App\Settings\Index as SettingsIndex;
 use App\Livewire\App\Staff\Create as StaffCreate;
 use App\Livewire\App\Staff\Edit as StaffEdit;
@@ -135,6 +137,19 @@ Route::get('/privacy', function () {
 Route::get('/invitation/{token}', InvitationAccept::class)
     ->middleware('throttle:10,1')
     ->name('invitations.accept');
+
+/*
+|--------------------------------------------------------------------------
+| Appointment Confirmation / Cancellation (public, no auth required)
+|--------------------------------------------------------------------------
+*/
+Route::get('/appointment/confirm/{token}', [AppointmentConfirmationController::class, 'confirm'])
+    ->middleware('throttle:10,1')
+    ->name('appointment.confirm');
+
+Route::get('/appointment/cancel/{token}', [AppointmentConfirmationController::class, 'cancel'])
+    ->middleware('throttle:10,1')
+    ->name('appointment.cancel');
 
 Route::post('logout', function () {
     (new Logout)();
@@ -251,8 +266,23 @@ Route::prefix('app/{clinic}')
                 Route::get('/reports', ReportsIndex::class)->name('reports');
                 // Registro de auditoría (owner y admin)
                 Route::middleware('can:audit.view')->get('/audit-log', AuditLogIndex::class)->name('audit-log');
+                // Bloqueo de horarios
+                Route::middleware('can:schedule.manage')->get('/schedule', ScheduleIndex::class)->name('schedule');
                 // Perfil de usuario (tenantizado)
                 Route::get('/profile', App\Livewire\App\Profile\Index::class)->name('profile');
+
+                // Facturación (invoices)
+                Route::middleware('can:invoices.view')->prefix('invoices')->name('invoices.')->group(function () {
+                    Route::get('/', App\Livewire\App\Invoices\Index::class)->name('index');
+                    Route::middleware('can:invoices.create')->get('/create', App\Livewire\App\Invoices\Create::class)->name('create');
+                    Route::get('/{invoice}', App\Livewire\App\Invoices\Show::class)->name('show');
+                    Route::middleware('can:invoices.print')->get('/{invoice}/pdf', function (\App\Models\Clinic $clinic, \App\Models\Invoice $invoice) {
+                        abort_unless($invoice->clinic_id === $clinic->id, 404);
+                        $invoice->loadMissing(['patient', 'doctor', 'items', 'payments']);
+                        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', compact('invoice', 'clinic'));
+                        return $pdf->stream("factura-{$invoice->invoice_number}.pdf");
+                    })->name('pdf');
+                });
             });
         });
     });

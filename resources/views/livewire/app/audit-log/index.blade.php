@@ -143,10 +143,10 @@
                                     {{-- Date --}}
                                     <td class="px-4 py-3 whitespace-nowrap">
                                         <span class="text-sm text-gray-900 dark:text-gray-100">
-                                            {{ $activity->created_at->format('d/m/Y') }}
+                                            {{ $clinic->formatDate($activity->created_at) }}
                                         </span>
                                         <span class="block text-xs text-gray-400 dark:text-gray-500">
-                                            {{ $activity->created_at->format('H:i') }}
+                                            {{ $activity->created_at->format($clinic->timeFormat()) }}
                                         </span>
                                     </td>
 

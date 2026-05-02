@@ -2,8 +2,10 @@
 
 namespace App\Livewire\App\Appointments;
 
+use App\Jobs\SendAppointmentNotification;
 use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\DoctorUnavailability;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -60,14 +62,14 @@ class Calendar extends Component
 
         $query = Appointment::query()
             ->forClinic($this->clinic->id)
-            ->with(['patient:id,first_name,last_name', 'doctor:id,name'])
+            ->with(['patient:id,first_name,last_name,phone,phone_country_code,email', 'doctor:id,name'])
             ->whereBetween('appointment_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
         if (! empty($this->selectedDoctors)) {
             $query->whereIn('doctor_id', $this->selectedDoctors);
         }
 
-        return $query->get()->map(function (Appointment $a) {
+        $appointmentEvents = $query->get()->map(function (Appointment $a) {
             $date = $a->appointment_date->toDateString();
 
             $startTime = $a->start_time ? Carbon::parse($a->start_time)->format('H:i:s') : '09:00:00';
@@ -99,10 +101,71 @@ class Calendar extends Component
                     'doctor' => $a->doctor->name ?? '—',
                     'status' => $a->status,
                     'time' => $a->start_time ? Carbon::parse($a->start_time)->format('H:i') : '',
+                    'email' => $a->patient->email ?? '',
+                    'phone' => $a->patient->phone ?? '',
+                    'wa_url' => (function () use ($a, $patientName): string {
+                        $localPhone = preg_replace('/[^0-9]/', '', $a->patient->phone ?? '');
+                        if (! $localPhone) {
+                            return '';
+                        }
+                        $code = preg_replace('/[^0-9]/', '', $a->patient->phone_country_code
+                            ?? $this->clinic->settings['phone_country_code'] ?? '');
+                        $phone = $code.$localPhone;
+                        $date = $a->appointment_date->translatedFormat('l d \d\e F');
+                        $time = $a->start_time ? Carbon::parse($a->start_time)->format('H:i') : '';
+                        $msg = __('appointments.whatsapp_reminder_message', [
+                            'patient' => $a->patient->first_name ?? $patientName,
+                            'doctor' => $a->doctor->name ?? '',
+                            'date' => $date,
+                            'time' => $time,
+                            'clinic' => $this->clinic->name,
+                        ]);
+
+                        return 'https://wa.me/'.$phone.'?text='.rawurlencode($msg);
+                    })(),
                 ],
                 'classNames' => $a->status === Appointment::STATUS_CANCELLED ? ['fc-event-cancelled'] : [],
             ];
         })->all();
+
+        // Unavailability background events
+        $unavailQuery = DoctorUnavailability::query()
+            ->forClinic($this->clinic->id)
+            ->overlapping($startDate->toDateString(), $endDate->toDateString());
+
+        if (! empty($this->selectedDoctors)) {
+            $unavailQuery->whereIn('doctor_id', $this->selectedDoctors);
+        }
+
+        $unavailEvents = $unavailQuery->with('doctor:id,name')->get()->map(function (DoctorUnavailability $block) {
+            $endDateExclusive = $block->date_to->copy()->addDay()->toDateString();
+
+            if (! $block->all_day && $block->date_from->eq($block->date_to)) {
+                $start = $block->date_from->toDateString().'T'.($block->time_from ?? '00:00');
+                $end = $block->date_to->toDateString().'T'.($block->time_to ?? '23:59');
+            } else {
+                $start = $block->date_from->toDateString();
+                $end = $endDateExclusive;
+            }
+
+            $title = $block->reason ?: ($block->doctor?->name ?? __('schedule.title'));
+
+            return [
+                'id' => 'unavail-'.$block->id,
+                'title' => $title,
+                'start' => $start,
+                'end' => $end,
+                'display' => 'background',
+                'backgroundColor' => '#fee2e2',
+                'classNames' => ['unavailability-block'],
+                'extendedProps' => [
+                    'isUnavailability' => true,
+                    'doctor' => $block->doctor?->name ?? '—',
+                ],
+            ];
+        })->all();
+
+        return array_merge($appointmentEvents, $unavailEvents);
     }
 
     /**
@@ -130,9 +193,41 @@ class Calendar extends Component
         $startCarbon = Carbon::parse($start);
         $endCarbon = $end ? Carbon::parse($end) : null;
 
+        // Calculate new start/end times
+        $newDate = $startCarbon->toDateString();
+        $newStartTime = $startCarbon->format('H:i:s');
+
+        if ($endCarbon) {
+            $newEndTime = $endCarbon->format('H:i:s');
+        } elseif ($appointment->start_time && $appointment->end_time) {
+            // Preserve original duration
+            $durationMinutes = Carbon::parse($appointment->start_time)
+                ->diffInMinutes(Carbon::parse($appointment->end_time));
+            $newEndTime = $startCarbon->copy()->addMinutes($durationMinutes)->format('H:i:s');
+        } else {
+            $newEndTime = $startCarbon->copy()->addMinutes(30)->format('H:i:s');
+        }
+
+        // Check for scheduling conflicts
+        $hasConflict = Appointment::query()
+            ->forClinic($this->clinic->id)
+            ->forDoctor((int) $appointment->doctor_id)
+            ->forDate($newDate)
+            ->active()
+            ->where('id', '!=', $appointment->id)
+            ->where(function ($q) use ($newStartTime, $newEndTime) {
+                $q->where('start_time', '<', $newEndTime)
+                    ->where('end_time', '>', $newStartTime);
+            })
+            ->exists();
+
+        if ($hasConflict) {
+            return ['success' => false, 'message' => __('appointments.conflict_detected')];
+        }
+
         $appointment->update([
-            'appointment_date' => $startCarbon->toDateString(),
-            'start_time' => $startCarbon->format('H:i:s'),
+            'appointment_date' => $newDate,
+            'start_time' => $newStartTime,
             'end_time' => $endCarbon ? $endCarbon->format('H:i:s') : $appointment->end_time,
         ]);
 
@@ -188,6 +283,27 @@ class Calendar extends Component
             Appointment::STATUS_WAITING => '#f59e0b',
             default => '#4b5563', // scheduled
         };
+    }
+
+    public function sendEmailReminder(string $id): array
+    {
+        if (! Auth::user()?->can('appointments.edit')) {
+            return ['success' => false, 'message' => __('general.unauthorized')];
+        }
+
+        $appointment = Appointment::with('patient')->find($id);
+
+        if (! $appointment || $appointment->clinic_id !== $this->clinic->id) {
+            return ['success' => false, 'message' => __('appointments.not_found')];
+        }
+
+        if (! $appointment->patient?->email) {
+            return ['success' => false, 'message' => __('appointments.reminder_no_email')];
+        }
+
+        SendAppointmentNotification::dispatch($appointment->id, SendAppointmentNotification::TYPE_REMINDER);
+
+        return ['success' => true, 'message' => __('appointments.reminder_sent')];
     }
 
     public function render()

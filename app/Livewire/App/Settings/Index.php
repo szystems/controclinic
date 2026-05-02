@@ -45,6 +45,8 @@ class Index extends Component
 
     public string $time_format = '24h';
 
+    public string $phone_country_code = '502';
+
     // Appointments
     public int $appointment_duration = 30;
 
@@ -108,6 +110,7 @@ class Index extends Component
             'currency' => ['required', 'string', 'size:3'],
             'date_format' => ['required', 'string'],
             'time_format' => ['required', 'in:12h,24h'],
+            'phone_country_code' => ['nullable', 'string', 'max:5', 'regex:/^[0-9]{1,5}$/'],
 
             // Appointments
             'appointment_duration' => ['required', 'integer', 'min:5', 'max:180'],
@@ -167,6 +170,7 @@ class Index extends Component
         $this->currency = $this->clinic->currency ?? 'USD';
         $this->date_format = $settings['date_format'] ?? 'd/m/Y';
         $this->time_format = $settings['time_format'] ?? '24h';
+        $this->phone_country_code = $settings['phone_country_code'] ?? '502';
 
         // Appointments
         $this->appointment_duration = $settings['appointment_duration'] ?? 30;
@@ -239,6 +243,7 @@ class Index extends Component
             'currency' => $this->rules()['currency'],
             'date_format' => $this->rules()['date_format'],
             'time_format' => $this->rules()['time_format'],
+            'phone_country_code' => $this->rules()['phone_country_code'],
         ]);
 
         $this->clinic->update([
@@ -250,6 +255,7 @@ class Index extends Component
         $this->updateSettings([
             'date_format' => $this->date_format,
             'time_format' => $this->time_format,
+            'phone_country_code' => $this->phone_country_code ?: '502',
         ]);
 
         session()->flash('success', __('settings.localization_saved'));

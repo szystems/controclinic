@@ -259,4 +259,45 @@ class AppointmentsCalendarTest extends TestCase
             ->assertSet('selectedDoctors', [])
             ->assertDispatched('calendar-refresh');
     }
+
+    public function test_reschedule_blocked_when_slot_is_occupied(): void
+    {
+        [$clinic, $user] = $this->makeContext();
+        $this->bindClinic($clinic);
+
+        $patient = Patient::factory()->create(['clinic_id' => $clinic->id]);
+
+        // Existing appointment at 14:00–14:30 on target date
+        Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $user->id,
+            'appointment_date' => '2026-05-15',
+            'start_time' => '14:00:00',
+            'end_time' => '14:30:00',
+            'status' => 'confirmed',
+        ]);
+
+        // Appointment to be dragged into the conflicting slot
+        $toMove = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $user->id,
+            'appointment_date' => '2026-05-10',
+            'start_time' => '09:00:00',
+            'end_time' => '09:30:00',
+        ]);
+
+        $component = Livewire::actingAs($user)->test(Calendar::class, ['clinic' => $clinic]);
+        $result = $component->instance()->rescheduleEvent(
+            (string) $toMove->id,
+            '2026-05-15T14:10:00',
+            '2026-05-15T14:40:00'
+        );
+
+        $this->assertFalse($result['success']);
+        $toMove->refresh();
+        // Should not have moved
+        $this->assertSame('2026-05-10', $toMove->appointment_date->toDateString());
+    }
 }

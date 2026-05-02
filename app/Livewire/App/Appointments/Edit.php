@@ -4,6 +4,7 @@ namespace App\Livewire\App\Appointments;
 
 use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\DoctorUnavailability;
 use App\Models\Patient;
 use App\Models\User;
 use Carbon\Carbon;
@@ -40,6 +41,8 @@ class Edit extends Component
     public string $patientSearch = '';
 
     public bool $showPatientDropdown = false;
+
+    public bool $doctorUnavailableConflict = false;
 
     protected function rules(): array
     {
@@ -163,7 +166,26 @@ class Edit extends Component
             })
             ->exists();
 
-        return $conflicts;
+        if ($conflicts) {
+            return true;
+        }
+
+        // Check doctor unavailabilities
+        $unavailabilities = DoctorUnavailability::query()
+            ->forClinic($this->currentClinic->id)
+            ->forDoctor((int) $this->doctor_id)
+            ->forDate($this->appointment_date)
+            ->get();
+
+        foreach ($unavailabilities as $block) {
+            if ($block->blocksSlot($this->appointment_date, $this->start_time, $endTime)) {
+                $this->doctorUnavailableConflict = true;
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function save()
@@ -183,8 +205,12 @@ class Edit extends Component
         $this->validate();
 
         // Check for conflicts
+        $this->doctorUnavailableConflict = false;
         if ($this->checkConflicts()) {
-            session()->flash('error', __('appointments.conflict_detected'));
+            $msg = $this->doctorUnavailableConflict
+                ? __('schedule.doctor_unavailable')
+                : __('appointments.conflict_detected');
+            session()->flash('error', $msg);
 
             return;
         }

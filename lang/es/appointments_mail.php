@@ -47,4 +47,21 @@ return [
     'label_cancellation_reason' => 'Motivo de cancelación',
     'clinic_info' => 'Información de la clínica',
     'cancellation_note' => 'Si no puedes asistir, te pedimos que canceles con antelación contactando a la clínica.',
+
+    // Botones de confirmación/cancelación por link
+    'btn_confirm' => 'Confirmar mi cita',
+    'btn_cancel' => 'Cancelar mi cita',
+    'cancel_via_link' => 'Cancelado por el paciente desde el correo',
+
+    // Páginas de respuesta
+    'confirm_page_title' => '¡Cita confirmada!',
+    'confirm_page_message' => 'Tu asistencia ha sido registrada. Te esperamos en la fecha y hora indicadas.',
+    'confirm_page_note' => 'Si necesitas cancelar o reprogramar, contacta a la clínica directamente.',
+    'cancel_page_title' => 'Cita cancelada',
+    'cancel_page_message' => 'Tu cita ha sido cancelada exitosamente. Lamentamos no poder atenderte.',
+    'cancel_page_note' => 'Si deseas agendar una nueva cita, contacta a la clínica.',
+    'invalid_token_title' => 'Enlace no válido',
+    'invalid_token_message' => 'Este enlace ya no es válido o ha expirado. Por favor, contacta a la clínica para más información.',
+    'already_cancelled_title' => 'Esta cita ya está cancelada',
+    'already_cancelled_message' => 'Esta cita ya fue cancelada anteriormente. Si necesitas agendar una nueva cita, contacta a la clínica.',
 ];

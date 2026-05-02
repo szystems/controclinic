@@ -91,6 +91,76 @@
              style="display:none;">
             <span x-text="toast.message"></span>
         </div>
+
+        {{-- Popover de cita (acciones rápidas) --}}
+        <div x-data="calendarPopover()"
+             @appointment-popover.window="open($event.detail)"
+             @click.away="close()"
+             @keydown.escape.window="close()"
+             x-show="show"
+             x-cloak
+             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-75"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             :style="`position:fixed;left:${pos.x}px;top:${pos.y}px;z-index:9999;min-width:240px;max-width:280px`"
+             class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4">
+
+            {{-- Header --}}
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate" x-text="event.title"></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <span x-text="event.time"></span>
+                        <span class="mx-1">·</span>
+                        <span x-text="event.doctor"></span>
+                    </p>
+                </div>
+                <button @click="close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Actions --}}
+            <div class="space-y-1.5">
+                {{-- Ver cita --}}
+                <a :href="event.url"
+                   class="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 transition">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    {{ __('general.view') }}
+                </a>
+
+                {{-- Email recordatorio --}}
+                <template x-if="event.email && canRemind">
+                    <button @click="sendEmailReminder()"
+                            :disabled="loading"
+                            class="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 disabled:opacity-50 transition">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        {{ __('appointments.send_email_reminder') }}
+                    </button>
+                </template>
+
+                {{-- WhatsApp --}}
+                <template x-if="event.wa_url && canRemind">
+                    <a :href="event.wa_url" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/40 hover:bg-green-100 dark:hover:bg-green-900/70 transition">
+                        <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        {{ __('appointments.send_whatsapp_reminder') }}
+                    </a>
+                </template>
+            </div>
+        </div>
     </div>
 
     <style>
@@ -284,11 +354,25 @@
                         },
 
                         eventClick: (info) => {
-                            // Use Livewire SPA navigation when possible
-                            if (info.event.url && window.Livewire) {
-                                info.jsEvent.preventDefault();
-                                window.Livewire.navigate(info.event.url);
-                            }
+                            if (info.event.extendedProps.isUnavailability) return;
+                            info.jsEvent.preventDefault();
+                            const rect = info.el.getBoundingClientRect();
+                            const popX = Math.min(rect.left, window.innerWidth - 296);
+                            const popY = Math.min(rect.bottom + 6, window.innerHeight - 260);
+                            window.dispatchEvent(new CustomEvent('appointment-popover', {
+                                detail: {
+                                    id:     info.event.id,
+                                    title:  info.event.title,
+                                    time:   info.event.extendedProps.time,
+                                    doctor: info.event.extendedProps.doctor,
+                                    status: info.event.extendedProps.status,
+                                    email:  info.event.extendedProps.email,
+                                    wa_url: info.event.extendedProps.wa_url,
+                                    url:    info.event.url,
+                                    x: popX,
+                                    y: popY,
+                                }
+                            }));
                         },
 
                         dateClick: (info) => {
@@ -326,11 +410,53 @@
                     Livewire.on('calendar-refresh', () => {
                         if (this.calendar) this.calendar.refetchEvents();
                     });
+
+                    // Toast from popover actions (e.g. email reminder)
+                    window.addEventListener('calendar-toast', (e) => {
+                        this.showToast(e.detail.success, e.detail.message);
+                    });
                 },
 
                 showToast(success, message) {
                     this.toast = { show: true, success, message };
                     setTimeout(() => this.toast.show = false, 3500);
+                },
+            }
+        }
+
+        function calendarPopover() {
+            return {
+                show: false,
+                loading: false,
+                event: {},
+                pos: { x: 0, y: 0 },
+                canRemind: @json(auth()->user()?->can('appointments.edit') ?? false),
+
+                open(detail) {
+                    this.event = detail;
+                    this.pos = { x: detail.x, y: detail.y };
+                    this.loading = false;
+                    this.show = true;
+                },
+
+                close() {
+                    this.show = false;
+                },
+
+                async sendEmailReminder() {
+                    if (this.loading) return;
+                    this.loading = true;
+                    try {
+                        const res = await this.$wire.sendEmailReminder(this.event.id);
+                        window.dispatchEvent(new CustomEvent('calendar-toast', { detail: res }));
+                    } catch {
+                        window.dispatchEvent(new CustomEvent('calendar-toast', {
+                            detail: { success: false, message: 'Error' }
+                        }));
+                    } finally {
+                        this.loading = false;
+                        this.close();
+                    }
                 },
             }
         }

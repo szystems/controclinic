@@ -323,6 +323,47 @@
                                     </select>
                                     @error('time_format') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                                 </div>
+                                <div>
+                                    <label for="phone_country_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.localization.phone_country_code') }}</label>
+                                    <select wire:model="phone_country_code" id="phone_country_code" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <optgroup label="🌎 Centroamérica">
+                                            <option value="502">🇬🇹 +502 Guatemala</option>
+                                            <option value="503">🇸🇻 +503 El Salvador</option>
+                                            <option value="504">🇭🇳 +504 Honduras</option>
+                                            <option value="505">🇳🇮 +505 Nicaragua</option>
+                                            <option value="506">🇨🇷 +506 Costa Rica</option>
+                                            <option value="507">🇵🇦 +507 Panamá</option>
+                                        </optgroup>
+                                        <optgroup label="🌎 Norteamérica">
+                                            <option value="52">🇲🇽 +52 México</option>
+                                            <option value="1">🇺🇸 +1 EE.UU. / Canadá</option>
+                                        </optgroup>
+                                        <optgroup label="🌎 Sudamérica">
+                                            <option value="57">🇨🇴 +57 Colombia</option>
+                                            <option value="51">🇵🇪 +51 Perú</option>
+                                            <option value="56">🇨🇱 +56 Chile</option>
+                                            <option value="54">🇦🇷 +54 Argentina</option>
+                                            <option value="55">🇧🇷 +55 Brasil</option>
+                                            <option value="58">🇻🇪 +58 Venezuela</option>
+                                            <option value="591">🇧🇴 +591 Bolivia</option>
+                                            <option value="595">🇵🇾 +595 Paraguay</option>
+                                            <option value="598">🇺🇾 +598 Uruguay</option>
+                                            <option value="593">🇪🇨 +593 Ecuador</option>
+                                        </optgroup>
+                                        <optgroup label="🌎 Caribe">
+                                            <option value="1809">🇩🇴 +1809 Rep. Dominicana</option>
+                                            <option value="53">🇨🇺 +53 Cuba</option>
+                                        </optgroup>
+                                        <optgroup label="🇪🇺 Europa">
+                                            <option value="34">🇪🇸 +34 España</option>
+                                            <option value="44">🇬🇧 +44 Reino Unido</option>
+                                            <option value="33">🇫🇷 +33 Francia</option>
+                                            <option value="49">🇩🇪 +49 Alemania</option>
+                                        </optgroup>
+                                    </select>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('settings.localization.phone_country_code_hint') }}</p>
+                                    @error('phone_country_code') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                </div>
                             </div>
                         </div>
                         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end">

@@ -32,6 +32,7 @@ return [
     // Status
     'status' => 'Status',
     'status_scheduled' => 'Scheduled',
+    'scheduled_by' => 'Scheduled by',
     'status_confirmed' => 'Confirmed',
     'status_waiting' => 'Waiting',
     'status_in_progress' => 'In Progress',
@@ -141,4 +142,29 @@ return [
     'rescheduled' => 'Appointment rescheduled successfully',
     'no_patient' => '(No patient)',
     'not_found' => 'Appointment not found',
+    'internal_comments' => 'Internal Comments',
+    'no_comments' => 'No comments yet.',
+    'add_comment' => 'Add',
+    'add_comment_placeholder' => 'Write an internal comment...',
+    'comment_added' => 'Comment added',
+    'comment_deleted' => 'Comment deleted',
+    'confirm_delete_comment' => 'Delete this comment?',
+
+    // Manual reminders
+    'send_email_reminder' => 'Send email reminder',
+    'send_whatsapp_reminder' => 'WhatsApp reminder',
+    'confirm_send_reminder' => 'Send an appointment reminder to the patient by email?',
+    'reminder_sent' => 'Reminder sent successfully',
+    'reminder_no_email' => 'The patient has no email on file',
+    'confirmed_via_link' => 'Confirmed by patient',
+
+    // Flow explanations for the interface
+    'create_staff_hint' => 'Appointments created here are <strong>automatically confirmed</strong>. The patient will receive an email with a cancellation link in case they need to cancel.',
+    'created_via_staff' => 'Created by staff',
+    'created_via_public' => 'Online booking by patient',
+    'status_hint_scheduled_public' => 'This appointment was booked by the patient via the portal. They received an email with a link to confirm or cancel.',
+    'status_hint_confirmed_staff' => 'Appointment confirmed. It was scheduled directly by the clinic staff.',
+    'status_hint_confirmed_link' => 'The patient confirmed attendance via the link sent by email.',
+
+    'whatsapp_reminder_message' => 'Hi :patient, this is a reminder for your appointment with :doctor on :date at :time at :clinic. See you soon!',
 ];

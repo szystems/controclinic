@@ -20,7 +20,11 @@ class Create extends Component
 
     public string $phone = '';
 
+    public string $phone_country_code = '502';
+
     public string $phone_secondary = '';
+
+    public string $phone_country_code_secondary = '';
 
     public ?string $birth_date = null;
 
@@ -113,6 +117,9 @@ class Create extends Component
     public function mount(Clinic $clinic)
     {
         $this->currentClinic = $clinic;
+        $settings = $clinic->settings ?? [];
+        $this->phone_country_code = $settings['phone_country_code'] ?? '502';
+        $this->phone_country_code_secondary = $settings['phone_country_code'] ?? '502';
     }
 
     public function getDoctorsProperty()
@@ -148,7 +155,9 @@ class Create extends Component
             'last_name' => $this->last_name,
             'email' => $this->email ?: null,
             'phone' => $this->phone,
+            'phone_country_code' => $this->phone_country_code ?: null,
             'phone_secondary' => $this->phone_secondary ?: null,
+            'phone_country_code_secondary' => $this->phone_country_code_secondary ?: null,
             'birth_date' => $this->birth_date ?: null,
             'gender' => $this->gender ?: null,
             'id_type' => $this->id_type ?: null,

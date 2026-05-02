@@ -1,6 +1,6 @@
 # 📝 Tareas Pendientes
 
-> Actualizado: 2026-04-30
+> Actualizado: 2026-05-02
 > Enfoque: SaaS-First
 
 ---
@@ -86,15 +86,15 @@
 - [x] **Consentimiento Términos & Privacidad** al registrar — checkbox + timestamp guardado en `users.terms_accepted_at` (2026-05-01)
 - [x] **Cookie banner** en portal público (GDPR mínimo) (2026-05-01)
 - [ ] **Política de retención por defecto** documentada (ej. 5 años para historiales tras última cita)
-- [ ] **Export ZIP de data por clínica** — owner descarga su data completa (CSV/JSON) — feature simple en v1
+- [x] **Export ZIP de data por clínica** — owner descarga su data completa (CSV patients/appointments/records/staff) ✅ 2026-05-01
 
 #### 0.4 Operación / DevOps mínimo
 - [ ] Backup automático diario (mysqldump → S3/storage cifrado)
 - [x] Health check endpoint (`/health`) para uptime monitoring (2026-05-01)
-- [ ] Logs estructurados (JSON) para producción
+- [x] Logs estructurados (JSON) para producción ✅ 2026-05-01
 - [ ] Sentry / Bugsnag / similar para errores en prod
 - [x] Variables de entorno revisadas (`.env.production.example`) (2026-05-01)
-- [ ] `php artisan optimize` en deploy
+- [x] `php artisan optimize` en deploy (incluido en deploy.sh) ✅ 2026-05-01
 - [ ] Documentación de deployment (Docker / VPS / similar)
 
 ---
@@ -104,17 +104,17 @@
 > Las features que más diferencian un producto vendible en LATAM. Después del lanzamiento, primer mes.
 
 - [ ] **Recordatorios SMS/WhatsApp** — Twilio + WhatsApp Business; usa `confirmation_token` ya reservado
-- [ ] **Confirmación por link** sin login — usa `confirmation_token` y `confirmed_via`
-- [ ] **Bloqueo de horarios / vacaciones del doctor** — nueva tabla `doctor_unavailabilities` (date_from, date_to, reason, all_day)
+- [x] **Confirmación por link** sin login — token auto-generado, rutas públicas GET /appointment/confirm/{token} y /cancel/{token}, controller, 4 vistas respuesta, botones en email, badge en Show, 9 tests ✅ 2026-05-02
+- [x] **Bloqueo de horarios / vacaciones del doctor** — tabla `doctor_unavailabilities`, modelo, Livewire `App\Schedule\Index`, integración calendar/booking/create/edit, 9 tests ✅ 2026-05-01
 - [ ] **Plantillas SOAP por especialidad** — nueva tabla `record_templates`; usa `medical_records.template_id` ya reservado
-- [ ] **Etiquetas en pacientes** — usa tablas `tags` + `taggables` ya creadas
-- [ ] **Búsqueda global Cmd+K** — Livewire component + Laravel Scout (opcional con SQLite/MySQL fulltext)
-- [ ] **Audit log UI** — listar `activity_log` por clínica/usuario con filtros (índices ya reservados)
-- [ ] **Conflicto de horarios** — validación en backend al crear/reagendar cita
+- [x] **Etiquetas en pacientes** — usa tablas `tags` + `taggables` ya creadas
+- [x] **Búsqueda global Cmd+K** — Livewire component + fulltext LIKE queries, modal Alpine.js, 7 tests ✅ 2026-05-01
+- [x] **Audit log UI** — listar `activity_log` por clínica/usuario con filtros (índices ya reservados) ✅ 2026-05-01
+- [x] **Conflicto de horarios** — validación en backend al crear/reagendar cita (Create, Edit y Calendar drag&drop)
 - [ ] **Vista calendario semanal multi-doctor** — extender FullCalendar con resourceTimeline
 - [ ] **Módulo Facturación v1 (MVP)** — tablas `invoices`, `invoice_items`, `invoice_payments` (ya diseñadas en backlog); usa campos `consultation_price` ya reservados en `appointments`
-- [ ] **Notas internas y comentarios en cita** — usa `patients.internal_notes` ya reservado + nueva tabla `appointment_comments`
-- [ ] **Dashboard del doctor personalizado** — vista filtrada por `doctor_id = auth()->id()`
+- [x] **Notas internas y comentarios en cita** — `patients.internal_notes` en Edit/Show (solo staff autorizado) + tabla `appointment_comments` con sección en `Appointments/Show` (añadir/eliminar)
+- [x] **Dashboard del doctor personalizado** — vista filtrada por `doctor_id = auth()->id()` (badge en header, `isPersonalizedForDoctor`, `appointmentsBaseQuery()` con filtro condicional)
 
 ---
 

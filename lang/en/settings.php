@@ -50,6 +50,8 @@ return [
         'currency' => 'Currency',
         'date_format' => 'Date format',
         'time_format' => 'Time format',
+        'phone_country_code' => 'Default country code (phone)',
+        'phone_country_code_hint' => 'International phone code used by default when registering new patients.',
     ],
 
     // Appointments

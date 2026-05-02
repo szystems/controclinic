@@ -4,6 +4,7 @@ namespace App\Livewire\App\Patients;
 
 use App\Models\Clinic;
 use App\Models\Patient;
+use App\Models\Tag;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -18,6 +19,8 @@ class Index extends Component
 
     public string $status = '';
 
+    public string $filterTag = '';
+
     public string $sortField = 'created_at';
 
     public string $sortDirection = 'desc';
@@ -25,6 +28,7 @@ class Index extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'status' => ['except' => ''],
+        'filterTag' => ['except' => ''],
     ];
 
     protected $listeners = [
@@ -48,6 +52,11 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterTag(): void
+    {
+        $this->resetPage();
+    }
+
     public function sortBy(string $field): void
     {
         if ($this->sortField === $field) {
@@ -62,6 +71,7 @@ class Index extends Component
     {
         return Patient::query()
             ->where('clinic_id', $this->currentClinic->id)
+            ->with('tags')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('first_name', 'like', '%'.$this->search.'%')
@@ -74,8 +84,19 @@ class Index extends Component
             ->when($this->status !== '', function ($query) {
                 $query->where('is_active', $this->status === 'active');
             })
+            ->when($this->filterTag !== '', function ($query) {
+                $query->withTag((int) $this->filterTag);
+            })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
+    }
+
+    public function getClinicTagsProperty()
+    {
+        return Tag::forClinic($this->currentClinic->id)
+            ->forPatients()
+            ->orderBy('name')
+            ->get();
     }
 
     public function deletePatient(string $id): void
@@ -113,6 +134,7 @@ class Index extends Component
     {
         return view('livewire.app.patients.index', [
             'patients' => $this->patients,
+            'clinicTags' => $this->clinicTags,
         ])->layout('layouts.app');
     }
 
@@ -134,6 +156,9 @@ class Index extends Component
             })
             ->when($this->status !== '', function ($query) {
                 $query->where('is_active', $this->status === 'active');
+            })
+            ->when($this->filterTag !== '', function ($query) {
+                $query->withTag((int) $this->filterTag);
             })
             ->orderBy($this->sortField, $this->sortDirection);
     }

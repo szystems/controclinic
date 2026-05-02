@@ -1,9 +1,41 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-01
-> **Fase actual:** v1.0 — Bloque 0 completado. Fase 3C (Permisos Personalizados) completada. Próximo: Bloque 1 Core App
+> **Fase actual:** v1.1 — Bloque 1 en progreso. Etiquetas ✅, Audit Log UI ✅, Conflicto de horarios ✅, Dashboard doctor personalizado ✅, Notas internas + comentarios de cita ✅, Formato de fecha por clínica ✅, UX mobile listados ✅, **Bloqueo de horarios del doctor ✅**
 > **Enfoque:** SaaS-First
-> **Métricas:** 335 tests / 763 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+> **Métricas:** 378 tests / 826 asserts · Pint clean · PHPStan level 5 (con baseline) · npm build OK
+
+## ✅ Bloque 1 — Features completadas (2026-05-12)
+
+### Bloqueo de horarios del doctor ✅ (2026-05-01)
+- Tabla `doctor_unavailabilities` (UUID, soft deletes, índice compuesto clinic+doctor+fechas)
+- Modelo `DoctorUnavailability` con scopes `forDate`, `forDoctor`, `overlapping` (con `whereDate` para compatibilidad SQLite/MySQL)
+- Métodos helpers: `blocksSlot()`, `coversDate()`, `getDateRangeLabel()`
+- Livewire `Schedule\Index`: CRUD inline, selector de doctor para owner/admin, historial plegable
+- Permiso `schedule.manage` → owner, doctor, assistant, admin
+- Nav link en navigation (grupo `account`)
+- Integración en `Appointments\Create` y `Appointments\Edit`: `checkConflicts()` bloquea si hay unavailability
+- Integración en `Appointments\Calendar::fetchEvents()`: bloques como background events de FullCalendar
+- Integración en `Public\Booking::getAvailableSlotsProperty()`: filtra slots bloqueados
+- 9 tests en `DoctorScheduleTest.php` (CRUD, permisos, conflictos, scoping multi-tenant)
+
+### Etiquetas en pacientes ✅
+- Modelo `Tag` polimórfico con colores Tailwind y categorías
+- UI en `Patients\Show`: panel de asignación/creación de tags con badges de colores
+- UI en `Patients\Index`: filtro por tag + badges inline en cada fila
+- Seeder con 5 tags demo; permiso `tags.manage` en owner/doctor/assistant
+- 8 tests Feature en `PatientTagsTest.php`
+
+### Audit log UI ✅ (ya estaba)
+- `AuditLog\Index` con filtros (event, subject, user, fechas) y paginación
+- Ruta `app.audit-log` con middleware `can:audit.view`
+- 7 tests Feature en `AuditLogTest.php`
+
+### Conflicto de horarios ✅
+- Validación en `Appointments\Create` y `Appointments\Edit` (ya existía)
+- Añadido a `Appointments\Calendar::rescheduleEvent` (drag & drop)
+- Calcula duración original si no se pasa `$end` en reschedule
+- 5 tests en `ScheduleConflictTest.php` + 1 test en `AppointmentsCalendarTest.php`
 
 ## ✅ Fase 3C — Permisos Personalizados (2026-05-01) ✅
 

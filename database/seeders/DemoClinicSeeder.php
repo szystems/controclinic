@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -112,6 +113,40 @@ class DemoClinicSeeder extends Seeder
         }
 
         app()->forgetInstance('current_clinic');
+
+        // Demo tags
+        $tagDefs = [
+            ['name' => 'VIP',         'color' => 'purple'],
+            ['name' => 'Alergia',     'color' => 'red'],
+            ['name' => 'Urgente',     'color' => 'orange'],
+            ['name' => 'Nuevo',       'color' => 'green'],
+            ['name' => 'Seguimiento', 'color' => 'blue'],
+        ];
+
+        $tags = collect($tagDefs)->map(fn ($attrs) => Tag::create(array_merge($attrs, [
+            'clinic_id' => $clinic->id,
+            'category' => Tag::CATEGORY_PATIENT,
+        ])));
+
+        // Assign tags to first few demo patients
+        $taggedPairs = [
+            0 => [$tags[0], $tags[4]], // VIP + Seguimiento
+            1 => [$tags[1]],           // Alergia
+            2 => [$tags[2]],           // Urgente
+            3 => [$tags[3]],           // Nuevo
+            4 => [$tags[0], $tags[1]], // VIP + Alergia
+        ];
+
+        foreach ($taggedPairs as $i => $assignedTags) {
+            if (isset($patients[$i])) {
+                foreach ($assignedTags as $tag) {
+                    $patients[$i]->tags()->attach($tag->id, [
+                        'tagged_by' => $owner->id,
+                        'tagged_at' => now(),
+                    ]);
+                }
+            }
+        }
 
         $this->command->info('✅ Clínica Demo creada exitosamente');
         $this->command->info('   Email: doctor@controclinic.com');

@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+[x-cloak] { display: none !important; }
+
 /* Dynamic Clinic Branding */
 :root {
     --color-primary: 79 70 229; /* indigo-600 default */

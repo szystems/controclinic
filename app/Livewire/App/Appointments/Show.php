@@ -2,7 +2,9 @@
 
 namespace App\Livewire\App\Appointments;
 
+use App\Jobs\SendAppointmentNotification;
 use App\Models\Appointment;
+use App\Models\AppointmentComment;
 use App\Models\Clinic;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
@@ -17,10 +19,12 @@ class Show extends Component
 
     public string $cancellationReason = '';
 
+    public string $newComment = '';
+
     public function mount(Clinic $clinic, Appointment $appointment): void
     {
         $this->currentClinic = $clinic;
-        $this->appointment = $appointment->load(['patient', 'doctor', 'createdBy']);
+        $this->appointment = $appointment->load(['patient', 'doctor', 'createdBy', 'comments.user']);
 
         // Verify appointment belongs to clinic
         if ($appointment->clinic_id !== $clinic->id) {
@@ -129,6 +133,27 @@ class Show extends Component
         session()->flash('success', __('appointments.appointment_cancelled'));
     }
 
+    public function sendEmailReminder(): void
+    {
+        if (! auth()->user()->can('appointments.edit')) {
+            session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        $patient = $this->appointment->patient;
+
+        if (! $patient?->email) {
+            session()->flash('error', __('appointments.reminder_no_email'));
+
+            return;
+        }
+
+        SendAppointmentNotification::dispatch($this->appointment->id, SendAppointmentNotification::TYPE_REMINDER);
+
+        session()->flash('success', __('appointments.reminder_sent'));
+    }
+
     public function markNoShow(): void
     {
         if (! auth()->user()->can('appointments.edit')) {
@@ -140,6 +165,55 @@ class Show extends Component
         $this->appointment->markAsNoShow();
         $this->appointment->refresh();
         session()->flash('success', __('appointments.appointment_updated'));
+    }
+
+    public function addComment(): void
+    {
+        if (! auth()->user()->can('appointments.edit')) {
+            session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        $this->validate(['newComment' => ['required', 'string', 'max:2000']]);
+
+        AppointmentComment::create([
+            'appointment_id' => $this->appointment->id,
+            'user_id' => auth()->id(),
+            'clinic_id' => $this->currentClinic->id,
+            'body' => trim($this->newComment),
+        ]);
+
+        $this->newComment = '';
+        $this->appointment->load('comments.user');
+    }
+
+    public function deleteComment(string $commentId): void
+    {
+        if (! auth()->user()->can('appointments.edit')) {
+            session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        $comment = AppointmentComment::query()
+            ->forClinic($this->currentClinic->id)
+            ->where('id', $commentId)
+            ->first();
+
+        if (! $comment) {
+            return; // silently ignore — not found in this clinic
+        }
+
+        // Only the author or owner/admin can delete
+        if ($comment->user_id !== auth()->id() && ! auth()->user()->hasAnyRole(['owner', 'admin'])) {
+            session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        $comment->delete();
+        $this->appointment->load('comments.user');
     }
 
     public function render()

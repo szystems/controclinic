@@ -216,7 +216,7 @@
                                     {{ $record->title ?? __('records.' . $record->record_type) }}
                                 </p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $record->doctor->name ?? 'N/A' }} · {{ $record->created_at->format('d/m/Y') }}
+                                    {{ $record->doctor->name ?? 'N/A' }} · {{ $currentClinic->formatDate($record->created_at) }}
                                 </p>
                             </div>
                         </a>
@@ -241,7 +241,7 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('patients.birth_date') }}</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                {{ $patient->birth_date ? $patient->birth_date->format('d/m/Y') : '-' }}
+                                {{ $currentClinic->formatDate($patient->birth_date) }}
                             </dd>
                         </div>
                         <div>
@@ -265,11 +265,109 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('patients.registered') }}</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                {{ $patient->created_at->format('d/m/Y') }}
+                                {{ $currentClinic->formatDate($patient->created_at) }}
                             </dd>
                         </div>
                     </dl>
                 </div>
+
+                {{-- Tags --}}
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+                     x-data="{ showTagPanel: @entangle('showTagPanel') }">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {{ __('patients.tags_section') }}
+                        </h3>
+                        @can('tags.manage')
+                        <button @click="showTagPanel = !showTagPanel"
+                                class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
+                            {{ __('patients.manage_tags') }}
+                        </button>
+                        @endcan
+                    </div>
+
+                    {{-- Assigned tags --}}
+                    <div class="flex flex-wrap gap-2">
+                        @forelse($patient->tags as $tag)
+                        <span class="{{ $tag->badge_classes }} inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium">
+                            {{ $tag->name }}
+                            @can('tags.manage')
+                            <button wire:click="toggleTag({{ $tag->id }})" class="ml-0.5 hover:opacity-75" title="{{ __('patients.remove_tag') }}">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                            @endcan
+                        </span>
+                        @empty
+                        <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ __('patients.no_tags') }}</p>
+                        @endforelse
+                    </div>
+
+                    {{-- Tag management panel --}}
+                    @can('tags.manage')
+                    <div x-show="showTagPanel" x-transition class="mt-4 space-y-3">
+                        <hr class="border-gray-200 dark:border-gray-700">
+
+                        {{-- Toggle existing clinic tags --}}
+                        @if($clinicTags->count() > 0)
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($clinicTags as $tag)
+                            <button wire:click="toggleTag({{ $tag->id }})"
+                                    class="{{ in_array($tag->id, $assignedTagIds)
+                                        ? $tag->badge_classes.' ring-2 ring-offset-1 ring-current'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}
+                                        inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium transition">
+                                @if(in_array($tag->id, $assignedTagIds))
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                @endif
+                                {{ $tag->name }}
+                            </button>
+                            @endforeach
+                        </div>
+                        @endif
+
+                        {{-- Create new tag --}}
+                        <div class="space-y-2">
+                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('patients.create_tag') }}</p>
+                            <div class="flex gap-2">
+                                <input wire:model="newTagName"
+                                       type="text"
+                                       placeholder="{{ __('patients.tag_name') }}"
+                                       class="flex-1 min-w-0 text-xs rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <select wire:model="newTagColor"
+                                        class="text-xs rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    @foreach($tagColors as $color)
+                                    <option value="{{ $color }}">{{ ucfirst($color) }}</option>
+                                    @endforeach
+                                </select>
+                                <button wire:click="createAndAssignTag"
+                                        class="px-2 py-1 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 transition">
+                                    +
+                                </button>
+                            </div>
+                            @error('newTagName') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    @endcan
+                </div>
+
+                {{-- Internal Notes (staff only) --}}
+                @can('patients.edit')
+                @if($patient->internal_notes)
+                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg shadow-sm border border-amber-200 dark:border-amber-700 p-6">
+                    <h3 class="text-sm font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        {{ __('patients.internal_notes') }}
+                    </h3>
+                    <p class="text-sm text-amber-800 dark:text-amber-300 whitespace-pre-wrap">{{ $patient->internal_notes }}</p>
+                </div>
+                @endif
+                @endcan
 
                 {{-- Emergency Contact --}}
                 @if($patient->emergency_contacts)
@@ -317,9 +415,23 @@
 
                 {{-- Upcoming Appointments --}}
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-                        {{ __('appointments.upcoming') }}
-                    </h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {{ __('appointments.upcoming') }}
+                        </h3>
+                        @can('appointments.create')
+                        @if($currentClinic->canWrite())
+                        <a href="{{ route('app.appointments.create', ['clinic' => $currentClinic->slug]) . '?patient=' . $patient->id }}"
+                           wire:navigate
+                           class="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            {{ __('appointments.new_appointment') }}
+                        </a>
+                        @endif
+                        @endcan
+                    </div>
                     @if($upcomingAppointments->count() > 0)
                     <div class="space-y-3">
                         @foreach($upcomingAppointments as $appointment)
@@ -334,7 +446,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $appointment->start_time ? \Carbon\Carbon::parse($appointment->start_time)->format('H:i') : 'TBD' }}
+                                    {{ $appointment->start_time ? \Carbon\Carbon::parse($appointment->start_time)->format($currentClinic->timeFormat()) : 'TBD' }}
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">
                                     {{ $appointment->doctor->name ?? 'N/A' }}
@@ -347,9 +459,23 @@
                         @endforeach
                     </div>
                     @else
-                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                        {{ __('appointments.no_upcoming') }}
-                    </p>
+                    <div class="text-center py-4">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ __('appointments.no_upcoming') }}
+                        </p>
+                        @can('appointments.create')
+                        @if($currentClinic->canWrite())
+                        <a href="{{ route('app.appointments.create', ['clinic' => $currentClinic->slug]) . '?patient=' . $patient->id }}"
+                           wire:navigate
+                           class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            {{ __('appointments.new_appointment') }}
+                        </a>
+                        @endif
+                        @endcan
+                    </div>
                     @endif
                 </div>
 
