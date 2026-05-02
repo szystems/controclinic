@@ -37,6 +37,13 @@ class Edit extends Component
 
     public string $room = '';
 
+    // Billing
+    public ?string $consultation_price = null;
+
+    public ?string $consultation_discount = null;
+
+    public bool $is_billable = true;
+
     // UI state
     public string $patientSearch = '';
 
@@ -57,6 +64,10 @@ class Edit extends Component
             'symptoms' => ['nullable', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:2000'],
             'room' => ['nullable', 'string', 'max:50'],
+            // Billing
+            'consultation_price' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'consultation_discount' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'is_billable' => ['boolean'],
         ];
     }
 
@@ -81,6 +92,11 @@ class Edit extends Component
         $this->symptoms = $appointment->symptoms ?? '';
         $this->notes = $appointment->notes ?? '';
         $this->room = $appointment->room ?? '';
+
+        // Billing
+        $this->consultation_price = $appointment->consultation_price !== null ? (string) $appointment->consultation_price : null;
+        $this->consultation_discount = $appointment->consultation_discount !== null ? (string) $appointment->consultation_discount : null;
+        $this->is_billable = $appointment->is_billable ?? true;
 
         // Set patient search
         if ($appointment->patient) {
@@ -232,6 +248,9 @@ class Edit extends Component
             'symptoms' => $this->symptoms ?: null,
             'notes' => $this->notes ?: null,
             'room' => $this->room ?: null,
+            'consultation_price' => $this->currentClinic->billingEnabled() ? ($this->consultation_price !== '' ? $this->consultation_price : null) : null,
+            'consultation_discount' => $this->currentClinic->billingEnabled() ? ($this->consultation_discount !== '' ? $this->consultation_discount : null) : null,
+            'is_billable' => $this->currentClinic->billingEnabled() ? $this->is_billable : true,
         ]);
 
         session()->flash('success', __('appointments.appointment_updated'));
@@ -247,6 +266,8 @@ class Edit extends Component
             'doctors' => $this->doctors,
             'patients' => $this->patients,
             'types' => $this->types,
+            'billingEnabled' => $this->currentClinic->billingEnabled(),
+            'currency' => $this->currentClinic->currency ?? 'USD',
         ])->layout('layouts.app');
     }
 }

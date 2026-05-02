@@ -207,6 +207,57 @@
                 </div>
             </div>
 
+            {{-- Billing section (only when billing_enabled) --}}
+            @if($billingEnabled)
+            <div class="rounded-xl border border-emerald-200 dark:border-emerald-700/50 bg-emerald-50/60 dark:bg-emerald-900/20 p-4 space-y-4">
+                <div class="flex items-center gap-2 mb-1">
+                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">{{ __('appointments.billing_section') }}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {{-- Precio --}}
+                    <div>
+                        <label for="consultation_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            {{ __('appointments.consultation_price') }}
+                        </label>
+                        <div class="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500">
+                            <span class="flex items-center px-3 bg-gray-50 dark:bg-gray-700 border-r border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-sm select-none">{{ $currency }}</span>
+                            <input wire:model="consultation_price"
+                                   type="number" id="consultation_price" min="0" step="0.01"
+                                   placeholder="0.00"
+                                   class="flex-1 min-w-0 py-2 px-3 border-0 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none sm:text-sm">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ __('appointments.price_optional') }}</p>
+                        @error('consultation_price') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                    </div>
+                    {{-- Descuento --}}
+                    <div>
+                        <label for="consultation_discount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            {{ __('appointments.consultation_discount') }}
+                        </label>
+                        <div class="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500">
+                            <span class="flex items-center px-3 bg-gray-50 dark:bg-gray-700 border-r border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-sm select-none">{{ $currency }}</span>
+                            <input wire:model="consultation_discount"
+                                   type="number" id="consultation_discount" min="0" step="0.01"
+                                   placeholder="0.00"
+                                   class="flex-1 min-w-0 py-2 px-3 border-0 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none sm:text-sm">
+                        </div>
+                        @error('consultation_discount') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+                {{-- Is billable toggle --}}
+                <div class="flex items-center gap-3">
+                    <button type="button" role="switch" wire:click="$toggle('is_billable')"
+                            class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 {{ $is_billable ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600' }}">
+                        <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ease-in-out {{ $is_billable ? 'translate-x-4' : 'translate-x-0' }}"></span>
+                    </button>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('appointments.is_billable_hint') }}</span>
+                </div>
+            </div>
+            @endif
+
             {{-- Staff confirmation hint --}}
             <div class="rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 p-4">
                 <div class="flex gap-3">

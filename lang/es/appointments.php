@@ -168,4 +168,12 @@ return [
     'status_hint_scheduled_public' => 'Esta cita fue reservada por el paciente en el portal. Se le envió un email con un enlace para confirmarla o cancelarla.',
     'status_hint_confirmed_staff' => 'Cita confirmada. Fue agendada directamente por el equipo de la clínica.',
     'status_hint_confirmed_link' => 'El paciente confirmó su asistencia desde el enlace enviado por email.',
+
+    // Billing
+    'billing_section' => 'Precio de consulta',
+    'consultation_price' => 'Precio',
+    'consultation_discount' => 'Descuento',
+    'is_billable' => 'Cobrable',
+    'is_billable_hint' => 'Marcar esta cita como cobrable al paciente',
+    'price_optional' => 'Si se deja en blanco se usará el precio por defecto de la clínica',
 ];

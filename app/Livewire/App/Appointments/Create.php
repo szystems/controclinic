@@ -35,6 +35,13 @@ class Create extends Component
 
     public string $room = '';
 
+    // Billing
+    public ?string $consultation_price = null;
+
+    public ?string $consultation_discount = null;
+
+    public bool $is_billable = true;
+
     // UI state
     public string $patientSearch = '';
 
@@ -55,6 +62,10 @@ class Create extends Component
             'symptoms' => ['nullable', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:2000'],
             'room' => ['nullable', 'string', 'max:50'],
+            // Billing (optional, only when billing_enabled)
+            'consultation_price' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'consultation_discount' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'is_billable' => ['boolean'],
         ];
     }
 
@@ -74,6 +85,12 @@ class Create extends Component
         $this->currentClinic = $clinic;
         $this->appointment_date = now()->toDateString();
         $this->duration_minutes = $clinic->settings['appointment_duration'] ?? 30;
+
+        // Pre-fill billing defaults if enabled
+        if ($clinic->billingEnabled()) {
+            $this->consultation_price = (string) ($clinic->settings['default_consultation_price'] ?? 0);
+            $this->is_billable = true;
+        }
 
         // Pre-fill from calendar dateClick (?date=YYYY-MM-DD&time=HH:MM)
         if (request()->filled('date')) {
@@ -253,6 +270,9 @@ class Create extends Component
             'symptoms' => $this->symptoms ?: null,
             'notes' => $this->notes ?: null,
             'room' => $this->room ?: null,
+            'consultation_price' => $this->currentClinic->billingEnabled() ? ($this->consultation_price !== '' ? $this->consultation_price : null) : null,
+            'consultation_discount' => $this->currentClinic->billingEnabled() ? ($this->consultation_discount !== '' ? $this->consultation_discount : null) : null,
+            'is_billable' => $this->currentClinic->billingEnabled() ? $this->is_billable : true,
         ]);
 
         session()->flash('success', __('appointments.appointment_created'));
@@ -268,6 +288,8 @@ class Create extends Component
             'doctors' => $this->doctors,
             'patients' => $this->patients,
             'types' => $this->types,
+            'billingEnabled' => $this->currentClinic->billingEnabled(),
+            'currency' => $this->currentClinic->currency ?? 'USD',
         ])->layout('layouts.app');
     }
 }

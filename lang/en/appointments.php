@@ -167,4 +167,12 @@ return [
     'status_hint_confirmed_link' => 'The patient confirmed attendance via the link sent by email.',
 
     'whatsapp_reminder_message' => 'Hi :patient, this is a reminder for your appointment with :doctor on :date at :time at :clinic. See you soon!',
+
+    // Billing
+    'billing_section' => 'Consultation price',
+    'consultation_price' => 'Price',
+    'consultation_discount' => 'Discount',
+    'is_billable' => 'Billable',
+    'is_billable_hint' => 'Mark this appointment as billable to the patient',
+    'price_optional' => 'Leave blank to use the clinic default price',
 ];
