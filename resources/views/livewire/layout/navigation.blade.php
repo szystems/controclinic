@@ -134,16 +134,16 @@ new class extends Component
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden space-x-0 lg:space-x-1 2xl:space-x-6 md:-my-px md:ms-3 lg:ms-6 2xl:ms-10 md:flex">
+                <div class="hidden space-x-0 md:space-x-1 2xl:space-x-6 md:-my-px md:ms-3 lg:ms-6 2xl:ms-10 md:flex">
                     @foreach ($primaryNav as $item)
                         @php $active = $item['active'](); @endphp
                         <x-nav-link :href="route($item['route'], $clinicSlug)" :active="$active" wire:navigate :title="$item['label']">
-                            <span class="inline-flex items-center gap-1.5 px-1.5 lg:px-2 2xl:px-0">
-                                <svg class="w-5 h-5 2xl:w-4 2xl:h-4 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
+                            <span class="inline-flex flex-col items-center gap-0.5 px-2 2xl:flex-row 2xl:gap-1.5 2xl:px-0">
+                                <svg class="w-5 h-5 shrink-0 {{ $active ? 'text-indigo-600 dark:text-indigo-300' : 'text-gray-400 dark:text-gray-500' }}"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     {!! $item['icon'] !!}
                                 </svg>
-                                <span class="hidden 2xl:inline">{{ $item['label'] }}</span>
+                                <span class="text-[10px] leading-none font-medium whitespace-nowrap 2xl:text-sm 2xl:leading-normal">{{ $item['label'] }}</span>
                             </span>
                         </x-nav-link>
                     @endforeach
