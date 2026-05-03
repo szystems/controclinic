@@ -619,31 +619,32 @@
                             @endif
                         @endcan
 
-                        {{-- Facturar esta cita --}}
+                        {{-- Facturas de esta cita --}}
                         @if($currentClinic->billingEnabled() && $appointment->is_billable)
                             @can('invoices.create')
                             @if($currentClinic->canWrite())
                             @php
-                                $existingInvoice = $appointment->invoice ?? null;
+                                $allInvoices = $appointment->invoices;
+                                $activeInvoices = $allInvoices->filter(fn($inv) => $inv->status !== \App\Models\Invoice::STATUS_CANCELLED);
+                                $cancelledInvoices = $allInvoices->filter(fn($inv) => $inv->status === \App\Models\Invoice::STATUS_CANCELLED);
                             @endphp
-                            @if($existingInvoice && $existingInvoice->status !== \App\Models\Invoice::STATUS_CANCELLED)
-                            <a href="{{ route('app.invoices.show', ['clinic' => $currentClinic->slug, 'invoice' => $existingInvoice->id]) }}"
+
+                            {{-- Botón por cada factura activa --}}
+                            @foreach($activeInvoices as $activeInvoice)
+                            <a href="{{ route('app.invoices.show', ['clinic' => $currentClinic->slug, 'invoice' => $activeInvoice->id]) }}"
                                class="w-full inline-flex justify-center items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-medium text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
                                 </svg>
                                 {{ __('invoices.view_invoice') }}
+                                @if($activeInvoices->count() > 1)
+                                <span class="ml-1 opacity-75">#{{ $activeInvoice->invoice_number }}</span>
+                                @endif
                             </a>
-                            @else
-                            {{-- Si hay factura cancelada, mostrar aviso + botón para crear nueva --}}
-                            @if($existingInvoice)
-                            <div class="w-full text-center">
-                                <a href="{{ route('app.invoices.show', ['clinic' => $currentClinic->slug, 'invoice' => $existingInvoice->id]) }}"
-                                   class="text-xs text-gray-400 dark:text-gray-500 underline hover:text-gray-600 dark:hover:text-gray-400">
-                                    {{ __('invoices.view_cancelled_invoice') }}
-                                </a>
-                            </div>
-                            @endif
+                            @endforeach
+
+                            {{-- Generar factura solo si no hay ninguna activa --}}
+                            @if($activeInvoices->isEmpty())
                             <a href="{{ route('app.invoices.create', ['clinic' => $currentClinic->slug, 'appointment' => $appointment->id]) }}"
                                class="w-full inline-flex justify-center items-center px-4 py-2 bg-emerald-600 border border-transparent rounded-lg font-medium text-xs text-white uppercase tracking-widest hover:bg-emerald-700 transition">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -652,6 +653,19 @@
                                 {{ __('invoices.create_invoice') }}
                             </a>
                             @endif
+
+                            {{-- Enlaces discretos a facturas canceladas --}}
+                            @if($cancelledInvoices->isNotEmpty())
+                            <div class="w-full text-center space-y-1">
+                                @foreach($cancelledInvoices as $cancelledInvoice)
+                                <a href="{{ route('app.invoices.show', ['clinic' => $currentClinic->slug, 'invoice' => $cancelledInvoice->id]) }}"
+                                   class="block text-xs text-gray-400 dark:text-gray-500 underline hover:text-gray-600 dark:hover:text-gray-400">
+                                    {{ __('invoices.view_cancelled_invoice') }} #{{ $cancelledInvoice->invoice_number }}
+                                </a>
+                                @endforeach
+                            </div>
+                            @endif
+
                             @endif
                             @endcan
                         @endif

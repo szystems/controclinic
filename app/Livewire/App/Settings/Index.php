@@ -78,6 +78,10 @@ class Index extends Component
     // Billing
     public bool $billing_enabled = false;
 
+    public string $tax_rate = '0';
+
+    public string $tax_label = 'IVA';
+
     public ?string $tax_id = '';
 
     public ?string $legal_name = '';
@@ -134,6 +138,8 @@ class Index extends Component
 
             // Billing
             'billing_enabled' => ['boolean'],
+            'tax_rate' => ['required', 'numeric', 'min:0', 'max:100'],
+            'tax_label' => ['required', 'string', 'max:20'],
             'tax_id' => ['nullable', 'string', 'max:50'],
             'legal_name' => ['nullable', 'string', 'max:255'],
             'billing_address' => ['nullable', 'string', 'max:500'],
@@ -194,6 +200,8 @@ class Index extends Component
 
         // Billing
         $this->billing_enabled = (bool) ($settings['billing_enabled'] ?? false);
+        $this->tax_rate = (string) ($settings['tax_rate'] ?? '0');
+        $this->tax_label = $settings['tax_label'] ?? 'IVA';
         $this->tax_id = $settings['tax_id'] ?? '';
         $this->legal_name = $settings['legal_name'] ?? '';
         $this->billing_address = $settings['billing_address'] ?? '';
@@ -317,6 +325,8 @@ class Index extends Component
     {
         $this->validate([
             'billing_enabled' => $this->rules()['billing_enabled'],
+            'tax_rate' => $this->rules()['tax_rate'],
+            'tax_label' => $this->rules()['tax_label'],
             'tax_id' => $this->rules()['tax_id'],
             'legal_name' => $this->rules()['legal_name'],
             'billing_address' => $this->rules()['billing_address'],
@@ -324,6 +334,8 @@ class Index extends Component
 
         $this->updateSettings([
             'billing_enabled' => $this->billing_enabled,
+            'tax_rate' => (float) $this->tax_rate,
+            'tax_label' => $this->tax_label,
             'tax_id' => $this->tax_id ?: null,
             'legal_name' => $this->legal_name ?: null,
             'billing_address' => $this->billing_address ?: null,

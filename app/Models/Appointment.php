@@ -157,7 +157,12 @@ class Appointment extends Model
 
     public function invoice(): HasOne
     {
-        return $this->hasOne(Invoice::class);
+        return $this->hasOne(Invoice::class)->latestOfMany();
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class)->orderByDesc('created_at');
     }
 
     // ==================== ACCESSORS ====================

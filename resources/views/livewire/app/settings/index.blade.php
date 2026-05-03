@@ -585,6 +585,28 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
+                                    <label for="tax_rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.billing.tax_rate') }}</label>
+                                    <div class="mt-1 relative rounded-lg shadow-sm">
+                                        <input type="number" wire:model="tax_rate" id="tax_rate" step="0.01" min="0" max="100"
+                                               placeholder="0"
+                                               class="block w-full pr-10 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 dark:text-gray-400 text-sm">%</span>
+                                        </div>
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('settings.billing.tax_rate_hint') }}</p>
+                                    @error('tax_rate') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label for="tax_label" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.billing.tax_label') }}</label>
+                                    <input type="text" wire:model="tax_label" id="tax_label" placeholder="IVA / IGV / ITBMS / Tax"
+                                           class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('settings.billing.tax_label_hint') }}</p>
+                                    @error('tax_label') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
                                     <label for="tax_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.billing.tax_id') }}</label>
                                     <input type="text" wire:model="tax_id" id="tax_id" placeholder="NIT / RFC / RUC" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     @error('tax_id') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
