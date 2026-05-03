@@ -280,6 +280,7 @@ Route::prefix('app/{clinic}')
                     Route::get('/', App\Livewire\App\Invoices\Index::class)->name('index');
                     Route::middleware('can:invoices.create')->get('/create', Create::class)->name('create');
                     Route::get('/{invoice}', App\Livewire\App\Invoices\Show::class)->name('show');
+                    Route::middleware('can:invoices.edit')->get('/{invoice}/edit', App\Livewire\App\Invoices\Edit::class)->name('edit');
                     Route::middleware('can:invoices.print')->get('/{invoice}/pdf', function (Clinic $clinic, Invoice $invoice) {
                         abort_unless($invoice->clinic_id === $clinic->id, 404);
                         $invoice->loadMissing(['patient', 'doctor', 'items', 'payments']);

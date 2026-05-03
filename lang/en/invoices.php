@@ -106,5 +106,8 @@ return [
     'from_appointment' => 'From appointment',
     'patient_search_hint' => 'Type at least 2 characters to search',
     'create_invoice' => 'Create invoice',
-    'view_invoice' => 'View invoice',
-];
+    'view_invoice' => 'View invoice',    'edit_invoice' => 'Edit invoice',
+    'patient_locked' => 'Not editable',
+    'delete_payment' => 'Void payment',
+    'confirm_delete_payment' => 'Void this payment? The invoice balance will be recalculated.',
+    'payment_deleted' => 'Payment voided successfully.',];

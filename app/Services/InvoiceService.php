@@ -95,6 +95,30 @@ class InvoiceService
     }
 
     /**
+     * Anula (elimina) un pago y recalcula el estado de la factura.
+     */
+    public function deletePayment(Invoice $invoice, string $paymentId): void
+    {
+        DB::transaction(function () use ($invoice, $paymentId) {
+            $payment = $invoice->payments()->findOrFail($paymentId);
+            $payment->delete();
+
+            $paid = (float) $invoice->payments()->sum('amount');
+
+            $status = match (true) {
+                $paid <= 0 => Invoice::STATUS_PENDING,
+                $paid < (float) $invoice->total => Invoice::STATUS_PARTIAL,
+                default => Invoice::STATUS_PAID,
+            };
+
+            $invoice->update([
+                'paid_amount' => round($paid, 2),
+                'status' => $status,
+            ]);
+        });
+    }
+
+    /**
      * Cancela una factura (solo si no está pagada completamente).
      */
     public function cancel(Invoice $invoice): void

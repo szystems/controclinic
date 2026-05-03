@@ -48,6 +48,15 @@
                 @endcan
                 @can('invoices.edit')
                 @if(!$invoice->isCancelled() && !$invoice->isPaid())
+                @if($invoice->payments->isEmpty())
+                <a href="{{ route('app.invoices.edit', ['clinic' => $currentClinic->slug, 'invoice' => $invoice->id]) }}"
+                   class="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    {{ __('general.edit') }}
+                </a>
+                @endif
                 <button type="button" wire:click="cancel"
                         wire:confirm="{{ __('invoices.confirm_cancel') }}"
                         class="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-700 border border-red-300 dark:border-red-600 rounded-lg text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
@@ -136,6 +145,11 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('invoices.payment_method') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('invoices.payment_reference') }}</th>
                                 <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ __('invoices.payment_amount') }}</th>
+                                @can('invoices.record_payment')
+                                @if(!$invoice->isCancelled())
+                                <th class="px-4 py-3 w-16"></th>
+                                @endif
+                                @endcan
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -145,6 +159,21 @@
                                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $payment->method_label }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 font-mono">{{ $payment->reference ?? '—' }}</td>
                                 <td class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">{{ number_format($payment->amount, 2) }}</td>
+                                @can('invoices.record_payment')
+                                @if(!$invoice->isCancelled())
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button"
+                                            wire:click="deletePayment('{{ $payment->id }}')"
+                                            wire:confirm="{{ __('invoices.confirm_delete_payment') }}"
+                                            class="text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                                            title="{{ __('invoices.delete_payment') }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                                @endif
+                                @endcan
                             </tr>
                             @endforeach
                         </tbody>

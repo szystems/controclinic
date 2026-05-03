@@ -85,6 +85,19 @@ class Show extends Component
         session()->flash('success', __('invoices.payment_recorded'));
     }
 
+    public function deletePayment(string $paymentId): void
+    {
+        $this->authorize('invoices.record_payment');
+
+        $invoice = $this->invoice;
+        abort_if($invoice->status === Invoice::STATUS_CANCELLED, 403);
+
+        app(InvoiceService::class)->deletePayment($invoice, $paymentId);
+
+        $this->invoice->refresh();
+        session()->flash('success', __('invoices.payment_deleted'));
+    }
+
     public function cancel(): void
     {
         $this->authorize('invoices.edit');

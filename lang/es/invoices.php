@@ -107,4 +107,9 @@ return [
     'patient_search_hint' => 'Escribe al menos 2 caracteres para buscar',
     'create_invoice' => 'Generar factura',
     'view_invoice' => 'Ver factura',
+    'edit_invoice' => 'Editar factura',
+    'patient_locked' => 'No editable',
+    'delete_payment' => 'Anular pago',
+    'confirm_delete_payment' => '¿Anular este pago? El saldo de la factura se recalculará.',
+    'payment_deleted' => 'Pago anulado correctamente.',
 ];
