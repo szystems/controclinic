@@ -210,14 +210,55 @@
                                 </select>
                             </div>
 
-                            {{-- Descripción --}}
-                            <div>
+                            {{-- Descripción con autocomplete del catálogo --}}
+                            <div x-data="{
+                                    open: false,
+                                    results: [],
+                                    loading: false,
+                                    search(term) {
+                                        if (term.length < 1) { this.results = []; this.open = false; return; }
+                                        this.loading = true;
+                                        $wire.searchCatalog(term).then(r => {
+                                            this.results = r;
+                                            this.open = r.length > 0;
+                                            this.loading = false;
+                                        });
+                                    },
+                                    pick(item, index) {
+                                        $wire.fillItemFromCatalog(index, item.id);
+                                        this.open = false;
+                                        this.results = [];
+                                    }
+                                }" class="relative">
                                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                                     {{ __('invoices.item_description') }} <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" wire:model="items.{{ $i }}.description"
-                                       placeholder="{{ __('invoices.item_description') }}"
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                                <div class="relative">
+                                    <input type="text" wire:model="items.{{ $i }}.description"
+                                           x-on:input="search($event.target.value)"
+                                           x-on:blur="setTimeout(() => open = false, 200)"
+                                           placeholder="{{ __('invoices.item_description') }}"
+                                           class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500 pr-8"/>
+                                    <span x-show="loading" class="absolute right-2 top-2.5">
+                                        <svg class="w-4 h-4 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <ul x-show="open" x-cloak
+                                    class="absolute z-20 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto text-sm">
+                                    <template x-for="res in results" :key="res.id">
+                                        <li x-on:mousedown.prevent="pick(res, {{ $i }})"
+                                            class="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30">
+                                            <div>
+                                                <span class="font-medium text-gray-900 dark:text-white" x-text="res.name"></span>
+                                                <span class="ml-2 text-xs text-gray-400" x-text="res.unit !== 'unit' ? res.unit : ''"></span>
+                                            </div>
+                                            <span class="text-xs font-semibold text-indigo-700 dark:text-indigo-300" x-text="res.price.toFixed(2)"></span>
+                                        </li>
+                                    </template>
+                                </ul>
                                 @error("items.{$i}.description") <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                             </div>
 

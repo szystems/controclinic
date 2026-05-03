@@ -613,6 +613,29 @@
                     </form>
                     @endif
 
+                    {{-- Catalog link (inside billing tab) --}}
+                    @if($activeTab === 'billing' && $billing_enabled)
+                    <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <a href="{{ route('app.settings.catalog', $currentClinic->slug) }}" wire:navigate
+                           class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ __('catalog.title') }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('catalog.subtitle') }}</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                    @endif
+
                     {{-- Branding Tab --}}
                     @if($activeTab === 'branding')
                     <form wire:submit="saveBranding">

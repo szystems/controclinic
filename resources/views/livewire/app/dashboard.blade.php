@@ -625,7 +625,7 @@
                         </div>
                     </dl>
                     <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <a href="{{ route('app.settings', $clinic->slug) }}" wire:navigate
+                        <a href="{{ route('app.settings.index', $clinic->slug) }}" wire:navigate
                            class="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                             {{ __('general.configure_clinic') }} →
                         </a>

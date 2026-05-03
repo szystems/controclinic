@@ -5,6 +5,7 @@ namespace App\Livewire\App\Invoices;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\ServiceCatalog;
 use App\Models\User;
 use App\Services\InvoiceService;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +29,9 @@ class Edit extends Component
 
     // Ítems dinámicos
     public array $items = [];
+
+    // catalog_item_id por posición (forward-compat)
+    public array $itemCatalogIds = [];
 
     protected function rules(): array
     {
@@ -73,6 +77,10 @@ class Edit extends Component
             'discount_amount' => (string) $item->discount_amount,
             'tax_rate' => (string) $item->tax_rate,
         ])->toArray();
+
+        $this->itemCatalogIds = $invoice->items->sortBy('order')->values()
+            ->map(fn ($item) => $item->catalog_item_id)
+            ->toArray();
     }
 
     public function addItem(): void
@@ -91,6 +99,52 @@ class Edit extends Component
     {
         unset($this->items[$index]);
         $this->items = array_values($this->items);
+        unset($this->itemCatalogIds[$index]);
+        $this->itemCatalogIds = array_values($this->itemCatalogIds);
+    }
+
+    // ==================== CATÁLOGO ====================
+
+    public function searchCatalog(string $term): array
+    {
+        if (strlen($term) < 1) {
+            return [];
+        }
+
+        return ServiceCatalog::where('clinic_id', $this->currentClinic->id)
+            ->where('is_active', true)
+            ->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'name', 'type', 'default_price', 'tax_rate_override', 'unit'])
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'type' => $c->type,
+                'price' => (float) $c->default_price,
+                'tax_rate' => $c->tax_rate_override !== null ? (float) $c->tax_rate_override : null,
+                'unit' => $c->unit,
+            ])
+            ->toArray();
+    }
+
+    public function fillItemFromCatalog(int $index, string $catalogId): void
+    {
+        $item = ServiceCatalog::where('clinic_id', $this->currentClinic->id)
+            ->where('is_active', true)
+            ->findOrFail($catalogId);
+
+        $taxRate = $item->tax_rate_override !== null
+            ? (float) $item->tax_rate_override
+            : (float) ($this->currentClinic->settings['tax_rate'] ?? 0);
+
+        $this->items[$index]['description'] = $item->name;
+        $this->items[$index]['unit_price'] = (string) $item->default_price;
+        $this->items[$index]['tax_rate'] = (string) $taxRate;
+        $this->itemCatalogIds[$index] = $catalogId;
     }
 
     public function getBreakdownProperty(): array
@@ -148,6 +202,7 @@ class Edit extends Component
             foreach ($validated['items'] as $order => $itemData) {
                 $item = new InvoiceItem([
                     'invoice_id' => $this->invoice->id,
+                    'catalog_item_id' => $this->itemCatalogIds[$order] ?? null,
                     'order' => $order + 1,
                     'type' => $itemData['type'],
                     'description' => $itemData['description'],

@@ -27,6 +27,7 @@ class InvoiceItem extends Model
 
     protected $fillable = [
         'invoice_id',
+        'catalog_item_id',
         'order',
         'type',
         'description',
@@ -48,6 +49,11 @@ class InvoiceItem extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function catalogItem(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCatalog::class, 'catalog_item_id');
     }
 
     public function getTypeLabelAttribute(): string

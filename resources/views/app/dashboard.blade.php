@@ -258,7 +258,7 @@
                         </dl>
 
                         <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('app.settings', ['clinic' => $currentClinic->slug ?? 'demo']) }}"
+                            <a href="{{ route('app.settings.index', ['clinic' => $currentClinic->slug ?? 'demo']) }}"
                                class="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                                 Configurar clínica →
                             </a>

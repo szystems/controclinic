@@ -254,7 +254,10 @@ Route::prefix('app/{clinic}')
                 });
 
                 // Settings (write — only fully-active clinics can change settings)
-                Route::middleware('can.write')->get('/settings', SettingsIndex::class)->name('settings');
+                Route::middleware('can.write')->prefix('settings')->name('settings.')->group(function () {
+                    Route::get('/', SettingsIndex::class)->name('index');
+                    Route::get('/catalog', App\Livewire\App\Settings\Catalog::class)->name('catalog');
+                });
 
                 // Staff
                 Route::prefix('staff')->name('staff.')->group(function () {
