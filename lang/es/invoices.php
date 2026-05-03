@@ -107,6 +107,7 @@ return [
     'patient_search_hint' => 'Escribe al menos 2 caracteres para buscar',
     'create_invoice' => 'Generar factura',
     'view_invoice' => 'Ver factura',
+    'view_cancelled_invoice' => 'Ver factura cancelada',
     'edit_invoice' => 'Editar factura',
     'patient_locked' => 'No editable',
     'delete_payment' => 'Anular pago',

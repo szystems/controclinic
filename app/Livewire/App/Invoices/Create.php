@@ -82,11 +82,12 @@ class Create extends Component
         if ($appointment) {
             $appt = Appointment::where('clinic_id', $clinic->id)->findOrFail($appointment);
 
-            // Evitar factura duplicada para la misma cita
-            if ($appt->invoice()->exists()) {
+            // Evitar factura duplicada para la misma cita (solo si no está cancelada)
+            $existingInvoice = $appt->invoice;
+            if ($existingInvoice && $existingInvoice->status !== Invoice::STATUS_CANCELLED) {
                 $this->redirect(route('app.invoices.show', [
                     'clinic' => $clinic->slug,
-                    'invoice' => $appt->invoice->id,
+                    'invoice' => $existingInvoice->id,
                 ]), navigate: true);
                 return;
             }
