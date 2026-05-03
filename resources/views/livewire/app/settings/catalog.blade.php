@@ -15,7 +15,7 @@
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ __('catalog.subtitle') }}</p>
                 </div>
             </div>
-            @can('settings.manage')
+            @can('settings.edit')
             <button type="button" wire:click="openCreate"
                     class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-lg text-sm font-semibold text-white hover:bg-primary/90 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +92,7 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-center">
-                            @can('settings.manage')
+                            @can('settings.edit')
                             <button type="button" wire:click="toggleActive('{{ $item->id }}')"
                                     class="text-xs {{ $item->is_active ? 'text-green-600 hover:text-green-800' : 'text-gray-400 hover:text-gray-600' }} transition-colors font-medium">
                                 {{ $item->is_active ? __('catalog.active') : __('catalog.inactive') }}
@@ -105,7 +105,7 @@
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end space-x-2">
-                                @can('settings.manage')
+                                @can('settings.edit')
                                 <button type="button" wire:click="openEdit('{{ $item->id }}')"
                                         class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                                         title="{{ __('general.edit') }}">
@@ -138,7 +138,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('catalog.empty') }}</p>
-                @can('settings.manage')
+                @can('settings.edit')
                 <button type="button" wire:click="openCreate"
                         class="mt-3 text-sm text-primary hover:underline">
                     {{ __('catalog.add_first') }}

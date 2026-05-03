@@ -45,6 +45,11 @@
                 <button wire:click="setTab('branding')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'branding' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
                     Marca
                 </button>
+                @can('settings.edit')
+                <a href="{{ route('app.settings.catalog', $currentClinic->slug) }}" wire:navigate class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                    {{ __('catalog.title') }}
+                </a>
+                @endcan
                 @if(auth()->id() === $clinic->owner_id)
                 <button wire:click="setTab('data')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'data' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
                     {{ __('settings.data.tab') }}
@@ -99,6 +104,15 @@
                         </svg>
                         Marca
                     </button>
+                    @can('settings.edit')
+                    <a href="{{ route('app.settings.catalog', $currentClinic->slug) }}" wire:navigate
+                       class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        {{ __('catalog.title') }}
+                    </a>
+                    @endcan
                     @if(auth()->id() === $clinic->owner_id)
                     <button wire:click="setTab('data')"
                             class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'data' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
@@ -635,8 +649,8 @@
                     </form>
                     @endif
 
-                    {{-- Catalog link (inside billing tab) --}}
-                    @if($activeTab === 'billing' && $billing_enabled)
+                    {{-- Catalog link (inside billing tab, shown regardless of billing_enabled) --}}
+                    @if($activeTab === 'billing')
                     <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
                         <a href="{{ route('app.settings.catalog', $currentClinic->slug) }}" wire:navigate
                            class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition group">

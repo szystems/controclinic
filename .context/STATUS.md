@@ -1,9 +1,23 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-05-12
-> **Fase actual:** v1.3 — 2FA Opcional (TOTP) ✅
+> **Última actualización:** 2026-05-02
+> **Fase actual:** v1.3 — 2FA Opcional (TOTP) ✅ + Mejoras Facturación/Catálogo
 > **Enfoque:** SaaS-First
 > **Métricas:** 424 tests / 922 asserts · Pint clean · npm build OK
+
+## ✅ Mejoras Módulo Facturación — Catálogo (2026-05-02)
+
+- [x] Catálogo de servicios (`service_catalog`) — CRUD completo en Settings (`app/{clinic}/settings/catalog`)
+- [x] Fix 403: permiso `settings.edit` (antes `settings.manage` no existía)
+- [x] Fix 500: `.layout('layouts.app')` en Catalog page component
+- [x] Fix visibilidad: enlace al catálogo en sidebar desktop + mobile tabs de Settings
+- [x] Autocompletado del catálogo en formulario de factura (Create/Edit) — ya existía
+- [x] Link contextual "Gestionar catálogo →" en sección de ítems de Create/Edit (visible solo con `settings.edit`)
+- [x] Modal post-guardado para sugerir guardar ítems libres al catálogo — Alpine.js con checkboxes, `saveItemsToCatalog()` / `skipCatalogSuggestion()`
+- [x] Fix bug Livewire: modal estaba fuera del elemento raíz → movido dentro del `<div>` raíz
+- [x] Traducciones ES/EN: `manage_catalog_link`, `suggest_catalog_title/desc/save/skip`
+
+---
 
 ## ✅ v1.3 — 2FA Opcional con TOTP (2026-05-12)
 

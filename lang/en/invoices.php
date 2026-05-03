@@ -112,4 +112,12 @@ return [
     'patient_locked' => 'Not editable',
     'delete_payment' => 'Void payment',
     'confirm_delete_payment' => 'Void this payment? The invoice balance will be recalculated.',
-    'payment_deleted' => 'Payment voided successfully.',];
+    'payment_deleted' => 'Payment voided successfully.',
+
+    // Catalog suggestion
+    'manage_catalog_link' => 'Manage catalog →',
+    'suggest_catalog_title' => 'Save items to catalog?',
+    'suggest_catalog_desc' => 'Some items in this invoice are not in your catalog. Save them for quick reuse in the future.',
+    'suggest_catalog_save' => 'Save selected',
+    'suggest_catalog_skip' => 'Skip for now',
+];

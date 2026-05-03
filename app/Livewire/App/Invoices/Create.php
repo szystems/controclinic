@@ -39,6 +39,13 @@ class Create extends Component
     // catalog_item_id por posición de ítem (para linkear al guardar)
     public array $itemCatalogIds = [];
 
+    // Sugerencia de guardar ítems libres al catálogo
+    public bool $showCatalogSuggestion = false;
+
+    public array $freeItemSuggestions = [];
+
+    public string $savedInvoiceId = '';
+
     // Búsqueda de paciente
     public string $patientSearch = '';
 
@@ -272,7 +279,9 @@ class Create extends Component
         $this->authorize('invoices.create');
         $validated = $this->validate();
 
-        DB::transaction(function () use ($validated) {
+        $invoiceId = null;
+
+        DB::transaction(function () use ($validated, &$invoiceId) {
             $service = app(InvoiceService::class);
             $number = $service->nextInvoiceNumber($this->currentClinic);
 
@@ -313,14 +322,68 @@ class Create extends Component
             }
 
             $service->recalculate($invoice);
-
-            $this->redirect(route('app.invoices.show', [
-                'clinic' => $this->currentClinic->slug,
-                'invoice' => $invoice->id,
-            ]), navigate: true);
+            $invoiceId = $invoice->id;
         });
 
         session()->flash('success', __('invoices.invoice_created'));
+
+        // Sugerir guardar ítems libres al catálogo si el usuario tiene permiso
+        if (auth()->user()->can('settings.edit')) {
+            $freeItems = [];
+            foreach ($validated['items'] as $order => $itemData) {
+                if (empty($this->itemCatalogIds[$order]) && !empty(trim($itemData['description'] ?? ''))) {
+                    $freeItems[] = [
+                        'index' => $order,
+                        'description' => $itemData['description'],
+                        'unit_price' => (float) ($itemData['unit_price'] ?? 0),
+                    ];
+                }
+            }
+
+            if (!empty($freeItems)) {
+                $this->savedInvoiceId = $invoiceId;
+                $this->freeItemSuggestions = $freeItems;
+                $this->showCatalogSuggestion = true;
+
+                return;
+            }
+        }
+
+        $this->redirect(route('app.invoices.show', [
+            'clinic' => $this->currentClinic->slug,
+            'invoice' => $invoiceId,
+        ]), navigate: true);
+    }
+
+    public function saveItemsToCatalog(array $selectedIndexes): void
+    {
+        $this->authorize('settings.edit');
+
+        foreach ($this->freeItemSuggestions as $suggestion) {
+            if (in_array($suggestion['index'], $selectedIndexes)) {
+                ServiceCatalog::firstOrCreate(
+                    ['clinic_id' => $this->currentClinic->id, 'name' => $suggestion['description']],
+                    [
+                        'type' => 'service',
+                        'default_price' => $suggestion['unit_price'],
+                        'is_active' => true,
+                    ]
+                );
+            }
+        }
+
+        $this->redirect(route('app.invoices.show', [
+            'clinic' => $this->currentClinic->slug,
+            'invoice' => $this->savedInvoiceId,
+        ]), navigate: true);
+    }
+
+    public function skipCatalogSuggestion(): void
+    {
+        $this->redirect(route('app.invoices.show', [
+            'clinic' => $this->currentClinic->slug,
+            'invoice' => $this->savedInvoiceId,
+        ]), navigate: true);
     }
 
     public function render(): View

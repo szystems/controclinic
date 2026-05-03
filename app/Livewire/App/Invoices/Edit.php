@@ -33,6 +33,13 @@ class Edit extends Component
     // catalog_item_id por posición (forward-compat)
     public array $itemCatalogIds = [];
 
+    // Sugerencia de guardar ítems libres al catálogo
+    public bool $showCatalogSuggestion = false;
+
+    public array $freeItemSuggestions = [];
+
+    public string $savedInvoiceId = '';
+
     protected function rules(): array
     {
         return [
@@ -221,9 +228,62 @@ class Edit extends Component
 
         session()->flash('success', __('invoices.invoice_updated'));
 
+        // Sugerir guardar ítems libres al catálogo si el usuario tiene permiso
+        if (auth()->user()->can('settings.edit')) {
+            $freeItems = [];
+            foreach ($validated['items'] as $order => $itemData) {
+                if (empty($this->itemCatalogIds[$order]) && !empty(trim($itemData['description'] ?? ''))) {
+                    $freeItems[] = [
+                        'index' => $order,
+                        'description' => $itemData['description'],
+                        'unit_price' => (float) ($itemData['unit_price'] ?? 0),
+                    ];
+                }
+            }
+
+            if (!empty($freeItems)) {
+                $this->savedInvoiceId = $this->invoice->id;
+                $this->freeItemSuggestions = $freeItems;
+                $this->showCatalogSuggestion = true;
+
+                return;
+            }
+        }
+
         $this->redirect(route('app.invoices.show', [
             'clinic' => $this->currentClinic->slug,
             'invoice' => $this->invoice->id,
+        ]), navigate: true);
+    }
+
+    public function saveItemsToCatalog(array $selectedIndexes): void
+    {
+        $this->authorize('settings.edit');
+
+        foreach ($this->freeItemSuggestions as $suggestion) {
+            if (in_array($suggestion['index'], $selectedIndexes)) {
+                ServiceCatalog::firstOrCreate(
+                    ['clinic_id' => $this->currentClinic->id, 'name' => $suggestion['description']],
+                    [
+                        'type' => 'service',
+                        'default_price' => $suggestion['unit_price'],
+                        'is_active' => true,
+                    ]
+                );
+            }
+        }
+
+        $this->redirect(route('app.invoices.show', [
+            'clinic' => $this->currentClinic->slug,
+            'invoice' => $this->savedInvoiceId,
+        ]), navigate: true);
+    }
+
+    public function skipCatalogSuggestion(): void
+    {
+        $this->redirect(route('app.invoices.show', [
+            'clinic' => $this->currentClinic->slug,
+            'invoice' => $this->savedInvoiceId,
         ]), navigate: true);
     }
 

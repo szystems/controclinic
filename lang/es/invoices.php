@@ -113,4 +113,11 @@ return [
     'delete_payment' => 'Anular pago',
     'confirm_delete_payment' => '¿Anular este pago? El saldo de la factura se recalculará.',
     'payment_deleted' => 'Pago anulado correctamente.',
+
+    // Sugerencia de catálogo
+    'manage_catalog_link' => 'Gestionar catálogo →',
+    'suggest_catalog_title' => '¿Guardar ítems al catálogo?',
+    'suggest_catalog_desc' => 'Algunos ítems de esta factura no están en tu catálogo. Guárdalos para usarlos rápidamente en el futuro.',
+    'suggest_catalog_save' => 'Guardar seleccionados',
+    'suggest_catalog_skip' => 'No por ahora',
 ];

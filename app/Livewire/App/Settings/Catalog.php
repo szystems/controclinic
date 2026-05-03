@@ -94,7 +94,7 @@ class Catalog extends Component
 
     public function save(): void
     {
-        $this->authorize('settings.manage');
+        $this->authorize('settings.edit');
         $validated = $this->validate();
 
         $data = [
@@ -125,14 +125,14 @@ class Catalog extends Component
 
     public function toggleActive(string $id): void
     {
-        $this->authorize('settings.manage');
+        $this->authorize('settings.edit');
         $item = ServiceCatalog::where('clinic_id', $this->currentClinic->id)->findOrFail($id);
         $item->update(['is_active' => ! $item->is_active]);
     }
 
     public function delete(string $id): void
     {
-        $this->authorize('settings.manage');
+        $this->authorize('settings.edit');
         $item = ServiceCatalog::where('clinic_id', $this->currentClinic->id)->findOrFail($id);
 
         // No eliminar si tiene ítems de factura asociados
@@ -149,7 +149,7 @@ class Catalog extends Component
 
     public function render(): View
     {
-        $this->authorize('settings.manage');
+        $this->authorize('settings.edit');
 
         $items = ServiceCatalog::where('clinic_id', $this->currentClinic->id)
             ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%")
@@ -159,6 +159,7 @@ class Catalog extends Component
             ->orderBy('name')
             ->paginate(25);
 
-        return view('livewire.app.settings.catalog', compact('items'));
+        return view('livewire.app.settings.catalog', compact('items'))
+            ->layout('layouts.app');
     }
 }

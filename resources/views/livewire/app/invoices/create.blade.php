@@ -157,6 +157,12 @@
                     <div>
                         <h2 class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('invoices.items') }}</h2>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ count($items) }} {{ __('invoices.items') }}</p>
+                        @can('settings.edit')
+                            <a href="{{ route('app.settings.catalog', ['clinic' => $currentClinic->slug]) }}"
+                               class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5 inline-block">
+                                {{ __('invoices.manage_catalog_link') }}
+                            </a>
+                        @endcan
                     </div>
                     <button type="button" wire:click="addItem"
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-800/50 transition-colors">
@@ -359,4 +365,59 @@
 
         </form>
     </div>
+
+    {{-- ── Modal: Sugerir guardar ítems al catálogo ── --}}
+    @if($showCatalogSuggestion)
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+         x-data="{
+             selected: @js(array_fill(0, count($freeItemSuggestions), true)),
+             indexes: @js(array_column($freeItemSuggestions, 'index')),
+             get hasSelected() { return this.selected.some(v => v); },
+             submit() {
+                 const toSave = this.indexes.filter((_, i) => this.selected[i]);
+                 $wire.saveItemsToCatalog(toSave);
+             }
+         }">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
+            <div class="flex items-start gap-3 mb-3">
+                <div class="shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40">
+                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('invoices.suggest_catalog_title') }}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ __('invoices.suggest_catalog_desc') }}</p>
+                </div>
+            </div>
+
+            <div class="space-y-2 my-4">
+                @foreach($freeItemSuggestions as $k => $suggestion)
+                    <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <input type="checkbox" x-model="selected[{{ $k }}]"
+                               class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500"/>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $suggestion['description'] }}</p>
+                        </div>
+                        <span class="text-xs font-mono text-gray-500 dark:text-gray-400 shrink-0">{{ number_format($suggestion['unit_price'], 2) }}</span>
+                    </label>
+                @endforeach
+            </div>
+
+            <div class="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                <button type="button" wire:click="skipCatalogSuggestion"
+                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                    {{ __('invoices.suggest_catalog_skip') }}
+                </button>
+                <button type="button" x-on:click="submit" x-bind:disabled="!hasSelected"
+                        class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {{ __('invoices.suggest_catalog_save') }}
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

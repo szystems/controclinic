@@ -1,7 +1,8 @@
 # 📝 Tareas Pendientes
 
-> Actualizado: 2026-05-02
+> Actualizado: 2026-05-02 (sincronizado con v1.3)
 > Enfoque: SaaS-First
+> Estado real: 424 tests / 922 asserts · v1.3 en curso
 
 ---
 
@@ -82,7 +83,7 @@
 > Detalle hist\u00f3rico del dise\u00f1o (consolidado arriba). Las migraciones ya est\u00e1n aplicadas y los modelos sincronizados.
 
 #### 0.3 Compliance mínimo v1.0
-- [ ] **2FA opcional** — habilitable por usuario (Laravel Fortify o paquete equivalente). Schema ya reservado en 0.2.
+- [x] **2FA opcional** — TOTP con Google Authenticator, QR, recovery codes, challenge middleware ✅ 2026-05-12
 - [x] **Consentimiento Términos & Privacidad** al registrar — checkbox + timestamp guardado en `users.terms_accepted_at` (2026-05-01)
 - [x] **Cookie banner** en portal público (GDPR mínimo) (2026-05-01)
 - [ ] **Política de retención por defecto** documentada (ej. 5 años para historiales tras última cita)
@@ -611,8 +612,8 @@ invoice_payments
 - [x] Servicio `InvoiceService` (cálculo de totales, generación de número, transacciones)
 - [x] Permisos Spatie: `invoices.view|create|edit|delete|export|record_payment`
 - [x] Settings de clínica (billing_enabled, invoice_prefix, tax_rate, default_consultation_price, etc.)
-- [ ] Campos `consultation_price`, `consultation_discount`, `is_billable` en `appointments`
-- [x] Livewire: `App\Invoices\Index`, `Create`, `Show` (con modal de pago)
+- [ ] Campos `consultation_price`, `consultation_discount`, `is_billable` en `appointments` (UI)
+- [x] Livewire: `App\Invoices\Index`, `Create`, `Show`, `Edit` (con modal de pago)
 - [x] PDF de factura/comprobante (DomPDF) — plantilla i18n
 - [ ] Reportes: ingresos por clínica, por doctor, por método de pago, por periodo
 - [x] Activity Log en Invoice (LogsActivity con logFillable)
@@ -620,6 +621,10 @@ invoice_payments
 - [x] i18n `lang/{es,en}/invoices.php` (70+ claves)
 - [ ] Toggle `billing_enabled` en Settings UI
 - [x] Documentación: política de no-factura-electrónica-oficial en v1
+- [x] Catálogo de servicios (`service_catalog`) — CRUD completo en Settings ✅ 2026-05-02
+- [x] Autocompletado del catálogo en formulario de factura (Create/Edit) ✅ 2026-05-02
+- [x] Link contextual "Gestionar catálogo →" en formulario de factura ✅ 2026-05-02
+- [x] Modal post-guardado para sugerir guardar ítems libres al catálogo ✅ 2026-05-02
 
 #### Consideraciones internacionales
 
