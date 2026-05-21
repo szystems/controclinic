@@ -2,7 +2,7 @@
 
 > Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 551 tests / 1197 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅)
+> Estado real: 551 tests / 1197 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ · F.7 🔄)
 
 ---
 
@@ -79,19 +79,20 @@
 
 - [x] Agregar **upload de logo** en Paso 3 (Branding) — drag-and-drop, preview, removeLogo()
 - [x] Botón "Saltar este paso" en pasos 2–4 (skipStep() sin validación)
-- [ ] Paso 5 (Plan): mostrar las 4 tiers reales con CTA a Paddle checkout en lugar de solo `free`
-- [ ] Skeleton de bienvenida después de completar onboarding ("¡Bienvenido a ControClinic! Aquí está tu checklist para empezar →")
+- [x] Fix `is_manual_plan=true` en registro → nuevas clínicas free tienen acceso completo
+- [ ] Paso 5 (Plan): mostrar las 4 tiers reales con CTA a Paddle checkout (diferido F.10+)
+- [ ] Skeleton de bienvenida post-onboarding (diferido F.10+)
 
-### F.7 — URL pública canónica
+### F.7 — URL pública canónica 🔄 EN CURSO 2026-05-20
 > Decisión: NO usar `/{slug}` en root (colisiona con `pricing`, `login`, `register`, `c`, `public`, etc.). Mantener `/c/{slug}` y agregar dominio custom opcional.
 
-- [ ] Mantener `/c/{slug}` como ruta canónica (ya existe)
-- [ ] Migración aditiva: `clinics.custom_domain` (string unique nullable) + `clinics.custom_domain_verified_at` (timestamp nullable)
-- [ ] Middleware `ResolveCustomDomain` que detecte `Host` header y resuelva la clínica
-- [ ] UI en Settings tab "Página Pública" para configurar custom domain + instrucciones DNS CNAME
-- [ ] Verificación TXT record para validar ownership del dominio
-- [ ] Disponible solo en planes Clínica y Enterprise (feature flag)
-- [ ] Diferido a v1.2 — schema preventivo ahora
+- [x] Mantener `/c/{slug}` como ruta canónica (ya existe)
+- [x] Migración aditiva: `clinics.custom_domain` (string unique nullable) + `clinics.custom_domain_verified_at` (timestamp nullable) + `clinics.custom_domain_txt_token` (string nullable)
+- [x] Middleware `ResolveCustomDomain` que detecte `Host` header y resuelva la clínica → dispatch interno a `/c/{slug}` sin redirigir
+- [x] UI en Settings tab "Página Pública" para configurar custom domain + instrucciones DNS CNAME
+- [x] Verificación TXT record para validar ownership del dominio
+- [x] Disponible solo en plan Enterprise (feature flag `custom_domain` en `PLAN_LIMITS`)
+- [x] Bootstrap + ruta raíz actualizada para servir portal de clínica en dominio custom
 
 ### F.8 — Demo data toggle
 > Para que clínicas nuevas puedan explorar el sistema con datos realistas sin contaminar su producción.

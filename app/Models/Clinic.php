@@ -59,6 +59,9 @@ class Clinic extends Model
         'data_retention_years',
         'sms_notifications_enabled',
         'sms_provider',
+        'custom_domain',
+        'custom_domain_verified_at',
+        'custom_domain_txt_token',
     ];
 
     protected $casts = [
@@ -78,6 +81,7 @@ class Clinic extends Model
         'max_storage_bytes' => 'integer',
         'data_retention_years' => 'integer',
         'sms_notifications_enabled' => 'boolean',
+        'custom_domain_verified_at' => 'datetime',
     ];
 
     /**
@@ -205,6 +209,12 @@ class Clinic extends Model
         $limits = $this->getPlanLimits();
 
         return in_array($feature, $limits['features'] ?? []);
+    }
+
+    public function isCustomDomainVerified(): bool
+    {
+        return $this->custom_domain !== null
+            && $this->custom_domain_verified_at !== null;
     }
 
     public function canAddPatient(): bool

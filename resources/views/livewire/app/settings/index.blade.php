@@ -966,6 +966,84 @@
                             </button>
                         </div>
                     </form>
+
+                    {{-- Dominio Custom — solo Enterprise --}}
+                    @if($clinic->hasFeature('custom_domain'))
+                    <div class="px-6 py-6 border-t border-gray-200 dark:border-gray-700">
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('settings.custom_domain.title') }}</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('settings.custom_domain.subtitle') }}</p>
+
+                        @if($domainVerified)
+                        <div class="mt-4 flex items-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-4 py-3">
+                            <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-sm text-green-700 dark:text-green-300">{{ __('settings.custom_domain.status_verified', ['domain' => $customDomain]) }}</span>
+                        </div>
+                        @elseif($customDomain)
+                        <div class="mt-4 flex items-center gap-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 px-4 py-3">
+                            <svg class="w-4 h-4 text-yellow-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-sm text-yellow-700 dark:text-yellow-300">{{ __('settings.custom_domain.status_pending') }}</span>
+                        </div>
+                        @endif
+
+                        <div class="mt-4 flex gap-2">
+                            <input wire:model="customDomain"
+                                   type="text"
+                                   placeholder="{{ __('settings.custom_domain.placeholder') }}"
+                                   class="flex-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                            />
+                            <button wire:click="saveCustomDomain" type="button"
+                                    class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                {{ __('general.save') }}
+                            </button>
+                            @if($customDomain)
+                            <button wire:click="removeCustomDomain" type="button"
+                                    wire:confirm="{{ __('settings.custom_domain.remove_confirm') }}"
+                                    class="inline-flex items-center px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                            @endif
+                        </div>
+                        @error('customDomain') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+
+                        @if($domainTxtToken && !$domainVerified)
+                        <div class="mt-5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 space-y-3">
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.custom_domain.dns_title') }}</p>
+                            <ol class="text-sm text-gray-600 dark:text-gray-400 list-decimal list-inside space-y-1">
+                                <li>{{ __('settings.custom_domain.dns_step1', ['appDomain' => parse_url(config('app.url'), PHP_URL_HOST)]) }}</li>
+                                <li>{{ __('settings.custom_domain.dns_step2') }}</li>
+                            </ol>
+                            <div class="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 font-mono text-xs text-gray-800 dark:text-gray-200 break-all select-all">{{ $domainTxtToken }}</div>
+                            <button wire:click="verifyCustomDomain" type="button"
+                                    wire:loading.attr="disabled"
+                                    class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
+                                <svg wire:loading wire:target="verifyCustomDomain" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ __('settings.custom_domain.verify_btn') }}
+                            </button>
+                        </div>
+                        @endif
+                    </div>
+                    @else
+                    <div class="px-6 py-5 border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex items-start gap-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 px-4 py-4">
+                            <svg class="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-indigo-700 dark:text-indigo-300">{{ __('settings.custom_domain.upsell_title') }}</p>
+                                <p class="mt-1 text-sm text-indigo-600 dark:text-indigo-400">{{ __('settings.custom_domain.upsell_desc') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     @endif
 
                     @if($activeTab === 'data' && auth()->id() === $clinic->owner_id)

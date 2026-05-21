@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureCanWrite;
 use App\Http\Middleware\EnsureTwoFactorAuthenticated;
+use App\Http\Middleware\ResolveCustomDomain;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(prepend: [
+            ResolveCustomDomain::class,
+        ]);
+
         $middleware->web(append: [
             SetLocale::class,
         ]);

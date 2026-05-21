@@ -3,6 +3,7 @@
 namespace App\Livewire\App\Settings;
 
 use App\Models\Clinic;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -112,6 +113,13 @@ class Index extends Component
 
     public array $public_services = [];
 
+    // Custom Domain
+    public string $customDomain = '';
+
+    public bool $domainVerified = false;
+
+    public ?string $domainTxtToken = null;
+
     protected function rules(): array
     {
         return [
@@ -174,6 +182,9 @@ class Index extends Component
             'public_services.*.title' => ['required_with:public_services', 'string', 'max:80'],
             'public_services.*.description' => ['nullable', 'string', 'max:300'],
             'public_services.*.icon' => ['nullable', 'string', 'max:30'],
+
+            // Custom Domain
+            'customDomain' => ['nullable', 'string', 'max:253', 'regex:/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)+([A-Za-z]{2,})$/'],
         ];
     }
 
@@ -244,6 +255,11 @@ class Index extends Component
         $this->public_seo_description = $this->clinic->public_seo_description ?? '';
         $this->currentCoverImage = $this->clinic->public_cover_image_url ?? null;
         $this->public_services = $this->clinic->public_services ?? [];
+
+        // Custom Domain
+        $this->customDomain = $this->clinic->custom_domain ?? '';
+        $this->domainVerified = $this->clinic->isCustomDomainVerified();
+        $this->domainTxtToken = $this->clinic->custom_domain_txt_token;
     }
 
     public function setTab(string $tab): void
@@ -472,6 +488,90 @@ class Index extends Component
         $this->currentCoverImage = null;
 
         session()->flash('success', __('settings.cover_removed'));
+    }
+
+    public function saveCustomDomain(): void
+    {
+        abort_if(auth()->id() !== $this->clinic->owner_id, 403);
+        abort_unless($this->clinic->hasFeature('custom_domain'), 403);
+
+        $this->validate(['customDomain' => $this->rules()['customDomain']]);
+
+        $newDomain = $this->customDomain ?: null;
+
+        // Si el dominio cambió, resetear la verificación
+        if ($newDomain !== $this->clinic->custom_domain) {
+            $token = null;
+            if ($newDomain) {
+                $token = 'controclinic-verify='.bin2hex(random_bytes(16));
+            }
+
+            $this->clinic->update([
+                'custom_domain' => $newDomain,
+                'custom_domain_verified_at' => null,
+                'custom_domain_txt_token' => $token,
+            ]);
+
+            $this->domainTxtToken = $token;
+            $this->domainVerified = false;
+        }
+
+        session()->flash('success', __('settings.custom_domain.saved'));
+    }
+
+    public function verifyCustomDomain(): void
+    {
+        abort_if(auth()->id() !== $this->clinic->owner_id, 403);
+        abort_unless($this->clinic->hasFeature('custom_domain'), 403);
+
+        $domain = $this->clinic->custom_domain;
+        $token = $this->clinic->custom_domain_txt_token;
+
+        if (! $domain || ! $token) {
+            session()->flash('error', __('settings.custom_domain.no_domain'));
+
+            return;
+        }
+
+        // Consultar registros TXT del dominio
+        $records = @dns_get_record($domain, DNS_TXT) ?: [];
+        $verified = collect($records)
+            ->flatMap(fn ($r) => (array) ($r['entries'] ?? [$r['txt'] ?? '']))
+            ->contains(fn ($txt) => str_contains($txt, $token));
+
+        if ($verified) {
+            $this->clinic->update(['custom_domain_verified_at' => now()]);
+            $this->domainVerified = true;
+            // Limpiar caché del dominio custom
+            Cache::forget("custom_domain:{$domain}");
+            session()->flash('success', __('settings.custom_domain.verified'));
+        } else {
+            session()->flash('error', __('settings.custom_domain.not_verified'));
+        }
+    }
+
+    public function removeCustomDomain(): void
+    {
+        abort_if(auth()->id() !== $this->clinic->owner_id, 403);
+        abort_unless($this->clinic->hasFeature('custom_domain'), 403);
+
+        $oldDomain = $this->clinic->custom_domain;
+
+        $this->clinic->update([
+            'custom_domain' => null,
+            'custom_domain_verified_at' => null,
+            'custom_domain_txt_token' => null,
+        ]);
+
+        $this->customDomain = '';
+        $this->domainVerified = false;
+        $this->domainTxtToken = null;
+
+        if ($oldDomain) {
+            Cache::forget("custom_domain:{$oldDomain}");
+        }
+
+        session()->flash('success', __('settings.custom_domain.removed'));
     }
 
     public function addService(): void
