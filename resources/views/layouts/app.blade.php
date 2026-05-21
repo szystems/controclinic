@@ -154,6 +154,16 @@
             <livewire:app.tour.launcher />
         @endauth
 
+        {{-- Keyboard shortcuts (F.10) --}}
+        @auth
+            @php
+                try { $__kbClinic = app('current_clinic'); } catch (\Throwable) { $__kbClinic = null; }
+            @endphp
+            @if($__kbClinic instanceof \App\Models\Clinic)
+                <livewire:app.keyboard-shortcuts :clinic="$__kbClinic" />
+            @endif
+        @endauth
+
         {{-- NProgress-style global page progress bar (F.9) --}}
         <div
             x-data="{
@@ -162,30 +172,31 @@
                 timer: null,
                 start() {
                     this.show = true;
-                    this.width = 15;
+                    this.width = 20;
                     clearInterval(this.timer);
                     this.timer = setInterval(() => {
-                        if (this.width < 85) this.width += Math.random() * 8;
-                    }, 300);
+                        if (this.width < 80) this.width += Math.random() * 12 + 3;
+                    }, 200);
                 },
                 finish() {
                     clearInterval(this.timer);
                     this.width = 100;
-                    setTimeout(() => { this.show = false; this.width = 0; }, 350);
+                    setTimeout(() => { this.show = false; this.width = 0; }, 400);
                 },
             }"
             x-init="
-                document.addEventListener('livewire:navigate', () => start());
-                document.addEventListener('livewire:navigated', () => finish());
                 document.addEventListener('livewire:request', () => start());
                 document.addEventListener('livewire:response', () => finish());
+                document.addEventListener('livewire:navigate', () => start());
+                document.addEventListener('livewire:navigated', () => finish());
             "
             x-show="show"
-            x-cloak
-            class="fixed top-0 left-0 right-0 z-[9999] h-0.5 pointer-events-none"
+            style="display:none"
+            class="fixed top-0 left-0 right-0 z-[9999] h-1 pointer-events-none"
         >
             <div
-                class="h-full bg-indigo-500 transition-all duration-300 ease-out shadow-[0_0_6px_rgba(99,102,241,0.8)]"
+                class="h-full bg-indigo-500 transition-[width] duration-200 ease-out"
+                style="box-shadow: 0 0 8px 1px rgba(99,102,241,0.7)"
                 :style="`width: ${width}%`"
             ></div>
         </div>
