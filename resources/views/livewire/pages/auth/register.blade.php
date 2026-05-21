@@ -55,6 +55,7 @@ new #[Layout('layouts.guest')] class extends Component
                 'email' => $validated['email'],
                 'plan_type' => 'free',
                 'status' => 'active',
+                'is_manual_plan' => true, // Registro voluntario en plan free → acceso completo dentro de límites
                 'settings' => Clinic::getDefaultSettings(),
                 'branding' => ['primary_color' => '#4f46e5', 'secondary_color' => '#10b981'],
             ]);

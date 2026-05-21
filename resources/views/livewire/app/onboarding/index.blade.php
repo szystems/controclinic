@@ -201,7 +201,17 @@
                             <div x-data="{ dragging: false }"
                                  @dragover.prevent="dragging = true"
                                  @dragleave.prevent="dragging = false"
-                                 @drop.prevent="dragging = false"
+                                 @drop.prevent="
+                                     dragging = false;
+                                     const files = $event.dataTransfer.files;
+                                     if (files.length > 0) {
+                                         const input = $el.querySelector('input[type=file]');
+                                         const dt = new DataTransfer();
+                                         dt.items.add(files[0]);
+                                         input.files = dt.files;
+                                         input.dispatchEvent(new Event('change'));
+                                     }
+                                 "
                                  :class="dragging ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-gray-600'"
                                  class="relative flex flex-col items-center justify-center w-full px-4 py-8 border-2 border-dashed rounded-xl cursor-pointer transition hover:border-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/30">
                                 <input wire:model="logo" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
