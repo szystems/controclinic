@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ · F.7 siguiente)
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ · F.8 siguiente)
 > **Enfoque:** SaaS-First
-> **Métricas:** 551 tests · 1197 assertions · Pint clean
+> **Métricas:** 559 tests · 1213 assertions · Pint clean
 
 ## ✅ Sprint F — UX & Onboarding (EN CURSO)
 
@@ -53,8 +53,19 @@
 ### F.6 — Mejora de Onboarding ✅ (2026-05-20)
 - Upload de logo en Paso 3 (Branding): drag-and-drop, preview del archivo, `removeLogo()`, `Storage::disk('public')`
 - Botón "Saltar este paso" en pasos 2–4 con `skipStep()` (avanza sin validar ni guardar)
+- Fix `is_manual_plan=true` en registro: nuevas clínicas free tienen acceso completo
 - Traducciones ES/EN: `logo_label`, `logo_hint`, `logo_drop`, `logo_max`, `logo_ready`, `logo_remove`, `skip_step`, `skip_step_hint`
 - 7 Feature tests (OnboardingTest · 17 assertions)
+
+### F.7 — Dominio custom para portal público ✅ (2026-05-20)
+- Migración aditiva: `clinics.custom_domain` (unique nullable) + `custom_domain_verified_at` + `custom_domain_txt_token`
+- `ResolveCustomDomain` middleware: detecta `Host` header → sirve portal de la clínica vía dispatch interno sin redirigir (URL permanece en dominio custom)
+- Modelo `Clinic`: `isCustomDomainVerified()`, fillable/cast actualizados
+- `Settings/Index`: `saveCustomDomain()`, `verifyCustomDomain()` (DNS TXT lookup), `removeCustomDomain()`; solo disponible con feature `custom_domain` (Enterprise)
+- UI en tab "Página Pública": input dominio, estado verified/pending, instrucciones CNAME + TXT, botón verificar, upsell para planes menores
+- Lang ES/EN: `settings.custom_domain.*` (14 claves)
+- Cache `custom_domain:{host}` 5 min; se invalida en save/remove/verify
+- 8 Feature tests (CustomDomainTest · 16 assertions)
 
 
 
