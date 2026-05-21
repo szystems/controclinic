@@ -154,7 +154,7 @@ return [
     'custom_domain' => [
         'title' => 'Dominio personalizado',
         'subtitle' => 'Conecta tu propio dominio para que tus pacientes accedan al portal de reservas con tu marca.',
-        'placeholder' => 'ej. reservas.midinica.com',
+        'placeholder' => 'ej. reservas.miclínica.com o miclínica.com',
         'saved' => 'Dominio guardado. Agrega los registros DNS para verificarlo.',
         'verified' => '¡Dominio verificado! El portal ya está activo en tu dominio.',
         'not_verified' => 'No se encontró el registro TXT. Verifica que los cambios DNS se hayan propagado (puede tardar hasta 48h).',

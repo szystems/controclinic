@@ -154,7 +154,7 @@ return [
     'custom_domain' => [
         'title' => 'Custom domain',
         'subtitle' => 'Connect your own domain so patients access the booking portal under your brand.',
-        'placeholder' => 'e.g. booking.myclinic.com',
+        'placeholder' => 'e.g. booking.myclinic.com or myclinic.com',
         'saved' => 'Domain saved. Add the DNS records to verify it.',
         'verified' => 'Domain verified! Your portal is now live at your custom domain.',
         'not_verified' => 'TXT record not found. Check that DNS changes have propagated (can take up to 48h).',

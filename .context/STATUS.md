@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ · F.8 siguiente)
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ · F.8 en curso)
 > **Enfoque:** SaaS-First
-> **Métricas:** 559 tests · 1213 assertions · Pint clean
+> **Métricas:** 559 tests · 1213 assertions · Pint clean · Backlog: venta de dominios documentado
 
 ## ✅ Sprint F — UX & Onboarding (EN CURSO)
 

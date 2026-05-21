@@ -2,7 +2,7 @@
 
 > Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 551 tests / 1197 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ · F.7 🔄)
+> Estado real: 559 tests / 1213 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ · F.8 🔄)
 
 ---
 
@@ -83,7 +83,7 @@
 - [ ] Paso 5 (Plan): mostrar las 4 tiers reales con CTA a Paddle checkout (diferido F.10+)
 - [ ] Skeleton de bienvenida post-onboarding (diferido F.10+)
 
-### F.7 — URL pública canónica 🔄 EN CURSO 2026-05-20
+### F.7 — URL pública canónica ✅ COMPLETADO 2026-05-20
 > Decisión: NO usar `/{slug}` en root (colisiona con `pricing`, `login`, `register`, `c`, `public`, etc.). Mantener `/c/{slug}` y agregar dominio custom opcional.
 
 - [x] Mantener `/c/{slug}` como ruta canónica (ya existe)
@@ -94,14 +94,15 @@
 - [x] Disponible solo en plan Enterprise (feature flag `custom_domain` en `PLAN_LIMITS`)
 - [x] Bootstrap + ruta raíz actualizada para servir portal de clínica en dominio custom
 
-### F.8 — Demo data toggle
+### F.8 — Demo data toggle 🔄 EN CURSO 2026-05-20
 > Para que clínicas nuevas puedan explorar el sistema con datos realistas sin contaminar su producción.
 
+- [ ] Migración aditiva: `is_demo` (bool default false) en `patients`, `appointments`, `medical_records`, `invoices`, `prescriptions`
 - [ ] Comando artisan `clinic:seed-demo {clinic}` que crea 5 pacientes, 10 citas, 3 historiales, 2 facturas, 1 receta
 - [ ] Botón "Cargar datos de ejemplo" en dashboard cuando la clínica está vacía
 - [ ] Botón "Borrar datos de ejemplo" que elimina solo los marcados con `is_demo=true`
-- [ ] Migración aditiva: `is_demo` (bool default false) en `patients`, `appointments`, `medical_records`, `invoices`, `prescriptions`
 - [ ] Activity Log de carga/borrado de demo
+- [ ] Tests Feature (DemoDataTest)
 
 ### F.9 — Skeleton screens y loaders
 > Mejora de percepción de velocidad en Livewire pesados.
@@ -649,6 +650,73 @@ viva ni rompe datos sensibles. Las migraciones del Bloque 0 son la "vacuna" para
 ---
 
 ## 🟢 Backlog (Sin orden estricto)
+
+### 🌐 Venta de dominios integrada — PROPUESTO 2026-05-20
+
+> **Contexto:** Actualmente F.7 permite usar un dominio propio ya comprado (CNAME + TXT). Esta feature
+> va más allá: cualquier clínica (cualquier tier, no solo Enterprise) puede **comprar su dominio
+> directamente desde ControClinic**, sin salir de la app. Szystems actúa como revendedor de dominios,
+> configurándolo automáticamente. Genera un canal de ingresos adicional con margen sobre el precio de
+> registro/renovación.
+
+#### Flujo de usuario
+1. En Settings → Página Pública aparece siempre (todos los tiers) la card "Consigue tu dominio propio"
+2. El usuario escribe el dominio deseado (ej. `miclinica.com`)
+3. La app consulta la API de disponibilidad → responde en tiempo real (disponible / no disponible / sugerencias)
+4. Si está disponible: muestra precio (primer año + renovación anual) y botón "Comprar"
+5. El pago se procesa vía Paddle (igual que las suscripciones)
+6. Al confirmar el pago: se crea una orden en `domain_orders` y se notifica a Szystems vía webhook/email
+7. Szystems compra el dominio manualmente en su registrador y lo configura (CNAME → app, TXT verify)
+8. Una vez configurado, el super admin marca el dominio como "aprovisionado" en el panel admin
+9. La clínica recibe email de confirmación + el portal queda activo en su dominio
+
+#### Automatización futura (v2 de este módulo)
+- Integración directa con API de registrador (Namecheap, Cloudflare Registrar, OpenSRS) para
+  compra y configuración DNS 100% automática sin intervención de Szystems
+
+#### Modelo de datos sugerido
+```
+domain_orders (UUID)
+├── clinic_id
+├── domain          (ej. miclinica.com)
+├── status          (pending_payment | paid | provisioning | active | failed | expired)
+├── price_paid      (decimal)
+├── currency
+├── paddle_txn_id   (referencia al pago)
+├── provisioned_at  (nullable — cuando Szystems lo activa)
+├── expires_at      (fecha de renovación)
+├── auto_renew      (bool)
+├── notes           (nullable — notas internas del super admin)
+├── timestamps + softDeletes
+```
+
+#### API de disponibilidad
+- Conectar con `portal.szystems.com` vía HTTP + API key (variable `SZYSTEMS_DOMAIN_API_KEY` en `.env`)
+- Endpoint sugerido: `GET /api/domains/check?domain=miclinica.com`
+- Respuesta esperada: `{ available: bool, price: { first_year: 12.99, renewal: 9.99 }, suggestions: [] }`
+- Cachear resultado 60 segundos para no saturar la API
+
+#### Tareas técnicas (cuando se implemente)
+- [ ] Migración `create_domain_orders_table`
+- [ ] Modelo `DomainOrder` (con scopes por clínica y status)
+- [ ] Livewire component `App\DomainOrder\Create` (buscador + checkout)
+- [ ] Job `ProvisionDomain` disparado al confirmar pago (notifica a Szystems)
+- [ ] Panel admin: listado de `domain_orders` pendientes de aprovisionar + botón "Marcar como activo"
+- [ ] Al marcar activo: auto-rellenar `custom_domain` en la clínica + marcar como verified
+- [ ] Email al owner con instrucciones de activación y fecha de renovación
+- [ ] Webhook de renovación (recordatorio 30/7 días antes de `expires_at`)
+- [ ] i18n `lang/{es,en}/domains.php`
+- [ ] Tests: flujo completo (check disponibilidad, orden, pago, aprovisionamiento)
+
+#### Notas estratégicas
+- El margen de reventa de dominios (`.com` ~ $9–12/año coste, vender a $15–20) es bajo pero recurrente
+- **El valor real** es la retención: una clínica con su dominio propio configurado en ControClinic
+  tiene un coste de salida mucho mayor (portabilidad del dominio implica reconfigurar DNS)
+- Diferencia la oferta de ControClinic vs competencia que no ofrece esto
+- Disponible para TODOS los tiers (no solo Enterprise) — el dominio comprado otorga acceso
+  a la feature `custom_domain` automáticamente, sin importar el plan
+
+---
 
 ### 🛠️ Módulo "Configuración General" en Panel Admin (Super Admin) — PROPUESTO 2026-04-30
 
