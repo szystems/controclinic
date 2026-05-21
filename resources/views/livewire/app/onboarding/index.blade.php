@@ -184,6 +184,41 @@
                     </p>
 
                     <div class="space-y-6">
+                        {{-- Logo Upload --}}
+                        <div>
+                            <x-input-label :value="__('onboarding.logo_label')" />
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-3">{{ __('onboarding.logo_hint') }}</p>
+
+                            @if ($currentLogo)
+                                <div class="flex items-center gap-4 mb-3">
+                                    <img src="{{ Storage::url($currentLogo) }}" alt="Logo" class="h-16 w-auto max-w-[160px] object-contain rounded border border-gray-200 dark:border-gray-700 p-1 bg-white" />
+                                    <button wire:click="removeLogo" type="button" class="text-xs text-red-500 hover:text-red-700 transition">
+                                        {{ __('onboarding.logo_remove') }}
+                                    </button>
+                                </div>
+                            @endif
+
+                            <div x-data="{ dragging: false }"
+                                 @dragover.prevent="dragging = true"
+                                 @dragleave.prevent="dragging = false"
+                                 @drop.prevent="dragging = false"
+                                 :class="dragging ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-gray-600'"
+                                 class="relative flex flex-col items-center justify-center w-full px-4 py-8 border-2 border-dashed rounded-xl cursor-pointer transition hover:border-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                                <input wire:model="logo" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                @if ($logo)
+                                    <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">{{ $logo->getClientOriginalName() }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ __('onboarding.logo_ready') }}</p>
+                                @else
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('onboarding.logo_drop') }}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">PNG, JPG, SVG · {{ __('onboarding.logo_max') }}</p>
+                                @endif
+                            </div>
+                            <x-input-error :messages="$errors->get('logo')" class="mt-1" />
+                        </div>
+
                         <div>
                             <x-input-label for="primary_color" :value="__('onboarding.primary_color')" />
                             <div class="flex items-center gap-3 mt-1">
@@ -446,7 +481,13 @@
                     @endif
                 </div>
 
-                <div>
+                <div class="flex items-center gap-3">
+                    @if ($currentStep > 1 && $currentStep < $totalSteps)
+                        <button wire:click="skipStep" type="button" class="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition" title="{{ __('onboarding.skip_step_hint') }}">
+                            {{ __('onboarding.skip_step') }}
+                        </button>
+                    @endif
+
                     @if ($currentStep < $totalSteps)
                         <button wire:click="nextStep" type="button" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-lg transition">
                             {{ __('onboarding.next') }}

@@ -4,10 +4,14 @@ namespace App\Livewire\App\Onboarding;
 
 use App\Models\Clinic;
 use App\Models\Plan;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Index extends Component
 {
+    use WithFileUploads;
+
     public Clinic $clinic;
 
     public int $currentStep = 1;
@@ -36,6 +40,10 @@ class Index extends Component
     public string $primary_color = '#4f46e5';
 
     public string $secondary_color = '#10b981';
+
+    public $logo = null;
+
+    public ?string $currentLogo = null;
 
     // Step 4: Working Hours
     public array $working_days = [1, 2, 3, 4, 5];
@@ -116,6 +124,7 @@ class Index extends Component
         $branding = $clinic->branding ?? [];
         $this->primary_color = $branding['primary_color'] ?? '#4f46e5';
         $this->secondary_color = $branding['secondary_color'] ?? '#10b981';
+        $this->currentLogo = $branding['logo'] ?? null;
 
         $settings = $clinic->settings ?? [];
 
@@ -235,6 +244,26 @@ class Index extends Component
         $this->redirect(route('app.dashboard', $this->clinic->slug), navigate: true);
     }
 
+    public function skipStep(): void
+    {
+        if ($this->currentStep < $this->totalSteps) {
+            $this->currentStep++;
+        }
+    }
+
+    public function removeLogo(): void
+    {
+        if ($this->currentLogo && Storage::disk('public')->exists($this->currentLogo)) {
+            Storage::disk('public')->delete($this->currentLogo);
+        }
+
+        $branding = $this->clinic->branding ?? [];
+        unset($branding['logo']);
+        $this->clinic->update(['branding' => $branding]);
+
+        $this->currentLogo = null;
+    }
+
     private function validateCurrentStep(): void
     {
         match ($this->currentStep) {
@@ -253,6 +282,7 @@ class Index extends Component
             3 => $this->validate([
                 'primary_color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
                 'secondary_color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+                'logo' => ['nullable', 'image', 'max:2048'],
             ]),
             4 => $this->validateSchedule(),
             default => null,
@@ -305,10 +335,7 @@ class Index extends Component
                 'locale' => $this->locale,
             ]),
             3 => $this->clinic->update([
-                'branding' => [
-                    'primary_color' => $this->primary_color,
-                    'secondary_color' => $this->secondary_color,
-                ],
+                'branding' => $this->buildBranding(),
             ]),
             4 => $this->saveSchedule(),
             default => null,
@@ -343,6 +370,25 @@ class Index extends Component
         $this->clinic->update([
             'settings' => array_merge($this->clinic->settings ?? [], $scheduleSettings),
         ]);
+    }
+
+    private function buildBranding(): array
+    {
+        $branding = $this->clinic->branding ?? [];
+        $branding['primary_color'] = $this->primary_color;
+        $branding['secondary_color'] = $this->secondary_color;
+
+        if ($this->logo) {
+            if ($this->currentLogo && Storage::disk('public')->exists($this->currentLogo)) {
+                Storage::disk('public')->delete($this->currentLogo);
+            }
+            $path = $this->logo->store("clinics/{$this->clinic->id}/branding", 'public');
+            $branding['logo'] = $path;
+            $this->currentLogo = $path;
+            $this->logo = null;
+        }
+
+        return $branding;
     }
 
     public function render()

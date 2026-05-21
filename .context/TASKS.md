@@ -2,7 +2,7 @@
 
 > Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 544 tests / 1180 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅)
+> Estado real: 551 tests / 1197 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅)
 
 ---
 
@@ -74,12 +74,12 @@
 - [x] Páginas de error personalizadas (403/404/500/503) con layout ControClinic
 - [x] i18n ES/EN en `lang/{es,en}/help.php` (8 módulos × título+resumen+tips)
 
-### F.6 — Mejora de Onboarding existente
+### F.6 — Mejora de Onboarding existente ✅ COMPLETADO 2026-05-20
 > Pulir los 5 pasos actuales sin reescribir.
 
-- [ ] Agregar **upload de logo** en Paso 3 (Branding) — hoy solo hay colores
-- [ ] Mensaje claro "Puedes saltar este paso y configurarlo después en Ajustes" en cada step opcional
-- [ ] Paso 5 (Plan): mostrar las 4 tiers reales (Solo/Práctica/Clínica/Enterprise) con CTA a Paddle checkout en lugar de solo `free`
+- [x] Agregar **upload de logo** en Paso 3 (Branding) — drag-and-drop, preview, removeLogo()
+- [x] Botón "Saltar este paso" en pasos 2–4 (skipStep() sin validación)
+- [ ] Paso 5 (Plan): mostrar las 4 tiers reales con CTA a Paddle checkout en lugar de solo `free`
 - [ ] Skeleton de bienvenida después de completar onboarding ("¡Bienvenido a ControClinic! Aquí está tu checklist para empezar →")
 
 ### F.7 — URL pública canónica

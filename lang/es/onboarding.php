@@ -96,5 +96,15 @@ return [
     'next' => 'Siguiente',
     'back' => 'Anterior',
     'skip' => 'Saltar configuración',
+    'skip_step' => 'Saltar este paso',
+    'skip_step_hint' => 'Puedes configurarlo después en Ajustes',
     'start_using' => '¡Comenzar a usar!',
+
+    // Branding: Logo
+    'logo_label' => 'Logo de la clínica',
+    'logo_hint' => 'Se mostrará en facturas, recetas y tu página pública. Recomendado: PNG o SVG con fondo transparente.',
+    'logo_drop' => 'Arrastra tu logo aquí o haz clic para seleccionar',
+    'logo_max' => 'Máx. 2 MB',
+    'logo_ready' => 'Listo para subir — haz clic en Siguiente para guardar',
+    'logo_remove' => 'Eliminar logo',
 ];

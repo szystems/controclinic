@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ · F.6 siguiente)
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ · F.7 siguiente)
 > **Enfoque:** SaaS-First
-> **Métricas:** 544 tests · 1180 assertions · Pint clean
+> **Métricas:** 551 tests · 1197 assertions · Pint clean
 
 ## ✅ Sprint F — UX & Onboarding (EN CURSO)
 
@@ -49,6 +49,12 @@
 - i18n ES/EN `lang/{es,en}/help.php` — 8 módulos × título + resumen + tips[]
 - Fix Blade: `@php(inline)` en lugar de `@php...@endphp` en error layout (evita greedy compile)
 - 7 Feature tests (HelpTest)
+
+### F.6 — Mejora de Onboarding ✅ (2026-05-20)
+- Upload de logo en Paso 3 (Branding): drag-and-drop, preview del archivo, `removeLogo()`, `Storage::disk('public')`
+- Botón "Saltar este paso" en pasos 2–4 con `skipStep()` (avanza sin validar ni guardar)
+- Traducciones ES/EN: `logo_label`, `logo_hint`, `logo_drop`, `logo_max`, `logo_ready`, `logo_remove`, `skip_step`, `skip_step_hint`
+- 7 Feature tests (OnboardingTest · 17 assertions)
 
 
 

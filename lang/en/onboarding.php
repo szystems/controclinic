@@ -96,5 +96,15 @@ return [
     'next' => 'Next',
     'back' => 'Back',
     'skip' => 'Skip setup',
+    'skip_step' => 'Skip this step',
+    'skip_step_hint' => 'You can configure this later in Settings',
     'start_using' => 'Start using!',
+
+    // Branding: Logo
+    'logo_label' => 'Clinic logo',
+    'logo_hint' => 'Shown on invoices, prescriptions and your public page. Recommended: PNG or SVG with transparent background.',
+    'logo_drop' => 'Drag your logo here or click to select',
+    'logo_max' => 'Max 2 MB',
+    'logo_ready' => 'Ready to upload — click Next to save',
+    'logo_remove' => 'Remove logo',
 ];
