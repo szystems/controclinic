@@ -8,6 +8,7 @@ use App\Models\Prescription;
 use App\Models\Tag;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
+use Spatie\Activitylog\Models\Activity;
 
 class Show extends Component
 {
@@ -29,14 +30,14 @@ class Show extends Component
 
     /** Tabs disponibles y sus permisos requeridos (null = sin restricción) */
     public const TABS = [
-        'datos'       => null,
-        'citas'       => 'appointments.view',
-        'historial'   => 'records.view',
-        'recetas'     => 'prescriptions.view',
-        'archivos'    => null,
+        'datos' => null,
+        'citas' => 'appointments.view',
+        'historial' => 'records.view',
+        'recetas' => 'prescriptions.view',
+        'archivos' => null,
         'facturacion' => 'invoices.view',
-        'notas'       => 'patients.edit',
-        'actividad'   => 'patients.view',
+        'notas' => 'patients.edit',
+        'actividad' => 'patients.view',
     ];
 
     public function mount(Patient $patient): void
@@ -248,7 +249,7 @@ class Show extends Component
             return null;
         }
 
-        return \Spatie\Activitylog\Models\Activity::where('subject_type', Patient::class)
+        return Activity::where('subject_type', Patient::class)
             ->where('subject_id', $this->patient->id)
             ->orderBy('created_at', 'desc')
             ->limit(50)
@@ -285,15 +286,15 @@ class Show extends Component
     {
         return view('livewire.app.patients.show', [
             'upcomingAppointments' => $this->upcomingAppointments,
-            'recentRecords'        => $this->recentRecords,
-            'allAppointments'      => $this->allAppointments,
-            'allRecords'           => $this->allRecords,
-            'invoices'             => $this->invoices,
-            'prescriptions'        => $this->prescriptions,
-            'activityLogs'         => $this->activityLogs,
-            'clinicTags'           => $this->clinicTags,
-            'assignedTagIds'       => $this->assignedTagIds,
-            'tagColors'            => Tag::COLORS,
+            'recentRecords' => $this->recentRecords,
+            'allAppointments' => $this->allAppointments,
+            'allRecords' => $this->allRecords,
+            'invoices' => $this->invoices,
+            'prescriptions' => $this->prescriptions,
+            'activityLogs' => $this->activityLogs,
+            'clinicTags' => $this->clinicTags,
+            'assignedTagIds' => $this->assignedTagIds,
+            'tagColors' => Tag::COLORS,
         ])->layout('layouts.app');
     }
 }

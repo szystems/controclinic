@@ -100,7 +100,7 @@ return [
     ],
 
     'book_appointment' => 'Book appointment',
-    'about_us'         => 'About us',
-    'our_services'     => 'Our services',
-    'our_team'         => 'Our team',
+    'about_us' => 'About us',
+    'our_services' => 'Our services',
+    'our_team' => 'Our team',
 ];

@@ -23,9 +23,9 @@ class PrescriptionItem extends Model
     ];
 
     protected $casts = [
-        'order'          => 'integer',
-        'quantity'       => 'integer',
-        'is_controlled'  => 'boolean',
+        'order' => 'integer',
+        'quantity' => 'integer',
+        'is_controlled' => 'boolean',
     ];
 
     public function prescription(): BelongsTo

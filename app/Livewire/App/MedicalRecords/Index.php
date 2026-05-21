@@ -57,11 +57,11 @@ class Index extends Component
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->when($this->filterHasFiles === 'yes', fn ($q) => $q
                 ->whereNotNull('attachments')
-                ->whereRaw("JSON_LENGTH(attachments) > 0")
+                ->whereRaw('JSON_LENGTH(attachments) > 0')
             )
             ->when($this->filterHasFiles === 'no', fn ($q) => $q->where(function ($sub) {
                 $sub->whereNull('attachments')
-                    ->orWhereRaw("JSON_LENGTH(attachments) = 0");
+                    ->orWhereRaw('JSON_LENGTH(attachments) = 0');
             }))
             ->with('doctor:id,name')
             ->orderByDesc('created_at')

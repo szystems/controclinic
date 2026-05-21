@@ -10,29 +10,34 @@ class Edit extends Component
     public Prescription $prescription;
 
     public string $diagnosis = '';
+
     public string $notes = '';
+
     public string $internalNotes = '';
+
     public string $validUntil = '';
+
     public string $issuedAt = '';
+
     public array $items = [];
 
     protected function rules(): array
     {
         return [
-            'diagnosis'    => ['nullable', 'string', 'max:500'],
-            'notes'        => ['nullable', 'string', 'max:1000'],
+            'diagnosis' => ['nullable', 'string', 'max:500'],
+            'notes' => ['nullable', 'string', 'max:1000'],
             'internalNotes' => ['nullable', 'string', 'max:1000'],
-            'validUntil'   => ['nullable', 'date'],
-            'issuedAt'     => ['nullable', 'date'],
-            'items'        => ['required', 'array', 'min:1'],
+            'validUntil' => ['nullable', 'date'],
+            'issuedAt' => ['nullable', 'date'],
+            'items' => ['required', 'array', 'min:1'],
             'items.*.medication_name' => ['required', 'string', 'max:200'],
-            'items.*.dose'            => ['nullable', 'string', 'max:100'],
-            'items.*.frequency'       => ['nullable', 'string', 'max:100'],
-            'items.*.duration'        => ['nullable', 'string', 'max:100'],
-            'items.*.route'           => ['nullable', 'string', 'max:100'],
-            'items.*.instructions'    => ['nullable', 'string', 'max:500'],
-            'items.*.quantity'        => ['nullable', 'integer', 'min:1', 'max:999'],
-            'items.*.is_controlled'   => ['boolean'],
+            'items.*.dose' => ['nullable', 'string', 'max:100'],
+            'items.*.frequency' => ['nullable', 'string', 'max:100'],
+            'items.*.duration' => ['nullable', 'string', 'max:100'],
+            'items.*.route' => ['nullable', 'string', 'max:100'],
+            'items.*.instructions' => ['nullable', 'string', 'max:500'],
+            'items.*.quantity' => ['nullable', 'integer', 'min:1', 'max:999'],
+            'items.*.is_controlled' => ['boolean'],
         ];
     }
 
@@ -41,24 +46,24 @@ class Edit extends Component
         $this->authorize('update', $prescription);
         $this->prescription = $prescription->load('items');
 
-        $this->diagnosis     = $prescription->diagnosis ?? '';
-        $this->notes         = $prescription->notes ?? '';
+        $this->diagnosis = $prescription->diagnosis ?? '';
+        $this->notes = $prescription->notes ?? '';
         $this->internalNotes = $prescription->internal_notes ?? '';
-        $this->validUntil    = $prescription->valid_until?->toDateString() ?? '';
-        $this->issuedAt      = $prescription->issued_at?->toDateString() ?? now()->toDateString();
+        $this->validUntil = $prescription->valid_until?->toDateString() ?? '';
+        $this->issuedAt = $prescription->issued_at?->toDateString() ?? now()->toDateString();
 
         $this->items = $prescription->items->map(fn ($item) => [
-            'id'               => $item->id,
-            'medication_name'  => $item->medication_name,
+            'id' => $item->id,
+            'medication_name' => $item->medication_name,
             'active_ingredient' => $item->active_ingredient ?? '',
-            'presentation'     => $item->presentation ?? '',
-            'dose'             => $item->dose ?? '',
-            'frequency'        => $item->frequency ?? '',
-            'duration'         => $item->duration ?? '',
-            'route'            => $item->route ?? '',
-            'instructions'     => $item->instructions ?? '',
-            'quantity'         => $item->quantity,
-            'is_controlled'    => (bool) $item->is_controlled,
+            'presentation' => $item->presentation ?? '',
+            'dose' => $item->dose ?? '',
+            'frequency' => $item->frequency ?? '',
+            'duration' => $item->duration ?? '',
+            'route' => $item->route ?? '',
+            'instructions' => $item->instructions ?? '',
+            'quantity' => $item->quantity,
+            'is_controlled' => (bool) $item->is_controlled,
         ])->toArray();
 
         if (empty($this->items)) {
@@ -69,16 +74,16 @@ class Edit extends Component
     public function addItem(): void
     {
         $this->items[] = [
-            'medication_name'  => '',
+            'medication_name' => '',
             'active_ingredient' => '',
-            'presentation'     => '',
-            'dose'             => '',
-            'frequency'        => '',
-            'duration'         => '',
-            'route'            => '',
-            'instructions'     => '',
-            'quantity'         => null,
-            'is_controlled'    => false,
+            'presentation' => '',
+            'dose' => '',
+            'frequency' => '',
+            'duration' => '',
+            'route' => '',
+            'instructions' => '',
+            'quantity' => null,
+            'is_controlled' => false,
         ];
     }
 
@@ -96,11 +101,11 @@ class Edit extends Component
         $this->validate();
 
         $this->prescription->update([
-            'diagnosis'     => $this->diagnosis ?: null,
-            'notes'         => $this->notes ?: null,
+            'diagnosis' => $this->diagnosis ?: null,
+            'notes' => $this->notes ?: null,
             'internal_notes' => $this->internalNotes ?: null,
-            'issued_at'     => $this->issuedAt ?: null,
-            'valid_until'   => $this->validUntil ?: null,
+            'issued_at' => $this->issuedAt ?: null,
+            'valid_until' => $this->validUntil ?: null,
         ]);
 
         // Reemplazar todos los items

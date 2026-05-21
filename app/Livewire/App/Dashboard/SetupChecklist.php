@@ -17,12 +17,12 @@ class SetupChecklist extends Component
      * Steps definition. Order matters for display.
      */
     public static array $STEPS = [
-        'logo'         => ['icon' => 'photo',        'perm' => null],
-        'schedule'     => ['icon' => 'clock',         'perm' => null],
-        'patient'      => ['icon' => 'users',         'perm' => 'patients.create'],
-        'appointment'  => ['icon' => 'calendar',      'perm' => 'appointments.create'],
-        'staff'        => ['icon' => 'user-add',      'perm' => 'users.manage'],
-        'public_page'  => ['icon' => 'globe',         'perm' => null],
+        'logo' => ['icon' => 'photo',        'perm' => null],
+        'schedule' => ['icon' => 'clock',         'perm' => null],
+        'patient' => ['icon' => 'users',         'perm' => 'patients.create'],
+        'appointment' => ['icon' => 'calendar',      'perm' => 'appointments.create'],
+        'staff' => ['icon' => 'user-add',      'perm' => 'users.manage'],
+        'public_page' => ['icon' => 'globe',         'perm' => null],
     ];
 
     public function mount(Clinic $clinic): void
@@ -54,11 +54,11 @@ class SetupChecklist extends Component
         $branding = $clinic->branding ?? [];
 
         return [
-            'logo'        => ! empty($branding['logo']),
-            'schedule'    => array_key_exists('working_days', $settings),
-            'patient'     => $clinic->patients()->exists(),
+            'logo' => ! empty($branding['logo']),
+            'schedule' => array_key_exists('working_days', $settings),
+            'patient' => $clinic->patients()->exists(),
             'appointment' => $clinic->appointments()->exists(),
-            'staff'       => $clinic->users()->where('users.id', '!=', $clinic->owner_id)->exists(),
+            'staff' => $clinic->users()->where('users.id', '!=', $clinic->owner_id)->exists(),
             'public_page' => ! empty($settings['description']) || ! empty($settings['website']),
         ];
     }
@@ -90,11 +90,11 @@ class SetupChecklist extends Component
         $slug = $this->clinic->slug;
 
         return [
-            'logo'        => route('app.settings.index', $slug),
-            'schedule'    => route('app.settings.index', $slug),
-            'patient'     => route('app.patients.create', $slug),
+            'logo' => route('app.settings.index', $slug),
+            'schedule' => route('app.settings.index', $slug),
+            'patient' => route('app.patients.create', $slug),
             'appointment' => route('app.appointments.create', $slug),
-            'staff'       => route('app.staff.create', $slug),
+            'staff' => route('app.staff.create', $slug),
             'public_page' => route('app.settings.index', $slug),
         ];
     }
@@ -102,12 +102,12 @@ class SetupChecklist extends Component
     public function render()
     {
         return view('livewire.app.dashboard.setup-checklist', [
-            'stepsStatus'      => $this->stepsStatus,
-            'completedCount'   => $this->completedCount,
-            'total'            => $this->total,
-            'progressPercent'  => $this->progressPercent,
-            'isAllDone'        => $this->isAllDone,
-            'routeForStep'     => $this->routeForStep,
+            'stepsStatus' => $this->stepsStatus,
+            'completedCount' => $this->completedCount,
+            'total' => $this->total,
+            'progressPercent' => $this->progressPercent,
+            'isAllDone' => $this->isAllDone,
+            'routeForStep' => $this->routeForStep,
         ]);
     }
 

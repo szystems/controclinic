@@ -2,7 +2,6 @@
 
 namespace App\Livewire\App\Prescriptions;
 
-use App\Models\Patient;
 use App\Models\Prescription;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,11 +11,13 @@ class Index extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $filterStatus = '';
+
     public string $filterDoctor = '';
 
     protected $queryString = [
-        'search'       => ['except' => ''],
+        'search' => ['except' => ''],
         'filterStatus' => ['except' => '', 'as' => 'status'],
         'filterDoctor' => ['except' => '', 'as' => 'doctor'],
     ];
@@ -54,7 +55,7 @@ class Index extends Component
 
         return view('livewire.app.prescriptions.index', [
             'prescriptions' => $this->prescriptions,
-            'statuses'      => Prescription::STATUSES,
+            'statuses' => Prescription::STATUSES,
             'currentClinic' => app('current_clinic'),
         ])->layout('layouts.app');
     }

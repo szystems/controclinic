@@ -26,7 +26,7 @@ class TourTest extends TestCase
     private function makeClinicWithOwner(): array
     {
         $clinic = Clinic::factory()->onboarded()->create();
-        $owner  = User::factory()->create(['clinic_id' => $clinic->id]);
+        $owner = User::factory()->create(['clinic_id' => $clinic->id]);
         $clinic->update(['owner_id' => $owner->id]);
         $owner->assignRole('owner');
 
@@ -120,7 +120,7 @@ class TourTest extends TestCase
         $owner->update([
             'preferences' => [
                 'tour_completed_at' => now()->toIso8601String(),
-                'tour_skipped_at'   => now()->toIso8601String(),
+                'tour_skipped_at' => now()->toIso8601String(),
             ],
         ]);
 
@@ -134,6 +134,6 @@ class TourTest extends TestCase
 
         $owner->refresh();
         $this->assertArrayNotHasKey('tour_completed_at', $owner->preferences ?? []);
-        $this->assertArrayNotHasKey('tour_skipped_at',   $owner->preferences ?? []);
+        $this->assertArrayNotHasKey('tour_skipped_at', $owner->preferences ?? []);
     }
 }

@@ -34,7 +34,7 @@ class Launcher extends Component
 
         $prefs = $user->preferences ?? [];
 
-        $tourDone    = ! empty($prefs['tour_completed_at']);
+        $tourDone = ! empty($prefs['tour_completed_at']);
         $tourSkipped = ! empty($prefs['tour_skipped_at']);
 
         // Auto-start only if the user has never completed or skipped the tour
@@ -44,7 +44,7 @@ class Launcher extends Component
     /** Called from JS when the user finishes the last step */
     public function completeTour(): void
     {
-        $user  = Auth::user();
+        $user = Auth::user();
         $prefs = $user->preferences ?? [];
         $prefs['tour_completed_at'] = now()->toIso8601String();
         $user->update(['preferences' => $prefs]);
@@ -55,7 +55,7 @@ class Launcher extends Component
     /** Called from JS when the user clicks "Skip tour" */
     public function skipTour(): void
     {
-        $user  = Auth::user();
+        $user = Auth::user();
         $prefs = $user->preferences ?? [];
         $prefs['tour_skipped_at'] = now()->toIso8601String();
         $user->update(['preferences' => $prefs]);
@@ -66,7 +66,7 @@ class Launcher extends Component
     /** Called from the "Repetir tour" button in the user menu */
     public function replayTour(): void
     {
-        $user  = Auth::user();
+        $user = Auth::user();
         $prefs = $user->preferences ?? [];
         unset($prefs['tour_completed_at'], $prefs['tour_skipped_at']);
         $user->update(['preferences' => $prefs]);

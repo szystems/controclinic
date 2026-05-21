@@ -157,9 +157,9 @@ class PatientShowTabsTest extends TestCase
         $doctor->assignRole('doctor');
 
         Appointment::factory()->create([
-            'clinic_id'  => $clinic->id,
+            'clinic_id' => $clinic->id,
             'patient_id' => $patient->id,
-            'doctor_id'  => $doctor->id,
+            'doctor_id' => $doctor->id,
         ]);
 
         $component = Livewire::actingAs($user)
@@ -196,9 +196,9 @@ class PatientShowTabsTest extends TestCase
         $doctor->assignRole('doctor');
 
         MedicalRecord::factory()->create([
-            'clinic_id'  => $clinic->id,
+            'clinic_id' => $clinic->id,
             'patient_id' => $patient->id,
-            'doctor_id'  => $doctor->id,
+            'doctor_id' => $doctor->id,
         ]);
 
         $component = Livewire::actingAs($user)

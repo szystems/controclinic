@@ -49,23 +49,23 @@ class PrescriptionsTest extends TestCase
     private function makeDraft(Clinic $clinic, Patient $patient, User $doctor, array $overrides = []): Prescription
     {
         $rx = Prescription::create(array_merge([
-            'clinic_id'  => $clinic->id,
+            'clinic_id' => $clinic->id,
             'patient_id' => $patient->id,
-            'doctor_id'  => $doctor->id,
-            'status'     => Prescription::STATUS_DRAFT,
-            'issued_at'  => now()->toDateString(),
-            'diagnosis'  => 'Gripe',
+            'doctor_id' => $doctor->id,
+            'status' => Prescription::STATUS_DRAFT,
+            'issued_at' => now()->toDateString(),
+            'diagnosis' => 'Gripe',
         ], $overrides));
 
         PrescriptionItem::create([
             'prescription_id' => $rx->id,
-            'order'           => 0,
+            'order' => 0,
             'medication_name' => 'Paracetamol',
-            'dose'            => '500mg',
-            'frequency'       => 'cada 8h',
-            'duration'        => '3 días',
-            'quantity'        => 9,
-            'is_controlled'   => false,
+            'dose' => '500mg',
+            'frequency' => 'cada 8h',
+            'duration' => '3 días',
+            'quantity' => 9,
+            'is_controlled' => false,
         ]);
 
         return $rx;
@@ -88,8 +88,8 @@ class PrescriptionsTest extends TestCase
 
     public function test_doctor_can_list_prescriptions(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
         $this->makeDraft($clinic, $patient, $doctor);
         $this->bindClinic($clinic);
@@ -102,13 +102,13 @@ class PrescriptionsTest extends TestCase
 
     public function test_index_isolates_by_clinic(): void
     {
-        $clinic1  = $this->makeClinic();
-        $doctor1  = $this->makeDoctor($clinic1);
+        $clinic1 = $this->makeClinic();
+        $doctor1 = $this->makeDoctor($clinic1);
         $patient1 = $this->makePatient($clinic1);
         $this->makeDraft($clinic1, $patient1, $doctor1);
 
-        $clinic2  = $this->makeClinic();
-        $doctor2  = $this->makeDoctor($clinic2);
+        $clinic2 = $this->makeClinic();
+        $doctor2 = $this->makeDoctor($clinic2);
         $patient2 = $this->makePatient($clinic2);
         $this->makeDraft($clinic2, $patient2, $doctor2);
         $this->bindClinic($clinic1);
@@ -123,7 +123,7 @@ class PrescriptionsTest extends TestCase
 
     public function test_assistant_cannot_access_create(): void
     {
-        $clinic    = $this->makeClinic();
+        $clinic = $this->makeClinic();
         $this->makeOwner($clinic);
         $this->bindClinic($clinic);
         $assistant = User::factory()->create(['clinic_id' => $clinic->id])->syncRoles(['assistant']);
@@ -135,8 +135,8 @@ class PrescriptionsTest extends TestCase
 
     public function test_doctor_can_create_draft_prescription(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
         $this->bindClinic($clinic);
 
@@ -146,26 +146,26 @@ class PrescriptionsTest extends TestCase
             ->set('diagnosis', 'Faringitis')
             ->set('issuedAt', now()->toDateString())
             ->set('items', [[
-                'medication_name'   => 'Amoxicilina',
+                'medication_name' => 'Amoxicilina',
                 'active_ingredient' => 'Amoxicilina',
-                'presentation'      => 'cápsulas 500mg',
-                'dose'              => '1 cápsula',
-                'frequency'         => 'cada 8h',
-                'duration'          => '7 días',
-                'route'             => 'oral',
-                'instructions'      => 'Con alimentos',
-                'quantity'          => 21,
-                'is_controlled'     => false,
+                'presentation' => 'cápsulas 500mg',
+                'dose' => '1 cápsula',
+                'frequency' => 'cada 8h',
+                'duration' => '7 días',
+                'route' => 'oral',
+                'instructions' => 'Con alimentos',
+                'quantity' => 21,
+                'is_controlled' => false,
             ]])
             ->call('save')
             ->assertRedirect();
 
         $this->assertDatabaseHas('prescriptions', [
-            'clinic_id'  => $clinic->id,
+            'clinic_id' => $clinic->id,
             'patient_id' => $patient->id,
-            'doctor_id'  => $doctor->id,
-            'status'     => Prescription::STATUS_DRAFT,
-            'diagnosis'  => 'Faringitis',
+            'doctor_id' => $doctor->id,
+            'status' => Prescription::STATUS_DRAFT,
+            'diagnosis' => 'Faringitis',
         ]);
 
         $rx = Prescription::where('patient_id', $patient->id)->first();
@@ -173,14 +173,14 @@ class PrescriptionsTest extends TestCase
         $this->assertDatabaseHas('prescription_items', [
             'prescription_id' => $rx->id,
             'medication_name' => 'Amoxicilina',
-            'quantity'        => 21,
+            'quantity' => 21,
         ]);
     }
 
     public function test_can_issue_prescription_on_save(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
         $this->bindClinic($clinic);
 
@@ -200,16 +200,16 @@ class PrescriptionsTest extends TestCase
 
         $this->assertDatabaseHas('prescriptions', [
             'patient_id' => $patient->id,
-            'status'     => Prescription::STATUS_ISSUED,
+            'status' => Prescription::STATUS_ISSUED,
         ]);
     }
 
     public function test_issue_generates_folio_and_qr(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
-        $rx      = $this->makeDraft($clinic, $patient, $doctor);
+        $rx = $this->makeDraft($clinic, $patient, $doctor);
 
         $rx->issue();
         $rx->refresh();
@@ -222,8 +222,8 @@ class PrescriptionsTest extends TestCase
 
     public function test_folio_increments_per_clinic(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
 
         $rx1 = $this->makeDraft($clinic, $patient, $doctor);
@@ -237,12 +237,12 @@ class PrescriptionsTest extends TestCase
 
     public function test_folio_does_not_bleed_across_clinics(): void
     {
-        $clinic1  = $this->makeClinic();
-        $doctor1  = $this->makeDoctor($clinic1);
+        $clinic1 = $this->makeClinic();
+        $doctor1 = $this->makeDoctor($clinic1);
         $patient1 = $this->makePatient($clinic1);
 
-        $clinic2  = $this->makeClinic();
-        $doctor2  = $this->makeDoctor($clinic2);
+        $clinic2 = $this->makeClinic();
+        $doctor2 = $this->makeDoctor($clinic2);
         $patient2 = $this->makePatient($clinic2);
 
         $rx1 = $this->makeDraft($clinic1, $patient1, $doctor1);
@@ -260,10 +260,10 @@ class PrescriptionsTest extends TestCase
 
     public function test_doctor_can_issue_from_show(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
-        $rx      = $this->makeDraft($clinic, $patient, $doctor);
+        $rx = $this->makeDraft($clinic, $patient, $doctor);
         $this->bindClinic($clinic);
 
         Livewire::actingAs($doctor)
@@ -276,10 +276,10 @@ class PrescriptionsTest extends TestCase
 
     public function test_doctor_can_cancel_issued_prescription(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
-        $rx      = $this->makeDraft($clinic, $patient, $doctor);
+        $rx = $this->makeDraft($clinic, $patient, $doctor);
         $rx->issue();
         $this->bindClinic($clinic);
 
@@ -298,10 +298,10 @@ class PrescriptionsTest extends TestCase
 
     public function test_cannot_edit_issued_prescription(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
-        $rx      = $this->makeDraft($clinic, $patient, $doctor);
+        $rx = $this->makeDraft($clinic, $patient, $doctor);
         $rx->issue();
         $this->bindClinic($clinic);
 
@@ -312,32 +312,32 @@ class PrescriptionsTest extends TestCase
 
     public function test_edit_updates_items(): void
     {
-        $clinic  = $this->makeClinic();
-        $doctor  = $this->makeDoctor($clinic);
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
         $patient = $this->makePatient($clinic);
-        $rx      = $this->makeDraft($clinic, $patient, $doctor);
+        $rx = $this->makeDraft($clinic, $patient, $doctor);
         $this->bindClinic($clinic);
 
         Livewire::actingAs($doctor)
             ->test(PrescriptionsEdit::class, ['clinic' => $clinic, 'prescription' => $rx])
             ->set('diagnosis', 'Actualizado')
             ->set('items', [[
-                'medication_name'   => 'Naproxeno',
-                'dose'              => '250mg',
-                'frequency'         => 'cada 12h',
-                'duration'          => '5 días',
-                'quantity'          => 10,
+                'medication_name' => 'Naproxeno',
+                'dose' => '250mg',
+                'frequency' => 'cada 12h',
+                'duration' => '5 días',
+                'quantity' => 10,
                 'active_ingredient' => '',
-                'presentation'      => '',
-                'route'             => 'oral',
-                'instructions'      => '',
-                'is_controlled'     => false,
+                'presentation' => '',
+                'route' => 'oral',
+                'instructions' => '',
+                'is_controlled' => false,
             ]])
             ->call('save')
             ->assertRedirect();
 
         $this->assertDatabaseHas('prescriptions', [
-            'id'        => $rx->id,
+            'id' => $rx->id,
             'diagnosis' => 'Actualizado',
         ]);
 
@@ -351,10 +351,10 @@ class PrescriptionsTest extends TestCase
 
     public function test_prescription_not_accessible_from_other_clinic(): void
     {
-        $clinic1  = $this->makeClinic();
-        $doctor1  = $this->makeDoctor($clinic1);
+        $clinic1 = $this->makeClinic();
+        $doctor1 = $this->makeDoctor($clinic1);
         $patient1 = $this->makePatient($clinic1);
-        $rx       = $this->makeDraft($clinic1, $patient1, $doctor1);
+        $rx = $this->makeDraft($clinic1, $patient1, $doctor1);
 
         $clinic2 = $this->makeClinic();
         $doctor2 = $this->makeDoctor($clinic2);

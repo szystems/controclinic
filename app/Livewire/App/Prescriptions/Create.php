@@ -4,20 +4,27 @@ namespace App\Livewire\App\Prescriptions;
 
 use App\Models\Patient;
 use App\Models\Prescription;
-use App\Models\PrescriptionItem;
 use Livewire\Component;
 
 class Create extends Component
 {
     // Prescription fields
     public string $patientId = '';
+
     public string $patientSearch = '';
+
     public string $selectedPatientName = '';
+
     public string $diagnosis = '';
+
     public string $notes = '';
+
     public string $internalNotes = '';
+
     public string $validUntil = '';
+
     public string $issuedAt = '';
+
     public bool $issueNow = false;
 
     // Items (repeater)
@@ -26,21 +33,21 @@ class Create extends Component
     protected function rules(): array
     {
         return [
-            'patientId'    => ['required', 'uuid', 'exists:patients,id'],
-            'diagnosis'    => ['nullable', 'string', 'max:500'],
-            'notes'        => ['nullable', 'string', 'max:1000'],
+            'patientId' => ['required', 'uuid', 'exists:patients,id'],
+            'diagnosis' => ['nullable', 'string', 'max:500'],
+            'notes' => ['nullable', 'string', 'max:1000'],
             'internalNotes' => ['nullable', 'string', 'max:1000'],
-            'validUntil'   => ['nullable', 'date', 'after_or_equal:today'],
-            'issuedAt'     => ['nullable', 'date'],
-            'items'        => ['required', 'array', 'min:1'],
+            'validUntil' => ['nullable', 'date', 'after_or_equal:today'],
+            'issuedAt' => ['nullable', 'date'],
+            'items' => ['required', 'array', 'min:1'],
             'items.*.medication_name' => ['required', 'string', 'max:200'],
-            'items.*.dose'            => ['nullable', 'string', 'max:100'],
-            'items.*.frequency'       => ['nullable', 'string', 'max:100'],
-            'items.*.duration'        => ['nullable', 'string', 'max:100'],
-            'items.*.route'           => ['nullable', 'string', 'max:100'],
-            'items.*.instructions'    => ['nullable', 'string', 'max:500'],
-            'items.*.quantity'        => ['nullable', 'integer', 'min:1', 'max:999'],
-            'items.*.is_controlled'   => ['boolean'],
+            'items.*.dose' => ['nullable', 'string', 'max:100'],
+            'items.*.frequency' => ['nullable', 'string', 'max:100'],
+            'items.*.duration' => ['nullable', 'string', 'max:100'],
+            'items.*.route' => ['nullable', 'string', 'max:100'],
+            'items.*.instructions' => ['nullable', 'string', 'max:500'],
+            'items.*.quantity' => ['nullable', 'integer', 'min:1', 'max:999'],
+            'items.*.is_controlled' => ['boolean'],
         ];
     }
 
@@ -73,16 +80,16 @@ class Create extends Component
     public function addItem(): void
     {
         $this->items[] = [
-            'medication_name'  => '',
+            'medication_name' => '',
             'active_ingredient' => '',
-            'presentation'     => '',
-            'dose'             => '',
-            'frequency'        => '',
-            'duration'         => '',
-            'route'            => '',
-            'instructions'     => '',
-            'quantity'         => null,
-            'is_controlled'    => false,
+            'presentation' => '',
+            'dose' => '',
+            'frequency' => '',
+            'duration' => '',
+            'route' => '',
+            'instructions' => '',
+            'quantity' => null,
+            'is_controlled' => false,
         ];
     }
 
@@ -107,15 +114,15 @@ class Create extends Component
             ->firstOrFail();
 
         $prescription = Prescription::create([
-            'clinic_id'     => $clinic->id,
-            'patient_id'    => $patient->id,
-            'doctor_id'     => auth()->id(),
-            'status'        => Prescription::STATUS_DRAFT,
-            'diagnosis'     => $this->diagnosis ?: null,
-            'notes'         => $this->notes ?: null,
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => auth()->id(),
+            'status' => Prescription::STATUS_DRAFT,
+            'diagnosis' => $this->diagnosis ?: null,
+            'notes' => $this->notes ?: null,
             'internal_notes' => $this->internalNotes ?: null,
-            'issued_at'     => $this->issuedAt ?: now()->toDateString(),
-            'valid_until'   => $this->validUntil ?: null,
+            'issued_at' => $this->issuedAt ?: now()->toDateString(),
+            'valid_until' => $this->validUntil ?: null,
         ]);
 
         foreach ($this->items as $order => $itemData) {
@@ -154,8 +161,8 @@ class Create extends Component
     public function render()
     {
         return view('livewire.app.prescriptions.create', [
-            'currentClinic'  => app('current_clinic'),
-            'searchResults'  => $this->searchResults,
+            'currentClinic' => app('current_clinic'),
+            'searchResults' => $this->searchResults,
         ])->layout('layouts.app');
     }
 }

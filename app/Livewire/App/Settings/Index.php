@@ -165,15 +165,15 @@ class Index extends Component
             'secondary_color' => ['required', 'string', 'regex:/^#[a-fA-F0-9]{6}$/'],
 
             // Public Page
-            'public_description'     => ['nullable', 'string', 'max:3000'],
-            'public_show_doctors'    => ['boolean'],
-            'public_seo_title'       => ['nullable', 'string', 'max:70'],
+            'public_description' => ['nullable', 'string', 'max:3000'],
+            'public_show_doctors' => ['boolean'],
+            'public_seo_title' => ['nullable', 'string', 'max:70'],
             'public_seo_description' => ['nullable', 'string', 'max:320'],
-            'public_cover_image'     => ['nullable', 'image', 'max:4096'],
-            'public_services'        => ['nullable', 'array'],
-            'public_services.*.title'       => ['required_with:public_services', 'string', 'max:80'],
+            'public_cover_image' => ['nullable', 'image', 'max:4096'],
+            'public_services' => ['nullable', 'array'],
+            'public_services.*.title' => ['required_with:public_services', 'string', 'max:80'],
             'public_services.*.description' => ['nullable', 'string', 'max:300'],
-            'public_services.*.icon'        => ['nullable', 'string', 'max:30'],
+            'public_services.*.icon' => ['nullable', 'string', 'max:30'],
         ];
     }
 
@@ -238,12 +238,12 @@ class Index extends Component
         $this->secondary_color = $branding['secondary_color'] ?? '#10b981';
 
         // Public Page
-        $this->public_description     = $this->clinic->public_description ?? '';
-        $this->public_show_doctors    = (bool) ($this->clinic->public_show_doctors ?? true);
-        $this->public_seo_title       = $this->clinic->public_seo_title ?? '';
+        $this->public_description = $this->clinic->public_description ?? '';
+        $this->public_show_doctors = (bool) ($this->clinic->public_show_doctors ?? true);
+        $this->public_seo_title = $this->clinic->public_seo_title ?? '';
         $this->public_seo_description = $this->clinic->public_seo_description ?? '';
-        $this->currentCoverImage      = $this->clinic->public_cover_image_url ?? null;
-        $this->public_services        = $this->clinic->public_services ?? [];
+        $this->currentCoverImage = $this->clinic->public_cover_image_url ?? null;
+        $this->public_services = $this->clinic->public_services ?? [];
     }
 
     public function setTab(string $tab): void
@@ -429,20 +429,20 @@ class Index extends Component
         abort_if(auth()->id() !== $this->clinic->owner_id, 403);
 
         $this->validate([
-            'public_description'     => $this->rules()['public_description'],
-            'public_show_doctors'    => $this->rules()['public_show_doctors'],
-            'public_seo_title'       => $this->rules()['public_seo_title'],
+            'public_description' => $this->rules()['public_description'],
+            'public_show_doctors' => $this->rules()['public_show_doctors'],
+            'public_seo_title' => $this->rules()['public_seo_title'],
             'public_seo_description' => $this->rules()['public_seo_description'],
-            'public_cover_image'     => $this->rules()['public_cover_image'],
-            'public_services'        => $this->rules()['public_services'],
+            'public_cover_image' => $this->rules()['public_cover_image'],
+            'public_services' => $this->rules()['public_services'],
         ]);
 
         $data = [
-            'public_description'     => $this->public_description ?: null,
-            'public_show_doctors'    => $this->public_show_doctors,
-            'public_seo_title'       => $this->public_seo_title ?: null,
+            'public_description' => $this->public_description ?: null,
+            'public_show_doctors' => $this->public_show_doctors,
+            'public_seo_title' => $this->public_seo_title ?: null,
             'public_seo_description' => $this->public_seo_description ?: null,
-            'public_services'        => array_values(array_filter($this->public_services, fn($s) => ! empty($s['title']))),
+            'public_services' => array_values(array_filter($this->public_services, fn ($s) => ! empty($s['title']))),
         ];
 
         if ($this->public_cover_image) {

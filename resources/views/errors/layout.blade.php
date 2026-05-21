@@ -11,8 +11,17 @@
 </head>
 <body class="antialiased bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen flex items-center">
     <div class="max-w-2xl mx-auto px-6 py-12 text-center">
-        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-100 mb-6">
-            <span class="text-4xl font-extrabold text-indigo-600">{{ $code }}</span>
+        <div class="flex justify-center mb-6">
+            @php($__logoUrl = rescue(fn () => \App\Models\AppSetting::get('branding.logo_url'), null, false))
+            @php($__appName = rescue(fn () => \App\Models\AppSetting::get('branding.app_name', config('app.name', 'ControClinic')), config('app.name', 'ControClinic'), false))
+            @if(!empty($__logoUrl))
+                <img src="{{ $__logoUrl }}" alt="{{ $__appName }}" class="h-12 w-auto object-contain" />
+            @else
+                <x-application-logo class="h-12 w-auto text-indigo-600" />
+            @endif
+        </div>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 mb-4">
+            <span class="text-3xl font-extrabold text-indigo-600">{{ $code }}</span>
         </div>
         <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">{{ $title }}</h1>
         <p class="text-lg text-gray-600 mb-8">{{ $message }}</p>

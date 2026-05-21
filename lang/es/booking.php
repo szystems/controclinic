@@ -101,7 +101,7 @@ return [
     ],
 
     'book_appointment' => 'Reservar cita',
-    'about_us'         => 'Sobre nosotros',
-    'our_services'     => 'Nuestros servicios',
-    'our_team'         => 'Nuestro equipo',
+    'about_us' => 'Sobre nosotros',
+    'our_services' => 'Nuestros servicios',
+    'our_team' => 'Nuestro equipo',
 ];

@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ · F.5 siguiente)
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ · F.6 siguiente)
 > **Enfoque:** SaaS-First
-> **Métricas:** 537 tests · Pint clean
+> **Métricas:** 544 tests · 1180 assertions · Pint clean
 
 ## ✅ Sprint F — UX & Onboarding (EN CURSO)
 
@@ -36,6 +36,19 @@
 - Persistencia en 3 capas: `window.TOUR_CONFIG` (SPA), `localStorage` (recargas), DB vía `$wire` directo (cross-device)
 - `window.__tourLauncher` expuesto en Alpine `x-init` para llamadas directas sin depender de chain de eventos
 - 6 Feature tests (TourTest · 11 assertions)
+
+### F.5 — Ayuda contextual + página `/help` ✅ (2026-05-20)
+- `<x-help-banner module="...">` — colapsable, dismissible por módulo (localStorage), links a `/help/{module}`
+- Aplicado en 6 módulos Index: patients, appointments, medical-records, invoices, prescriptions, staff
+- `<x-tooltip text="...">` — popover Alpine.js (hover/focus, 4 posiciones: top/bottom/left/right)
+- `App\Livewire\App\Help\Index` + `Show` con validación `abort_unless` para los 8 módulos
+- Rutas `app.help.index` / `app.help.show` dentro del grupo `app/{clinic}`
+- Botón flotante `?` móvil (`md:hidden`), icono `?` en nav desktop, link en dropdown de usuario
+- Drawer móvil: Ayuda + Página pública (`target="_blank"`)
+- Páginas de error (403/404/500/503) con layout ControClinic (logo, código, mensaje, botón volver)
+- i18n ES/EN `lang/{es,en}/help.php` — 8 módulos × título + resumen + tips[]
+- Fix Blade: `@php(inline)` en lugar de `@php...@endphp` en error layout (evita greedy compile)
+- 7 Feature tests (HelpTest)
 
 
 

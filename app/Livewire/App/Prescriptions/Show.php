@@ -8,6 +8,7 @@ use Livewire\Component;
 class Show extends Component
 {
     public Prescription $prescription;
+
     public bool $showCancelModal = false;
 
     public function mount(Prescription $prescription): void

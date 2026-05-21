@@ -2,7 +2,7 @@
 
 > Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 531 tests / 1150 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅)
+> Estado real: 544 tests / 1180 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅)
 
 ---
 
@@ -59,19 +59,20 @@
 - [x] i18n `lang/{es,en}/tour.php`
 - [x] 6 Feature tests (TourTest · todos pasan)
 
-### F.5 — Ayuda contextual + página `/help`
+### F.5 — Ayuda contextual + página `/help` ✅ COMPLETADO 2026-05-20
 > Reducir tickets de soporte con docs accesibles.
 
-- [ ] Componente Blade `<x-help-banner :article="...">` colapsable, dismissible por módulo (persiste en localStorage)
-- [ ] Aplicar en top de cada Index con texto "¿Cómo funciona [módulo]?"
-- [ ] Componente `<x-tooltip text="...">` reusable basado en Alpine.js (popover en hover/focus)
-- [ ] Aplicar tooltips en campos críticos (estados de cita, tipos de historial, métodos de pago, permisos)
-- [ ] Página `/help` con artículos Markdown estáticos:
-  - Estructura: `resources/views/help/{modulo}.blade.php` o `resources/markdown/help/{modulo}.md` parseado con `league/commonmark`
-  - Index con tarjetas por módulo
-  - Búsqueda simple cliente (Alpine)
-- [ ] Botón flotante "?" (bottom-right) que abre panel lateral con artículos del módulo actual (futuro)
-- [ ] i18n ES/EN
+- [x] Componente Blade `<x-help-banner module="...">` colapsable, dismissible por módulo (localStorage)
+- [x] Aplicado en 6 módulos Index: patients, appointments, medical-records, invoices, prescriptions, staff
+- [x] Componente `<x-tooltip text="...">` reusable Alpine.js (popover hover/focus, 4 posiciones)
+- [x] Página `/help` — índice con búsqueda Alpine.js cliente, 8 tarjetas de módulo
+- [x] Rutas `app.help.index` y `app.help.show` con validación de módulo (abort 404)
+- [x] `App\Livewire\App\Help\Index` + `Show` (8 módulos)
+- [x] Botón flotante `?` en móvil (`md:hidden`, bottom-right)
+- [x] Icono `?` en nav desktop + link "Centro de Ayuda" en dropdown de usuario
+- [x] Drawer móvil: links Ayuda + Página pública (con `target="_blank"`)
+- [x] Páginas de error personalizadas (403/404/500/503) con layout ControClinic
+- [x] i18n ES/EN en `lang/{es,en}/help.php` (8 módulos × título+resumen+tips)
 
 ### F.6 — Mejora de Onboarding existente
 > Pulir los 5 pasos actuales sin reescribir.

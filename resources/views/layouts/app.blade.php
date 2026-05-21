@@ -163,7 +163,7 @@
                 <a
                     href="{{ route('app.help.index', ['clinic' => $__helpClinic->slug]) }}"
                     title="{{ __('help.title') }}"
-                    class="fixed bottom-5 right-5 z-40 flex items-center justify-center w-11 h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 shadow-lg text-white transition"
+                    class="md:hidden fixed bottom-5 right-5 z-40 flex items-center justify-center w-11 h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 shadow-lg text-white transition"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -32,17 +32,20 @@ class Prescription extends Model
     ];
 
     protected $casts = [
-        'issued_at'   => 'date',
+        'issued_at' => 'date',
         'valid_until' => 'date',
         'is_controlled' => 'boolean',
     ];
 
     // ==================== CONSTANTES ====================
 
-    public const STATUS_DRAFT      = 'draft';
-    public const STATUS_ISSUED     = 'issued';
-    public const STATUS_DISPENSED  = 'dispensed';
-    public const STATUS_CANCELLED  = 'cancelled';
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_ISSUED = 'issued';
+
+    public const STATUS_DISPENSED = 'dispensed';
+
+    public const STATUS_CANCELLED = 'cancelled';
 
     public const STATUSES = [
         self::STATUS_DRAFT,
@@ -93,22 +96,22 @@ class Prescription extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            self::STATUS_DRAFT     => __('prescriptions.status_draft'),
-            self::STATUS_ISSUED    => __('prescriptions.status_issued'),
+            self::STATUS_DRAFT => __('prescriptions.status_draft'),
+            self::STATUS_ISSUED => __('prescriptions.status_issued'),
             self::STATUS_DISPENSED => __('prescriptions.status_dispensed'),
             self::STATUS_CANCELLED => __('prescriptions.status_cancelled'),
-            default                => ucfirst($this->status),
+            default => ucfirst($this->status),
         };
     }
 
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
-            self::STATUS_DRAFT     => 'gray',
-            self::STATUS_ISSUED    => 'blue',
+            self::STATUS_DRAFT => 'gray',
+            self::STATUS_ISSUED => 'blue',
             self::STATUS_DISPENSED => 'green',
             self::STATUS_CANCELLED => 'red',
-            default                => 'gray',
+            default => 'gray',
         };
     }
 
@@ -162,9 +165,9 @@ class Prescription extends Model
     public function issue(): void
     {
         $this->update([
-            'status'    => self::STATUS_ISSUED,
+            'status' => self::STATUS_ISSUED,
             'issued_at' => $this->issued_at ?? now()->toDateString(),
-            'folio'     => $this->folio ?? static::generateFolio($this->clinic_id),
+            'folio' => $this->folio ?? static::generateFolio($this->clinic_id),
             'qr_payload' => $this->qr_payload ?? static::generateQrPayload($this->id),
         ]);
     }

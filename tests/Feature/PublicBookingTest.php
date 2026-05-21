@@ -8,6 +8,7 @@ use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -393,10 +394,10 @@ class PublicBookingTest extends TestCase
 
     public function test_public_page_shows_cover_image_when_set(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('public');
+        Storage::fake('public');
 
         $path = 'clinics/test/public/cover.jpg';
-        \Illuminate\Support\Facades\Storage::disk('public')->put($path, 'fake');
+        Storage::disk('public')->put($path, 'fake');
 
         [$clinic] = $this->makeClinicWithDoctor(['public_cover_image_url' => $path]);
 

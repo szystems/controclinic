@@ -28,7 +28,7 @@ class SettingsPublicPageTest extends TestCase
     private function makeClinicWithOwner(): array
     {
         $clinic = Clinic::factory()->onboarded()->create();
-        $owner  = User::factory()->create(['clinic_id' => $clinic->id]);
+        $owner = User::factory()->create(['clinic_id' => $clinic->id]);
         $clinic->update(['owner_id' => $owner->id]);
         $owner->assignRole('owner');
 

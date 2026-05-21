@@ -24,16 +24,15 @@ use App\Livewire\App\MedicalRecords\Create as MedicalRecordsCreate;
 use App\Livewire\App\MedicalRecords\Edit as MedicalRecordsEdit;
 use App\Livewire\App\MedicalRecords\Index as MedicalRecordsIndex;
 use App\Livewire\App\MedicalRecords\Show as MedicalRecordsShow;
-use App\Livewire\App\Prescriptions\Create as PrescriptionsCreate;
-use App\Livewire\App\Prescriptions\Edit as PrescriptionsEdit;
-use App\Livewire\App\Prescriptions\Index as PrescriptionsIndex;
-use App\Livewire\App\Prescriptions\Show as PrescriptionsShow;
-use App\Models\Prescription;
 use App\Livewire\App\Onboarding\Index;
 use App\Livewire\App\Patients\Create as PatientsCreate;
 use App\Livewire\App\Patients\Edit as PatientsEdit;
 use App\Livewire\App\Patients\Index as PatientsIndex;
 use App\Livewire\App\Patients\Show as PatientsShow;
+use App\Livewire\App\Prescriptions\Create as PrescriptionsCreate;
+use App\Livewire\App\Prescriptions\Edit as PrescriptionsEdit;
+use App\Livewire\App\Prescriptions\Index as PrescriptionsIndex;
+use App\Livewire\App\Prescriptions\Show as PrescriptionsShow;
 use App\Livewire\App\Reports\Index as ReportsIndex;
 use App\Livewire\App\Schedule\Index as ScheduleIndex;
 use App\Livewire\App\Settings\Catalog;
@@ -46,6 +45,7 @@ use App\Livewire\Public\Booking;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Models\Plan;
+use App\Models\Prescription;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -318,10 +318,10 @@ Route::prefix('app/{clinic}')
                     Route::middleware('can:prescriptions.create')->get('/create', PrescriptionsCreate::class)->name('create');
                     Route::get('/{prescription}', PrescriptionsShow::class)->name('show');
                     Route::middleware('can:prescriptions.edit')->get('/{prescription}/edit', PrescriptionsEdit::class)->name('edit');
-                    Route::middleware('can:prescriptions.print')->get('/{prescription}/pdf', function (\App\Models\Clinic $clinic, Prescription $prescription) {
+                    Route::middleware('can:prescriptions.print')->get('/{prescription}/pdf', function (Clinic $clinic, Prescription $prescription) {
                         abort_unless($prescription->clinic_id === $clinic->id, 404);
                         $prescription->loadMissing(['patient', 'doctor', 'items']);
-                        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.prescription', compact('prescription', 'clinic'));
+                        $pdf = Pdf::loadView('pdf.prescription', compact('prescription', 'clinic'));
 
                         return $pdf->stream("receta-{$prescription->folio}.pdf");
                     })->name('pdf');

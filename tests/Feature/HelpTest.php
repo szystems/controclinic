@@ -27,7 +27,7 @@ class HelpTest extends TestCase
     private function makeClinicWithOwner(): array
     {
         $clinic = Clinic::factory()->onboarded()->create();
-        $owner  = User::factory()->create(['clinic_id' => $clinic->id]);
+        $owner = User::factory()->create(['clinic_id' => $clinic->id]);
         $clinic->update(['owner_id' => $owner->id]);
         $owner->assignRole('owner');
 
@@ -92,6 +92,7 @@ class HelpTest extends TestCase
     public function authenticated_user_can_access_help_index_route(): void
     {
         [$clinic, $owner] = $this->makeClinicWithOwner();
+        app()->instance('current_clinic', $clinic);
 
         $this->actingAs($owner)
             ->get(route('app.help.index', ['clinic' => $clinic->slug]))
@@ -102,6 +103,7 @@ class HelpTest extends TestCase
     public function authenticated_user_can_access_help_show_route(): void
     {
         [$clinic, $owner] = $this->makeClinicWithOwner();
+        app()->instance('current_clinic', $clinic);
 
         $this->actingAs($owner)
             ->get(route('app.help.show', ['clinic' => $clinic->slug, 'module' => 'appointments']))
@@ -112,6 +114,7 @@ class HelpTest extends TestCase
     public function help_show_route_returns_404_for_unknown_module(): void
     {
         [$clinic, $owner] = $this->makeClinicWithOwner();
+        app()->instance('current_clinic', $clinic);
 
         $this->actingAs($owner)
             ->get(route('app.help.show', ['clinic' => $clinic->slug, 'module' => 'unknown']))
