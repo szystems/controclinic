@@ -148,5 +148,10 @@
         @if($clinic)
             <livewire:app.global-search :clinic="$clinic" />
         @endif
+
+        {{-- Interactive onboarding tour (F.4) --}}
+        @auth
+            <livewire:app.tour.launcher />
+        @endauth
     </body>
 </html>

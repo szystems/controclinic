@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ · F.4 siguiente)
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ · F.5 siguiente)
 > **Enfoque:** SaaS-First
-> **Métricas:** 531 tests / 1150 asserts (MySQL) · Pint clean
+> **Métricas:** 537 tests · Pint clean
 
 ## ✅ Sprint F — UX & Onboarding (EN CURSO)
 
@@ -25,6 +25,17 @@
 - SEO dinámico en `<head>` y Open Graph desde `public_seo_title/description`
 - 21 tests nuevos: `SettingsPublicPageTest` (11) + `PublicBookingTest` (10 nuevos)
 - Fix: consulta equipo médico usa `role` column + Spatie roles (OR logic)
+
+### F.4 — Tour guiado interactivo (Driver.js) ✅ (2026-05-20)
+- `driver.js` v1.4.0 instalado vía npm, importado en `resources/js/tour.js`
+- `App\Livewire\App\Tour\Launcher` — controla `autoStart`, `completeTour()`, `skipTour()`, `replayTour()`; persiste en `users.preferences`
+- Tour por rol: owner/doctor/admin (8 pasos) · assistant (5) · secretary/receptionist (4)
+- Atributos `data-tour="nav-*"` en links del nav desktop + settings icon
+- Botón "Repetir tour" en el menú de usuario
+- Traducciones `lang/{es,en}/tour.php` (ES+EN, 15 keys)
+- Persistencia en 3 capas: `window.TOUR_CONFIG` (SPA), `localStorage` (recargas), DB vía `$wire` directo (cross-device)
+- `window.__tourLauncher` expuesto en Alpine `x-init` para llamadas directas sin depender de chain de eventos
+- 6 Feature tests (TourTest · 11 assertions)
 
 
 

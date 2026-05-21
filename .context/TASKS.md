@@ -46,21 +46,18 @@
 - ✅ Traducciones ES+EN: `settings.public_page.*`, `settings.public_page_saved`, `settings.cover_removed`, `booking.book_appointment|about_us|our_services|our_team`, `general.add`
 - ✅ 21 tests Feature: `SettingsPublicPageTest` (11) + `PublicBookingTest` (10 nuevos) — 531 total, 1150 assertions
 
-### F.4 — Tour guiado interactivo (Driver.js)
+### F.4 — Tour guiado interactivo (Driver.js) ✅
 > Onboarding visual para primer login post-registro. Reduce fricción inicial.
 
-- [ ] Instalar `driver.js` vía npm (~15KB, MIT)
-- [ ] Migración aditiva: agregar `tour_completed_at` y `tour_skipped_at` al JSON `users.preferences` (ya existe)
-- [ ] Componente Alpine.js `<x-tour-launcher>` global en layout
-- [ ] Definir tour por rol:
-  - Owner/Doctor: dashboard → patients → appointments → calendar → medical-records → invoices → reports → settings
-  - Assistant: dashboard → patients → appointments → calendar
-  - Receptionist: dashboard → appointments → calendar → patients
-- [ ] Trigger automático en primer login después de onboarding
-- [ ] Botón "Repetir tour" en menú de usuario
-- [ ] Botón "Saltar tour" persistente
-- [ ] i18n de todos los textos del tour (`lang/{es,en}/tour.php`)
-- [ ] Tests Feature (3): inicia automático, skip persiste, replay funciona
+- [x] Instalar `driver.js` v1.4.0 vía npm
+- [x] Estado en `users.preferences['tour_completed_at']` y `tour_skipped_at` (JSON cast, sin migración extra)
+- [x] `App\Livewire\App\Tour\Launcher` Livewire component global en layout
+- [x] Tour por rol (8 pasos owner/doctor, 5 assistant, 4 secretary/receptionist)
+- [x] Trigger automático en primer login (preferences null)
+- [x] Botón "Repetir tour" en menú de usuario
+- [x] Skip persistente vía `skipTour()` Livewire action
+- [x] i18n `lang/{es,en}/tour.php`
+- [x] 6 Feature tests (TourTest · todos pasan)
 
 ### F.5 — Ayuda contextual + página `/help`
 > Reducir tickets de soporte con docs accesibles.

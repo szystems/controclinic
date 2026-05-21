@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "chart.js": "^4.5.1",
+        "driver.js": "^1.4.0",
         "fullcalendar": "^6.1.20"
     }
 }

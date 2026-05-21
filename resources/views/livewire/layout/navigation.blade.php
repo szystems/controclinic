@@ -41,6 +41,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.dashboard'),
             'label' => __('general.dashboard'),
             'group' => 'main',
+            'tour'  => 'nav-dashboard',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>',
         ],
         [
@@ -48,6 +49,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.patients.*'),
             'label' => __('general.patients'),
             'group' => 'main',
+            'tour'  => 'nav-patients',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5a4 4 0 11-8 0 4 4 0 018 0zm6 0a4 4 0 11-8 0 4 4 0 018 0z"/>',
         ],
         [
@@ -55,6 +57,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.appointments.index') || request()->routeIs('app.appointments.show') || request()->routeIs('app.appointments.create') || request()->routeIs('app.appointments.edit'),
             'label' => __('general.appointments'),
             'group' => 'main',
+            'tour'  => 'nav-appointments',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>',
         ],
         [
@@ -62,6 +65,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.appointments.calendar'),
             'label' => __('general.calendar'),
             'group' => 'main',
+            'tour'  => 'nav-calendar',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>',
         ],
     ];
@@ -72,6 +76,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.staff.*'),
             'label' => __('general.staff'),
             'group' => 'team',
+            'tour'  => 'nav-staff',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>',
         ];
     }
@@ -82,6 +87,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.reports'),
             'label' => __('general.reports'),
             'group' => 'team',
+            'tour'  => 'nav-reports',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>',
         ];
     }
@@ -92,6 +98,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.invoices.*'),
             'label' => __('invoices.title'),
             'group' => 'main',
+            'tour'  => 'nav-invoices',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>',
         ];
     }
@@ -102,6 +109,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.prescriptions.*'),
             'label' => __('prescriptions.prescriptions'),
             'group' => 'main',
+            'tour'  => 'nav-prescriptions',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 8h.01M9 14h.01M12 14h6"/>',
         ];
     }
@@ -112,6 +120,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.audit-log'),
             'label' => __('general.audit_log'),
             'group' => 'team',
+            'tour'  => 'nav-audit',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>',
         ];
     }
@@ -122,6 +131,7 @@ new class extends Component
             'active' => fn () => request()->routeIs('app.schedule'),
             'label' => __('schedule.title'),
             'group' => 'account',
+            'tour'  => 'nav-schedule',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>',
         ];
     }
@@ -214,6 +224,7 @@ new class extends Component
 
                 <!-- Settings Link -->
                 <a href="{{ route('app.settings.index', $clinicSlug) }}" wire:navigate
+                   data-tour="nav-settings"
                    class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition {{ request()->routeIs('app.settings.*') ? 'bg-gray-100 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400' : '' }}"
                    title="{{ __('general.settings') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,6 +255,16 @@ new class extends Component
                         <x-dropdown-link :href="route('app.billing.index', $clinicSlug)" wire:navigate>
                             {{ __('general.billing') }}
                         </x-dropdown-link>
+
+                        {{-- Replay tour --}}
+                        <button
+                            @click="$dispatch('replay-tour')"
+                            class="w-full text-start"
+                        >
+                            <x-dropdown-link>
+                                {{ __('tour.replay_tour') }}
+                            </x-dropdown-link>
+                        </button>
 
                         @if(auth()->user()->is_super_admin)
                             <div class="border-t border-gray-200 dark:border-gray-600"></div>
@@ -301,6 +322,7 @@ new class extends Component
                     @php $active = $item['active'](); @endphp
                     <a href="{{ route($item['route'], $clinicSlug) }}" wire:navigate
                        title="{{ $item['label'] }}"
+                       @if(!empty($item['tour'])) data-tour="{{ $item['tour'] }}" @endif
                        class="group relative inline-flex flex-col items-center justify-center px-3 lg:px-4 py-2 min-w-[64px] lg:min-w-[76px] border-b-2 transition
                               {{ $active
                                     ? 'border-indigo-500 text-indigo-700 dark:text-indigo-300'
