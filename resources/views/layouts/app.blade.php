@@ -154,6 +154,42 @@
             <livewire:app.tour.launcher />
         @endauth
 
+        {{-- NProgress-style global page progress bar (F.9) --}}
+        <div
+            x-data="{
+                show: false,
+                width: 0,
+                timer: null,
+                start() {
+                    this.show = true;
+                    this.width = 15;
+                    clearInterval(this.timer);
+                    this.timer = setInterval(() => {
+                        if (this.width < 85) this.width += Math.random() * 8;
+                    }, 300);
+                },
+                finish() {
+                    clearInterval(this.timer);
+                    this.width = 100;
+                    setTimeout(() => { this.show = false; this.width = 0; }, 350);
+                },
+            }"
+            x-init="
+                document.addEventListener('livewire:navigate', () => start());
+                document.addEventListener('livewire:navigated', () => finish());
+                document.addEventListener('livewire:request', () => start());
+                document.addEventListener('livewire:response', () => finish());
+            "
+            x-show="show"
+            x-cloak
+            class="fixed top-0 left-0 right-0 z-[9999] h-0.5 pointer-events-none"
+        >
+            <div
+                class="h-full bg-indigo-500 transition-all duration-300 ease-out shadow-[0_0_6px_rgba(99,102,241,0.8)]"
+                :style="`width: ${width}%`"
+            ></div>
+        </div>
+
         {{-- Floating Help button (F.5) --}}
         @auth
             @php

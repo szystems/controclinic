@@ -85,8 +85,19 @@
         </div>
 
         {{-- Calendar container --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div wire:ignore x-ref="calendar" class="fc-controclinic" style="min-height: 650px;"></div>
+
+            {{-- Loading overlay --}}
+            <div wire:loading class="absolute inset-0 bg-white/70 dark:bg-gray-800/70 flex items-center justify-center rounded-lg z-10">
+                <div class="flex flex-col items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                    <svg class="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+                    </svg>
+                    <span class="text-sm font-medium">{{ __('general.loading') }}</span>
+                </div>
+            </div>
         </div>
 
         {{-- Toast --}}
