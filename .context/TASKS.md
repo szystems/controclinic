@@ -1,8 +1,144 @@
 # 📝 Tareas Pendientes
 
-> Actualizado: 2026-05-02 (sincronizado con v1.3)
+> Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 424 tests / 922 asserts · v1.3 en curso
+> Estado real: 531 tests / 1150 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅)
+
+---
+
+## 🚀 Sprint UX & Onboarding (EN CURSO — 2026-05-20)
+
+> **Contexto:** Evaluación de feedback del usuario sobre UX, onboarding y diferenciación de la página pública de la clínica. Objetivo: hacer la aplicación más fácil de adoptar para clínicas sin experiencia técnica y darle más valor visible al portal público.
+>
+> **Priorización (mayor valor / menor esfuerzo):**
+> 1. ~~Setup checklist + empty states ricos~~ ✅
+> 2. Página pública de clínica enriquecida + tab Settings
+> 3. Tour guiado con Driver.js
+> 4. Tooltips contextuales + página `/help`
+> 5. URL pública mejorada (custom domain / subdominio)
+> 6. Múltiples sedes (diferido hasta tener cliente que lo pida)
+
+### F.1 — Setup Checklist post-onboarding (Dashboard) ✅ COMPLETADO 2026-05-20
+- ✅ Componente Livewire `App\Dashboard\SetupChecklist` (collapsible, dismissible)
+- ✅ 6 pasos: logo, schedule, patient, appointment, staff, public_page
+- ✅ Persistencia en `users.preferences` (`setup_checklist_collapsed`, `setup_checklist_dismissed`)
+- ✅ Barra de progreso visual con gradiente inline (fix purge Tailwind)
+- ✅ Anillo SVG de progreso en header (w-12, 48px)
+- ✅ Auto-dismiss cuando se completan todos los pasos
+- ✅ Solo visible para role `owner`
+- ✅ Traducciones ES/EN en `lang/{es,en}/setup_checklist.php`
+- ✅ Link "Ver página pública" en nav top-bar (icono flecha externa)
+- ✅ Banner link página pública en Settings → Citas → Reservas en línea
+- ⏳ Tests Feature (pendiente)
+
+### F.2 — Empty States ricos en todos los módulos ✅ COMPLETADO 2026-05-20
+- ✅ Componente Blade `<x-empty-state>` con 10 variantes de icono, modo compact, CTA con permisos
+- ✅ Aplicado en: Patients, Appointments, Invoices, Prescriptions, Staff, MedicalRecords
+- ✅ Traducciones ES/EN con bullets explicativos en todos los módulos
+- ⏳ Tests Feature (pendiente)
+
+### F.3 — Página pública de clínica enriquecida ✅ COMPLETADO 2026-05-20
+- ✅ Migración aditiva: `public_description`, `public_cover_image_url`, `public_services`, `public_show_doctors`, `public_seo_title`, `public_seo_description`
+- ✅ Modelo `Clinic`: fillable + casts (array, boolean)
+- ✅ Tab "Página Pública" en `App\Livewire\App\Settings\Index` (owner only): cover image upload/remove, descripción (3000 chars), servicios dinámicos, toggle equipo médico, SEO title (70) + meta description (320)
+- ✅ Vista `/c/{slug}` convertida en landing: hero (cover/gradiente + logo + teléfono + horarios + ciudad), About, Servicios grid, Equipo médico, CTA scroll al booking wizard
+- ✅ SEO: `<title>` y `<meta description>` dinámicos + Open Graph desde `public_seo_title/description`
+- ✅ Traducciones ES+EN: `settings.public_page.*`, `settings.public_page_saved`, `settings.cover_removed`, `booking.book_appointment|about_us|our_services|our_team`, `general.add`
+- ✅ 21 tests Feature: `SettingsPublicPageTest` (11) + `PublicBookingTest` (10 nuevos) — 531 total, 1150 assertions
+
+### F.4 — Tour guiado interactivo (Driver.js)
+> Onboarding visual para primer login post-registro. Reduce fricción inicial.
+
+- [ ] Instalar `driver.js` vía npm (~15KB, MIT)
+- [ ] Migración aditiva: agregar `tour_completed_at` y `tour_skipped_at` al JSON `users.preferences` (ya existe)
+- [ ] Componente Alpine.js `<x-tour-launcher>` global en layout
+- [ ] Definir tour por rol:
+  - Owner/Doctor: dashboard → patients → appointments → calendar → medical-records → invoices → reports → settings
+  - Assistant: dashboard → patients → appointments → calendar
+  - Receptionist: dashboard → appointments → calendar → patients
+- [ ] Trigger automático en primer login después de onboarding
+- [ ] Botón "Repetir tour" en menú de usuario
+- [ ] Botón "Saltar tour" persistente
+- [ ] i18n de todos los textos del tour (`lang/{es,en}/tour.php`)
+- [ ] Tests Feature (3): inicia automático, skip persiste, replay funciona
+
+### F.5 — Ayuda contextual + página `/help`
+> Reducir tickets de soporte con docs accesibles.
+
+- [ ] Componente Blade `<x-help-banner :article="...">` colapsable, dismissible por módulo (persiste en localStorage)
+- [ ] Aplicar en top de cada Index con texto "¿Cómo funciona [módulo]?"
+- [ ] Componente `<x-tooltip text="...">` reusable basado en Alpine.js (popover en hover/focus)
+- [ ] Aplicar tooltips en campos críticos (estados de cita, tipos de historial, métodos de pago, permisos)
+- [ ] Página `/help` con artículos Markdown estáticos:
+  - Estructura: `resources/views/help/{modulo}.blade.php` o `resources/markdown/help/{modulo}.md` parseado con `league/commonmark`
+  - Index con tarjetas por módulo
+  - Búsqueda simple cliente (Alpine)
+- [ ] Botón flotante "?" (bottom-right) que abre panel lateral con artículos del módulo actual (futuro)
+- [ ] i18n ES/EN
+
+### F.6 — Mejora de Onboarding existente
+> Pulir los 5 pasos actuales sin reescribir.
+
+- [ ] Agregar **upload de logo** en Paso 3 (Branding) — hoy solo hay colores
+- [ ] Mensaje claro "Puedes saltar este paso y configurarlo después en Ajustes" en cada step opcional
+- [ ] Paso 5 (Plan): mostrar las 4 tiers reales (Solo/Práctica/Clínica/Enterprise) con CTA a Paddle checkout en lugar de solo `free`
+- [ ] Skeleton de bienvenida después de completar onboarding ("¡Bienvenido a ControClinic! Aquí está tu checklist para empezar →")
+
+### F.7 — URL pública canónica
+> Decisión: NO usar `/{slug}` en root (colisiona con `pricing`, `login`, `register`, `c`, `public`, etc.). Mantener `/c/{slug}` y agregar dominio custom opcional.
+
+- [ ] Mantener `/c/{slug}` como ruta canónica (ya existe)
+- [ ] Migración aditiva: `clinics.custom_domain` (string unique nullable) + `clinics.custom_domain_verified_at` (timestamp nullable)
+- [ ] Middleware `ResolveCustomDomain` que detecte `Host` header y resuelva la clínica
+- [ ] UI en Settings tab "Página Pública" para configurar custom domain + instrucciones DNS CNAME
+- [ ] Verificación TXT record para validar ownership del dominio
+- [ ] Disponible solo en planes Clínica y Enterprise (feature flag)
+- [ ] Diferido a v1.2 — schema preventivo ahora
+
+### F.8 — Demo data toggle
+> Para que clínicas nuevas puedan explorar el sistema con datos realistas sin contaminar su producción.
+
+- [ ] Comando artisan `clinic:seed-demo {clinic}` que crea 5 pacientes, 10 citas, 3 historiales, 2 facturas, 1 receta
+- [ ] Botón "Cargar datos de ejemplo" en dashboard cuando la clínica está vacía
+- [ ] Botón "Borrar datos de ejemplo" que elimina solo los marcados con `is_demo=true`
+- [ ] Migración aditiva: `is_demo` (bool default false) en `patients`, `appointments`, `medical_records`, `invoices`, `prescriptions`
+- [ ] Activity Log de carga/borrado de demo
+
+### F.9 — Skeleton screens y loaders
+> Mejora de percepción de velocidad en Livewire pesados.
+
+- [ ] Componente `<x-skeleton-card>`, `<x-skeleton-table>`, `<x-skeleton-list>`
+- [ ] Aplicar en `wire:loading` de: calendar, reports, patient show tabs lazy, files grid
+- [ ] Spinner global de página con barra de progreso superior (NProgress style)
+
+### F.10 — Atajos de teclado expandidos
+> Cmd+K ya existe. Agregar más atajos y modal "?" que los muestre.
+
+- [ ] Atajos globales: `g+p` (patients), `g+a` (appointments), `g+c` (calendar), `g+i` (invoices), `g+r` (reports), `?` (help modal), `n` (new — contextual)
+- [ ] Modal "?" con lista completa de atajos
+- [ ] Implementar con Alpine.js (`@keydown.window`)
+- [ ] Disable en inputs/textarea
+- [ ] i18n
+
+---
+
+### 📊 Múltiples sedes — verificación forward-compat (2026-05-20)
+
+> **Estado:** ✅ Schema ya preparado. No requiere migración nueva ahora.
+>
+> **Columnas existentes:**
+> - `clinics.parent_clinic_id` (UUID nullable, FK self-referencing, nullOnDelete, indexado) — migración `2026_04_30_000001`
+> - `appointments.branch_id` (UUID nullable, FK a clinics, nullOnDelete, indexado) — migración `2026_04_30_000004`
+>
+> **Lo que falta cuando se implemente (Bloque 2):**
+> - UI en Settings para crear/editar sedes hijas
+> - Selector de sede en `Appointments/Create|Edit`
+> - Filtro por sede en calendario, reportes, listados
+> - Asignación de staff a sedes (tabla pivote `clinic_user_branches` o columna `users.branch_id`)
+> - Horarios de doctor por sede (extender `doctor_unavailabilities` con `branch_id`)
+> - Inventario y catálogo por sede (extender `service_catalog`, etc.)
+>
+> **Veredicto:** No romperá datos vivos cuando se active. Diferido hasta tener al menos 1 cliente que lo pida.
 
 ---
 
@@ -66,6 +202,7 @@
 > 5. `2026_04_30_000005_forward_compat_medical_records_table` — `amendment_of_id`, `template_id`, `signed_at`, `signature_hash`, `ai_generated`, `ai_metadata`
 > 6. `2026_04_30_000006_create_app_settings_table` — key-value global de plataforma
 > 7. `2026_04_30_000007_create_tags_and_taggables_tables` — sistema polimorfo de etiquetas
+> 8. `2026_05_06_forward_compat_bloque2_columns` — `clinics.sms_notifications_enabled/sms_provider`, `patients.preferred_channel`, `medical_records.qr_payload`, `appointments.nps_sent_at`
 >
 > **Modelos actualizados** (fillable + casts): `User`, `Clinic`, `Patient`, `Appointment`, `MedicalRecord`.
 > **2FA secret/recovery_codes** se castean como `encrypted` y están en `$hidden`.
@@ -86,17 +223,17 @@
 - [x] **2FA opcional** — TOTP con Google Authenticator, QR, recovery codes, challenge middleware ✅ 2026-05-12
 - [x] **Consentimiento Términos & Privacidad** al registrar — checkbox + timestamp guardado en `users.terms_accepted_at` (2026-05-01)
 - [x] **Cookie banner** en portal público (GDPR mínimo) (2026-05-01)
-- [ ] **Política de retención por defecto** documentada (ej. 5 años para historiales tras última cita)
+- [x] **Política de retención por defecto** documentada (ej. 5 años para historiales tras última cita) ✅ 2026-05-04 → ver `.context/DATA_RETENTION.md`
 - [x] **Export ZIP de data por clínica** — owner descarga su data completa (CSV patients/appointments/records/staff) ✅ 2026-05-01
 
 #### 0.4 Operación / DevOps mínimo
-- [ ] Backup automático diario (mysqldump → S3/storage cifrado)
+- [x] Backup automático diario (`spatie/laravel-backup` → DB gzip → local + S3, `backup:run` 02:00, `backup:clean` 01:00) ✅ 2026-05-04
 - [x] Health check endpoint (`/health`) para uptime monitoring (2026-05-01)
 - [x] Logs estructurados (JSON) para producción ✅ 2026-05-01
-- [ ] Sentry / Bugsnag / similar para errores en prod
+- [x] Sentry instalado y configurado (`sentry/sentry-laravel ^4.25`, DSN via `SENTRY_LARAVEL_DSN`) ✅ 2026-05-04
 - [x] Variables de entorno revisadas (`.env.production.example`) (2026-05-01)
 - [x] `php artisan optimize` en deploy (incluido en deploy.sh) ✅ 2026-05-01
-- [ ] Documentación de deployment (Docker / VPS / similar)
+- [ ] Documentación de deployment (Docker / VPS / similar) — diferido hasta tener servidor de pruebas
 
 ---
 
@@ -104,22 +241,108 @@
 
 > Las features que más diferencian un producto vendible en LATAM. Después del lanzamiento, primer mes.
 
-- [ ] **Recordatorios SMS/WhatsApp** — Twilio + WhatsApp Business; usa `confirmation_token` ya reservado
+- [ ] **🤝 Programa de Partners B2B (Modelo A — caso Find Doctor)** — alianzas comerciales con sitios externos que envían clínicas. Schema preventivo ya en `clinics.partner_id/partner_code_id/partner_attributed_at` (Sprint B pre-launch).
+  - Nuevas tablas: `partners` (UUID, name, slug, contact, commission_type/value, commission_recurring, payout_method, payout_details cifrados, status), `partner_codes` (partner_id, code unique, plan_id, valid_from/until, max_uses, uses_count, status), `partner_commissions` (partner_id, clinic_id, subscription_id, period_start/end, base_amount, commission_amount, status, paid_at)
+  - Plans privados: usar `plans.is_private` y `plans.requires_code` (Sprint B pre-launch). NO aparecen en `/pricing` ni en `Plan::active()->where('is_private', false)`.
+  - Ruta `/signup?code=XXX` valida código (active, dentro de fechas, no exhausto), asigna `plan_id` del código + atribuye partner.
+  - Listener `PaddleSubscriptionPaymentSucceeded` genera registros en `partner_commissions` (todos pagos si `commission_recurring=true`, solo primer pago si false).
+  - Admin UI `/admin/partners`: CRUD partners, generador de códigos, listado de clínicas atribuidas, reporte de comisiones devengadas, marcar pagos, exportar CSV mensual.
+  - Tests Feature (10+): código válido/inválido/expirado/exhausto, atribución, generación de comisión, multi-tenant en reportes.
+- [ ] **Programa de Referidos peer-to-peer (Modelo B)** — clínica refiere a clínica vía `clinics.referral_code` (auto-generado) y `clinics.referred_by_clinic_id`. Reusa tabla `partner_commissions`. Otorga crédito en mes siguiente. Diferido a v1.2 — schema ya preventivo.
+
+- [ ] **Recordatorios SMS/WhatsApp** — Twilio + WhatsApp Business *(diferido post-lanzamiento)*
+  - Schema ya preparado: `appointments.confirmation_token`, `patients.preferred_channel`, `clinics.sms_notifications_enabled/sms_provider`
+  - Al implementar: instalar `laravel/vonage-notification-channel` o Twilio SDK, crear Notification class, agregar canal en notificaciones existentes
 - [x] **Confirmación por link** sin login — token auto-generado, rutas públicas GET /appointment/confirm/{token} y /cancel/{token}, controller, 4 vistas respuesta, botones en email, badge en Show, 9 tests ✅ 2026-05-02
 - [x] **Bloqueo de horarios / vacaciones del doctor** — tabla `doctor_unavailabilities`, modelo, Livewire `App\Schedule\Index`, integración calendar/booking/create/edit, 9 tests ✅ 2026-05-01
-- [ ] **Plantillas SOAP por especialidad** — nueva tabla `record_templates`; usa `medical_records.template_id` ya reservado
+- [x] **Plantillas SOAP por especialidad** — tabla `record_templates`, modelo, política, CRUD en Settings, integración en MedicalRecords\Create, 10 tests ✅ 2026-05-03
 - [x] **Etiquetas en pacientes** — usa tablas `tags` + `taggables` ya creadas
 - [x] **Búsqueda global Cmd+K** — Livewire component + fulltext LIKE queries, modal Alpine.js, 7 tests ✅ 2026-05-01
 - [x] **Audit log UI** — listar `activity_log` por clínica/usuario con filtros (índices ya reservados) ✅ 2026-05-01
 - [x] **Conflicto de horarios** — validación en backend al crear/reagendar cita (Create, Edit y Calendar drag&drop)
-- [ ] **Vista calendario semanal multi-doctor** — extender FullCalendar con resourceTimeline
+- [x] **Archivos del paciente** (`patient_files`) — migración, modelo, policy, controller stream, Livewire Files (grid, filtros, lightbox, delete), mini-uploader en MedicalRecords/Create|Edit ✅ 2026-05-03
+- [x] **Vista agenda diaria multi-doctor** — tabla HTML nativa Livewire (`Schedule.php`), slots 30min, filtro por doctor, navegación día, colores por doctor ✅ 2026-05-03
 - [x] **Módulo Facturación v1 (MVP)** — tablas `invoices`, `invoice_items`, `invoice_payments` (ya diseñadas en backlog); usa campos `consultation_price` ya reservados en `appointments`
 - [x] **Notas internas y comentarios en cita** — `patients.internal_notes` en Edit/Show (solo staff autorizado) + tabla `appointment_comments` con sección en `Appointments/Show` (añadir/eliminar)
 - [x] **Dashboard del doctor personalizado** — vista filtrada por `doctor_id = auth()->id()` (badge en header, `isPersonalizedForDoctor`, `appointmentsBaseQuery()` con filtro condicional)
 
 ---
 
-### 🟡 BLOQUE 2 — Mediano plazo (v1.2 – v1.4)
+## 🚀 Sprint Pre-Lanzamiento (PROPUESTO 2026-05-06) — Landing pública + UX listados + Recetas
+
+> **Decisión usuario 2026-05-06:**
+> - SMS gratuito en Guatemala: NO existe opción confiable. WhatsApp por link + email se mantiene como canal v1.0. SMS queda diferido como add-on de pago en BLOQUE 1 post-launch (schema ya reservado).
+> - Aprobados 4 tiers de planes con precios ajustados (descuento por volumen).
+> - Programa de Partners (caso Find Doctor) se incorpora al BLOQUE 1 post-launch.
+
+### Sprint A — Admin Settings UI (prerequisito)
+> Sin esto, la landing no puede leer branding/legal/SEO de BD. Tabla `app_settings` ya existe.
+
+- [ ] Modelo `AppSetting` + helper `app_setting('key', $default)` con caché `Cache::rememberForever`
+- [ ] Seeder `AppSettingsSeeder` con valores por defecto agrupados (branding, legal, seo, defaults, features)
+- [ ] Livewire `Admin\Settings\Index` con tabs: Branding · Legal · SEO · Defaults · Feature Flags · Planes Públicos
+- [ ] Subida de logos/favicon a `storage/app/public/branding/` (claro, oscuro, favicon, logo PDF)
+- [ ] Refactor `layouts/public.blade.php` y `layouts/admin.blade.php` para consumir `app_setting('branding.*')`
+- [ ] i18n `lang/{es,en}/admin_settings.php`
+- [ ] Tests Feature (8+): middleware admin, render, persistencia, caché invalidation, upload logos
+
+### Sprint B — Landing pública refactor + 4 tiers de planes
+> Auditar las 5 vistas en `resources/views/public/*.blade.php` y reescribir con features reales.
+
+- [ ] **Migración aditiva** `2026_05_XX_pricing_revamp_columns`:
+  - `plans.is_private` (bool default false), `plans.requires_code` (bool default false), `plans.highlight_features` (json nullable — para mostrar como bullets en landing), `plans.cta_text` (string nullable), `plans.cta_url` (string nullable — para Enterprise "Contactar")
+  - `clinics.partner_id` (uuid nullable, FK partners nullOnDelete — preventiva para Modelo A)
+  - `clinics.partner_code_id` (uuid nullable — preventiva)
+  - `clinics.partner_attributed_at` (timestamp nullable — preventiva)
+  - `clinics.referral_code` (string unique nullable — preventiva Modelo B)
+  - `clinics.referred_by_clinic_id` (uuid nullable, FK clinics nullOnDelete — preventiva Modelo B)
+- [ ] Actualizar `PlansSeeder` a 4 tiers + Free + Enterprise:
+  - Free: 1 doc / 0 asist / 25 pac / 5 citas-mes — $0 cortesía
+  - **Solo**: 1 doc / 1 asist / ilimitado — **$19/mes** · $190/año (ahorra 17%)
+  - **Práctica**: 3 doc / 4 asist / ilimitado — **$49/mes** · $490/año (popular ⭐)
+  - **Clínica**: 8 doc / 10 asist / ilimitado — **$99/mes** · $990/año
+  - **Enterprise**: ∞ — "Contactar comercial" (CTA mailto/form)
+- [ ] Sincronizar Paddle product/price IDs (sandbox primero, después production)
+- [ ] Refactor `home.blade.php` (hero · features reales: pacientes, citas, calendario multi-doctor, historial SOAP, recetas, archivos, facturación, reportes, audit log, 2FA, portal público, multi-idioma · cómo funciona · testimonios placeholder · FAQ · CTA)
+- [ ] Refactor `pricing.blade.php` (4 cards desde `Plan::active()->where('is_private', false)->ordered()->get()` · toggle mensual/anual · tabla comparativa · tooltip Free)
+- [ ] `contact.blade.php`: form con honeypot + rate limit + envío a `app_setting('legal.support_email')`
+- [ ] SEO: meta tags + Open Graph + sitemap.xml + robots.txt actualizado
+- [ ] Layout público con selector idioma ES/EN, logo dinámico desde `app_setting`, footer dinámico
+- [ ] Tests Feature (10+): planes públicos visibles, planes privados ocultos, branding dinámico, contact form, locale switch
+
+### Sprint C — Pulido de listados (módulo por módulo) ✅ 2026-05-08
+> Quick wins de UX. Una iteración por módulo para no romper tests.
+
+- [x] **Patients/Index**: agregar columnas `última visita`, `próxima cita`, `# consultas`, `balance pendiente`, badges de tags. Filtros: tag, rango edad, con/sin cita futura, deudores. Eager loading para evitar N+1.
+- [x] **Appointments/Index**: agregar `duración`, `precio`, `facturado sí/no`, `vía creación` (portal/staff). Filtros: rango fechas custom, vía. **Fecha visible en columna al usar rango. Acciones en dropdown Alpine.js (UX móvil).**
+- [x] **MedicalRecords/Index**: agregar `dx principal` (primer diagnóstico), `# archivos adjuntos`, badge confidencial. Filtros: con/sin archivos.
+- [x] **Invoices/Index**: agregar `método pago último`, `días vencida`. Filtros: vencidas, método pago.
+- [x] **Staff/Index**: agregar `último login`, `# citas asignadas`, `# consultas registradas`. Filtros: rol, activo/inactivo.
+- [x] **Tests migrados a MySQL** — `phpunit.xml` ahora usa `controclinic_test` (MySQL), elimina conflicto con SQLite.
+
+### Sprint D — Patient Show con tabs
+- [ ] Refactor `Patients\Show` con tabs Alpine.js: Datos · Citas · Historial · Recetas · Archivos · Facturación · Notas internas · Actividad
+- [ ] Persistir tab activo en URL (`?tab=citas`) para back-button
+- [ ] Header sticky con resumen: nombre, edad, alergias críticas, alertas, badge tags
+- [ ] Lazy load de tabs pesados (Historial, Facturación) con `wire:loading`
+- [ ] Tests Feature (4): cada tab carga, persistencia URL, permisos por tab
+
+### Sprint E — Módulo Recetas independiente
+> Separar prescripciones del modelo `medical_records` como módulo propio con QR público verificable.
+
+- [ ] Migración `create_prescriptions_table`:
+  - `prescriptions` (UUID): clinic_id, patient_id, doctor_id, medical_record_id (nullable), issued_at, valid_until, status (draft|issued|dispensed|cancelled), qr_payload (string unique), signature_path, notes, soft deletes
+  - `prescription_items`: prescription_id, order, medication_name, presentation, dose, frequency, duration, route, instructions
+- [ ] Modelo `Prescription` con `BelongsToClinic`, `LogsActivity`, soft deletes, generación automática de `qr_payload` (hash firmado)
+- [ ] `PrescriptionPolicy` + permisos Spatie: `prescriptions.view|create|edit|delete|print|verify`
+- [ ] Livewire CRUD: `App\Prescriptions\Index|Create|Show|Edit` con UI de items repeater
+- [ ] PDF con QR (paquete `simplesoftwareio/simple-qrcode` ya o instalar)
+- [ ] Ruta pública `/rx/verify/{qr_payload}` — verificación sin login (rate limited), muestra solo info segura: doctor, fecha, validez, hash
+- [ ] Acción "Convertir a receta independiente" desde `MedicalRecords/Show` (NO migración automática — preserva data viva)
+- [ ] Tab "Recetas" en `Patients/Show` consume el nuevo módulo
+- [ ] Tests Feature (12+): CRUD, multi-tenant, permisos, QR generación/verificación, PDF, conversión desde MedicalRecord, ruta pública
+
+---
 
 - [ ] **Múltiples sucursales** — usa `parent_clinic_id` y `appointments.branch_id` ya reservados; UI en Settings
 - [ ] **Portal del paciente** — usa `patients.portal_user_id` ya reservado; rutas `/portal/{token}`
@@ -516,7 +739,81 @@ viva ni rompe datos sensibles. Las migraciones del Bloque 0 son la "vacuna" para
 
 ---
 
-### 💰 Módulo "Facturación / Cobros de Consultas" (Por Clínica) — PROPUESTO 2026-04-30
+### � Módulo "Archivos del Paciente" (`patient_files`) — BLOQUE 1
+
+> **Contexto:** Los doctores necesitan archivar documentos que el paciente entrega físicamente o envía
+> (laboratorios, radiografías, informes externos, recetas anteriores, consentimientos, etc.). Hoy no hay
+> forma de adjuntar archivos al expediente del paciente más allá del texto en SOAP.
+>
+> **Diseño:** sección propia bajo `Patients/Show` (tab "Archivos"), separada de las consultas pero con
+> capacidad de ligar un archivo a una consulta específica (`medical_record_id nullable`). Los archivos
+> se sirven vía rutas autenticadas con stream controlado, **nunca** acceso público directo.
+
+#### Modelo de datos
+
+```
+patient_files (UUID)
+├── clinic_id (tenant scope)
+├── patient_id
+├── medical_record_id (nullable — ligado a consulta específica si aplica)
+├── uploaded_by_user_id
+├── category: lab | image | report | prescription | consent | other
+├── name (string — nombre descriptivo: "Hemograma 2026-05-03")
+├── original_filename
+├── disk_path (ruta interna, nunca URL pública)
+├── mime_type
+├── size_bytes
+├── notes (text nullable)
+├── timestamps + softDeletes
+```
+
+#### Permisos
+
+| Acción | Roles |
+|--------|-------|
+| Ver / descargar | doctor, assistant, owner, admin |
+| Subir | doctor, assistant, owner |
+| Eliminar | doctor, owner |
+| NO acceso | receptionist, secretary (datos clínicos sensibles) |
+
+Nuevos permisos Spatie: `files.view`, `files.upload`, `files.delete`
+
+#### UX
+
+- Tab "Archivos" en `Patients/Show` con contador de archivos en el badge
+- Grid de tarjetas: ícono por tipo (PDF, imagen, hoja), nombre, categoría, fecha, subido por
+- Filtro por categoría (dropdown)
+- Click en imagen → preview inline (lightbox Alpine.js)
+- Click en PDF → abrir stream en nueva pestaña
+- Click en DOCX/XLSX → descarga directa autenticada
+- Uploader drag&drop o click (múltiples archivos)
+- Desde `MedicalRecords/Create|Edit` → mini-uploader opcional que liga el archivo a esa consulta
+
+#### Seguridad de archivos
+
+- `Storage::disk('local')` en dev, `Storage::disk('s3')` en prod
+- Nunca `disk('public')` para docs médicos
+- Servir vía controller con validación de permisos antes del stream
+- Nombres internos: UUID, no el `original_filename` (evita path traversal)
+- Validación MIME strict en backend (no solo extensión)
+
+#### Tareas técnicas
+
+- [ ] Migración `create_patient_files_table`
+- [ ] Modelo `PatientFile` con `BelongsToClinic`, SoftDeletes, casts
+- [ ] `PatientFilePolicy` (view, upload, delete)
+- [ ] Permisos Spatie en seeder: `files.view|upload|delete`
+- [ ] Controller `PatientFileController` — `store` (upload), `show` (stream), `destroy`
+- [ ] Livewire `App\Patients\Files` (tab en Show) con uploader, grid, filtros, delete
+- [ ] Preview lightbox para imágenes (Alpine.js)
+- [ ] Stream seguro PDF/otros en nueva pestaña
+- [ ] Mini-uploader en `MedicalRecords/Create|Edit` (opcional, liga `medical_record_id`)
+- [ ] i18n `lang/{es,en}/files.php`
+- [ ] Tests Feature (8+): upload, stream, permisos, multi-tenant, categorías, delete
+
+---
+
+### �💰 Módulo "Facturación / Cobros de Consultas" (Por Clínica) — PROPUESTO 2026-04-30
 
 > **Contexto:** Hoy `appointments` no maneja precio. Las clínicas necesitan llevar control de cuánto se cobra
 > por cada consulta, descuentos, procedimientos extras, medicamentos vendidos, etc. y emitir un comprobante
@@ -612,14 +909,14 @@ invoice_payments
 - [x] Servicio `InvoiceService` (cálculo de totales, generación de número, transacciones)
 - [x] Permisos Spatie: `invoices.view|create|edit|delete|export|record_payment`
 - [x] Settings de clínica (billing_enabled, invoice_prefix, tax_rate, default_consultation_price, etc.)
-- [ ] Campos `consultation_price`, `consultation_discount`, `is_billable` en `appointments` (UI)
+- [x] Campos `consultation_price`, `consultation_discount`, `is_billable` en `appointments` (UI) ✅ 2026-05-04
 - [x] Livewire: `App\Invoices\Index`, `Create`, `Show`, `Edit` (con modal de pago)
 - [x] PDF de factura/comprobante (DomPDF) — plantilla i18n
-- [ ] Reportes: ingresos por clínica, por doctor, por método de pago, por periodo
+- [x] Reportes: ingresos por clínica, por doctor, por método de pago, por periodo ✅ 2026-05-04
 - [x] Activity Log en Invoice (LogsActivity con logFillable)
 - [x] Tests Feature (15 tests: creación, cálculo, pagos parciales, PDF, permisos, multi-tenant)
 - [x] i18n `lang/{es,en}/invoices.php` (70+ claves)
-- [ ] Toggle `billing_enabled` en Settings UI
+- [x] Toggle `billing_enabled` en Settings UI ✅ 2026-05-03
 - [x] Documentación: política de no-factura-electrónica-oficial en v1
 - [x] Catálogo de servicios (`service_catalog`) — CRUD completo en Settings ✅ 2026-05-02
 - [x] Autocompletado del catálogo en formulario de factura (Create/Edit) ✅ 2026-05-02

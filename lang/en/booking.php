@@ -98,4 +98,9 @@ return [
         'time_required' => 'You must select a time slot.',
         'terms_required' => 'You must accept data processing.',
     ],
+
+    'book_appointment' => 'Book appointment',
+    'about_us'         => 'About us',
+    'our_services'     => 'Our services',
+    'our_team'         => 'Our team',
 ];

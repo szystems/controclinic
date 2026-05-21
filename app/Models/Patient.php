@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -56,6 +57,7 @@ class Patient extends Model
         'external_id',
         'consent_signed_at',
         'marketing_opt_in',
+        'preferred_channel',
     ];
 
     protected $casts = [
@@ -96,6 +98,15 @@ class Patient extends Model
         return $this->hasMany(Appointment::class);
     }
 
+    public function nextUpcomingAppointment(): HasOne
+    {
+        return $this->hasOne(Appointment::class)
+            ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_CONFIRMED])
+            ->where('appointment_date', '>=', now()->toDateString())
+            ->orderBy('appointment_date')
+            ->orderBy('start_time');
+    }
+
     public function medicalRecords(): HasMany
     {
         return $this->hasMany(MedicalRecord::class);
@@ -104,6 +115,11 @@ class Patient extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(PatientFile::class);
     }
 
     public function tags(): MorphToMany

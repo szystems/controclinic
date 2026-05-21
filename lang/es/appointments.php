@@ -84,8 +84,12 @@ return [
     'appointment_updated' => 'Cita actualizada exitosamente',
     'appointment_cancelled' => 'Cita cancelada exitosamente',
     'appointment_confirmed' => 'Cita confirmada exitosamente',
-    'no_appointments' => 'No hay citas programadas',
+    'no_appointments' => 'No hay citas para mostrar',
     'no_appointments_today' => 'No hay citas para hoy',
+    'no_appointments_description' => 'Agenda tu primera cita para empezar a organizar la consulta.',
+    'empty_state_bullet_1' => 'Confirmación automática por email con link de cancelación',
+    'empty_state_bullet_2' => 'Vista de calendario diaria y semanal por doctor',
+    'empty_state_bullet_3' => 'Detección automática de conflictos de horario',
     'conflict_detected' => 'Se detectó un conflicto de horario',
 
     // Dashboard
@@ -176,4 +180,25 @@ return [
     'is_billable' => 'Cobrable',
     'is_billable_hint' => 'Marcar esta cita como cobrable al paciente',
     'price_optional' => 'Si se deja en blanco se usará el precio por defecto de la clínica',
+
+    // Vista multi-doctor (Schedule)
+    'schedule_view_title' => 'Agenda del día',
+    'schedule_view_hint' => 'Ver las citas de todos los doctores en columnas por hora.',
+    'calendar_view' => 'Calendario',
+    'appointment_count' => '{1} 1 cita|[2,*] :count citas',
+    'no_doctors_registered' => 'No hay doctores registrados en la clínica.',
+    'time' => 'Hora',
+
+    // Sprint C — nuevos filtros y columnas
+    'date_time' => 'Fecha / Hora',
+    'date_from' => 'Desde',
+    'date_to' => 'Hasta',
+    'created_via' => 'Origen',
+    'all_origins' => 'Todos los orígenes',
+    'origin_web' => 'Web',
+    'origin_app' => 'App',
+    'origin_phone' => 'Teléfono',
+    'origin_walkin' => 'Presencial',
+    'price' => 'Precio',
+    'invoiced' => 'Facturado',
 ];

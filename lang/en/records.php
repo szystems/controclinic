@@ -10,7 +10,11 @@ return [
     'back_to_records' => '← Back to records',
 
     'subtitle' => 'Clinical history of :patient',
-    'no_records' => 'No records yet for this patient.',
+    'no_records' => 'No records yet',
+    'no_records_description' => 'Create the first consultation to start this patient\'s medical history.',
+    'empty_state_bullet_1' => 'SOAP format with diagnosis, treatment and follow-up plan',
+    'empty_state_bullet_2' => 'Attach files, images and lab results',
+    'empty_state_bullet_3' => 'Generate prescriptions directly from the record',
     'create_first' => 'Create first record',
     'filter_type' => 'Type',
     'filter_all_types' => 'All types',
@@ -114,4 +118,10 @@ return [
     'new_prescription' => 'New Prescription',
     'field_diagnoses' => 'Diagnoses',
     'field_prescriptions' => 'Prescriptions',
+
+    // Sprint C
+    'filter_files' => 'Files',
+    'filter_all_files' => 'All',
+    'filter_with_files' => 'With files',
+    'filter_without_files' => 'Without files',
 ];

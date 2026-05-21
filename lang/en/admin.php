@@ -192,4 +192,18 @@ return [
     'save_legal' => 'Save Legal',
     'save_defaults' => 'Save Defaults',
     'save_features' => 'Save Features',
+
+    // --- SEO ---
+    'seo' => 'SEO & Analytics',
+    'seo_description' => 'Metadata for search engines and social networks, plus analytics identifiers.',
+    'seo_meta_title' => 'Meta Title',
+    'seo_meta_title_help' => 'Shown in the browser tab and Google results. Recommended: 50-60 characters.',
+    'seo_meta_description' => 'Meta Description',
+    'seo_meta_description_help' => 'Shown in Google results and when sharing on social networks. Recommended: 150-160 characters.',
+    'seo_og_image' => 'Open Graph Image',
+    'seo_og_image_help' => 'Image shown when sharing the site on Facebook, WhatsApp, LinkedIn, etc. Recommended size 1200×630 px.',
+    'seo_og_image_select' => 'Select image',
+    'seo_ga_id' => 'Google Analytics 4 ID',
+    'seo_gtm_id' => 'Google Tag Manager ID',
+    'save_seo' => 'Save SEO',
 ];

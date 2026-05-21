@@ -26,6 +26,11 @@ return [
     'expires' => 'Expires :date',
 
     // Actions
+    'edit' => 'Edit',
+    'edit_title' => 'Edit invitation',
+    'edit_resend_hint' => 'Saving will send an updated invitation email to the recipient.',
+    'save_and_resend' => 'Save & Resend',
+    'invitation_updated' => 'Invitation updated and resent successfully.',
     'resend' => 'Resend',
     'cancel_invitation' => 'Cancel invitation',
     'confirm_cancel' => 'Are you sure you want to cancel the invitation for :name?',

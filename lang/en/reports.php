@@ -74,4 +74,26 @@ return [
 
     // No data
     'no_data' => 'No data for the selected period',
+
+    // Billing / Revenue section
+    'billing_section' => 'Revenue',
+    'billing_section_subtitle' => 'Financial summary for the period (invoices issued within the period)',
+    'billing_disabled_hint' => 'Enable billing in Settings to view revenue reports.',
+    'total_invoiced' => 'Total Invoiced',
+    'total_invoiced_help' => 'Sum of invoices issued in the period (excludes drafts and cancelled).',
+    'total_collected' => 'Total Collected',
+    'total_collected_help' => 'Sum of payments received in the period.',
+    'pending_revenue' => 'Outstanding Balance',
+    'pending_revenue_help' => 'Pending balance on active invoices (not filtered by period).',
+    'average_ticket' => 'Average Ticket',
+    'average_ticket_help' => 'Average total of invoices issued in the period.',
+    'revenue_by_doctor' => 'Revenue by Doctor',
+    'revenue_by_payment_method' => 'Revenue by Payment Method',
+    'chart_revenue_by_day' => 'Collections per day',
+    'col_invoiced' => 'Invoiced',
+    'col_collected' => 'Collected',
+    'col_invoices' => 'Invoices',
+    'col_payments' => 'Payments',
+    'col_method' => 'Method',
+    'col_amount' => 'Amount',
 ];

@@ -74,4 +74,26 @@ return [
 
     // No data
     'no_data' => 'Sin datos para el período seleccionado',
+
+    // Billing / Revenue section
+    'billing_section' => 'Ingresos',
+    'billing_section_subtitle' => 'Resumen financiero del período (solo facturas emitidas en el período)',
+    'billing_disabled_hint' => 'Habilita la facturación en Configuración para ver reportes de ingresos.',
+    'total_invoiced' => 'Total Facturado',
+    'total_invoiced_help' => 'Suma de facturas emitidas en el período (excluye borradores y canceladas).',
+    'total_collected' => 'Total Cobrado',
+    'total_collected_help' => 'Suma de pagos recibidos en el período.',
+    'pending_revenue' => 'Pendiente de Cobro',
+    'pending_revenue_help' => 'Saldo pendiente en facturas activas (no filtrado por período).',
+    'average_ticket' => 'Ticket Promedio',
+    'average_ticket_help' => 'Promedio del total de facturas emitidas en el período.',
+    'revenue_by_doctor' => 'Ingresos por Doctor',
+    'revenue_by_payment_method' => 'Ingresos por Método de Pago',
+    'chart_revenue_by_day' => 'Cobros por día',
+    'col_invoiced' => 'Facturado',
+    'col_collected' => 'Cobrado',
+    'col_invoices' => 'Facturas',
+    'col_payments' => 'Pagos',
+    'col_method' => 'Método',
+    'col_amount' => 'Monto',
 ];

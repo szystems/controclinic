@@ -138,6 +138,47 @@ class AppSettingsSeeder extends Seeder
                 'is_public' => false,
                 'description' => 'Mostrar página de mantenimiento a usuarios normales',
             ],
+            // --- SEO ---
+            [
+                'group' => 'seo',
+                'key' => 'seo.meta_title',
+                'value' => 'ControClinic — Software para Clínicas Médicas',
+                'type' => 'string',
+                'is_public' => true,
+                'description' => 'Título por defecto en meta tags y Open Graph',
+            ],
+            [
+                'group' => 'seo',
+                'key' => 'seo.meta_description',
+                'value' => 'ControClinic es el software de gestión para clínicas médicas más fácil de usar. Agenda citas, gestiona pacientes y haz crecer tu práctica médica.',
+                'type' => 'string',
+                'is_public' => true,
+                'description' => 'Descripción por defecto en meta tags (recomendado 150-160 caracteres)',
+            ],
+            [
+                'group' => 'seo',
+                'key' => 'seo.og_image_url',
+                'value' => null,
+                'type' => 'string',
+                'is_public' => true,
+                'description' => 'URL de imagen Open Graph (1200×630 px recomendado)',
+            ],
+            [
+                'group' => 'seo',
+                'key' => 'seo.google_analytics_id',
+                'value' => null,
+                'type' => 'string',
+                'is_public' => true,
+                'description' => 'ID de Google Analytics 4 (formato G-XXXXXXXXXX)',
+            ],
+            [
+                'group' => 'seo',
+                'key' => 'seo.gtm_id',
+                'value' => null,
+                'type' => 'string',
+                'is_public' => true,
+                'description' => 'ID de Google Tag Manager (formato GTM-XXXXXXX)',
+            ],
         ];
 
         foreach ($defaults as $setting) {

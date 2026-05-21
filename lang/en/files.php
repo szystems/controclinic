@@ -1,0 +1,45 @@
+<?php
+
+return [
+    'title' => 'Files',
+    'tab_label' => 'Files',
+    'empty' => 'No files attached to this patient.',
+    'upload_button' => 'Upload file',
+    'upload_title' => 'Upload files',
+    'upload_hint' => 'PDF, images, Word, Excel — max 20 MB per file.',
+    'file_name' => 'Descriptive name',
+    'file_name_hint' => 'E.g.: Blood test May 2026 (optional, uses filename if left empty)',
+    'category' => 'Category',
+    'notes' => 'Internal notes',
+    'notes_hint' => 'Notes about this file (staff only)',
+    'drop_or_click' => 'Drag files here or click to select',
+    'save' => 'Upload',
+    'cancel' => 'Cancel',
+    'uploaded_success' => 'Files uploaded successfully.',
+    'deleted_success' => 'File deleted.',
+    'uploaded_by' => 'Uploaded by',
+    'uploaded_at' => 'Date',
+    'size' => 'Size',
+    'filter_all' => 'All categories',
+    'filter_clear' => 'Clear filter',
+    'empty_filtered' => 'No files in this category.',
+    'delete_confirm' => 'Delete this file? This action cannot be undone.',
+    'delete' => 'Delete',
+    'view' => 'View',
+    'download' => 'Download',
+    'no_permission' => 'You do not have permission to view files for this patient.',
+
+    // Mini-uploader in medical records
+    'attach_files' => 'Attach files',
+    'attach_hint' => 'Optional. Files will be linked to this record when saved.',
+    'attach_select_label' => 'Files to attach',
+    'attach_select_button' => 'Choose files',
+
+    // Categories
+    'category_lab' => 'Lab / Blood test',
+    'category_image' => 'Image / X-ray',
+    'category_report' => 'Report',
+    'category_prescription' => 'Prescription',
+    'category_consent' => 'Consent form',
+    'category_other' => 'Other',
+];

@@ -3,6 +3,12 @@
     $time = \Carbon\Carbon::parse($appointment->start_time)->format('H:i');
 @endphp
 <x-mail::message>
+
+{{-- Clinic branding sub-header --}}
+<x-slot:clinicHeader>
+@include('mail.partials.clinic-header', ['clinic' => $clinic])
+</x-slot:clinicHeader>
+
 # {{ __('appointments_mail.greeting', ['name' => $patient->first_name]) }}
 
 {{ __('appointments_mail.cancelled_intro', ['clinic' => $clinic->name]) }}

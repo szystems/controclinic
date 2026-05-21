@@ -192,4 +192,18 @@ return [
     'save_legal' => 'Guardar Legal',
     'save_defaults' => 'Guardar Defaults',
     'save_features' => 'Guardar Funcionalidades',
+
+    // --- SEO ---
+    'seo' => 'SEO y Analytics',
+    'seo_description' => 'Metadatos para buscadores y redes sociales, e identificadores de analytics.',
+    'seo_meta_title' => 'Título Meta',
+    'seo_meta_title_help' => 'Aparece en la pestaña del navegador y en resultados de Google. Recomendado: 50-60 caracteres.',
+    'seo_meta_description' => 'Descripción Meta',
+    'seo_meta_description_help' => 'Aparece en resultados de Google y al compartir en redes. Recomendado: 150-160 caracteres.',
+    'seo_og_image' => 'Imagen Open Graph',
+    'seo_og_image_help' => 'Imagen mostrada al compartir el sitio en Facebook, WhatsApp, LinkedIn, etc. Tamaño recomendado 1200×630 px.',
+    'seo_og_image_select' => 'Seleccionar imagen',
+    'seo_ga_id' => 'Google Analytics 4 ID',
+    'seo_gtm_id' => 'Google Tag Manager ID',
+    'save_seo' => 'Guardar SEO',
 ];

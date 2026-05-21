@@ -71,6 +71,7 @@ class Appointment extends Model
         'pre_consultation_form_id',
         'parent_appointment_id',
         'created_via',
+        'nps_sent_at',
     ];
 
     protected $casts = [
@@ -90,6 +91,7 @@ class Appointment extends Model
         'consultation_price' => 'decimal:2',
         'consultation_discount' => 'decimal:2',
         'is_billable' => 'boolean',
+        'nps_sent_at' => 'datetime',
     ];
 
     // Status constants

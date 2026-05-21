@@ -84,8 +84,12 @@ return [
     'appointment_updated' => 'Appointment updated successfully',
     'appointment_cancelled' => 'Appointment cancelled successfully',
     'appointment_confirmed' => 'Appointment confirmed successfully',
-    'no_appointments' => 'No appointments scheduled',
+    'no_appointments' => 'No appointments to show',
     'no_appointments_today' => 'No appointments for today',
+    'no_appointments_description' => 'Schedule your first appointment to start organizing consultations.',
+    'empty_state_bullet_1' => 'Automatic email confirmation with cancellation link',
+    'empty_state_bullet_2' => 'Daily and weekly calendar view per doctor',
+    'empty_state_bullet_3' => 'Automatic schedule conflict detection',
     'conflict_detected' => 'Schedule conflict detected',
 
     // Dashboard
@@ -175,4 +179,24 @@ return [
     'is_billable' => 'Billable',
     'is_billable_hint' => 'Mark this appointment as billable to the patient',
     'price_optional' => 'Leave blank to use the clinic default price',
+
+    // Multi-doctor schedule view
+    'schedule_view_title' => 'Day schedule',
+    'schedule_view_hint' => 'See all doctors\' appointments side by side, by hour.',
+    'calendar_view' => 'Calendar',
+    'appointment_count' => '{1} 1 appointment|[2,*] :count appointments',
+    'no_doctors_registered' => 'No doctors registered in this clinic.',
+    'time' => 'Time',
+    // Sprint C — new filters and columns
+    'date_time' => 'Date / Time',
+    'date_from' => 'From',
+    'date_to' => 'To',
+    'created_via' => 'Origin',
+    'all_origins' => 'All origins',
+    'origin_web' => 'Web',
+    'origin_app' => 'App',
+    'origin_phone' => 'Phone',
+    'origin_walkin' => 'Walk-in',
+    'price' => 'Price',
+    'invoiced' => 'Invoiced',
 ];

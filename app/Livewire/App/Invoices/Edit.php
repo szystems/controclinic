@@ -59,6 +59,7 @@ class Edit extends Component
 
     public function mount(Clinic $clinic, Invoice $invoice): void
     {
+        abort_unless($clinic->billingEnabled(), 403);
         abort_unless($invoice->clinic_id === $clinic->id, 404);
 
         // Solo se puede editar si está en draft o pending y sin pagos
@@ -232,7 +233,7 @@ class Edit extends Component
         if (auth()->user()->can('settings.edit')) {
             $freeItems = [];
             foreach ($validated['items'] as $order => $itemData) {
-                if (empty($this->itemCatalogIds[$order]) && !empty(trim($itemData['description'] ?? ''))) {
+                if (empty($this->itemCatalogIds[$order]) && ! empty(trim($itemData['description'] ?? ''))) {
                     $freeItems[] = [
                         'index' => $order,
                         'description' => $itemData['description'],
@@ -241,7 +242,7 @@ class Edit extends Component
                 }
             }
 
-            if (!empty($freeItems)) {
+            if (! empty($freeItems)) {
                 $this->savedInvoiceId = $this->invoice->id;
                 $this->freeItemSuggestions = $freeItems;
                 $this->showCatalogSuggestion = true;

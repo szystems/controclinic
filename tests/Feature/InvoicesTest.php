@@ -278,6 +278,30 @@ class InvoicesTest extends TestCase
         $this->assertEquals(Invoice::STATUS_CANCELLED, $invoice->status);
     }
 
+    public function test_invoices_index_blocked_when_billing_disabled(): void
+    {
+        $clinic = Clinic::factory()->onboarded()->create();
+        $owner = User::factory()->owner()->create(['clinic_id' => $clinic->id]);
+
+        // billing_enabled = false (default)
+        $settings = $clinic->settings ?? [];
+        $settings['billing_enabled'] = false;
+        $clinic->update(['settings' => $settings]);
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesIndex::class, ['clinic' => $clinic])
+            ->assertForbidden();
+    }
+
+    public function test_invoices_index_accessible_when_billing_enabled(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner(); // billing_enabled = true
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesIndex::class, ['clinic' => $clinic])
+            ->assertOk();
+    }
+
     // ==================== InvoiceService ====================
 
     public function test_invoice_service_generates_sequential_numbers(): void

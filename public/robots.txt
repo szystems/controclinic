@@ -1,2 +1,14 @@
 User-agent: *
-Disallow:
+Allow: /
+Allow: /pricing
+Allow: /contact
+Allow: /terms
+Allow: /privacy
+Disallow: /app/
+Disallow: /admin/
+Disallow: /booking/
+Disallow: /confirm/
+Disallow: /portal/
+Disallow: /rx/
+
+Sitemap: https://app.controclinic.com/sitemap.xml

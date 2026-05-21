@@ -125,43 +125,94 @@
             </div>
             <div class="divide-y divide-gray-200 dark:divide-gray-700">
                 @foreach($pendingInvitations as $invitation)
-                <div class="px-6 py-4 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ $invitation->name }}
+                <div wire:key="inv-{{ $invitation->id }}">
+                    {{-- Main row --}}
+                    <div class="px-6 py-4 flex items-center justify-between"
+                         x-show="{{ $editingInvitationId !== $invitation->id ? 'true' : 'false' }}">
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
                             </div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $invitation->email }}
+                            <div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $invitation->name }}
+                                </div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $invitation->email }}
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {{ $invitation->role === 'doctor' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
+                                {{ __('staff.role_' . $invitation->role) }}
+                            </span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
+                                {{ __('invitations.status_pending') }}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ __('invitations.expires', ['date' => $invitation->expires_at->diffForHumans()]) }}
+                            </span>
+                            <button wire:click="editInvitation('{{ $invitation->id }}')"
+                                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium">
+                                {{ __('invitations.edit') }}
+                            </button>
+                            <button wire:click="resendInvitation('{{ $invitation->id }}')"
+                                    class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm font-medium">
+                                {{ __('invitations.resend') }}
+                            </button>
+                            <button wire:click="cancelInvitation('{{ $invitation->id }}')"
+                                    wire:confirm="{{ __('invitations.confirm_cancel', ['name' => $invitation->name]) }}"
+                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm font-medium">
+                                {{ __('general.cancel') }}
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Inline edit form --}}
+                    @if($editingInvitationId === $invitation->id)
+                    <div class="px-6 py-5 bg-indigo-50/60 dark:bg-indigo-900/10 border-l-4 border-indigo-400 dark:border-indigo-600">
+                        <p class="text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-3">{{ __('invitations.edit_title') }}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('staff.name') }} *</label>
+                                <input type="text" wire:model="editInvitationName"
+                                       class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm">
+                                @error('editInvitationName') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('staff.email') }} *</label>
+                                <input type="email" wire:model="editInvitationEmail"
+                                       class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm">
+                                @error('editInvitationEmail') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('staff.role') }} *</label>
+                                <select wire:model="editInvitationRole"
+                                        class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm">
+                                    <option value="doctor">{{ __('staff.role_doctor') }}</option>
+                                    <option value="assistant">{{ __('staff.role_assistant') }}</option>
+                                    <option value="secretary">{{ __('staff.role_secretary') }}</option>
+                                    <option value="receptionist">{{ __('staff.role_receptionist') }}</option>
+                                </select>
+                                @error('editInvitationRole') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            {{ $invitation->role === 'doctor' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
-                            {{ __('staff.role_' . $invitation->role) }}
-                        </span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
-                            {{ __('invitations.status_pending') }}
-                        </span>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">{{ __('invitations.edit_resend_hint') }}</p>
+                        <div class="flex items-center gap-3 mt-3">
+                            <button wire:click="saveInvitation"
+                                    class="inline-flex items-center px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition">
+                                {{ __('invitations.save_and_resend') }}
+                            </button>
+                            <button wire:click="cancelEditInvitation"
+                                    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition">
+                                {{ __('general.cancel') }}
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ __('invitations.expires', ['date' => $invitation->expires_at->diffForHumans()]) }}
-                        </span>
-                        <button wire:click="resendInvitation('{{ $invitation->id }}')"
-                                class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium">
-                            {{ __('invitations.resend') }}
-                        </button>
-                        <button wire:click="cancelInvitation('{{ $invitation->id }}')"
-                                wire:confirm="{{ __('invitations.confirm_cancel', ['name' => $invitation->name]) }}"
-                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm font-medium">
-                            {{ __('general.cancel') }}
-                        </button>
-                    </div>
+                    @endif
                 </div>
                 @endforeach
             </div>
@@ -258,6 +309,12 @@
                                         @endif
                                     </div>
                                 </th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    {{ __('staff.appointments_count') }}
+                                </th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    {{ __('staff.records_count') }}
+                                </th>
                                 @can('users.manage')
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     {{ __('staff.actions') }}
@@ -267,7 +324,8 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach ($members as $member)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition @can('users.manage') cursor-pointer @endcan"
+                                    @can('users.manage') @click="window.location.href='{{ route('app.staff.edit', ['clinic' => $currentClinic->slug, 'user' => $member->id]) }}'" @endcan>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
@@ -401,8 +459,26 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {{ $member->last_login_at ? $member->last_login_at->diffForHumans() : __('staff.never') }}
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
+                                        @if($member->appointments_count > 0)
+                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold">
+                                                {{ $member->appointments_count }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-400">0</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
+                                        @if($member->records_count > 0)
+                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
+                                                {{ $member->records_count }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-400">0</span>
+                                        @endif
+                                    </td>
                                     @can('users.manage')
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
                                         <div class="flex items-center justify-end gap-2">
                                             @if($member->isOwner())
                                                 {{-- Owner: sin acciones destructivas, sólo edit perfil --}}
@@ -469,34 +545,31 @@
                 @endif
             @else
                 {{-- Empty State --}}
-                <div class="text-center py-12">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
-                    @if($search || $roleFilter || $statusFilter !== '')
-                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('staff.no_results') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('staff.no_results_description') }}</p>
-                    @else
-                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('staff.no_members') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('staff.no_members_description') }}</p>
-                        @can('users.manage')
-                        <div class="mt-6">
-                            @if($currentClinic->canAddDoctor() || $currentClinic->canAddStaff())
-                                <a href="{{ route('app.staff.create', ['clinic' => $currentClinic->slug]) }}"
-                                   wire:navigate
-                                   class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-hover transition">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                    </svg>
-                                    {{ __('staff.add_member') }}
-                                </a>
-                            @else
-                                <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
-                            @endif
-                        </div>
-                        @endcan
-                    @endif
-                </div>
+                @if($search || $roleFilter || $statusFilter !== '')
+                <x-empty-state
+                    icon="staff"
+                    :compact="true"
+                    :title="__('staff.no_results')"
+                    :description="__('staff.no_results_description')"
+                />
+                @else
+                <x-empty-state
+                    icon="staff"
+                    :title="__('staff.no_members')"
+                    :description="__('staff.no_members_description')"
+                    :bullets="[__('staff.empty_state_bullet_1'), __('staff.empty_state_bullet_2'), __('staff.empty_state_bullet_3')]"
+                    :cta-text="($currentClinic->canAddDoctor() || $currentClinic->canAddStaff()) ? __('staff.add_member') : null"
+                    :cta-route="($currentClinic->canAddDoctor() || $currentClinic->canAddStaff()) ? route('app.staff.create', ['clinic' => $currentClinic->slug]) : null"
+                    cta-permission="users.manage"
+                />
+                @if(! $currentClinic->canAddDoctor() && ! $currentClinic->canAddStaff())
+                    @can('users.manage')
+                    <div class="pb-8 flex justify-center">
+                        <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
+                    </div>
+                    @endcan
+                @endif
+                @endif
             @endif
         </div>
     </div>

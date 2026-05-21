@@ -1,9 +1,111 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-05-02
-> **Fase actual:** v1.3 — 2FA Opcional (TOTP) ✅ + Mejoras Facturación/Catálogo
+> **Última actualización:** 2026-05-20
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ · F.4 siguiente)
 > **Enfoque:** SaaS-First
-> **Métricas:** 424 tests / 922 asserts · Pint clean · npm build OK
+> **Métricas:** 531 tests / 1150 asserts (MySQL) · Pint clean
+
+## ✅ Sprint F — UX & Onboarding (EN CURSO)
+
+### F.1 — Setup Checklist ✅ (2026-05-20)
+- `App\Livewire\App\Dashboard\SetupChecklist` — 6 pasos, anillo SVG, barra gradiente inline, collapsible/dismissible con `users.preferences`
+- Solo visible para role `owner`, auto-oculta cuando `dismissed = true`
+- Traducciones `lang/{es,en}/setup_checklist.php`
+- Link página pública en nav top-bar + banner en Settings → Citas
+
+### F.2 — Empty States ricos ✅ (2026-05-20)
+- `<x-empty-state>` — 10 iconos, modo compact, CTA con `@can`, bullets i18n
+- Aplicado en 6 módulos: patients, appointments, invoices, prescriptions, staff, medical-records
+- Traducciones ES+EN con 3 bullets por módulo
+
+### F.3 — Página pública enriquecida ✅ (2026-05-20)
+- Migración: `public_description`, `public_cover_image_url`, `public_services` (json), `public_show_doctors`, `public_seo_title`, `public_seo_description`
+- Tab "Página Pública" en Settings (solo owner): cover image upload/remove, descripción, servicios dinámicos, toggle equipo médico, SEO fields
+- Vista `/c/{slug}` convertida en landing: hero con cover/gradiente, About, Servicios grid, Equipo médico, CTA scroll al booking
+- SEO dinámico en `<head>` y Open Graph desde `public_seo_title/description`
+- 21 tests nuevos: `SettingsPublicPageTest` (11) + `PublicBookingTest` (10 nuevos)
+- Fix: consulta equipo médico usa `role` column + Spatie roles (OR logic)
+
+
+
+### Sprint A — Admin Settings (SEO + Branding) ✅
+- Helper `app_setting()`, tab SEO, Google Analytics / GTM, OG image, i18n
+
+### Sprint B — Landing + 4 Tiers + Migración ✅
+- 4 planes (Free $0 / Solo $19 / Práctica $49⭐ / Clínica $99 / Enterprise contacto)
+- Migración aditiva `sprint_b_pricing_revamp_columns`, `Plan::scopePublic()`, sitemap, robots.txt
+
+### Sprint C — Pulido de Listados ✅ (2026-05-08)
+- **Patients/Index:** filtros edad (min/max), cita futura (sí/no), deudores; columnas `# Consultas`, `Próxima Cita`, `Saldo pendiente`; relación `Patient::nextUpcomingAppointment()`
+- **Appointments/Index:** filtro rango de fechas (dateFrom/dateTo) + `createdVia`; columnas Precio, Facturado; **fecha visible en columna cuando se usa rango**; **acciones en dropdown Alpine.js** (mejor UX móvil)
+- **MedicalRecords/Index:** filtro por archivos adjuntos (JSON `attachments`); badge conteo adjuntos en tarjetas
+- **Invoices/Index:** filtro vencidas (`filterOverdue`) + método de pago (`filterPaymentMethod`); columnas Días vencida, Último pago; eager load `payments`
+- **Staff/Index:** `withCount` appointments + medicalRecords; columnas `# Citas`, `# Consultas`
+- **Tests:** migrados de SQLite `:memory:` → **MySQL** (`controclinic_test`); 484/484 tests ✅
+
+## ✅ v1.4 — Estado final (2026-05-03)
+
+### Módulos 100% implementados
+
+| Módulo | Componentes | Tests |
+|--------|-------------|-------|
+| Pacientes | Index, Show, Create, Edit, Files (archivos) | PatientFilesTest, PatientsExportTest, PatientTagsTest |
+| Citas | Index, Show, Create, Edit, Calendar, Schedule (agenda diaria) | AppointmentsCalendarTest, AppointmentsExportTest, ScheduleConflictTest |
+| Historial médico | Index, Show, Create (+ mini-uploader), Edit (+ mini-uploader) | MedicalRecordsTest, MedicalRecordsExportTest |
+| Staff | Index (+ editar invitación), Create, Edit (permisos custom) | StaffManagementTest, StaffCustomPermissionsTest, StaffExportTest, StaffOwnershipTest |
+| Facturación | Index, Show, Create, Edit (catálogo + autocompletado) | InvoicesTest |
+| Reportes | Index (gráficas, CSV export) | ReportsTest |
+| Settings | Index, Catalog (servicios), RecordTemplates (SOAP) | RecordTemplatesTest |
+| Admin | Dashboard, Clínicas, Planes, Settings (branding) | AdminPanelTest, AdminSettingsTest |
+| Perfil | Perfil, 2FA, Transferencia ownership | ProfileTest, ProfileActivityTest |
+| Bloqueo horarios | Schedule\Index (doctor_unavailabilities) | DoctorScheduleTest |
+| Audit log | AuditLog\Index (filtros, paginación) | AuditLogTest |
+| Búsqueda global | GlobalSearch (Cmd+K, modal Alpine) | GlobalSearchTest |
+| Invitaciones | Invitations (aceptar), Staff\Index (editar pendientes) | InvitationTest |
+| Confirmación citas | AppointmentConfirmationController (sin login) | AppointmentConfirmationTest |
+| Notificaciones email | 5 Mailables + Job + Scheduler | AppointmentNotificationsTest |
+| Portal público | `/c/{slug}` wizard 3 pasos | PublicBookingTest, PublicBookingAccessLevelTest |
+| Export ZIP | ClinicDataExport (CSV completo) | ClinicDataExportTest |
+
+### Features implementados esta semana (v1.4)
+- ✅ **Plantillas SOAP** — `record_templates`, CRUD en Settings, integración en MedicalRecords\Create, 10 tests
+- ✅ **Archivos del paciente** — `patient_files`, stream seguro, lightbox, filtros, mini-uploader ligado a consulta
+- ✅ **Agenda diaria multi-doctor** — tabla HTML nativa, slots 30min 07:00-20:30, filtro por doctor
+- ✅ **Editar invitación pendiente** — nombre/email/rol editable inline, reenvía email automáticamente
+
+### Pendiente para lanzamiento v1.0 (Bloque 0)
+- [x] Política de retención documentada → `.context/DATA_RETENTION.md` ✅ 2026-05-04
+- [x] Backup automático diario (`spatie/laravel-backup` → DB gzip local+S3, schedule 02:00) ✅ 2026-05-04
+- [x] Sentry configurado (`sentry/sentry-laravel ^4.25`, canal `sentry` en logging.php) ✅ 2026-05-04
+- [ ] Documentación deployment (Docker/VPS)
+
+### Próximo sprint sugerido (Bloque 1 restante)
+- **SMS/WhatsApp** (Twilio) — feature #1 para reducir no-shows en LATAM
+- **Campos `consultation_price/discount`** en UI de citas (columnas DB ya existen)
+- **Reportes de ingresos** (gráficas/CSV por doctor/método/periodo en módulo Facturación)
+
+## ✅ v1.4 — Plantillas SOAP + fixes (2026-05-03)
+
+### Plantillas SOAP por especialidad ✅
+- Migración `create_record_templates_table` (UUID, `clinic_id`, `created_by_user_id`, campos SOAP, `is_default`, soft deletes)
+- Modelo `RecordTemplate` con `BelongsToClinic`, `HasUuids`, `LogsActivity`, `SoftDeletes`, scopes `forRecordType()` / `defaults()`, método `toSoapArray()`
+- `RecordTemplatePolicy` (view/create/update/delete con `templates.manage`)
+- Permisos Spatie: `templates.manage` (owner, doctor) y `templates.use` (owner, doctor, assistant)
+- Livewire `App\Settings\RecordTemplates`: CRUD completo con modal, validación, flag `is_default` atómico (desmarca anteriores del mismo tipo)
+- Ruta `app.settings.templates` dentro del grupo de settings
+- Nav "Plantillas" en `settings/index.blade.php` (sidebar desktop + tabs mobile), protegido con `@can('templates.manage')`
+- Integración en `MedicalRecords\Create`: propiedad `$selectedTemplateId`, método `loadTemplate()`, computed `getTemplatesForTypeProperty()` (filtrado por `record_type`, `is_default` primero)
+- Dropdown en formulario Create con selector + botón "Cargar plantilla" — **fix: `wire:model.live`** para que el botón se habilite al seleccionar
+- Traducciones ES/EN en `lang/{es,en}/templates.php`
+- 10 tests Feature en `RecordTemplatesTest.php` (acceso, CRUD, validación, default flag, multi-tenant, carga en Create, aislamiento cross-tenant)
+
+### Fix UI archivos del paciente ✅
+- **Bug posición**: header de la sección ahora tiene `pb-4 border-b` — separador visual claro entre controles y grilla
+- **Bug filtro desaparece**: `render()` pasa `$totalFiles` (count sin filtrar); condición del select cambió de `$files->isNotEmpty()` a `$totalFiles > 0` — el filtro persiste aunque el resultado filtrado esté vacío
+- Botón **×** para limpiar filtro activo (junto al select)
+- Badge del header muestra `$totalFiles` (total real, no el filtrado)
+- Estado vacío diferenciado: "No hay archivos en esta categoría" + link "Quitar filtro" cuando hay filtro activo vs. "Sin archivos" cuando no hay ninguno
+- Traducciones: `filter_clear`, `empty_filtered` en ES/EN
 
 ## ✅ Mejoras Módulo Facturación — Catálogo (2026-05-02)
 

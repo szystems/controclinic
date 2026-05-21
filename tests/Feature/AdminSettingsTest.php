@@ -385,4 +385,140 @@ class AdminSettingsTest extends TestCase
         $this->assertNull(AppSetting::get('branding.favicon_url'));
         Storage::disk('public')->assertMissing('branding/favicon.png');
     }
+
+    // ==================== SEO ====================
+
+    public function test_save_seo_persists_values(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('seo_meta_title', 'Mi Clínica — La mejor')
+            ->set('seo_meta_description', 'Descripción de prueba con suficiente longitud para validar.')
+            ->set('seo_google_analytics_id', 'G-ABC123XYZ')
+            ->set('seo_gtm_id', 'GTM-ABCD123')
+            ->call('saveSeo')
+            ->assertHasNoErrors();
+
+        $this->assertSame('Mi Clínica — La mejor', AppSetting::get('seo.meta_title'));
+        $this->assertSame('G-ABC123XYZ', AppSetting::get('seo.google_analytics_id'));
+        $this->assertSame('GTM-ABCD123', AppSetting::get('seo.gtm_id'));
+    }
+
+    public function test_save_seo_validates_required_meta_fields(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('seo_meta_title', '')
+            ->set('seo_meta_description', '')
+            ->call('saveSeo')
+            ->assertHasErrors(['seo_meta_title', 'seo_meta_description']);
+    }
+
+    public function test_save_seo_validates_ga_id_format(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('seo_meta_title', 'Title')
+            ->set('seo_meta_description', 'Description for SEO test long enough.')
+            ->set('seo_google_analytics_id', 'invalid-id')
+            ->call('saveSeo')
+            ->assertHasErrors(['seo_google_analytics_id']);
+    }
+
+    public function test_save_seo_validates_gtm_id_format(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('seo_meta_title', 'Title')
+            ->set('seo_meta_description', 'Description for SEO test long enough.')
+            ->set('seo_gtm_id', 'wrong-format')
+            ->call('saveSeo')
+            ->assertHasErrors(['seo_gtm_id']);
+    }
+
+    public function test_save_seo_uploads_og_image(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        $file = UploadedFile::fake()->image('og.png', 1200, 630);
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('seo_meta_title', 'Title')
+            ->set('seo_meta_description', 'Description for SEO test long enough.')
+            ->set('og_image_file', $file)
+            ->call('saveSeo')
+            ->assertHasNoErrors();
+
+        $url = AppSetting::get('seo.og_image_url');
+        $this->assertNotNull($url);
+        $this->assertStringStartsWith('/storage/branding/', $url);
+        Storage::disk('public')->assertExists('branding/'.basename($url));
+    }
+
+    // ==================== HELPER FUNCTION ====================
+
+    public function test_global_helper_app_setting_returns_value(): void
+    {
+        AppSetting::set('branding.app_name', 'HelperTest');
+
+        $this->assertSame('HelperTest', app_setting('branding.app_name'));
+    }
+
+    public function test_global_helper_app_setting_returns_default_when_missing(): void
+    {
+        $this->assertSame('fallback', app_setting('nonexistent.key', 'fallback'));
+    }
+
+    // ==================== PUBLIC LAYOUT BRANDING ====================
+
+    public function test_public_home_uses_dynamic_app_name(): void
+    {
+        AppSetting::set('branding.app_name', 'CustomBrand');
+        AppSetting::clearCache();
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('CustomBrand', false);
+    }
+
+    public function test_public_home_uses_dynamic_meta_description(): void
+    {
+        AppSetting::set('seo.meta_description', 'Mi descripción personalizada para SEO test.');
+        AppSetting::clearCache();
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Mi descripción personalizada para SEO test.', false);
+    }
+
+    public function test_public_home_includes_ga_when_configured(): void
+    {
+        AppSetting::set('seo.google_analytics_id', 'G-TESTID12345');
+        AppSetting::clearCache();
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('G-TESTID12345', false)
+            ->assertSee('googletagmanager.com/gtag/js', false);
+    }
+
+    public function test_public_home_omits_ga_when_not_configured(): void
+    {
+        AppSetting::set('seo.google_analytics_id', null);
+        AppSetting::clearCache();
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertDontSee('googletagmanager.com/gtag/js', false);
+    }
 }

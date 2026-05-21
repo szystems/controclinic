@@ -461,10 +461,17 @@ class Booking extends Component
 
     public function render()
     {
+        $clinic = $this->clinic;
+
         return view('livewire.public.booking')
             ->layout('components.layouts.public-clinic', [
-                'clinic' => $this->clinic,
-                'title' => __('booking.page_title', ['clinic' => $this->clinic->name]),
+                'clinic'      => $clinic,
+                'title'       => $clinic->public_seo_title
+                    ?: __('booking.page_title', ['clinic' => $clinic->name]),
+                'description' => $clinic->public_seo_description
+                    ?: ($clinic->public_description
+                        ? mb_substr(strip_tags($clinic->public_description), 0, 155)
+                        : __('booking.page_title', ['clinic' => $clinic->name])),
             ]);
     }
 }

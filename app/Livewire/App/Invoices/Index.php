@@ -25,16 +25,23 @@ class Index extends Component
 
     public string $dateTo = '';
 
+    public string $filterOverdue = '';  // '' | 'yes'
+
+    public string $filterPaymentMethod = '';  // '' | cash | card | transfer | insurance | other
+
     protected $queryString = [
         'search' => ['except' => ''],
         'status' => ['except' => ''],
         'doctorId' => ['except' => ''],
         'dateFrom' => ['except' => ''],
         'dateTo' => ['except' => ''],
+        'filterOverdue' => ['except' => ''],
+        'filterPaymentMethod' => ['except' => ''],
     ];
 
     public function mount(Clinic $clinic): void
     {
+        abort_unless($clinic->billingEnabled(), 403);
         $this->currentClinic = $clinic;
     }
 
@@ -63,13 +70,23 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterOverdue(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterPaymentMethod(): void
+    {
+        $this->resetPage();
+    }
+
     public function render(): View
     {
         $this->authorize('invoices.view');
 
         $invoices = Invoice::query()
             ->where('clinic_id', $this->currentClinic->id)
-            ->with(['patient', 'doctor'])
+            ->with(['patient', 'doctor', 'payments' => fn ($q) => $q->orderByDesc('paid_at')->limit(1)])
             ->when($this->search, function ($q) {
                 $q->where(function ($q2) {
                     $q2->where('invoice_number', 'like', "%{$this->search}%")
@@ -81,6 +98,14 @@ class Index extends Component
             ->when($this->doctorId, fn ($q) => $q->where('doctor_id', $this->doctorId))
             ->when($this->dateFrom, fn ($q) => $q->whereDate('issued_at', '>=', $this->dateFrom))
             ->when($this->dateTo, fn ($q) => $q->whereDate('issued_at', '<=', $this->dateTo))
+            ->when($this->filterOverdue === 'yes', fn ($q) => $q
+                ->whereIn('status', [Invoice::STATUS_PENDING, Invoice::STATUS_PARTIAL])
+                ->whereNotNull('due_at')
+                ->whereDate('due_at', '<', today())
+            )
+            ->when($this->filterPaymentMethod, fn ($q) => $q
+                ->whereHas('payments', fn ($p) => $p->where('method', $this->filterPaymentMethod))
+            )
             ->orderByDesc('issued_at')
             ->orderByDesc('created_at')
             ->paginate(15);

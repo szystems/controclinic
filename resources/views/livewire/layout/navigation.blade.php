@@ -86,13 +86,23 @@ new class extends Component
         ];
     }
 
-    if (auth()->user()->can('invoices.view')) {
+    if (auth()->user()->can('invoices.view') && app('current_clinic')->billingEnabled()) {
         $primaryNav[] = [
             'route' => 'app.invoices.index',
             'active' => fn () => request()->routeIs('app.invoices.*'),
             'label' => __('invoices.title'),
             'group' => 'main',
             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>',
+        ];
+    }
+
+    if (auth()->user()->can('prescriptions.view')) {
+        $primaryNav[] = [
+            'route' => 'app.prescriptions.index',
+            'active' => fn () => request()->routeIs('app.prescriptions.*'),
+            'label' => __('prescriptions.prescriptions'),
+            'group' => 'main',
+            'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 8h.01M9 14h.01M12 14h6"/>',
         ];
     }
 
@@ -192,6 +202,15 @@ new class extends Component
                         </a>
                     </x-slot>
                 </x-dropdown>
+
+                <!-- Public Page Link -->
+                <a href="{{ route('public.clinic', $clinicSlug) }}" target="_blank" rel="noopener noreferrer"
+                   class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                   title="{{ __('general.view_public_page') }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                </a>
 
                 <!-- Settings Link -->
                 <a href="{{ route('app.settings.index', $clinicSlug) }}" wire:navigate

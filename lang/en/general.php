@@ -14,6 +14,7 @@ return [
     'medical_records' => 'Medical Records',
     'records' => 'Medical Records',
     'settings' => 'Settings',
+    'view_public_page' => 'View public page',
     'billing' => 'Billing',
     'reports' => 'Reports',
     'audit_log' => 'Audit Log',
@@ -36,6 +37,8 @@ return [
     'sending' => 'Sending',
     'saved' => 'Saved.',
     'cancel' => 'Cancel',
+    'dismiss' => 'Dismiss',
+    'add' => 'Add',
     'optional' => 'Optional',
     'search' => 'Search',
     'filter' => 'Filter',
@@ -175,6 +178,7 @@ return [
 
     // Email
     'thanks' => 'Thanks',
+    'all_rights_reserved' => 'All rights reserved.',
 
     // Doctor personalized dashboard
     'my_schedule' => 'My schedule',

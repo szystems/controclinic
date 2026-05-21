@@ -132,8 +132,11 @@ return [
     'limit_reached' => 'Has alcanzado el límite de pacientes de tu plan',
 
     // Empty States
-    'no_patients' => 'No hay pacientes',
-    'no_patients_description' => 'Comienza agregando tu primer paciente',
+    'no_patients' => 'Aún no tienes pacientes registrados',
+    'no_patients_description' => 'Comienza registrando tu primer paciente para llevar el control de su historial médico.',
+    'empty_state_bullet_1' => 'Historial médico completo con diagnósticos y tratamientos',
+    'empty_state_bullet_2' => 'Citas, recetas y facturas vinculadas a cada paciente',
+    'empty_state_bullet_3' => 'Búsqueda instantánea por nombre, teléfono o expediente',
     'list_title' => 'Listado de Pacientes',
     'patient_card' => 'Ficha del Paciente',
     'born' => 'Nacido',
@@ -158,4 +161,32 @@ return [
     'tag_already_assigned' => 'Esta etiqueta ya está asignada al paciente',
     'internal_notes_hint' => 'Solo visible para el personal autorizado. No se comparte con el paciente.',
     'internal_notes_placeholder' => 'Observaciones internas del equipo médico...',
+
+    // Sprint C — nuevas columnas y filtros
+    'next_appointment' => 'Próxima cita',
+    'consultations' => '# Consultas',
+    'pending_balance' => 'Saldo pendiente',
+    'filter_future_appt' => 'Cita futura',
+    'all_appointments' => 'Todas',
+    'with_future_appt' => 'Con cita futura',
+    'without_future_appt' => 'Sin cita futura',
+    'filter_debtor' => 'Saldo',
+    'all_balance' => 'Todos los saldos',
+    'with_pending_balance' => 'Con saldo pendiente',
+    'age_min' => 'Edad mín.',
+    'age_max' => 'Edad máx.',
+
+    // Sprint D — tabs vista detalle
+    'tab_datos'        => 'Datos',
+    'tab_citas'        => 'Citas',
+    'tab_historial'    => 'Historial',
+    'tab_archivos'     => 'Archivos',
+    'tab_recetas'      => 'Recetas',
+    'tab_facturacion'  => 'Facturación',
+    'tab_notas'        => 'Notas internas',
+    'tab_actividad'    => 'Actividad',
+    'no_internal_notes'  => 'No hay notas internas registradas.',
+    'add_internal_notes' => 'Agregar notas internas',
+    'no_activity'      => 'Sin actividad registrada.',
+    'no_records'       => 'No hay registros médicos.',
 ];

@@ -46,6 +46,7 @@ class MedicalRecord extends Model
         'signature_hash',
         'ai_generated',
         'ai_metadata',
+        'qr_payload',
     ];
 
     protected $casts = [

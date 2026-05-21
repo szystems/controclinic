@@ -52,7 +52,9 @@ class Create extends Component
     public bool $showPatientDropdown = false;
 
     public ?string $patientName = null;
+
     public ?string $patientEmail = null;
+
     public ?string $patientPhone = null;
 
     protected function rules(): array
@@ -75,6 +77,7 @@ class Create extends Component
 
     public function mount(Clinic $clinic, ?string $appointment = null): void
     {
+        abort_unless($clinic->billingEnabled(), 403);
         $this->currentClinic = $clinic;
         $this->issued_at = now()->toDateString();
         $this->currency = $clinic->currency ?: 'USD';
@@ -96,6 +99,7 @@ class Create extends Component
                     'clinic' => $clinic->slug,
                     'invoice' => $existingInvoice->id,
                 ]), navigate: true);
+
                 return;
             }
 
@@ -331,7 +335,7 @@ class Create extends Component
         if (auth()->user()->can('settings.edit')) {
             $freeItems = [];
             foreach ($validated['items'] as $order => $itemData) {
-                if (empty($this->itemCatalogIds[$order]) && !empty(trim($itemData['description'] ?? ''))) {
+                if (empty($this->itemCatalogIds[$order]) && ! empty(trim($itemData['description'] ?? ''))) {
                     $freeItems[] = [
                         'index' => $order,
                         'description' => $itemData['description'],
@@ -340,7 +344,7 @@ class Create extends Component
                 }
             }
 
-            if (!empty($freeItems)) {
+            if (! empty($freeItems)) {
                 $this->savedInvoiceId = $invoiceId;
                 $this->freeItemSuggestions = $freeItems;
                 $this->showCatalogSuggestion = true;

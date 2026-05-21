@@ -4,6 +4,8 @@ namespace App\Livewire\App\Reports;
 
 use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\Invoice;
+use App\Models\InvoicePayment;
 use App\Models\Patient;
 use App\Models\User;
 use Carbon\Carbon;
@@ -375,6 +377,180 @@ class Index extends Component
         ]);
     }
 
+    // ==================== BILLING BASE QUERY ====================
+
+    /**
+     * Base query for invoices in the current period (tenant-scoped).
+     * Excludes draft and cancelled invoices.
+     * If $previousPeriod is true, uses the prior date window.
+     */
+    private function invoiceBaseQuery(bool $previousPeriod = false)
+    {
+        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->dateFrom, $this->dateTo];
+
+        $query = Invoice::query()
+            ->withoutGlobalScope('clinic')
+            ->where('clinic_id', $this->clinic->id)
+            ->whereNotIn('status', [Invoice::STATUS_DRAFT, Invoice::STATUS_CANCELLED])
+            ->whereDate('issued_at', '>=', $from)
+            ->whereDate('issued_at', '<=', $to);
+
+        if ($this->doctorFilter) {
+            $query->where('doctor_id', $this->doctorFilter);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Base query for invoice payments in the current period.
+     */
+    private function paymentBaseQuery(bool $previousPeriod = false)
+    {
+        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->dateFrom, $this->dateTo];
+
+        $query = InvoicePayment::query()
+            ->whereHas('invoice', function ($q) {
+                $q->withoutGlobalScope('clinic')->where('clinic_id', $this->clinic->id);
+            })
+            ->whereDate('paid_at', '>=', $from)
+            ->whereDate('paid_at', '<=', $to);
+
+        if ($this->doctorFilter) {
+            $query->whereHas('invoice', function ($q) {
+                $q->withoutGlobalScope('clinic')->where('doctor_id', $this->doctorFilter);
+            });
+        }
+
+        return $query;
+    }
+
+    // ==================== BILLING STATS ====================
+
+    public function totalInvoiced(): float
+    {
+        return (float) $this->invoiceBaseQuery()->sum('total');
+    }
+
+    public function totalCollected(): float
+    {
+        return (float) $this->paymentBaseQuery()->sum('amount');
+    }
+
+    public function pendingRevenue(): float
+    {
+        return (float) Invoice::query()
+            ->withoutGlobalScope('clinic')
+            ->where('clinic_id', $this->clinic->id)
+            ->whereIn('status', [Invoice::STATUS_PENDING, Invoice::STATUS_PARTIAL])
+            ->sum(DB::raw('total - paid_amount'));
+    }
+
+    public function averageTicket(): float
+    {
+        $avg = $this->invoiceBaseQuery()
+            ->where('total', '>', 0)
+            ->avg('total');
+
+        return round((float) ($avg ?? 0), 2);
+    }
+
+    public function revenueDelta(): array
+    {
+        $prevInvoiced = (float) $this->invoiceBaseQuery(true)->sum('total');
+        $prevCollected = (float) $this->paymentBaseQuery(true)->sum('amount');
+
+        return [
+            'invoiced' => $this->deltaPercent($this->totalInvoiced(), $prevInvoiced),
+            'collected' => $this->deltaPercent($this->totalCollected(), $prevCollected),
+        ];
+    }
+
+    /**
+     * Revenue grouped by doctor for the current period.
+     *
+     * @return array<int, array{name: string, invoiced: float, collected: float, invoice_count: int}>
+     */
+    public function revenueByDoctor(): array
+    {
+        $rows = $this->invoiceBaseQuery()
+            ->whereNotNull('doctor_id')
+            ->selectRaw('doctor_id, count(*) as invoice_count, sum(total) as invoiced, sum(paid_amount) as collected')
+            ->groupBy('doctor_id')
+            ->orderByDesc('invoiced')
+            ->limit(10)
+            ->get();
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $names = User::whereIn('id', $rows->pluck('doctor_id'))->pluck('name', 'id');
+
+        return $rows->map(fn ($r) => [
+            'name' => $names[$r->doctor_id] ?? '—',
+            'invoiced' => (float) $r->invoiced,
+            'collected' => (float) $r->collected,
+            'invoice_count' => (int) $r->invoice_count,
+        ])->all();
+    }
+
+    /**
+     * Revenue grouped by payment method for the current period.
+     *
+     * @return array<int, array{method: string, label: string, amount: float, count: int}>
+     */
+    public function revenueByPaymentMethod(): array
+    {
+        $rows = $this->paymentBaseQuery()
+            ->selectRaw('method, count(*) as payment_count, sum(amount) as amount')
+            ->groupBy('method')
+            ->orderByDesc('amount')
+            ->get();
+
+        return $rows->map(fn ($r) => [
+            'method' => $r->method,
+            'label' => __('invoices.payment_method_'.$r->method),
+            'amount' => (float) $r->amount,
+            'count' => (int) $r->payment_count,
+        ])->all();
+    }
+
+    /**
+     * Daily revenue (collected payments) for the current period — for the chart.
+     */
+    public function revenueByDay(): string
+    {
+        $from = Carbon::parse($this->dateFrom);
+        $to = Carbon::parse($this->dateTo);
+
+        if ($from->diffInDays($to) > 90) {
+            $from = $to->copy()->subDays(89);
+        }
+
+        $isMysql = DB::getDriverName() === 'mysql';
+        $dateExpr = $isMysql ? 'DATE(paid_at)' : 'date(paid_at)';
+
+        $data = $this->paymentBaseQuery()
+            ->selectRaw("{$dateExpr} as day, sum(amount) as total")
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('total', 'day')
+            ->toArray();
+
+        $labels = [];
+        $values = [];
+        $current = $from->copy();
+        while ($current->lte($to)) {
+            $key = $current->toDateString();
+            $labels[] = $current->format('d/m');
+            $values[] = round((float) ($data[$key] ?? 0), 2);
+            $current->addDay();
+        }
+
+        return json_encode(['labels' => $labels, 'values' => $values]);
+    }
+
     // ==================== FILTERS ====================
 
     public function doctors()
@@ -515,6 +691,16 @@ class Index extends Component
             'appointmentsByType' => $this->appointmentsByType(),
             'newPatientsByMonth' => $this->newPatientsByMonth(),
             'doctors' => $this->doctors(),
+            // Billing
+            'billingEnabled' => $this->clinic->billingEnabled(),
+            'totalInvoiced' => $this->clinic->billingEnabled() ? $this->totalInvoiced() : null,
+            'totalCollected' => $this->clinic->billingEnabled() ? $this->totalCollected() : null,
+            'pendingRevenue' => $this->clinic->billingEnabled() ? $this->pendingRevenue() : null,
+            'averageTicket' => $this->clinic->billingEnabled() ? $this->averageTicket() : null,
+            'revenueDelta' => $this->clinic->billingEnabled() ? $this->revenueDelta() : [],
+            'revenueByDoctor' => $this->clinic->billingEnabled() ? $this->revenueByDoctor() : [],
+            'revenueByPaymentMethod' => $this->clinic->billingEnabled() ? $this->revenueByPaymentMethod() : [],
+            'revenueByDay' => $this->clinic->billingEnabled() ? $this->revenueByDay() : json_encode(['labels' => [], 'values' => []]),
         ])->layout('layouts.app', [
             'header' => __('reports.title'),
         ]);

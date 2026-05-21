@@ -81,7 +81,10 @@ return [
     'invoice_paid' => 'Invoice marked as paid',
     'cannot_edit_paid' => 'Cannot edit a paid or cancelled invoice',
     'no_invoices' => 'No invoices yet',
-    'no_invoices_desc' => 'Invoices are created by generating a payment receipt for a consultation.',
+    'no_invoices_desc' => 'Create your first invoice to track clinic revenue.',
+    'empty_state_bullet_1' => 'Invoice with consultation, procedure and product items',
+    'empty_state_bullet_2' => 'Partial payment tracking and pending balance',
+    'empty_state_bullet_3' => 'Export income reports by period or doctor',
 
     // Billing settings
     'billing_settings' => 'Billing Settings',
@@ -120,4 +123,15 @@ return [
     'suggest_catalog_desc' => 'Some items in this invoice are not in your catalog. Save them for quick reuse in the future.',
     'suggest_catalog_save' => 'Save selected',
     'suggest_catalog_skip' => 'Skip for now',
+    // Sprint C
+    'all_due' => 'All due dates',
+    'only_overdue' => 'Overdue only',
+    'all_payment_methods' => 'All methods',
+    'days_overdue' => 'Days overdue',
+    'last_payment_method' => 'Last payment',
+    'method_cash' => 'Cash',
+    'method_card' => 'Card',
+    'method_transfer' => 'Transfer',
+    'method_insurance' => 'Insurance',
+    'method_other' => 'Other',
 ];

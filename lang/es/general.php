@@ -14,6 +14,7 @@ return [
     'medical_records' => 'Historiales',
     'records' => 'Historiales',
     'settings' => 'Configuración',
+    'view_public_page' => 'Ver página pública',
     'billing' => 'Facturación',
     'reports' => 'Reportes',
     'audit_log' => 'Auditoría',
@@ -36,6 +37,8 @@ return [
     'sending' => 'Enviando',
     'saved' => 'Guardado.',
     'cancel' => 'Cancelar',
+    'dismiss' => 'Cerrar',
+    'add' => 'Agregar',
     'optional' => 'Opcional',
     'search' => 'Buscar',
     'filter' => 'Filtrar',
@@ -174,6 +177,7 @@ return [
 
     // Email
     'thanks' => 'Gracias',
+    'all_rights_reserved' => 'Todos los derechos reservados.',
 
     // Doctor personalized dashboard
     'my_schedule' => 'Mi agenda',

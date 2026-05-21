@@ -135,6 +135,50 @@
                     </select>
                 </div>
                 @endif
+
+                {{-- Future Appointment Filter --}}
+                <div>
+                    <label for="filterFutureAppt" class="sr-only">{{ __('patients.filter_future_appt') }}</label>
+                    <select wire:model.live="filterFutureAppt"
+                            id="filterFutureAppt"
+                            class="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="">{{ __('patients.all_appointments') }}</option>
+                        <option value="yes">{{ __('patients.with_future_appt') }}</option>
+                        <option value="no">{{ __('patients.without_future_appt') }}</option>
+                    </select>
+                </div>
+
+                {{-- Debtor Filter --}}
+                <div>
+                    <label for="filterDebtor" class="sr-only">{{ __('patients.filter_debtor') }}</label>
+                    <select wire:model.live="filterDebtor"
+                            id="filterDebtor"
+                            class="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="">{{ __('patients.all_balance') }}</option>
+                        <option value="yes">{{ __('patients.with_pending_balance') }}</option>
+                    </select>
+                </div>
+
+                {{-- Age Range --}}
+                <div class="flex gap-2 items-center">
+                    <input wire:model.live.debounce.400ms="ageMin"
+                           type="number" min="0" max="130" placeholder="{{ __('patients.age_min') }}"
+                           class="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <span class="text-gray-400 text-sm">–</span>
+                    <input wire:model.live.debounce.400ms="ageMax"
+                           type="number" min="0" max="130" placeholder="{{ __('patients.age_max') }}"
+                           class="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+
+                {{-- Clear Filters --}}
+                @if($search || $status || $filterTag || $filterFutureAppt || $filterDebtor || $ageMin || $ageMax)
+                <div class="flex items-center">
+                    <button type="button" wire:click="clearFilters"
+                            class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        ✕ {{ __('general.clear_filters') }}
+                    </button>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -178,6 +222,15 @@
                                     </svg>
                                     @endif
                                 </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                {{ __('patients.next_appointment') }}
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                {{ __('patients.consultations') }}
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                {{ __('patients.pending_balance') }}
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 {{ __('general.status') }}
@@ -231,6 +284,39 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                 {{ $patient->last_visit_at ? $patient->last_visit_at->diffForHumans() : __('patients.never') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                @if($patient->nextUpcomingAppointment)
+                                    <div class="text-xs">
+                                        <span class="font-medium text-indigo-600 dark:text-indigo-400">
+                                            {{ $patient->nextUpcomingAppointment->appointment_date->isoFormat('D MMM') }}
+                                        </span>
+                                        @if($patient->nextUpcomingAppointment->start_time)
+                                        <span class="text-gray-400 ml-1">{{ \Carbon\Carbon::parse($patient->nextUpcomingAppointment->start_time)->format('H:i') }}</span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">—</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
+                                @if($patient->records_count > 0)
+                                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
+                                        {{ $patient->records_count }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400">0</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                @php $pending = max(0, (float)($patient->pending_total ?? 0) - (float)($patient->paid_on_pending ?? 0)); @endphp
+                                @if($pending > 0)
+                                    <span class="font-semibold text-red-600 dark:text-red-400">
+                                        {{ number_format($pending, 2) }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400">—</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($patient->is_active)
@@ -286,28 +372,20 @@
             </div>
             @else
             {{-- Empty State --}}
-            <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('patients.no_patients') }}</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('patients.no_patients_description') }}</p>
-                @can('patients.create')
-                <div class="mt-6">
-                    @if($currentClinic->canAddPatient())
-                        <a href="{{ route('app.patients.create', ['clinic' => $currentClinic->slug]) }}"
-                           class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            {{ __('patients.new_patient') }}
-                        </a>
-                    @else
-                        <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
-                    @endif
+            <x-empty-state
+                icon="users"
+                :title="__('patients.no_patients')"
+                :description="__('patients.no_patients_description')"
+                :bullets="[__('patients.empty_state_bullet_1'), __('patients.empty_state_bullet_2'), __('patients.empty_state_bullet_3')]"
+                :cta-text="$currentClinic->canAddPatient() ? __('patients.new_patient') : null"
+                :cta-route="$currentClinic->canAddPatient() ? route('app.patients.create', ['clinic' => $currentClinic->slug]) : null"
+                cta-permission="patients.create"
+            />
+            @if(! $currentClinic->canAddPatient())
+                <div class="pb-8 flex justify-center">
+                    <x-upgrade-nudge type="button" :clinic-slug="$currentClinic->slug" />
                 </div>
-                @endcan
-            </div>
+            @endif
             @endif
         </div>
     </div>

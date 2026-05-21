@@ -1,0 +1,45 @@
+<?php
+
+return [
+    'title' => 'Archivos',
+    'tab_label' => 'Archivos',
+    'empty' => 'No hay archivos adjuntos para este paciente.',
+    'upload_button' => 'Subir archivo',
+    'upload_title' => 'Subir archivos',
+    'upload_hint' => 'PDF, imágenes, Word, Excel — máx. 20 MB por archivo.',
+    'file_name' => 'Nombre descriptivo',
+    'file_name_hint' => 'Ej: Hemograma mayo 2026 (opcional, usa el nombre del archivo si se deja vacío)',
+    'category' => 'Categoría',
+    'notes' => 'Notas internas',
+    'notes_hint' => 'Observaciones sobre este archivo (solo visible al staff)',
+    'drop_or_click' => 'Arrastra archivos aquí o haz clic para seleccionar',
+    'save' => 'Subir',
+    'cancel' => 'Cancelar',
+    'uploaded_success' => 'Archivos subidos correctamente.',
+    'deleted_success' => 'Archivo eliminado.',
+    'uploaded_by' => 'Subido por',
+    'uploaded_at' => 'Fecha',
+    'size' => 'Tamaño',
+    'filter_all' => 'Todas las categorías',
+    'filter_clear' => 'Quitar filtro',
+    'empty_filtered' => 'No hay archivos en esta categoría.',
+    'delete_confirm' => '¿Eliminar este archivo? Esta acción no se puede deshacer.',
+    'delete' => 'Eliminar',
+    'view' => 'Ver',
+    'download' => 'Descargar',
+    'no_permission' => 'No tienes permiso para ver los archivos de este paciente.',
+
+    // Mini-uploader en consultas
+    'attach_files' => 'Adjuntar archivos',
+    'attach_hint' => 'Opcional. Los archivos se vincularán a esta consulta al guardar.',
+    'attach_select_label' => 'Archivos a adjuntar',
+    'attach_select_button' => 'Elegir archivos',
+
+    // Categorías
+    'category_lab' => 'Laboratorio',
+    'category_image' => 'Imagen / Radiografía',
+    'category_report' => 'Informe',
+    'category_prescription' => 'Receta',
+    'category_consent' => 'Consentimiento',
+    'category_other' => 'Otro',
+];

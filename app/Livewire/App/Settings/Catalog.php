@@ -4,7 +4,6 @@ namespace App\Livewire\App\Settings;
 
 use App\Models\Clinic;
 use App\Models\ServiceCatalog;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -138,6 +137,7 @@ class Catalog extends Component
         // No eliminar si tiene ítems de factura asociados
         if ($item->invoiceItems()->count() > 0) {
             session()->flash('error', __('catalog.cannot_delete_has_items'));
+
             return;
         }
 

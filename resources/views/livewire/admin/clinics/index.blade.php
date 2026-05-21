@@ -54,7 +54,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse($clinics as $clinic)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" @click="window.location.href='{{ route('admin.clinics.show', $clinic) }}'">
                                     <td class="px-6 py-4">
                                         <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $clinic->name }}</div>
                                         <div class="text-xs text-gray-500 dark:text-gray-400">{{ $clinic->slug }}</div>
@@ -92,7 +92,7 @@
                                     <td class="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">{{ $clinic->patients_count }}</td>
                                     <td class="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">{{ $clinic->users_count }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $clinic->created_at->format('d/m/Y') }}</td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-right" @click.stop>
                                         <a href="{{ route('admin.clinics.show', $clinic) }}" wire:navigate
                                            class="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                                             {{ __('admin.view') }}

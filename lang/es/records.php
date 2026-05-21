@@ -12,8 +12,12 @@ return [
 
     // Index
     'subtitle' => 'Historial clínico de :patient',
-    'no_records' => 'Aún no hay consultas registradas para este paciente.',
-    'create_first' => 'Crear primera consulta',
+    'no_records' => 'Sin consultas registradas',
+    'no_records_description' => 'Registra la primera consulta para comenzar el historial médico de este paciente.',
+    'empty_state_bullet_1' => 'Formato SOAP con diagnóstico, tratamiento y plan de seguimiento',
+    'empty_state_bullet_2' => 'Adjunta archivos, imágenes y resultados de laboratorio',
+    'empty_state_bullet_3' => 'Genera recetas directamente desde la consulta',
+    'create_first' => 'Registrar primera consulta',
     'filter_type' => 'Tipo',
     'filter_all_types' => 'Todos los tipos',
     'filter_status' => 'Estado',
@@ -123,4 +127,10 @@ return [
     'new_prescription' => 'Nueva Receta',
     'field_diagnoses' => 'Diagnósticos',
     'field_prescriptions' => 'Prescripciones',
+
+    // Sprint C
+    'filter_files' => 'Archivos',
+    'filter_all_files' => 'Todos',
+    'filter_with_files' => 'Con archivos',
+    'filter_without_files' => 'Sin archivos',
 ];

@@ -42,6 +42,13 @@ class RolesAndPermissionsSeeder extends Seeder
             // Facturación
             'invoices.view', 'invoices.create', 'invoices.edit', 'invoices.delete',
             'invoices.record_payment', 'invoices.export', 'invoices.print',
+            // Archivos del paciente
+            'files.view', 'files.upload', 'files.delete',
+            // Plantillas de consulta
+            'templates.manage', 'templates.use',
+            // Recetas
+            'prescriptions.view', 'prescriptions.create', 'prescriptions.edit',
+            'prescriptions.delete', 'prescriptions.print',
         ];
 
         foreach ($permissions as $permission) {
@@ -68,6 +75,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'schedule.manage',
             'invoices.view', 'invoices.create', 'invoices.edit',
             'invoices.record_payment', 'invoices.export', 'invoices.print',
+            'files.view', 'files.upload', 'files.delete',
+            'templates.manage', 'templates.use',
+            'prescriptions.view', 'prescriptions.create', 'prescriptions.edit',
+            'prescriptions.delete', 'prescriptions.print',
         ]);
 
         // Asistente - Apoyo al doctor
@@ -81,6 +92,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'schedule.manage',
             'invoices.view', 'invoices.create', 'invoices.edit',
             'invoices.record_payment', 'invoices.print',
+            'files.view', 'files.upload',
+            'templates.use',
+            'prescriptions.view', 'prescriptions.print',
         ]);
 
         // Secretaria - Gestión de citas
@@ -109,6 +123,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'users.manage', 'users.print', 'billing.manage',
             'reports.view', 'reports.export',
             'audit.view',
+            'files.view',
         ]);
 
         $this->command->info('✅ Roles y permisos creados exitosamente');

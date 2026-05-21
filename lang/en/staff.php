@@ -74,7 +74,10 @@ return [
 
     // Empty state
     'no_members' => 'No team members yet',
-    'no_members_description' => 'Add doctors and staff to start managing your clinic',
+    'no_members_description' => 'Invite doctors and staff to collaborate in managing the clinic.',
+    'empty_state_bullet_1' => 'Built-in roles: doctor, assistant, secretary and receptionist',
+    'empty_state_bullet_2' => 'Each role has specific permissions for patients and appointments',
+    'empty_state_bullet_3' => 'Secure email invitation with account activation',
     'no_results' => 'No results found',
     'no_results_description' => 'Try different search filters',
 
@@ -138,4 +141,8 @@ return [
     'restore_role_permissions' => 'Restore role permissions',
     'restore_permissions_confirm' => 'Are you sure? All extra permissions will be removed, leaving only the role defaults.',
     'permissions_restored' => 'Permissions restored to role defaults.',
+
+    // Sprint C
+    'appointments_count' => '# Appts.',
+    'records_count' => '# Consults',
 ];

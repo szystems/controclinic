@@ -22,7 +22,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach($plans as $plan)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" @click="window.location.href='{{ route('admin.plans.edit', $plan) }}'">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center">
                                             <div>
@@ -68,7 +68,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-right" @click.stop>
                                         <a href="{{ route('admin.plans.edit', $plan) }}" wire:navigate
                                            class="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                                             {{ __('general.edit') }}

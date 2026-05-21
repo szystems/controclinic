@@ -277,6 +277,173 @@
         </div>
         @endif
 
+        {{-- ==================== BILLING / REVENUE SECTION ==================== --}}
+        @if($billingEnabled)
+        <div class="mb-6">
+            <div class="mb-3 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('reports.billing_section') }}</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ __('reports.billing_section_subtitle') }}</p>
+                </div>
+            </div>
+
+            {{-- Revenue KPI cards --}}
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+                {{-- Total Invoiced --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('reports.total_invoiced') }}</span>
+                        <span class="text-lg text-emerald-500">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">
+                        {{ number_format($totalInvoiced, 2) }}
+                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ $clinic->currency }}</span>
+                    </div>
+                    @if(isset($revenueDelta['invoiced']) && $revenueDelta['invoiced'] !== null)
+                    <div class="mt-1 flex items-center gap-1 text-xs {{ $revenueDelta['invoiced'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400' }}">
+                        @if($revenueDelta['invoiced'] >= 0)
+                            <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+                        @else
+                            <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        @endif
+                        {{ abs($revenueDelta['invoiced']) }}% vs período anterior
+                    </div>
+                    @endif
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ __('reports.total_invoiced_help') }}</p>
+                </div>
+
+                {{-- Total Collected --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('reports.total_collected') }}</span>
+                        <span class="text-lg text-blue-500">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">
+                        {{ number_format($totalCollected, 2) }}
+                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ $clinic->currency }}</span>
+                    </div>
+                    @if(isset($revenueDelta['collected']) && $revenueDelta['collected'] !== null)
+                    <div class="mt-1 flex items-center gap-1 text-xs {{ $revenueDelta['collected'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400' }}">
+                        @if($revenueDelta['collected'] >= 0)
+                            <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+                        @else
+                            <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        @endif
+                        {{ abs($revenueDelta['collected']) }}% vs período anterior
+                    </div>
+                    @endif
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ __('reports.total_collected_help') }}</p>
+                </div>
+
+                {{-- Pending --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('reports.pending_revenue') }}</span>
+                        <span class="text-lg text-amber-500">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">
+                        {{ number_format($pendingRevenue, 2) }}
+                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ $clinic->currency }}</span>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ __('reports.pending_revenue_help') }}</p>
+                </div>
+
+                {{-- Average Ticket --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('reports.average_ticket') }}</span>
+                        <span class="text-lg text-purple-500">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">
+                        {{ number_format($averageTicket, 2) }}
+                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ $clinic->currency }}</span>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ __('reports.average_ticket_help') }}</p>
+                </div>
+            </div>
+
+            {{-- Revenue chart + tables row --}}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+
+                {{-- Chart: cobros por día --}}
+                <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{{ __('reports.chart_revenue_by_day') }}</h3>
+                    <div class="h-48">
+                        <canvas id="chartRevenueByDay" x-ref="chartRevenueByDay"></canvas>
+                    </div>
+                </div>
+
+                {{-- Revenue by payment method --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{{ __('reports.revenue_by_payment_method') }}</h3>
+                    @if(count($revenueByPaymentMethod) > 0)
+                    <div class="space-y-2">
+                        @php $maxMethodAmount = collect($revenueByPaymentMethod)->max('amount') ?: 1; @endphp
+                        @foreach($revenueByPaymentMethod as $row)
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $row['label'] }}</span>
+                                <span class="tabular-nums text-gray-900 dark:text-white font-semibold">{{ number_format($row['amount'], 2) }} {{ $clinic->currency }}</span>
+                            </div>
+                            <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                                <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ round(($row['amount'] / $maxMethodAmount) * 100) }}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-400 mt-0.5">{{ $row['count'] }} {{ __('reports.col_payments') }}</div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <p class="text-sm text-gray-400 dark:text-gray-500">{{ __('reports.no_data') }}</p>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Revenue by doctor --}}
+            @if(count($revenueByDoctor) > 0)
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{{ __('reports.revenue_by_doctor') }}</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                                <th class="text-left font-medium py-2 pr-4">{{ __('general.doctor') }}</th>
+                                <th class="text-right font-medium py-2 pr-4">{{ __('reports.col_invoices') }}</th>
+                                <th class="text-right font-medium py-2 pr-4">{{ __('reports.col_invoiced') }}</th>
+                                <th class="text-right font-medium py-2">{{ __('reports.col_collected') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($revenueByDoctor as $row)
+                            <tr class="border-b border-gray-100 dark:border-gray-700/50 last:border-b-0">
+                                <td class="py-2 pr-4 font-medium text-gray-900 dark:text-white">{{ $row['name'] }}</td>
+                                <td class="py-2 pr-4 text-right tabular-nums text-gray-500 dark:text-gray-400">{{ $row['invoice_count'] }}</td>
+                                <td class="py-2 pr-4 text-right tabular-nums text-emerald-600 dark:text-emerald-400 font-medium">{{ number_format($row['invoiced'], 2) }} {{ $clinic->currency }}</td>
+                                <td class="py-2 text-right tabular-nums text-blue-600 dark:text-blue-400 font-medium">{{ number_format($row['collected'], 2) }} {{ $clinic->currency }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @endif
+        </div>
+
+        {{-- Billing data for chart --}}
+        <script id="revenue-data" type="application/json">
+        @json(json_decode($revenueByDay))
+        </script>
+
+        @endif {{-- end billingEnabled --}}
+
         {{-- Print-only report header --}}
         @php
             $clinicLogo = $clinic->branding['logo'] ?? null;
@@ -566,6 +733,42 @@ function buildCharts() {
                 }
             }
         });
+    }
+
+    // --- Bar chart: revenue by day ---
+    const revEl = document.getElementById('revenue-data');
+    if (revEl) {
+        const revData = JSON.parse(revEl.textContent);
+        const ctxRev = document.getElementById('chartRevenueByDay');
+        if (ctxRev && revData?.labels?.length) {
+            charts.revenueByDay = new ChartJs(ctxRev, {
+                type: 'bar',
+                data: {
+                    labels: revData.labels,
+                    datasets: [{
+                        label: '',
+                        data: revData.values,
+                        backgroundColor: 'rgba(16,185,129,0.7)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { display: false }, tooltip: {
+                        callbacks: {
+                            label: (ctx) => ' ' + ctx.parsed.y.toFixed(2)
+                        }
+                    }},
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: text, maxTicksLimit: 10 } },
+                        y: { grid: { color: grid }, ticks: { color: text }, beginAtZero: true }
+                    }
+                }
+            });
+        }
     }
 }
 

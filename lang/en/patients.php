@@ -132,8 +132,11 @@ return [
     'limit_reached' => 'You have reached your plan\'s patient limit',
 
     // Empty States
-    'no_patients' => 'No patients',
-    'no_patients_description' => 'Start by adding your first patient',
+    'no_patients' => 'No patients registered yet',
+    'no_patients_description' => 'Start by adding your first patient to track their medical history.',
+    'empty_state_bullet_1' => 'Complete medical history with diagnoses and treatments',
+    'empty_state_bullet_2' => 'Appointments, prescriptions and invoices linked to each patient',
+    'empty_state_bullet_3' => 'Instant search by name, phone or record number',
     'list_title' => 'Patients list',
     'patient_card' => 'Patient card',
     'born' => 'Born',
@@ -158,4 +161,32 @@ return [
     'tag_already_assigned' => 'This tag is already assigned to the patient',
     'internal_notes_hint' => 'Only visible to authorized staff. Not shared with the patient.',
     'internal_notes_placeholder' => 'Internal team observations...',
+
+    // Sprint C — new columns and filters
+    'next_appointment' => 'Next Appt.',
+    'consultations' => '# Consults',
+    'pending_balance' => 'Pending Balance',
+    'filter_future_appt' => 'Future Appt.',
+    'all_appointments' => 'All',
+    'with_future_appt' => 'With future appt.',
+    'without_future_appt' => 'Without future appt.',
+    'filter_debtor' => 'Balance',
+    'all_balance' => 'All balances',
+    'with_pending_balance' => 'With pending balance',
+    'age_min' => 'Min age',
+    'age_max' => 'Max age',
+
+    // Sprint D — tabs patient detail view
+    'tab_datos'        => 'Data',
+    'tab_citas'        => 'Appointments',
+    'tab_historial'    => 'Medical History',
+    'tab_recetas'      => 'Prescriptions',
+    'tab_archivos'     => 'Files',
+    'tab_facturacion'  => 'Billing',
+    'tab_notas'        => 'Internal Notes',
+    'tab_actividad'    => 'Activity',
+    'no_internal_notes'  => 'No internal notes recorded.',
+    'add_internal_notes' => 'Add internal notes',
+    'no_activity'      => 'No activity recorded.',
+    'no_records'       => 'No medical records.',
 ];

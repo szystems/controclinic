@@ -155,6 +155,127 @@
                     @endif
                 </section>
 
+                {{-- Adjuntar archivos --}}
+                @can('create', \App\Models\PatientFile::class)
+                <section class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6"
+                         x-data="{
+                             open: false,
+                             uploading: false,
+                             progress: 0,
+                             fileNames: [],
+                             handleFiles(files) {
+                                 if (!files || files.length === 0) return;
+                                 this.fileNames = Array.from(files).map(f => f.name);
+                                 this.uploading = true;
+                                 this.progress = 0;
+                                 $wire.uploadMultiple(
+                                     'pendingUploads',
+                                     Array.from(files),
+                                     () => { this.uploading = false; },
+                                     () => { this.uploading = false; this.fileNames = []; },
+                                     (event) => { this.progress = event.detail.progress; }
+                                 );
+                             },
+                             clear() {
+                                 this.fileNames = [];
+                                 $wire.set('pendingUploads', []);
+                             }
+                         }">
+                    <button type="button" class="w-full flex items-center justify-between" @click="open = !open">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/>
+                            </svg>
+                            <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('files.attach_files') }}</h3>
+                            <span x-show="fileNames.length > 0"
+                                  x-text="fileNames.length"
+                                  class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-medium px-2 py-0.5 rounded-full"></span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-150" :class="open ? 'rotate-180' : ''"
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div x-show="open"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-1"
+                         class="mt-4 space-y-4">
+
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('files.attach_hint') }}</p>
+
+                        <div class="flex flex-col sm:flex-row gap-4 items-start">
+                            {{-- Category --}}
+                            <div class="w-full sm:w-48 flex-shrink-0">
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('files.category') }}</label>
+                                <select wire:model="pendingCategory"
+                                        class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm">
+                                    @foreach(\App\Models\PatientFile::CATEGORIES as $cat)
+                                        <option value="{{ $cat }}">{{ __('files.category_'.$cat) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- File picker --}}
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('files.attach_select_label') }}</label>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button type="button"
+                                            @click="$refs.miniFileInput.click()"
+                                            :disabled="uploading"
+                                            class="inline-flex items-center gap-1.5 text-sm font-medium border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                        </svg>
+                                        {{ __('files.attach_select_button') }}
+                                    </button>
+                                    <input type="file" x-ref="miniFileInput" multiple class="hidden"
+                                           @change="handleFiles($event.target.files); $event.target.value = ''">
+
+                                    <template x-if="uploading">
+                                        <span class="text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                            </svg>
+                                            <span x-text="progress + '%'"></span>
+                                        </span>
+                                    </template>
+
+                                    <template x-if="!uploading && fileNames.length > 0">
+                                        <button type="button" @click="clear()"
+                                                class="text-xs text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 transition">
+                                            {{ __('files.cancel') }}
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <template x-if="fileNames.length > 0">
+                            <ul class="space-y-1 border-t border-gray-100 dark:border-gray-700 pt-3">
+                                <template x-for="name in fileNames" :key="name">
+                                    <li class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <span x-text="name" class="truncate max-w-xs"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+
+                        @error('pendingUploads.*')
+                            <p class="text-xs text-rose-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </section>
+                @endcan
+
                 {{-- Confidentiality --}}
                 <section class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6">
                     <label class="inline-flex items-start gap-2">

@@ -2,9 +2,11 @@
 
 namespace App\Livewire\App\Invoices;
 
+use App\Mail\InvoiceReceiptMail;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -40,6 +42,7 @@ class Show extends Component
 
     public function mount(Clinic $clinic, Invoice $invoice): void
     {
+        abort_unless($clinic->billingEnabled(), 403);
         abort_unless($invoice->clinic_id === $clinic->id, 404);
 
         $this->currentClinic = $clinic;
@@ -80,6 +83,14 @@ class Show extends Component
         ]);
 
         $this->invoice->refresh();
+
+        // Si la factura quedó pagada en su totalidad y el paciente tiene email, enviar recibo
+        if ($this->invoice->status === Invoice::STATUS_PAID && $this->invoice->patient?->email) {
+            Mail::to($this->invoice->patient->email)
+                ->locale($this->invoice->clinic->locale ?? app()->getLocale())
+                ->queue(new InvoiceReceiptMail($this->invoice));
+        }
+
         $this->closePaymentModal();
         $this->dispatch('payment-recorded');
         session()->flash('success', __('invoices.payment_recorded'));

@@ -50,6 +50,16 @@
                     {{ __('catalog.title') }}
                 </a>
                 @endcan
+                @can('templates.manage')
+                <a href="{{ route('app.settings.templates', $currentClinic->slug) }}" wire:navigate class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                    {{ __('templates.title') }}
+                </a>
+                @endcan
+                @if(auth()->id() === $clinic->owner_id)
+                <button wire:click="setTab('public_page')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'public_page' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
+                    {{ __('settings.public_page.tab') }}
+                </button>
+                @endif
                 @if(auth()->id() === $clinic->owner_id)
                 <button wire:click="setTab('data')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'data' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
                     {{ __('settings.data.tab') }}
@@ -113,6 +123,24 @@
                         {{ __('catalog.title') }}
                     </a>
                     @endcan
+                    @can('templates.manage')
+                    <a href="{{ route('app.settings.templates', $currentClinic->slug) }}" wire:navigate
+                       class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        {{ __('templates.title') }}
+                    </a>
+                    @endcan
+                    @if(auth()->id() === $clinic->owner_id)
+                    <button wire:click="setTab('public_page')"
+                            class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'public_page' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ __('settings.public_page.tab') }}
+                    </button>
+                    @endif
                     @if(auth()->id() === $clinic->owner_id)
                     <button wire:click="setTab('data')"
                             class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'data' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
@@ -463,6 +491,25 @@
                             {{-- Online Booking --}}
                             <div>
                                 <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">{{ __('settings.appointments.online_booking') }}</h3>
+
+                                {{-- Public page link banner --}}
+                                @php $publicUrl = route('public.clinic', $clinic->slug); @endphp
+                                <div class="mb-4 flex items-center justify-between gap-3 px-4 py-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <svg class="w-4 h-4 flex-shrink-0 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span class="text-xs text-indigo-700 dark:text-indigo-300 truncate">{{ $publicUrl }}</span>
+                                    </div>
+                                    <a href="{{ $publicUrl }}" target="_blank" rel="noopener noreferrer"
+                                       class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                        </svg>
+                                        {{ __('general.view_public_page') }}
+                                    </a>
+                                </div>
+
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -757,6 +804,169 @@
                     @endif
 
                 </div>
+
+                    @if($activeTab === 'public_page' && auth()->id() === $clinic->owner_id)
+                    <form wire:submit.prevent="savePublicPage">
+                        <div class="px-6 py-5 space-y-6">
+                            <div>
+                                <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('settings.public_page.title') }}</h2>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('settings.public_page.subtitle') }}</p>
+                            </div>
+
+                            {{-- Preview link --}}
+                            @php $publicUrl = route('public.clinic', $clinic->slug); @endphp
+                            <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <svg class="w-4 h-4 flex-shrink-0 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span class="text-xs text-indigo-700 dark:text-indigo-300 truncate">{{ $publicUrl }}</span>
+                                </div>
+                                <a href="{{ $publicUrl }}" target="_blank" rel="noopener noreferrer"
+                                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                    {{ __('general.view_public_page') }}
+                                </a>
+                            </div>
+
+                            {{-- Cover Image --}}
+                            <div x-data="{
+                                preview: @js($currentCoverImage ? Storage::disk('public')->url($currentCoverImage) : null),
+                                onChange(e) {
+                                    const file = e.target.files[0];
+                                    if (file) this.preview = URL.createObjectURL(file);
+                                }
+                            }">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('settings.public_page.cover_image') }}</label>
+
+                                {{-- Preview: imagen guardada o seleccionada --}}
+                                <template x-if="preview">
+                                    <div class="relative mb-3 rounded-lg overflow-hidden h-40 bg-gray-100 dark:bg-gray-700">
+                                        <img :src="preview" alt="Cover" class="w-full h-full object-cover">
+                                        @if($currentCoverImage)
+                                        <button type="button" wire:click="removePublicCover"
+                                                class="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition shadow-md"
+                                                title="{{ __('settings.public_page.remove_cover') }}">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                        @endif
+                                    </div>
+                                </template>
+
+                                @if($currentCoverImage)
+                                    <button type="button" wire:click="removePublicCover"
+                                            class="mb-3 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        {{ __('settings.public_page.remove_cover') }}
+                                    </button>
+                                @endif
+
+                                <input type="file" wire:model="public_cover_image" accept="image/*"
+                                       x-on:change="onChange($event)"
+                                       class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-900/30 dark:file:text-indigo-300 hover:file:bg-indigo-100">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('settings.public_page.cover_hint') }}</p>
+                                @error('public_cover_image') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Description --}}
+                            <div>
+                                <label for="public_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.public_page.description') }}</label>
+                                <textarea wire:model="public_description" id="public_description" rows="5"
+                                          placeholder="{{ __('settings.public_page.description_placeholder') }}"
+                                          class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500 text-sm"></textarea>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('settings.public_page.description_hint') }}</p>
+                                @error('public_description') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Servicios destacados --}}
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.public_page.services') }}</label>
+                                    <button type="button" wire:click="addService"
+                                            class="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        {{ __('general.add') }}
+                                    </button>
+                                </div>
+                                <div class="space-y-3">
+                                    @forelse($public_services as $i => $service)
+                                        <div class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                                            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <input type="text" wire:model="public_services.{{ $i }}.title"
+                                                           placeholder="{{ __('settings.public_page.service_title') }}"
+                                                           class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                                    @error("public_services.{$i}.title") <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                                </div>
+                                                <div>
+                                                    <input type="text" wire:model="public_services.{{ $i }}.description"
+                                                           placeholder="{{ __('settings.public_page.service_description') }}"
+                                                           class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                                </div>
+                                            </div>
+                                            <button type="button" wire:click="removeService({{ $i }})"
+                                                    class="flex-shrink-0 p-1.5 text-red-400 hover:text-red-600 dark:hover:text-red-400 rounded transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    @empty
+                                        <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ __('settings.public_page.no_services') }}</p>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            {{-- Show doctors --}}
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.public_page.show_doctors') }}</label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('settings.public_page.show_doctors_desc') }}</p>
+                                </div>
+                                <button type="button" wire:click="$toggle('public_show_doctors')"
+                                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ $public_show_doctors ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700' }}">
+                                    <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $public_show_doctors ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                                </button>
+                            </div>
+
+                            {{-- SEO --}}
+                            <div class="border-t border-gray-200 dark:border-gray-700 pt-5">
+                                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">{{ __('settings.public_page.seo_title_section') }}</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="public_seo_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.public_page.seo_title') }}</label>
+                                        <input type="text" wire:model="public_seo_title" id="public_seo_title" maxlength="70"
+                                               placeholder="{{ $clinic->name }}"
+                                               class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                                        @error('public_seo_title') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                    </div>
+                                    <div>
+                                        <label for="public_seo_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.public_page.seo_description') }}</label>
+                                        <textarea wire:model="public_seo_description" id="public_seo_description" rows="2" maxlength="320"
+                                                  class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500 text-sm"></textarea>
+                                        @error('public_seo_description') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
+                                <svg wire:loading wire:target="savePublicPage" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 5 12H4z"></path>
+                                </svg>
+                                {{ __('general.save') }}
+                            </button>
+                        </div>
+                    </form>
+                    @endif
 
                     @if($activeTab === 'data' && auth()->id() === $clinic->owner_id)
                     <div>

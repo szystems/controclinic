@@ -36,7 +36,7 @@
 
             {{-- Filters --}}
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-4 mb-6">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('records.filter_type') }}</label>
                         <select wire:model.live="typeFilter"
@@ -57,8 +57,17 @@
                             @endforeach
                         </select>
                     </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('records.filter_files') }}</label>
+                        <select wire:model.live="filterHasFiles"
+                                class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm">
+                            <option value="">{{ __('records.filter_all_files') }}</option>
+                            <option value="yes">{{ __('records.filter_with_files') }}</option>
+                            <option value="no">{{ __('records.filter_without_files') }}</option>
+                        </select>
+                    </div>
                     <div class="flex items-end">
-                        @if($typeFilter || $statusFilter)
+                        @if($typeFilter || $statusFilter || $filterHasFiles)
                             <button type="button" wire:click="clearFilters"
                                     class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                                 ✕ {{ __('general.clear_filters') }}
@@ -106,6 +115,15 @@
                             <div class="text-right flex-shrink-0 text-xs text-gray-500 dark:text-gray-400">
                                 <div>{{ $record->created_at->isoFormat('LL') }}</div>
                                 <div class="mt-0.5">{{ $record->doctor?->name }}</div>
+                                @php $attachmentsCount = count($record->attachments ?? []); @endphp
+                                @if($attachmentsCount > 0)
+                                    <div class="mt-1 inline-flex items-center gap-0.5 text-gray-500 dark:text-gray-400">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                        </svg>
+                                        {{ $attachmentsCount }}
+                                    </div>
+                                @endif
                                 @if($record->status === \App\Models\MedicalRecord::STATUS_DRAFT)
                                     @can('records.edit')
                                         @if($clinic->canWrite())
@@ -122,21 +140,16 @@
                         </div>
                     </a>
                 @empty
-                    <div class="p-8 text-center">
-                        <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ __('records.no_records') }}</p>
-                        @can('records.create')
-                            @if($clinic->canWrite())
-                                <a href="{{ route('app.records.create', ['clinic' => $clinic->slug, 'patient' => $patient->id]) }}"
-                                   wire:navigate
-                                   class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                    {{ __('records.create_first') }} →
-                                </a>
-                            @endif
-                        @endcan
-                    </div>
+                    <x-empty-state
+                        icon="document"
+                        :compact="true"
+                        :title="__('records.no_records')"
+                        :description="__('records.no_records_description')"
+                        :bullets="[__('records.empty_state_bullet_1'), __('records.empty_state_bullet_2'), __('records.empty_state_bullet_3')]"
+                        :cta-text="$clinic->canWrite() ? __('records.create_first') : null"
+                        :cta-route="$clinic->canWrite() ? route('app.records.create', ['clinic' => $clinic->slug, 'patient' => $patient->id]) : null"
+                        cta-permission="records.create"
+                    />
                 @endforelse
             </div>
 

@@ -99,4 +99,9 @@ return [
         'time_required' => 'Debes seleccionar un horario.',
         'terms_required' => 'Debes aceptar el procesamiento de datos.',
     ],
+
+    'book_appointment' => 'Reservar cita',
+    'about_us'         => 'Sobre nosotros',
+    'our_services'     => 'Nuestros servicios',
+    'our_team'         => 'Nuestro equipo',
 ];

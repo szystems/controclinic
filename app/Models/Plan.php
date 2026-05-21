@@ -20,21 +20,27 @@ class Plan extends Model
         'max_staff',
         'max_storage_bytes',
         'features',
+        'highlight_features',
         'monthly_price',
         'yearly_price',
         'paddle_monthly_price_id',
         'paddle_yearly_price_id',
         'paddle_product_id',
+        'cta_text',
+        'cta_url',
         'trial_days',
         'sort_order',
         'is_active',
         'is_popular',
         'is_free',
         'is_enterprise',
+        'is_private',
+        'requires_code',
     ];
 
     protected $casts = [
         'features' => 'array',
+        'highlight_features' => 'array',
         'monthly_price' => 'decimal:2',
         'yearly_price' => 'decimal:2',
         'max_patients' => 'integer',
@@ -48,6 +54,8 @@ class Plan extends Model
         'is_popular' => 'boolean',
         'is_free' => 'boolean',
         'is_enterprise' => 'boolean',
+        'is_private' => 'boolean',
+        'requires_code' => 'boolean',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -72,6 +80,15 @@ class Plan extends Model
     public function scopeSubscribable($query)
     {
         return $query->where('is_free', false)->where('is_enterprise', false)->where('is_active', true);
+    }
+
+    /**
+     * Public plans visible on the marketing /pricing page.
+     * Excludes plans flagged as private (used internally or by partners only).
+     */
+    public function scopePublic($query)
+    {
+        return $query->where('is_private', false);
     }
 
     // ==================== HELPERS ====================

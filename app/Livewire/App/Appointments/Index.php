@@ -25,6 +25,12 @@ class Index extends Component
 
     public string $dateFilter = '';
 
+    public string $dateFrom = '';
+
+    public string $dateTo = '';
+
+    public string $createdViaFilter = '';
+
     public string $sortField = 'appointment_date';
 
     public string $sortDirection = 'asc';
@@ -34,6 +40,9 @@ class Index extends Component
         'status' => ['except' => ''],
         'doctorId' => ['except' => ''],
         'dateFilter' => ['except' => ''],
+        'dateFrom' => ['except' => ''],
+        'dateTo' => ['except' => ''],
+        'createdViaFilter' => ['except' => ''],
     ];
 
     protected $listeners = [
@@ -68,6 +77,21 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingDateFrom(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateTo(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCreatedViaFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function sortBy(string $field): void
     {
         if ($this->sortField === $field) {
@@ -80,7 +104,7 @@ class Index extends Component
 
     public function clearFilters(): void
     {
-        $this->reset(['search', 'status', 'doctorId']);
+        $this->reset(['search', 'status', 'doctorId', 'dateFrom', 'dateTo', 'createdViaFilter']);
         $this->dateFilter = now()->toDateString();
         $this->resetPage();
     }
@@ -104,7 +128,7 @@ class Index extends Component
     {
         return Appointment::query()
             ->forClinic($this->currentClinic->id)
-            ->with(['patient', 'doctor'])
+            ->with(['patient', 'doctor', 'invoice'])
             ->when($this->search, function ($query) {
                 $query->whereHas('patient', function ($q) {
                     $q->where('first_name', 'like', '%'.$this->search.'%')
@@ -118,8 +142,17 @@ class Index extends Component
             ->when($this->doctorId, function ($query) {
                 $query->where('doctor_id', $this->doctorId);
             })
-            ->when($this->dateFilter, function ($query) {
+            ->when($this->dateFilter && ! $this->dateFrom && ! $this->dateTo, function ($query) {
                 $query->forDate($this->dateFilter);
+            })
+            ->when($this->dateFrom, function ($query) {
+                $query->whereDate('appointment_date', '>=', $this->dateFrom);
+            })
+            ->when($this->dateTo, function ($query) {
+                $query->whereDate('appointment_date', '<=', $this->dateTo);
+            })
+            ->when($this->createdViaFilter, function ($query) {
+                $query->where('created_via', $this->createdViaFilter);
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->orderBy('start_time', 'asc')

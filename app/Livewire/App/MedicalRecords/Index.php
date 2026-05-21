@@ -22,6 +22,8 @@ class Index extends Component
 
     public string $statusFilter = '';
 
+    public string $filterHasFiles = '';  // '' | 'yes' | 'no'
+
     public function mount(Patient $patient): void
     {
         abort_if($patient->clinic_id !== app('current_clinic')->id, 404);
@@ -38,7 +40,7 @@ class Index extends Component
 
     public function clearFilters(): void
     {
-        $this->reset(['typeFilter', 'statusFilter']);
+        $this->reset(['typeFilter', 'statusFilter', 'filterHasFiles']);
         $this->resetPage();
     }
 
@@ -53,6 +55,14 @@ class Index extends Component
             ->when(! $canViewConfidential, fn ($q) => $q->where('is_confidential', false))
             ->when($this->typeFilter, fn ($q) => $q->where('record_type', $this->typeFilter))
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
+            ->when($this->filterHasFiles === 'yes', fn ($q) => $q
+                ->whereNotNull('attachments')
+                ->whereRaw("JSON_LENGTH(attachments) > 0")
+            )
+            ->when($this->filterHasFiles === 'no', fn ($q) => $q->where(function ($sub) {
+                $sub->whereNull('attachments')
+                    ->orWhereRaw("JSON_LENGTH(attachments) = 0");
+            }))
             ->with('doctor:id,name')
             ->orderByDesc('created_at')
             ->paginate(10);

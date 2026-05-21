@@ -30,6 +30,7 @@ class ClinicInvitationMail extends Mailable
             markdown: 'mail.clinic-invitation',
             with: [
                 'invitation' => $this->invitation,
+                'clinic' => $this->invitation->clinic,
                 'acceptUrl' => route('invitations.accept', $this->invitation->token),
                 'clinicName' => $this->invitation->clinic->name,
                 'inviterName' => $this->invitation->inviter->name,

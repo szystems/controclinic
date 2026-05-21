@@ -73,8 +73,11 @@ return [
     'upgrade_for_staff' => 'Mejora tu plan para agregar más personal',
 
     // Empty state
-    'no_members' => 'No hay miembros en tu equipo',
-    'no_members_description' => 'Agrega doctores y personal para comenzar a gestionar tu clínica',
+    'no_members' => 'Aún no hay miembros en tu equipo',
+    'no_members_description' => 'Invita doctores y personal para colaborar en la gestión de la clínica.',
+    'empty_state_bullet_1' => 'Roles predefinidos: doctor, asistente, secretaria y recepcionista',
+    'empty_state_bullet_2' => 'Cada rol tiene permisos específicos sobre pacientes y citas',
+    'empty_state_bullet_3' => 'Invitación por email con activación segura',
     'no_results' => 'No se encontraron resultados',
     'no_results_description' => 'Intenta con otros filtros de búsqueda',
 
@@ -138,4 +141,8 @@ return [
     'restore_role_permissions' => 'Restaurar permisos del rol',
     'restore_permissions_confirm' => '¿Estas seguro? Se eliminarán todos los permisos adicionales y se dejarán solo los del rol asignado.',
     'permissions_restored' => 'Permisos restaurados al estado base del rol.',
+
+    // Sprint C
+    'appointments_count' => '# Citas',
+    'records_count' => '# Consultas',
 ];

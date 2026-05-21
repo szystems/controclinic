@@ -51,19 +51,39 @@
                     <input type="date" wire:model.live="dateTo"
                            class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"/>
                 </div>
+                {{-- Vencidas --}}
+                <div>
+                    <select wire:model.live="filterOverdue" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">{{ __('invoices.all_due') }}</option>
+                        <option value="yes">{{ __('invoices.only_overdue') }}</option>
+                    </select>
+                </div>
+                {{-- Método de pago --}}
+                <div>
+                    <select wire:model.live="filterPaymentMethod" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">{{ __('invoices.all_payment_methods') }}</option>
+                        <option value="cash">{{ __('invoices.method_cash') }}</option>
+                        <option value="card">{{ __('invoices.method_card') }}</option>
+                        <option value="transfer">{{ __('invoices.method_transfer') }}</option>
+                        <option value="insurance">{{ __('invoices.method_insurance') }}</option>
+                        <option value="other">{{ __('invoices.method_other') }}</option>
+                    </select>
+                </div>
             </div>
         </div>
 
         {{-- Tabla --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             @if($invoices->isEmpty())
-            <div class="px-6 py-16 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
-                </svg>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ __('invoices.no_invoices') }}</p>
-                <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ __('invoices.no_invoices_desc') }}</p>
-            </div>
+            <x-empty-state
+                icon="invoice"
+                :title="__('invoices.no_invoices')"
+                :description="__('invoices.no_invoices_desc')"
+                :bullets="[__('invoices.empty_state_bullet_1'), __('invoices.empty_state_bullet_2'), __('invoices.empty_state_bullet_3')]"
+                :cta-text="__('invoices.new_invoice')"
+                :cta-route="route('app.invoices.create', ['clinic' => $currentClinic->slug])"
+                cta-permission="invoices.create"
+            />
             @else
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900/50">
@@ -74,12 +94,14 @@
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('invoices.total') }}</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('invoices.balance') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('invoices.status') }}</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('invoices.days_overdue') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('invoices.last_payment_method') }}</th>
                         <th class="relative px-6 py-3"><span class="sr-only">{{ __('general.actions') }}</span></th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($invoices as $invoice)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" @click="window.location.href='{{ route('app.invoices.show', ['clinic' => $currentClinic->slug, 'invoice' => $invoice->id]) }}'">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-semibold text-gray-900 dark:text-white">
                             {{ $invoice->invoice_number }}
                         </td>
@@ -100,7 +122,27 @@
                                 {{ $invoice->status_label }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                            @php
+                                $isOverdue = in_array($invoice->status, [\App\Models\Invoice::STATUS_PENDING, \App\Models\Invoice::STATUS_PARTIAL])
+                                    && $invoice->due_at
+                                    && \Carbon\Carbon::parse($invoice->due_at)->isPast();
+                                $daysOverdue = $isOverdue ? (int) \Carbon\Carbon::parse($invoice->due_at)->diffInDays(now()) : 0;
+                            @endphp
+                            @if($isOverdue)
+                                <span class="font-semibold text-red-600 dark:text-red-400">{{ $daysOverdue }}d</span>
+                            @else
+                                <span class="text-gray-400">—</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            @if($invoice->payments->isNotEmpty())
+                                {{ __('invoices.method_' . $invoice->payments->first()->method) }}
+                            @else
+                                <span class="text-gray-400">—</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
                             <a href="{{ route('app.invoices.show', ['clinic' => $currentClinic->slug, 'invoice' => $invoice->id]) }}"
                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
                                 {{ __('general.view') }}

@@ -24,12 +24,12 @@
     <meta name="robots" content="index,follow">
 
     <title>{{ $title ?? __('booking.page_title', ['clinic' => $clinic->name]) }}</title>
-    <meta name="description" content="{{ __('booking.page_title', ['clinic' => $clinic->name]) }}">
+    <meta name="description" content="{{ $description ?? __('booking.page_title', ['clinic' => $clinic->name]) }}">
 
     {{-- Open Graph --}}
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $clinic->name }}">
-    <meta property="og:description" content="{{ __('booking.page_title', ['clinic' => $clinic->name]) }}">
+    <meta property="og:title" content="{{ $title ?? $clinic->name }}">
+    <meta property="og:description" content="{{ $description ?? __('booking.page_title', ['clinic' => $clinic->name]) }}">
     @if($logo)
         <meta property="og:image" content="{{ asset('storage/' . $logo) }}">
     @endif

@@ -26,6 +26,11 @@ return [
     'expires' => 'Expira :date',
 
     // Actions
+    'edit' => 'Editar',
+    'edit_title' => 'Editar invitación',
+    'edit_resend_hint' => 'Al guardar se enviará el correo de invitación actualizado al destinatario.',
+    'save_and_resend' => 'Guardar y reenviar',
+    'invitation_updated' => 'Invitación actualizada y reenviada exitosamente.',
     'resend' => 'Reenviar',
     'cancel_invitation' => 'Cancelar invitación',
     'confirm_cancel' => '¿Estás seguro de que deseas cancelar la invitación de :name?',

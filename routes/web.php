@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppointmentConfirmationController;
+use App\Http\Controllers\PatientFileController;
 use App\Http\Middleware\CheckPlanLimits;
 use App\Http\Middleware\EnsureIsAdmin;
 use App\Http\Middleware\EnsureOnboardingCompleted;
@@ -12,6 +13,7 @@ use App\Livewire\App\Appointments\Calendar as AppointmentsCalendar;
 use App\Livewire\App\Appointments\Create as AppointmentsCreate;
 use App\Livewire\App\Appointments\Edit as AppointmentsEdit;
 use App\Livewire\App\Appointments\Index as AppointmentsIndex;
+use App\Livewire\App\Appointments\Schedule as AppointmentsSchedule;
 use App\Livewire\App\Appointments\Show as AppointmentsShow;
 use App\Livewire\App\AuditLog\Index as AuditLogIndex;
 use App\Livewire\App\Billing\Index as BillingIndex;
@@ -22,6 +24,11 @@ use App\Livewire\App\MedicalRecords\Create as MedicalRecordsCreate;
 use App\Livewire\App\MedicalRecords\Edit as MedicalRecordsEdit;
 use App\Livewire\App\MedicalRecords\Index as MedicalRecordsIndex;
 use App\Livewire\App\MedicalRecords\Show as MedicalRecordsShow;
+use App\Livewire\App\Prescriptions\Create as PrescriptionsCreate;
+use App\Livewire\App\Prescriptions\Edit as PrescriptionsEdit;
+use App\Livewire\App\Prescriptions\Index as PrescriptionsIndex;
+use App\Livewire\App\Prescriptions\Show as PrescriptionsShow;
+use App\Models\Prescription;
 use App\Livewire\App\Onboarding\Index;
 use App\Livewire\App\Patients\Create as PatientsCreate;
 use App\Livewire\App\Patients\Edit as PatientsEdit;
@@ -29,7 +36,9 @@ use App\Livewire\App\Patients\Index as PatientsIndex;
 use App\Livewire\App\Patients\Show as PatientsShow;
 use App\Livewire\App\Reports\Index as ReportsIndex;
 use App\Livewire\App\Schedule\Index as ScheduleIndex;
+use App\Livewire\App\Settings\Catalog;
 use App\Livewire\App\Settings\Index as SettingsIndex;
+use App\Livewire\App\Settings\RecordTemplates;
 use App\Livewire\App\Staff\Create as StaffCreate;
 use App\Livewire\App\Staff\Edit as StaffEdit;
 use App\Livewire\App\Staff\Index as StaffIndex;
@@ -117,7 +126,7 @@ Route::get('/', function () {
 
 Route::get('/pricing', function () {
     return view('public.pricing', [
-        'plans' => Plan::active()->ordered()->get(),
+        'plans' => Plan::active()->public()->ordered()->get(),
     ]);
 })->name('pricing');
 
@@ -132,6 +141,29 @@ Route::get('/terms', function () {
 Route::get('/privacy', function () {
     return view('public.privacy');
 })->name('privacy');
+
+Route::get('/sitemap.xml', function () {
+    $urls = [
+        ['loc' => route('home'),    'changefreq' => 'weekly',  'priority' => '1.0'],
+        ['loc' => route('pricing'), 'changefreq' => 'weekly',  'priority' => '0.9'],
+        ['loc' => route('contact'), 'changefreq' => 'monthly', 'priority' => '0.7'],
+        ['loc' => route('terms'),   'changefreq' => 'yearly',  'priority' => '0.3'],
+        ['loc' => route('privacy'), 'changefreq' => 'yearly',  'priority' => '0.3'],
+    ];
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+    foreach ($urls as $u) {
+        $xml .= "  <url>\n";
+        $xml .= '    <loc>'.htmlspecialchars($u['loc']).'</loc>'."\n";
+        $xml .= '    <changefreq>'.$u['changefreq'].'</changefreq>'."\n";
+        $xml .= '    <priority>'.$u['priority'].'</priority>'."\n";
+        $xml .= "  </url>\n";
+    }
+    $xml .= '</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'application/xml']);
+})->name('sitemap');
 
 /*
 |--------------------------------------------------------------------------
@@ -243,6 +275,7 @@ Route::prefix('app/{clinic}')
                 Route::prefix('appointments')->name('appointments.')->group(function () {
                     Route::get('/', AppointmentsIndex::class)->name('index');
                     Route::get('/calendar', AppointmentsCalendar::class)->name('calendar');
+                    Route::get('/schedule', AppointmentsSchedule::class)->name('schedule');
 
                     // Write routes (require canWrite) — must come BEFORE /{appointment} catch-all
                     Route::middleware('can.write')->group(function () {
@@ -256,7 +289,8 @@ Route::prefix('app/{clinic}')
                 // Settings (write — only fully-active clinics can change settings)
                 Route::middleware('can.write')->prefix('settings')->name('settings.')->group(function () {
                     Route::get('/', SettingsIndex::class)->name('index');
-                    Route::get('/catalog', App\Livewire\App\Settings\Catalog::class)->name('catalog');
+                    Route::get('/catalog', Catalog::class)->name('catalog');
+                    Route::get('/templates', RecordTemplates::class)->name('templates');
                 });
 
                 // Staff
@@ -278,6 +312,21 @@ Route::prefix('app/{clinic}')
                 // Perfil de usuario (tenantizado)
                 Route::get('/profile', App\Livewire\App\Profile\Index::class)->name('profile');
 
+                // Recetas (prescriptions)
+                Route::middleware('can:prescriptions.view')->prefix('prescriptions')->name('prescriptions.')->group(function () {
+                    Route::get('/', PrescriptionsIndex::class)->name('index');
+                    Route::middleware('can:prescriptions.create')->get('/create', PrescriptionsCreate::class)->name('create');
+                    Route::get('/{prescription}', PrescriptionsShow::class)->name('show');
+                    Route::middleware('can:prescriptions.edit')->get('/{prescription}/edit', PrescriptionsEdit::class)->name('edit');
+                    Route::middleware('can:prescriptions.print')->get('/{prescription}/pdf', function (\App\Models\Clinic $clinic, Prescription $prescription) {
+                        abort_unless($prescription->clinic_id === $clinic->id, 404);
+                        $prescription->loadMissing(['patient', 'doctor', 'items']);
+                        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.prescription', compact('prescription', 'clinic'));
+
+                        return $pdf->stream("receta-{$prescription->folio}.pdf");
+                    })->name('pdf');
+                });
+
                 // Facturación (invoices)
                 Route::middleware('can:invoices.view')->prefix('invoices')->name('invoices.')->group(function () {
                     Route::get('/', App\Livewire\App\Invoices\Index::class)->name('index');
@@ -291,6 +340,12 @@ Route::prefix('app/{clinic}')
 
                         return $pdf->stream("factura-{$invoice->invoice_number}.pdf");
                     })->name('pdf');
+                });
+
+                // Patient Files — stream seguro (fuera de storage público)
+                Route::middleware('can:files.view')->prefix('patient-files')->name('patient-files.')->group(function () {
+                    Route::get('/{file}/view', [PatientFileController::class, 'show'])->name('show');
+                    Route::get('/{file}/download', [PatientFileController::class, 'download'])->name('download');
                 });
             });
         });

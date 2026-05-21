@@ -102,6 +102,15 @@ return [
             'monthly' => env('PADDLE_PRICE_SOLO_MONTHLY'),
             'yearly' => env('PADDLE_PRICE_SOLO_YEARLY'),
         ],
+        'practica' => [
+            'monthly' => env('PADDLE_PRICE_PRACTICA_MONTHLY'),
+            'yearly' => env('PADDLE_PRICE_PRACTICA_YEARLY'),
+        ],
+        'clinica' => [
+            'monthly' => env('PADDLE_PRICE_CLINICA_MONTHLY'),
+            'yearly' => env('PADDLE_PRICE_CLINICA_YEARLY'),
+        ],
+        // Legacy — mantener mientras existan suscripciones activas en este precio.
         'group' => [
             'monthly' => env('PADDLE_PRICE_GROUP_MONTHLY'),
             'yearly' => env('PADDLE_PRICE_GROUP_YEARLY'),

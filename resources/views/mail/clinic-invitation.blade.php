@@ -1,4 +1,10 @@
 <x-mail::message>
+
+{{-- Clinic branding sub-header --}}
+<x-slot:clinicHeader>
+@include('mail.partials.clinic-header', ['clinic' => $clinic])
+</x-slot:clinicHeader>
+
 # {{ __('invitations.email_greeting', ['name' => $invitation->name]) }}
 
 {{ __('invitations.email_body', ['inviter' => $inviterName, 'clinic' => $clinicName]) }}

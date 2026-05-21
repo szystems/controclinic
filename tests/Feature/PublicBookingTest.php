@@ -301,4 +301,116 @@ class PublicBookingTest extends TestCase
             ->call('submitBooking')
             ->assertHasErrors(['submit']);
     }
+
+    // ─── Landing pública enriquecida (F.3) ───────────────────────────────────
+
+    public function test_public_page_shows_description_when_set(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor([
+            'public_description' => 'Clínica especializada en medicina interna.',
+        ]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee('Clínica especializada en medicina interna.', false);
+    }
+
+    public function test_public_page_does_not_show_about_section_when_no_description(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor(['public_description' => null]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertDontSee(__('booking.about_us'), false);
+    }
+
+    public function test_public_page_shows_services_when_set(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor([
+            'public_services' => [
+                ['title' => 'Cardiología', 'description' => 'Atención del corazón', 'icon' => ''],
+            ],
+        ]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee('Cardiología', false);
+    }
+
+    public function test_public_page_does_not_show_services_section_when_empty(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor(['public_services' => []]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertDontSee(__('booking.our_services'), false);
+    }
+
+    public function test_public_page_shows_doctor_team_when_enabled(): void
+    {
+        [$clinic, $doctor] = $this->makeClinicWithDoctor([
+            'public_show_doctors' => true,
+        ]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee(__('booking.our_team'), false);
+    }
+
+    public function test_public_page_hides_doctor_team_when_disabled(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor(['public_show_doctors' => false]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertDontSee(__('booking.our_team'), false);
+    }
+
+    public function test_public_page_uses_seo_title_in_meta(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor([
+            'public_seo_title' => 'Clínica Norte | Reserva tu cita',
+        ]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee('Clínica Norte | Reserva tu cita', false);
+    }
+
+    public function test_public_page_uses_seo_description_in_meta(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor([
+            'public_seo_description' => 'Atención médica de calidad en el norte.',
+        ]);
+
+        $response = $this->get('/c/'.$clinic->slug)->assertOk();
+
+        $this->assertStringContainsString(
+            'Atención médica de calidad en el norte.',
+            $response->getContent()
+        );
+    }
+
+    public function test_public_page_shows_cover_image_when_set(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $path = 'clinics/test/public/cover.jpg';
+        \Illuminate\Support\Facades\Storage::disk('public')->put($path, 'fake');
+
+        [$clinic] = $this->makeClinicWithDoctor(['public_cover_image_url' => $path]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee($path, false);
+    }
+
+    public function test_public_page_shows_book_appointment_cta_when_booking_enabled(): void
+    {
+        [$clinic] = $this->makeClinicWithDoctor();
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee(__('booking.book_appointment'), false);
+    }
 }

@@ -94,6 +94,11 @@
                 @endif
             @endif
 
+            {{-- Setup Checklist — only for owner, hidden once dismissed via preferences --}}
+            @if(auth()->user()->hasRole('owner') && ! (auth()->user()->preferences['setup_checklist_dismissed'] ?? false))
+                @livewire('app.dashboard.setup-checklist', ['clinic' => $clinic], key('setup-checklist'))
+            @endif
+
             {{-- Stats Cards --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {{-- Pacientes --}}

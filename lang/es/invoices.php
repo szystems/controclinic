@@ -81,7 +81,10 @@ return [
     'invoice_paid' => 'Factura marcada como pagada',
     'cannot_edit_paid' => 'No se puede editar una factura pagada o cancelada',
     'no_invoices' => 'No hay facturas aún',
-    'no_invoices_desc' => 'Las facturas se crean al generar un comprobante de pago por consulta.',
+    'no_invoices_desc' => 'Crea tu primera factura para llevar el control de ingresos de la clínica.',
+    'empty_state_bullet_1' => 'Factura con ítems de consulta, procedimientos y productos',
+    'empty_state_bullet_2' => 'Registro de pagos parciales y saldo pendiente',
+    'empty_state_bullet_3' => 'Exporta reportes de ingresos por periodo o doctor',
 
     // Configuración de facturación
     'billing_settings' => 'Configuración de Facturación',
@@ -120,4 +123,16 @@ return [
     'suggest_catalog_desc' => 'Algunos ítems de esta factura no están en tu catálogo. Guárdalos para usarlos rápidamente en el futuro.',
     'suggest_catalog_save' => 'Guardar seleccionados',
     'suggest_catalog_skip' => 'No por ahora',
+
+    // Sprint C
+    'all_due' => 'Todos los vencimientos',
+    'only_overdue' => 'Solo vencidas',
+    'all_payment_methods' => 'Todos los métodos',
+    'days_overdue' => 'Días vencida',
+    'last_payment_method' => 'Último pago',
+    'method_cash' => 'Efectivo',
+    'method_card' => 'Tarjeta',
+    'method_transfer' => 'Transferencia',
+    'method_insurance' => 'Seguro',
+    'method_other' => 'Otro',
 ];

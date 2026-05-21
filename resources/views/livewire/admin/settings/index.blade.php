@@ -453,6 +453,130 @@
                 </form>
             </div>
 
+            {{-- ================================================================
+                 SEO
+            ================================================================ --}}
+            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+                        {{ __('admin.seo') }}
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {{ __('admin.seo_description') }}
+                    </p>
+                </div>
+
+                <form wire:submit="saveSeo" class="p-6 space-y-4">
+                    <div>
+                        <x-input-label for="seo_meta_title" :value="__('admin.seo_meta_title')" />
+                        <x-text-input
+                            id="seo_meta_title"
+                            wire:model="seo_meta_title"
+                            type="text"
+                            class="mt-1 block w-full"
+                            maxlength="80"
+                        />
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.seo_meta_title_help') }}</p>
+                        <x-input-error :messages="$errors->get('seo_meta_title')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="seo_meta_description" :value="__('admin.seo_meta_description')" />
+                        <textarea
+                            id="seo_meta_description"
+                            wire:model="seo_meta_description"
+                            rows="3"
+                            maxlength="200"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        ></textarea>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.seo_meta_description_help') }}</p>
+                        <x-input-error :messages="$errors->get('seo_meta_description')" class="mt-2" />
+                    </div>
+
+                    {{-- OG Image --}}
+                    <div x-data="{ ogPreview: null }">
+                        <x-input-label :value="__('admin.seo_og_image')" />
+                        <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.seo_og_image_help') }}</p>
+
+                        @if($seo_og_image_url)
+                            <div class="mt-2 mb-3">
+                                <img src="{{ $seo_og_image_url }}" alt="OG image" class="max-w-md max-h-48 object-contain rounded border border-gray-200 dark:border-gray-700" />
+                            </div>
+                        @endif
+
+                        <input
+                            id="og_image_file_input"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                            class="hidden"
+                            x-ref="ogInput"
+                            x-on:change="
+                                const file = $event.target.files[0];
+                                if (file) {
+                                    ogPreview = URL.createObjectURL(file);
+                                    @this.upload('og_image_file', file);
+                                }
+                            "
+                        />
+                        <button
+                            type="button"
+                            x-on:click="$refs.ogInput.click()"
+                            class="mt-1 inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                            <span>{{ __('admin.seo_og_image_select') }}</span>
+                        </button>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">JPG, PNG, WEBP · 1200×630 px · max 2 MB</p>
+                        <div wire:loading wire:target="og_image_file" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {{ __('admin.logo_uploading') }}
+                        </div>
+                        <x-input-error :messages="$errors->get('og_image_file')" class="mt-2" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label for="seo_google_analytics_id" :value="__('admin.seo_ga_id')" />
+                            <x-text-input
+                                id="seo_google_analytics_id"
+                                wire:model="seo_google_analytics_id"
+                                type="text"
+                                class="mt-1 block w-full"
+                                placeholder="G-XXXXXXXXXX"
+                                maxlength="30"
+                            />
+                            <x-input-error :messages="$errors->get('seo_google_analytics_id')" class="mt-2" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="seo_gtm_id" :value="__('admin.seo_gtm_id')" />
+                            <x-text-input
+                                id="seo_gtm_id"
+                                wire:model="seo_gtm_id"
+                                type="text"
+                                class="mt-1 block w-full"
+                                placeholder="GTM-XXXXXXX"
+                                maxlength="30"
+                            />
+                            <x-input-error :messages="$errors->get('seo_gtm_id')" class="mt-2" />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <x-primary-button wire:loading.attr="disabled">
+                            <span wire:loading wire:target="saveSeo" class="mr-2">
+                                <svg class="animate-spin h-4 w-4 inline" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 12 0 12 0v4a8 8 0 00-8 8H0z"></path>
+                                </svg>
+                            </span>
+                            {{ __('admin.save_seo') }}
+                        </x-primary-button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>

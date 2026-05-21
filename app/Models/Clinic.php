@@ -42,6 +42,12 @@ class Clinic extends Model
         'branding',
         'public_portal_enabled',
         'public_portal_slug',
+        'public_description',
+        'public_cover_image_url',
+        'public_services',
+        'public_show_doctors',
+        'public_seo_title',
+        'public_seo_description',
         'max_patients',
         'max_appointments_per_month',
         'max_doctors',
@@ -51,12 +57,16 @@ class Clinic extends Model
         'parent_clinic_id',
         'legal_entity_id',
         'data_retention_years',
+        'sms_notifications_enabled',
+        'sms_provider',
     ];
 
     protected $casts = [
         'settings' => 'array',
         'branding' => 'array',
         'public_portal_enabled' => 'boolean',
+        'public_services' => 'array',
+        'public_show_doctors' => 'boolean',
         'is_manual_plan' => 'boolean',
         'trial_ends_at' => 'datetime',
         'onboarding_completed_at' => 'datetime',
@@ -67,6 +77,7 @@ class Clinic extends Model
         'storage_used_bytes' => 'integer',
         'max_storage_bytes' => 'integer',
         'data_retention_years' => 'integer',
+        'sms_notifications_enabled' => 'boolean',
     ];
 
     /**

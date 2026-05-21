@@ -5,10 +5,164 @@
         'start' => $settings['working_hours_start'] ?? '08:00',
         'end' => $settings['working_hours_end'] ?? '18:00',
     ];
-    $description = $settings['description'] ?? null;
+    $description    = $settings['description'] ?? null;
+    $publicDesc     = $clinic->public_description;
+    $coverUrl       = $clinic->public_cover_image_url
+        ? \Illuminate\Support\Facades\Storage::disk('public')->url($clinic->public_cover_image_url)
+        : null;
+    $services       = $clinic->public_services ?? [];
+    $showDoctors    = (bool) ($clinic->public_show_doctors ?? true);
+    $branding       = $clinic->branding ?? [];
+    $logoPath       = $branding['logo'] ?? null;
+    $logoUrl        = $logoPath ? \Illuminate\Support\Facades\Storage::disk('public')->url($logoPath) : null;
+    $dayNames       = [0 => 'Dom', 1 => 'Lun', 2 => 'Mar', 3 => 'Mié', 4 => 'Jue', 5 => 'Vie', 6 => 'Sáb'];
+    $workingDayList = collect($hours['days'])->map(fn($d) => $dayNames[$d] ?? '')->implode(', ');
 @endphp
 
 <div>
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- HERO                                                   --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    <div class="relative overflow-hidden rounded-xl shadow-sm mb-8
+        {{ $coverUrl ? '' : 'bg-clinic-primary' }}"
+         style="{{ $coverUrl ? '' : 'background: linear-gradient(135deg, var(--clinic-primary) 0%, var(--clinic-secondary, #6366f1) 100%)' }}">
+        @if($coverUrl)
+            <div class="absolute inset-0">
+                <img src="{{ $coverUrl }}" alt="{{ $clinic->name }}" class="w-full h-full object-cover">
+                <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.65) 100%)"></div>
+            </div>
+        @endif
+        <div class="relative px-8 py-12 text-center text-white">
+            @if($logoUrl)
+                <img src="{{ $logoUrl }}" alt="{{ $clinic->name }}" class="h-16 w-auto mx-auto mb-4 rounded-lg shadow object-contain bg-white/10 p-1">
+            @endif
+            <h1 class="text-3xl sm:text-4xl font-bold leading-tight drop-shadow">{{ $clinic->name }}</h1>
+            @if($description)
+                <p class="mt-3 text-white/85 max-w-xl mx-auto text-base drop-shadow">{{ $description }}</p>
+            @endif
+            <div class="mt-6 flex flex-wrap justify-center gap-4 text-sm text-white/90">
+                @if($clinic->phone)
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        {{ $clinic->phone }}
+                    </span>
+                @endif
+                @if($workingDayList)
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        {{ $workingDayList }} · {{ $hours['start'] }}–{{ $hours['end'] }}
+                    </span>
+                @endif
+                @if($clinic->city)
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ $clinic->city }}
+                    </span>
+                @endif
+            </div>
+            @if(! $portalDisabled && $this->onlineBookingEnabled)
+                <a href="#booking" class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-white text-clinic-primary font-semibold rounded-full shadow hover:shadow-md transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ __('booking.book_appointment') }}
+                </a>
+            @endif
+        </div>
+    </div>
+
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- SOBRE NOSOTROS                                         --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    @if($publicDesc)
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-clinic-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {{ __('booking.about_us') }}
+        </h2>
+        <p class="text-gray-600 leading-relaxed whitespace-pre-line text-sm sm:text-base">{{ $publicDesc }}</p>
+    </div>
+    @endif
+
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- SERVICIOS                                              --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    @if(count($services) > 0)
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-clinic-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            {{ __('booking.our_services') }}
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach($services as $service)
+                @if(! empty($service['title']))
+                <div class="flex gap-3 p-4 rounded-lg bg-gray-50 border border-gray-100">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style="background: rgba(var(--clinic-primary-rgb,79,70,229),0.1)">
+                        <svg class="w-4 h-4 text-clinic-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm text-gray-900">{{ $service['title'] }}</p>
+                        @if(! empty($service['description']))
+                            <p class="text-xs text-gray-500 mt-0.5">{{ $service['description'] }}</p>
+                        @endif
+                    </div>
+                </div>
+                @endif
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- EQUIPO MÉDICO                                          --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    @if($showDoctors)
+    @php
+        $doctors = $clinic->users()
+            ->where(function ($q) {
+                $q->whereHas('roles', fn ($r) => $r->whereIn('name', ['owner', 'doctor']))
+                  ->orWhereIn('role', ['owner', 'doctor']);
+            })
+            ->where('is_active', true)
+            ->get();
+    @endphp
+    @if($doctors->count() > 0)
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-clinic-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            {{ __('booking.our_team') }}
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach($doctors as $doctor)
+            <div class="text-center p-4 rounded-lg bg-gray-50 border border-gray-100">
+                <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-lg font-bold"
+                     style="background: linear-gradient(135deg, var(--clinic-primary) 0%, var(--clinic-secondary,#6366f1) 100%)">
+                    {{ mb_strtoupper(mb_substr($doctor->name, 0, 1)) }}
+                </div>
+                <p class="text-sm font-medium text-gray-900 leading-tight">{{ $doctor->name }}</p>
+                @php $role = $doctor->getRoleNames()->first(); @endphp
+                @if($role)
+                    <p class="text-xs text-gray-500 mt-0.5 capitalize">{{ __('roles.'.$role, ['default' => $role]) }}</p>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+    @endif
+
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- BOOKING WIZARD (existente — sin cambios)               --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    <div id="booking">
+        @if(! $portalDisabled && $this->onlineBookingEnabled && $step < 4)
+        <div class="flex items-center gap-3 mb-4">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--clinic-primary) 0%, var(--clinic-secondary,#6366f1) 100%)">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900">{{ __('booking.book_appointment') }}</h2>
+        </div>
+        @endif
 
     {{-- Account in read-only / billing-only — booking unavailable (ADR-008) --}}
     @if($portalDisabled)
@@ -328,5 +482,7 @@
             </section>
         </div>
     @endif
+
+    </div>{{-- end #booking --}}
 
 </div>

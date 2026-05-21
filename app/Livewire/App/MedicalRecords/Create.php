@@ -6,12 +6,19 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
+use App\Models\PatientFile;
+use App\Models\RecordTemplate;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.app')]
 class Create extends Component
 {
+    use WithFileUploads;
+
     public Patient $patient;
 
     public Clinic $clinic;
@@ -52,6 +59,13 @@ class Create extends Component
     public array $prescriptions = [];
 
     public bool $isConfidential = false;
+
+    public ?string $selectedTemplateId = null;
+
+    /** @var array<int,mixed> */
+    public array $pendingUploads = [];
+
+    public string $pendingCategory = 'other';
 
     public function mount(Patient $patient, ?string $appointmentId = null): void
     {
@@ -97,6 +111,38 @@ class Create extends Component
         $this->diagnoses[] = ['code' => '', 'description' => ''];
     }
 
+    public function loadTemplate(): void
+    {
+        if (! $this->selectedTemplateId) {
+            return;
+        }
+
+        $template = RecordTemplate::where('clinic_id', $this->patient->clinic_id)
+            ->find($this->selectedTemplateId);
+
+        if (! $template) {
+            return;
+        }
+
+        $this->chiefComplaint = $template->chief_complaint ?? $this->chiefComplaint;
+        $this->presentIllness = $template->present_illness ?? $this->presentIllness;
+        $this->physicalExamination = $template->physical_examination ?? $this->physicalExamination;
+        $this->assessment = $template->assessment ?? $this->assessment;
+        $this->plan = $template->plan ?? $this->plan;
+
+        $this->dispatch('template-loaded');
+    }
+
+    public function getTemplatesForTypeProperty(): Collection
+    {
+        return RecordTemplate::query()
+            ->where('clinic_id', $this->patient->clinic_id)
+            ->where('record_type', $this->recordType)
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
+    }
+
     public function removeDiagnosis(int $index): void
     {
         unset($this->diagnoses[$index]);
@@ -130,7 +176,15 @@ class Create extends Component
             abort(403);
         }
 
-        $data = $this->validate([
+        $fileRules = [];
+        if (! empty($this->pendingUploads) && auth()->user()->can('files.upload')) {
+            $fileRules = [
+                'pendingUploads.*' => ['file', 'max:20480', 'mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,csv,txt,zip'],
+                'pendingCategory' => ['required', 'in:'.implode(',', PatientFile::CATEGORIES)],
+            ];
+        }
+
+        $data = $this->validate(array_merge([
             'recordType' => ['required', 'string', 'max:50'],
             'title' => ['nullable', 'string', 'max:255'],
             'chiefComplaint' => ['nullable', 'string', 'max:2000'],
@@ -139,7 +193,7 @@ class Create extends Component
             'assessment' => ['nullable', 'string', 'max:5000'],
             'plan' => ['nullable', 'string', 'max:5000'],
             'isConfidential' => ['boolean'],
-        ]);
+        ], $fileRules));
 
         $vitals = array_filter($this->vitalSigns, fn ($v) => $v !== '' && $v !== null);
         $diagnoses = array_values(array_filter(
@@ -170,6 +224,29 @@ class Create extends Component
             'status' => $status,
             'finalized_at' => $status === MedicalRecord::STATUS_FINAL ? now() : null,
         ]);
+
+        if (! empty($this->pendingUploads) && auth()->user()->can('files.upload')) {
+            foreach ($this->pendingUploads as $upload) {
+                $path = $upload->storeAs(
+                    "clinics/{$this->patient->clinic_id}/patients/{$this->patient->id}/files",
+                    Str::uuid().'.'.$upload->extension(),
+                    'local'
+                );
+                PatientFile::create([
+                    'clinic_id' => $this->patient->clinic_id,
+                    'patient_id' => $this->patient->id,
+                    'medical_record_id' => $record->id,
+                    'uploaded_by_user_id' => auth()->id(),
+                    'category' => $this->pendingCategory,
+                    'name' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
+                    'original_filename' => $upload->getClientOriginalName(),
+                    'disk_path' => $path,
+                    'disk' => 'local',
+                    'mime_type' => $upload->getMimeType(),
+                    'size_bytes' => $upload->getSize(),
+                ]);
+            }
+        }
 
         session()->flash('success', __('records.created'));
 

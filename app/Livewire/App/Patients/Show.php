@@ -2,7 +2,9 @@
 
 namespace App\Livewire\App\Patients;
 
+use App\Models\Invoice;
 use App\Models\Patient;
+use App\Models\Prescription;
 use App\Models\Tag;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
@@ -10,6 +12,8 @@ use Livewire\Component;
 class Show extends Component
 {
     public Patient $patient;
+
+    public string $tab = 'datos';
 
     public bool $showDeleteModal = false;
 
@@ -19,12 +23,39 @@ class Show extends Component
 
     public string $newTagColor = 'blue';
 
+    protected $queryString = [
+        'tab' => ['except' => 'datos', 'as' => 'tab'],
+    ];
+
+    /** Tabs disponibles y sus permisos requeridos (null = sin restricción) */
+    public const TABS = [
+        'datos'       => null,
+        'citas'       => 'appointments.view',
+        'historial'   => 'records.view',
+        'recetas'     => 'prescriptions.view',
+        'archivos'    => null,
+        'facturacion' => 'invoices.view',
+        'notas'       => 'patients.edit',
+        'actividad'   => 'patients.view',
+    ];
+
     public function mount(Patient $patient): void
     {
-        // Tenant isolation
         abort_if($patient->clinic_id !== app('current_clinic')->id, 404);
 
-        $this->patient = $patient->load(['primaryDoctor', 'appointments', 'medicalRecords', 'tags']);
+        // Validar tab permitido
+        if (! array_key_exists($this->tab, self::TABS)) {
+            $this->tab = 'datos';
+        }
+
+        $this->patient = $patient->load(['primaryDoctor', 'tags']);
+    }
+
+    public function setTab(string $tab): void
+    {
+        if (array_key_exists($tab, self::TABS)) {
+            $this->tab = $tab;
+        }
     }
 
     public function confirmDelete(): void
@@ -142,6 +173,7 @@ class Show extends Component
     public function getUpcomingAppointmentsProperty()
     {
         return $this->patient->appointments()
+            ->with('doctor')
             ->where('appointment_date', '>=', now()->toDateString())
             ->whereNotIn('status', ['cancelled', 'completed', 'no_show'])
             ->orderBy('appointment_date')
@@ -150,12 +182,76 @@ class Show extends Component
             ->get();
     }
 
+    public function getAllAppointmentsProperty()
+    {
+        if ($this->tab !== 'citas') {
+            return null;
+        }
+
+        return $this->patient->appointments()
+            ->with('doctor', 'invoice')
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->paginate(10);
+    }
+
     public function getRecentRecordsProperty()
     {
         return $this->patient->medicalRecords()
             ->with('doctor')
             ->orderBy('created_at', 'desc')
             ->limit(5)
+            ->get();
+    }
+
+    public function getAllRecordsProperty()
+    {
+        if ($this->tab !== 'historial') {
+            return null;
+        }
+
+        return $this->patient->medicalRecords()
+            ->with('doctor')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    }
+
+    public function getInvoicesProperty()
+    {
+        if ($this->tab !== 'facturacion') {
+            return null;
+        }
+
+        return Invoice::where('patient_id', $this->patient->id)
+            ->where('clinic_id', $this->patient->clinic_id)
+            ->with('doctor')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    }
+
+    public function getPrescriptionsProperty()
+    {
+        if ($this->tab !== 'recetas') {
+            return null;
+        }
+
+        return Prescription::where('patient_id', $this->patient->id)
+            ->where('clinic_id', $this->patient->clinic_id)
+            ->with('doctor')
+            ->orderByDesc('created_at')
+            ->paginate(10);
+    }
+
+    public function getActivityLogsProperty()
+    {
+        if ($this->tab !== 'actividad') {
+            return null;
+        }
+
+        return \Spatie\Activitylog\Models\Activity::where('subject_type', Patient::class)
+            ->where('subject_id', $this->patient->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
             ->get();
     }
 
@@ -189,10 +285,15 @@ class Show extends Component
     {
         return view('livewire.app.patients.show', [
             'upcomingAppointments' => $this->upcomingAppointments,
-            'recentRecords' => $this->recentRecords,
-            'clinicTags' => $this->clinicTags,
-            'assignedTagIds' => $this->assignedTagIds,
-            'tagColors' => Tag::COLORS,
+            'recentRecords'        => $this->recentRecords,
+            'allAppointments'      => $this->allAppointments,
+            'allRecords'           => $this->allRecords,
+            'invoices'             => $this->invoices,
+            'prescriptions'        => $this->prescriptions,
+            'activityLogs'         => $this->activityLogs,
+            'clinicTags'           => $this->clinicTags,
+            'assignedTagIds'       => $this->assignedTagIds,
+            'tagColors'            => Tag::COLORS,
         ])->layout('layouts.app');
     }
 }

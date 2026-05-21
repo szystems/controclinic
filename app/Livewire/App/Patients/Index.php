@@ -2,6 +2,7 @@
 
 namespace App\Livewire\App\Patients;
 
+use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\Tag;
@@ -21,6 +22,14 @@ class Index extends Component
 
     public string $filterTag = '';
 
+    public string $filterFutureAppt = '';  // '' | 'yes' | 'no'
+
+    public string $filterDebtor = '';  // '' | 'yes'
+
+    public string $ageMin = '';
+
+    public string $ageMax = '';
+
     public string $sortField = 'created_at';
 
     public string $sortDirection = 'desc';
@@ -29,6 +38,10 @@ class Index extends Component
         'search' => ['except' => ''],
         'status' => ['except' => ''],
         'filterTag' => ['except' => ''],
+        'filterFutureAppt' => ['except' => ''],
+        'filterDebtor' => ['except' => ''],
+        'ageMin' => ['except' => ''],
+        'ageMax' => ['except' => ''],
     ];
 
     protected $listeners = [
@@ -57,6 +70,32 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterFutureAppt(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterDebtor(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingAgeMin(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingAgeMax(): void
+    {
+        $this->resetPage();
+    }
+
+    public function clearFilters(): void
+    {
+        $this->reset(['search', 'status', 'filterTag', 'filterFutureAppt', 'filterDebtor', 'ageMin', 'ageMax']);
+        $this->resetPage();
+    }
+
     public function sortBy(string $field): void
     {
         if ($this->sortField === $field) {
@@ -69,25 +108,7 @@ class Index extends Component
 
     public function getPatientsProperty()
     {
-        return Patient::query()
-            ->where('clinic_id', $this->currentClinic->id)
-            ->with('tags')
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('first_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('last_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('email', 'like', '%'.$this->search.'%')
-                        ->orWhere('phone', 'like', '%'.$this->search.'%')
-                        ->orWhere('medical_record_number', 'like', '%'.$this->search.'%');
-                });
-            })
-            ->when($this->status !== '', function ($query) {
-                $query->where('is_active', $this->status === 'active');
-            })
-            ->when($this->filterTag !== '', function ($query) {
-                $query->withTag((int) $this->filterTag);
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
+        return $this->buildBaseQuery()
             ->paginate(15);
     }
 
@@ -141,10 +162,23 @@ class Index extends Component
     /**
      * Build the filtered patient query (without pagination) — shared by exports.
      */
-    private function buildExportQuery()
+    private function buildBaseQuery()
     {
+        $today = now()->toDateString();
+
         return Patient::query()
             ->where('clinic_id', $this->currentClinic->id)
+            ->with('tags')
+            ->withCount('medicalRecords as records_count')
+            ->withSum(
+                ['invoices as pending_total' => fn ($q) => $q->whereIn('status', ['pending', 'partial'])],
+                'total'
+            )
+            ->withSum(
+                ['invoices as paid_on_pending' => fn ($q) => $q->whereIn('status', ['pending', 'partial'])],
+                'paid_amount'
+            )
+            ->with(['nextUpcomingAppointment'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('first_name', 'like', '%'.$this->search.'%')
@@ -160,7 +194,35 @@ class Index extends Component
             ->when($this->filterTag !== '', function ($query) {
                 $query->withTag((int) $this->filterTag);
             })
+            ->when($this->filterFutureAppt === 'yes', function ($query) use ($today) {
+                $query->whereHas('appointments', fn ($q) => $q
+                    ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_CONFIRMED])
+                    ->where('appointment_date', '>=', $today)
+                );
+            })
+            ->when($this->filterFutureAppt === 'no', function ($query) use ($today) {
+                $query->whereDoesntHave('appointments', fn ($q) => $q
+                    ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_CONFIRMED])
+                    ->where('appointment_date', '>=', $today)
+                );
+            })
+            ->when($this->filterDebtor === 'yes', function ($query) {
+                $query->whereHas('invoices', fn ($q) => $q->whereIn('status', ['pending', 'partial']));
+            })
+            ->when($this->ageMin !== '', function ($query) {
+                $query->whereNotNull('birth_date')
+                    ->whereDate('birth_date', '<=', now()->subYears((int) $this->ageMin)->toDateString());
+            })
+            ->when($this->ageMax !== '', function ($query) {
+                $query->whereNotNull('birth_date')
+                    ->whereDate('birth_date', '>=', now()->subYears((int) $this->ageMax + 1)->addDay()->toDateString());
+            })
             ->orderBy($this->sortField, $this->sortDirection);
+    }
+
+    private function buildExportQuery()
+    {
+        return $this->buildBaseQuery();
     }
 
     private function activeFiltersText(): string

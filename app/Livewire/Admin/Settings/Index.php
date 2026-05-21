@@ -53,6 +53,20 @@ class Index extends Component
 
     public bool $features_maintenance_mode = false;
 
+    // --- SEO ---
+    public string $seo_meta_title = '';
+
+    public string $seo_meta_description = '';
+
+    public string $seo_og_image_url = '';
+
+    /** @var TemporaryUploadedFile|null */
+    public $og_image_file = null;
+
+    public string $seo_google_analytics_id = '';
+
+    public string $seo_gtm_id = '';
+
     public function mount(): void
     {
         $settings = AppSetting::allCached();
@@ -75,6 +89,12 @@ class Index extends Component
         $this->features_ai_enabled = (bool) ($settings['features.ai_enabled'] ?? false);
         $this->features_registration_open = (bool) ($settings['features.registration_open'] ?? true);
         $this->features_maintenance_mode = (bool) ($settings['features.maintenance_mode'] ?? false);
+
+        $this->seo_meta_title = $settings['seo.meta_title'] ?? 'ControClinic — Software para Clínicas Médicas';
+        $this->seo_meta_description = $settings['seo.meta_description'] ?? '';
+        $this->seo_og_image_url = $settings['seo.og_image_url'] ?? '';
+        $this->seo_google_analytics_id = $settings['seo.google_analytics_id'] ?? '';
+        $this->seo_gtm_id = $settings['seo.gtm_id'] ?? '';
     }
 
     public function saveBranding(): void
@@ -205,6 +225,43 @@ class Index extends Component
         AppSetting::set('features.maintenance_mode', $this->features_maintenance_mode, $userId);
 
         $this->dispatch('notify', type: 'success', message: __('settings.features_saved'));
+    }
+
+    public function saveSeo(): void
+    {
+        $this->validate([
+            'seo_meta_title' => 'required|string|max:80',
+            'seo_meta_description' => 'required|string|max:200',
+            'seo_og_image_url' => ['nullable', 'max:500', function ($attribute, $value, $fail) {
+                if ($value && ! str_starts_with($value, '/storage/') && ! filter_var($value, FILTER_VALIDATE_URL)) {
+                    $fail(__('validation.url', ['attribute' => $attribute]));
+                }
+            }],
+            'og_image_file' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:2048',
+            'seo_google_analytics_id' => ['nullable', 'string', 'max:30', 'regex:/^G-[A-Z0-9]+$/'],
+            'seo_gtm_id' => ['nullable', 'string', 'max:30', 'regex:/^GTM-[A-Z0-9]+$/'],
+        ]);
+
+        $userId = Auth::id();
+
+        if ($this->og_image_file) {
+            $current = AppSetting::get('seo.og_image_url');
+            if ($current && str_starts_with($current, '/storage/branding/')) {
+                Storage::disk('public')->delete('branding/'.basename($current));
+            }
+
+            $path = $this->og_image_file->store('branding', 'public');
+            $this->seo_og_image_url = '/storage/'.$path;
+            $this->og_image_file = null;
+        }
+
+        AppSetting::set('seo.meta_title', $this->seo_meta_title, $userId);
+        AppSetting::set('seo.meta_description', $this->seo_meta_description, $userId);
+        AppSetting::set('seo.og_image_url', $this->seo_og_image_url ?: null, $userId);
+        AppSetting::set('seo.google_analytics_id', $this->seo_google_analytics_id ?: null, $userId);
+        AppSetting::set('seo.gtm_id', $this->seo_gtm_id ?: null, $userId);
+
+        $this->dispatch('notify', type: 'success', message: __('settings.seo_saved'));
     }
 
     public function render()

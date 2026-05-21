@@ -5,21 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? \App\Models\AppSetting::get('branding.app_name', 'ControClinic') }} - Software para Clínicas Médicas</title>
-    <meta name="description" content="{{ $description ?? 'ControClinic es el software de gestión para clínicas médicas más fácil de usar. Agenda citas, gestiona pacientes y haz crecer tu práctica médica.' }}">
+    @php
+        $appName = app_setting('branding.app_name', 'ControClinic');
+        $logoUrl = app_setting('branding.logo_url');
+        $primaryColor = app_setting('branding.primary_color', '#4f46e5');
+        $defaultMetaTitle = app_setting('seo.meta_title', $appName.' — Software para Clínicas Médicas');
+        $defaultMetaDesc = app_setting('seo.meta_description', 'Software de gestión para clínicas médicas. Agenda citas, gestiona pacientes y haz crecer tu práctica.');
+        $ogImageUrl = app_setting('seo.og_image_url') ?: asset('images/og-image.png');
+        $gaId = app_setting('seo.google_analytics_id');
+        $gtmId = app_setting('seo.gtm_id');
+        $supportEmail = app_setting('legal.support_email', 'soporte@controclinic.com');
+        $termsUrl = app_setting('legal.terms_url', '/terms');
+        $privacyUrl = app_setting('legal.privacy_url', '/privacy');
+
+        // Convertir color primario hex → "r, g, b" para usar con CSS rgb()
+        $hex = ltrim($primaryColor, '#');
+        $primaryRgb = sprintf('%d, %d, %d', hexdec(substr($hex, 0, 2)), hexdec(substr($hex, 2, 2)), hexdec(substr($hex, 4, 2)));
+    @endphp
+
+    <title>{{ $title ?? $defaultMetaTitle }}</title>
+    <meta name="description" content="{{ $description ?? $defaultMetaDesc }}">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $title ?? 'ControClinic' }} - Software para Clínicas Médicas">
-    <meta property="og:description" content="{{ $description ?? 'El software de gestión para clínicas médicas más fácil de usar.' }}">
-    <meta property="og:image" content="{{ asset('images/og-image.png') }}">
+    <meta property="og:title" content="{{ $title ?? $defaultMetaTitle }}">
+    <meta property="og:description" content="{{ $description ?? $defaultMetaDesc }}">
+    <meta property="og:image" content="{{ $ogImageUrl }}">
+    <meta property="og:site_name" content="{{ $appName }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="{{ $title ?? 'ControClinic' }}">
-    <meta property="twitter:description" content="{{ $description ?? 'El software de gestión para clínicas médicas más fácil de usar.' }}">
+    <meta property="twitter:title" content="{{ $title ?? $defaultMetaTitle }}">
+    <meta property="twitter:description" content="{{ $description ?? $defaultMetaDesc }}">
+    <meta property="twitter:image" content="{{ $ogImageUrl }}">
 
     <!-- Favicon -->
     @include('partials._head-branding')
@@ -36,23 +56,51 @@
 
     <style>
         :root {
-            --color-primary: 79, 70, 229;
-            --color-primary-hover: 67, 56, 202;
+            --color-primary: {{ $primaryRgb }};
+            --color-primary-hex: {{ $primaryColor }};
         }
     </style>
+
+    @if($gtmId)
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ $gtmId }}');</script>
+    @endif
+
+    @if($gaId)
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $gaId }}');
+    </script>
+    @endif
 </head>
 <body class="font-sans antialiased bg-white text-gray-900">
+    @if($gtmId)
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    @endif
     <!-- Navigation -->
     <nav x-data="{ mobileMenuOpen: false }" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                    <svg class="w-8 h-8 text-indigo-600" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="8" fill="currentColor"/>
-                        <path d="M16 8v16M8 16h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                    </svg>
-                    <span class="text-xl font-bold text-gray-900">ControClinic</span>
+                    @if($logoUrl)
+                        <img src="{{ $logoUrl }}" alt="{{ $appName }}" class="h-8 w-auto" />
+                    @else
+                        <svg class="w-8 h-8 text-indigo-600" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="8" fill="currentColor"/>
+                            <path d="M16 8v16M8 16h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    @endif
+                    <span class="text-xl font-bold text-gray-900">{{ $appName }}</span>
                 </a>
 
                 <!-- Desktop Navigation -->
@@ -138,11 +186,15 @@
                 <!-- Brand -->
                 <div class="col-span-2 md:col-span-1">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2 mb-4">
-                        <svg class="w-8 h-8 text-indigo-500" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="32" height="32" rx="8" fill="currentColor"/>
-                            <path d="M16 8v16M8 16h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                        <span class="text-xl font-bold text-white">ControClinic</span>
+                        @if($logoUrl)
+                            <img src="{{ $logoUrl }}" alt="{{ $appName }}" class="h-8 w-auto brightness-0 invert" />
+                        @else
+                            <svg class="w-8 h-8 text-indigo-500" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="8" fill="currentColor"/>
+                                <path d="M16 8v16M8 16h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        @endif
+                        <span class="text-xl font-bold text-white">{{ $appName }}</span>
                     </a>
                     <p class="text-sm">
                         Software de gestión para clínicas médicas. Simple, potente y accesible.
@@ -175,17 +227,16 @@
                 <div>
                     <h4 class="text-white font-semibold mb-4">Legal</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition-colors">Privacidad</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Términos de Uso</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Cookies</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">HIPAA</a></li>
+                        <li><a href="{{ $privacyUrl }}" class="hover:text-white transition-colors">Privacidad</a></li>
+                        <li><a href="{{ $termsUrl }}" class="hover:text-white transition-colors">Términos de Uso</a></li>
+                        <li><a href="mailto:{{ $supportEmail }}" class="hover:text-white transition-colors">{{ $supportEmail }}</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm">
-                    © {{ date('Y') }} ControClinic. Todos los derechos reservados.
+                    © {{ date('Y') }} {{ $appName }}. Todos los derechos reservados.
                 </p>
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
                     <!-- Social Links -->

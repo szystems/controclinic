@@ -27,6 +27,15 @@ class Index extends Component
 
     public string $sortDirection = 'asc';
 
+    // Editing pending invitation
+    public ?string $editingInvitationId = null;
+
+    public string $editInvitationName = '';
+
+    public string $editInvitationEmail = '';
+
+    public string $editInvitationRole = '';
+
     protected $queryString = [
         'search' => ['except' => ''],
         'roleFilter' => ['except' => ''],
@@ -72,6 +81,10 @@ class Index extends Component
     {
         return User::query()
             ->where('clinic_id', $this->currentClinic->id)
+            ->withCount([
+                'appointments as appointments_count',
+                'medicalRecords as records_count',
+            ])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%'.$this->search.'%')
@@ -209,6 +222,106 @@ class Index extends Component
         $invitation->update(['cancelled_at' => now()]);
 
         session()->flash('success', __('invitations.invitation_cancelled'));
+    }
+
+    public function editInvitation(string $id): void
+    {
+        if (! auth()->user()->can('users.manage')) {
+            return;
+        }
+
+        $invitation = ClinicInvitation::where('clinic_id', $this->currentClinic->id)
+            ->findOrFail($id);
+
+        if (! $invitation->isPending()) {
+            return;
+        }
+
+        $this->editingInvitationId = $id;
+        $this->editInvitationName = $invitation->name;
+        $this->editInvitationEmail = $invitation->email;
+        $this->editInvitationRole = $invitation->role;
+    }
+
+    public function cancelEditInvitation(): void
+    {
+        $this->editingInvitationId = null;
+        $this->editInvitationName = '';
+        $this->editInvitationEmail = '';
+        $this->editInvitationRole = '';
+    }
+
+    public function saveInvitation(): void
+    {
+        if (! auth()->user()->can('users.manage')) {
+            session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        $invitation = ClinicInvitation::where('clinic_id', $this->currentClinic->id)
+            ->findOrFail($this->editingInvitationId);
+
+        if (! $invitation->isPending()) {
+            $this->cancelEditInvitation();
+
+            return;
+        }
+
+        $this->validate([
+            'editInvitationName' => ['required', 'string', 'max:255'],
+            'editInvitationEmail' => ['required', 'email', 'max:255'],
+            'editInvitationRole' => ['required', 'in:doctor,assistant,secretary,receptionist'],
+        ]);
+
+        $emailChanged = strtolower($this->editInvitationEmail) !== strtolower($invitation->email);
+
+        // If email changed, ensure it's not already used or duplicated
+        if ($emailChanged) {
+            $alreadyUser = User::where('clinic_id', $this->currentClinic->id)
+                ->where('email', $this->editInvitationEmail)
+                ->exists();
+
+            if ($alreadyUser) {
+                $this->addError('editInvitationEmail', __('invitations.email_already_registered'));
+
+                return;
+            }
+
+            $duplicate = ClinicInvitation::where('clinic_id', $this->currentClinic->id)
+                ->where('email', $this->editInvitationEmail)
+                ->where('id', '!=', $invitation->id)
+                ->pending()
+                ->exists();
+
+            if ($duplicate) {
+                $this->addError('editInvitationEmail', __('invitations.duplicate_pending'));
+
+                return;
+            }
+        }
+
+        $updateData = [
+            'name' => $this->editInvitationName,
+            'email' => $this->editInvitationEmail,
+            'role' => $this->editInvitationRole,
+        ];
+
+        // If email changed, regenerate token and extend expiration so the new address gets a valid link
+        if ($emailChanged) {
+            $updateData['token'] = ClinicInvitation::generateToken();
+            $updateData['expires_at'] = now()->addDays(7);
+        }
+
+        $invitation->update($updateData);
+
+        // Re-send the invitation email (either new address or same address with updated role/name)
+        Mail::to($invitation->fresh()->email)
+            ->locale($this->currentClinic->locale ?? config('app.locale'))
+            ->send(new ClinicInvitationMail($invitation->fresh()));
+
+        $this->cancelEditInvitation();
+        session()->flash('success', __('invitations.invitation_updated'));
     }
 
     public function render()
