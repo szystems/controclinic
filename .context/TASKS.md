@@ -2,7 +2,7 @@
 
 > Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 567 tests / 1235 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ · F.9 🔄)
+> Estado real: 567 tests / 1235 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ F.9 ✅ · F.10 siguiente)
 
 ---
 
@@ -104,12 +104,12 @@
 - [x] Activity Log de carga/borrado de demo
 - [x] Tests Feature (DemoDataTest · 8 tests · 22 assertions)
 
-### F.9 — Skeleton screens y loaders
+### F.9 — Skeleton screens y loaders ✅ COMPLETADO 2026-05-20
 > Mejora de percepción de velocidad en Livewire pesados.
 
-- [ ] Componente `<x-skeleton-card>`, `<x-skeleton-table>`, `<x-skeleton-list>`
-- [ ] Aplicar en `wire:loading` de: calendar, reports, patient show tabs lazy, files grid
-- [ ] Spinner global de página con barra de progreso superior (NProgress style)
+- [x] Componente `<x-skeleton-card>`, `<x-skeleton-table>`, `<x-skeleton-list>`
+- [x] Aplicar en `wire:loading` de: calendar (overlay), files grid, patients/index, appointments/index
+- [x] Spinner global de página con barra de progreso superior (NProgress style, Alpine.js)
 
 ### F.10 — Atajos de teclado expandidos
 > Cmd+K ya existe. Agregar más atajos y modal "?" que los muestre.

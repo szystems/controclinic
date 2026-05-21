@@ -1,7 +1,7 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ · F.9 siguiente)
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ F.9 ✅ · F.10 siguiente)
 > **Enfoque:** SaaS-First
 > **Métricas:** 567 tests · 1235 assertions · Pint clean · Backlog: venta de dominios documentado
 
@@ -75,6 +75,14 @@
 - `DemoDataBanner` Livewire component: muestra card "Cargar datos de ejemplo" cuando clínica está vacía; banner amber "Modo demostración activo" + botón borrar cuando hay demo activo; solo visible para `owner`
 - Lang ES/EN: `lang/{es,en}/demo_data.php` (9 claves)
 - 8 Feature tests (DemoDataTest · 22 assertions)
+
+### F.9 — Skeleton screens y loaders ✅ (2026-05-20)
+- 3 componentes anónimos Blade: `x-skeleton-table` (rows/cols/header), `x-skeleton-card` (count/lines), `x-skeleton-list` (count)
+- Barra de progreso NProgress-style en `layouts/app.blade.php` con Alpine.js + eventos `livewire:request/response/navigate/navigated`
+- `wire:loading` + `x-skeleton-table` aplicado en `patients/index` y `appointments/index`
+- `wire:loading` overlay spinner en `appointments/calendar` (posición relativa al contenedor)
+- `wire:loading` + `x-skeleton-card` en `patients/files`
+- 567 tests · 1235 assertions · Pint clean · commit `1c38d6f`
 
 
 
