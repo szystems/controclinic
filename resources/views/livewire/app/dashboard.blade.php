@@ -99,6 +99,11 @@
                 @livewire('app.dashboard.setup-checklist', ['clinic' => $clinic], key('setup-checklist'))
             @endif
 
+            {{-- Demo data banner — visible for owner only --}}
+            @if(auth()->user()->hasRole('owner'))
+                @livewire('app.dashboard.demo-data-banner', ['clinic' => $clinic], key('demo-data-banner'))
+            @endif
+
             {{-- Stats Cards --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {{-- Pacientes --}}

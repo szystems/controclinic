@@ -72,10 +72,12 @@ class Appointment extends Model
         'parent_appointment_id',
         'created_via',
         'nps_sent_at',
+        'is_demo',
     ];
 
     protected $casts = [
         'appointment_date' => 'date',
+        'is_demo' => 'boolean',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
         'duration_minutes' => 'integer',

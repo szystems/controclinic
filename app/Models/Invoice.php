@@ -49,10 +49,12 @@ class Invoice extends Model
         'paid_amount',
         'currency',
         'notes',
+        'is_demo',
     ];
 
     protected $casts = [
         'issued_at' => 'date',
+        'is_demo' => 'boolean',
         'due_at' => 'date',
         'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',

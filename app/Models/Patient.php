@@ -58,10 +58,12 @@ class Patient extends Model
         'consent_signed_at',
         'marketing_opt_in',
         'preferred_channel',
+        'is_demo',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
+        'is_demo' => 'boolean',
         'emergency_contacts' => 'array',
         'insurance_info' => 'array',
         'preferences' => 'array',
@@ -153,6 +155,16 @@ class Patient extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeDemo($query)
+    {
+        return $query->where('is_demo', true);
+    }
+
+    public function scopeNotDemo($query)
+    {
+        return $query->where('is_demo', false);
     }
 
     public function scopeForClinic($query, string $clinicId)

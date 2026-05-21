@@ -29,10 +29,12 @@ class Prescription extends Model
         'qr_payload',
         'signature_path',
         'folio',
+        'is_demo',
     ];
 
     protected $casts = [
         'issued_at' => 'date',
+        'is_demo' => 'boolean',
         'valid_until' => 'date',
         'is_controlled' => 'boolean',
     ];

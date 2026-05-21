@@ -47,10 +47,12 @@ class MedicalRecord extends Model
         'ai_generated',
         'ai_metadata',
         'qr_payload',
+        'is_demo',
     ];
 
     protected $casts = [
         'vital_signs' => 'array',
+        'is_demo' => 'boolean',
         'diagnoses' => 'array',
         'prescriptions' => 'array',
         'attachments' => 'array',
