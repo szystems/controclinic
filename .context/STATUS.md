@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ · F.8 en curso)
+> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ · F.9 siguiente)
 > **Enfoque:** SaaS-First
-> **Métricas:** 559 tests · 1213 assertions · Pint clean · Backlog: venta de dominios documentado
+> **Métricas:** 567 tests · 1235 assertions · Pint clean · Backlog: venta de dominios documentado
 
 ## ✅ Sprint F — UX & Onboarding (EN CURSO)
 
@@ -66,6 +66,15 @@
 - Lang ES/EN: `settings.custom_domain.*` (14 claves)
 - Cache `custom_domain:{host}` 5 min; se invalida en save/remove/verify
 - 8 Feature tests (CustomDomainTest · 16 assertions)
+
+### F.8 — Demo data toggle ✅ (2026-05-20)
+- Migración aditiva: `is_demo` (bool default false) en `patients`, `appointments`, `medical_records`, `invoices`, `prescriptions`
+- Comando `clinic:seed-demo {clinic}`: 5 pacientes, 10 citas, 3 historiales, 2 facturas, 1 receta — datos 100% etiquetados con `is_demo=true`
+- Opción `--clear`: elimina solo registros `is_demo=true` con `forceDelete()`, preserva datos reales
+- Activity Log: `demo_data_loaded` / `demo_data_cleared` en `clinic`
+- `DemoDataBanner` Livewire component: muestra card "Cargar datos de ejemplo" cuando clínica está vacía; banner amber "Modo demostración activo" + botón borrar cuando hay demo activo; solo visible para `owner`
+- Lang ES/EN: `lang/{es,en}/demo_data.php` (9 claves)
+- 8 Feature tests (DemoDataTest · 22 assertions)
 
 
 

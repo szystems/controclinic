@@ -2,7 +2,7 @@
 
 > Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 559 tests / 1213 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ · F.8 🔄)
+> Estado real: 567 tests / 1235 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ · F.9 🔄)
 
 ---
 
@@ -94,15 +94,15 @@
 - [x] Disponible solo en plan Enterprise (feature flag `custom_domain` en `PLAN_LIMITS`)
 - [x] Bootstrap + ruta raíz actualizada para servir portal de clínica en dominio custom
 
-### F.8 — Demo data toggle 🔄 EN CURSO 2026-05-20
+### F.8 — Demo data toggle ✅ COMPLETADO 2026-05-20
 > Para que clínicas nuevas puedan explorar el sistema con datos realistas sin contaminar su producción.
 
-- [ ] Migración aditiva: `is_demo` (bool default false) en `patients`, `appointments`, `medical_records`, `invoices`, `prescriptions`
-- [ ] Comando artisan `clinic:seed-demo {clinic}` que crea 5 pacientes, 10 citas, 3 historiales, 2 facturas, 1 receta
-- [ ] Botón "Cargar datos de ejemplo" en dashboard cuando la clínica está vacía
-- [ ] Botón "Borrar datos de ejemplo" que elimina solo los marcados con `is_demo=true`
-- [ ] Activity Log de carga/borrado de demo
-- [ ] Tests Feature (DemoDataTest)
+- [x] Migración aditiva: `is_demo` (bool default false) en `patients`, `appointments`, `medical_records`, `invoices`, `prescriptions`
+- [x] Comando artisan `clinic:seed-demo {clinic}` que crea 5 pacientes, 10 citas, 3 historiales, 2 facturas, 1 receta
+- [x] Botón "Cargar datos de ejemplo" en dashboard cuando la clínica está vacía
+- [x] Botón "Borrar datos de ejemplo" que elimina solo los marcados con `is_demo=true`
+- [x] Activity Log de carga/borrado de demo
+- [x] Tests Feature (DemoDataTest · 8 tests · 22 assertions)
 
 ### F.9 — Skeleton screens y loaders
 > Mejora de percepción de velocidad en Livewire pesados.
