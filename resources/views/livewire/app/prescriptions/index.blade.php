@@ -1,5 +1,6 @@
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <x-help-banner module="prescriptions" />
 
         {{-- Header --}}
         <div class="sm:flex sm:items-center sm:justify-between mb-6">

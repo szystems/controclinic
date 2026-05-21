@@ -347,6 +347,12 @@ Route::prefix('app/{clinic}')
                     Route::get('/{file}/view', [PatientFileController::class, 'show'])->name('show');
                     Route::get('/{file}/download', [PatientFileController::class, 'download'])->name('download');
                 });
+
+                // Centro de Ayuda
+                Route::prefix('help')->name('help.')->group(function () {
+                    Route::get('/', App\Livewire\App\Help\Index::class)->name('index');
+                    Route::get('/{module}', App\Livewire\App\Help\Show::class)->name('show');
+                });
             });
         });
     });
