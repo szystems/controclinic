@@ -156,11 +156,8 @@
 
         {{-- Keyboard shortcuts (F.10) --}}
         @auth
-            @php
-                try { $__kbClinic = app('current_clinic'); } catch (\Throwable) { $__kbClinic = null; }
-            @endphp
-            @if($__kbClinic instanceof \App\Models\Clinic)
-                <livewire:app.keyboard-shortcuts :clinic="$__kbClinic" />
+            @if($clinic instanceof \App\Models\Clinic)
+                <livewire:app.keyboard-shortcuts :clinic="$clinic" />
             @endif
         @endauth
 
