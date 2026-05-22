@@ -2,7 +2,7 @@
 
 > Actualizado: 2026-05-20
 > Enfoque: SaaS-First
-> Estado real: 567 tests / 1235 asserts · Sprint F en curso (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ F.9 ✅ · F.10 siguiente)
+> Estado real: 567 tests / 1235 asserts · Sprint F ✅ COMPLETADO (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ F.9 ✅ F.10 ✅)
 
 ---
 
@@ -111,14 +111,16 @@
 - [x] Aplicar en `wire:loading` de: calendar (overlay), files grid, patients/index, appointments/index
 - [x] Spinner global de página con barra de progreso superior (NProgress style, Alpine.js)
 
-### F.10 — Atajos de teclado expandidos
+### F.10 — Atajos de teclado expandidos ✅ COMPLETADO 2026-05-21
 > Cmd+K ya existe. Agregar más atajos y modal "?" que los muestre.
 
-- [ ] Atajos globales: `g+p` (patients), `g+a` (appointments), `g+c` (calendar), `g+i` (invoices), `g+r` (reports), `?` (help modal), `n` (new — contextual)
-- [ ] Modal "?" con lista completa de atajos
-- [ ] Implementar con Alpine.js (`@keydown.window`)
-- [ ] Disable en inputs/textarea
-- [ ] i18n
+- [x] Atajos globales: `g+d` (dashboard), `g+p` (patients), `g+a` (appointments), `g+c` (calendar), `g+i` (invoices), `g+r` (reports), `?` (help modal)
+- [x] Modal "?" con lista completa filtrada por permisos del usuario
+- [x] `App\Livewire\App\KeyboardShortcuts` + vista con botón flotante (fixed bottom-right)
+- [x] Disable en inputs/textarea/contentEditable + Ctrl/Meta/Alt
+- [x] i18n ES/EN en `lang/{es,en}/shortcuts.php`
+- [x] Fix: `$cleanup` para evitar listeners duplicados en re-renders de Livewire
+- [x] Fix: `$clinic` directo desde route model binding en layout (en lugar de `app('current_clinic')`)
 
 ---
 

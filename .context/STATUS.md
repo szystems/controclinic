@@ -1,7 +1,7 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-05-20
-> **Fase actual:** Sprint F — UX & Onboarding (F.1 ✅ F.2 ✅ F.3 ✅ F.4 ✅ F.5 ✅ F.6 ✅ F.7 ✅ F.8 ✅ F.9 ✅ · F.10 siguiente)
+> **Última actualización:** 2026-05-21
+> **Fase actual:** Sprint F ✅ COMPLETADO — Próximo: Bloque 2 / nuevo sprint
 > **Enfoque:** SaaS-First
 > **Métricas:** 567 tests · 1235 assertions · Pint clean · Backlog: venta de dominios documentado
 
@@ -83,6 +83,16 @@
 - `wire:loading` overlay spinner en `appointments/calendar` (posición relativa al contenedor)
 - `wire:loading` + `x-skeleton-card` en `patients/files`
 - 567 tests · 1235 assertions · Pint clean · commit `1c38d6f`
+
+### F.10 — Atajos de teclado ✅ (2026-05-21)
+- `App\Livewire\App\KeyboardShortcuts` — shortcuts filtrados por `$user->can()` en PHP, pasados a Alpine via `@js()`
+- Atajos: `g+d/p/a/c/i/r` (navegación), `?` (toggle modal), `Esc` (cerrar), `g` con timeout 1.5s
+- Botón flotante `fixed bottom-5 right-5` visible en desktop (`hidden md:flex`)
+- Modal con secciones Navegar + General, chips `<kbd>`, dark mode
+- `x-init` + `$cleanup` evita listeners duplicados en re-renders de Livewire
+- `$clinic` desde route model binding en layout (fix: `app('current_clinic')` fallaba en algunos contextos)
+- Lang ES/EN `lang/{es,en}/shortcuts.php` (11 keys)
+- Fix build: `npm run build` para incluir clases Tailwind del componente nuevo
 
 
 
