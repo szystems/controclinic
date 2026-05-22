@@ -18,10 +18,6 @@
                 ->all()
         ),
 
-        init() {
-            window.addEventListener('keydown', (e) => this.handleKey(e));
-        },
-
         isEditable(el) {
             const tag = el.tagName.toLowerCase();
             return tag === 'input' || tag === 'textarea' || tag === 'select' || el.isContentEditable;
@@ -62,8 +58,26 @@
             }
         },
     }"
-    x-init="init()"
+    x-init="
+        const _kbHandler = (e) => handleKey(e);
+        window.addEventListener('keydown', _kbHandler);
+        $cleanup(() => window.removeEventListener('keydown', _kbHandler));
+    "
 >
+    {{-- Botón flotante para abrir el modal (desktop, esquina inferior derecha) --}}
+    <button
+        @click="open = true"
+        title="{{ __('shortcuts.modal_title') }} (?)"
+        class="hidden md:flex fixed bottom-5 right-5 z-40 items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition text-xs font-medium select-none"
+    >
+        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {{-- keyboard icon --}}
+            <rect x="2" y="6" width="20" height="12" rx="2" stroke-width="2"/>
+            <path stroke-linecap="round" stroke-width="2" d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M10 14h4M18 14h.01"/>
+        </svg>
+        <kbd class="font-mono leading-none">?</kbd>
+    </button>
+
     {{-- Modal de atajos --}}
     <div
         x-show="open"
