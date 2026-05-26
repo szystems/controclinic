@@ -111,8 +111,20 @@
                     <a href="{{ route('contact') }}" class="text-gray-600 hover:text-indigo-600 transition-colors">Contacto</a>
                 </div>
 
-                <!-- Auth Buttons -->
+                <!-- Language Toggle + Auth Buttons -->
                 <div class="hidden md:flex items-center space-x-4">
+                    <!-- Language toggle -->
+                    <div class="flex items-center text-sm font-medium">
+                        <a href="{{ route('lang.switch', 'es') }}"
+                           class="px-1.5 py-0.5 rounded transition-colors {{ app()->getLocale() === 'es' ? 'text-indigo-600 font-semibold' : 'text-gray-400 hover:text-gray-700' }}">
+                            ES
+                        </a>
+                        <span class="text-gray-300 select-none">|</span>
+                        <a href="{{ route('lang.switch', 'en') }}"
+                           class="px-1.5 py-0.5 rounded transition-colors {{ app()->getLocale() === 'en' ? 'text-indigo-600 font-semibold' : 'text-gray-400 hover:text-gray-700' }}">
+                            EN
+                        </a>
+                    </div>
                     @auth
                         <a href="{{ route('app.dashboard', ['clinic' => auth()->user()->clinic->slug ?? 'demo']) }}" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">
                             Mi Dashboard
@@ -169,6 +181,19 @@
                             Prueba Gratis
                         </a>
                     @endauth
+                    <hr class="border-gray-100">
+                    <!-- Language toggle mobile -->
+                    <div class="flex items-center space-x-3 text-sm font-medium">
+                        <span class="text-gray-500">Idioma:</span>
+                        <a href="{{ route('lang.switch', 'es') }}"
+                           class="px-2 py-1 rounded transition-colors {{ app()->getLocale() === 'es' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'text-gray-500 hover:text-gray-700' }}">
+                            Español
+                        </a>
+                        <a href="{{ route('lang.switch', 'en') }}"
+                           class="px-2 py-1 rounded transition-colors {{ app()->getLocale() === 'en' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'text-gray-500 hover:text-gray-700' }}">
+                            English
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
