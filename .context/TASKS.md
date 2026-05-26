@@ -1,53 +1,34 @@
 # 📝 Tareas Pendientes
 
 > Actualizado: 2026-05-25
-> Estado: 567 tests / 1235 asserts · Pint clean · Sprint G en curso
-> Sprints completados: A ✅ B ✅ C ✅ F.1→F.10 ✅
+> Estado: 588 tests / 1270 asserts · Pint clean · Sprint G completado
+> Sprints completados: A ✅ B ✅ C ✅ F.1→F.10 ✅ G ✅
 
 ---
 
-## 🚀 Sprint G — Pulido, Pagos y Admin (EN CURSO — 2026-05-25)
+## ✅ Sprint G — Pulido, Pagos y Admin (COMPLETADO — 2026-05-25)
 
-> **Objetivo:** Cerrar huecos visibles antes de lanzamiento: fixes de branding público,
-> pagos parciales completos y panel admin con métricas reales.
+### G.1 — Fixes de branding ✅ (commits `db0521c`, `7dab2af`, `208d061`, `a6638b9`)
+- Nav público: logo sin texto redundante cuando hay logo configurado
+- Auth views: `<x-app-logo>` en lugar de SVG hardcoded
 
-### G.1 — Fixes de branding en páginas públicas y auth
-> Logo aparece redundante en nav público. Logo no aparece en vistas de auth (login, register, etc).
+### G.2 — Pagos parciales en Facturación ✅ (commit `f025372` — 19 tests)
+- `openPaymentModal()`, `savePayment()`, `deletePayment()` implementados
+- `amount_due = total - sum(payments)` · status → `paid` automático cuando amount_due = 0
+- `InvoicePartialPaymentsTest` — 19 tests pasando
 
-- [ ] **Nav público** (`layouts/public.blade.php`): si hay logo configurado, mostrar solo imagen sin el texto `$appName` al lado
-- [ ] **Auth views** (`layouts/guest.blade.php`): reemplazar `<x-application-logo>` (SVG hardcoded) por `<x-app-logo>` que ya lee `branding.logo_url`
-- [ ] Verificar en: login, register, forgot-password, reset-password, verify-email
+### G.3 — Panel Admin: métricas ✅ (commit `e282731` + `eed6104`)
+- KPIs: total clínicas, activas, free/paid, nuevas 30 días
+- Gráfica semanal últimas 12 semanas · Tabla recientes con último login
+- Fix: `last_login_at` ahora se registra via `Event::listen(Login::class, ...)`
 
-### G.2 — Completar pagos parciales en Facturación
-> Tabla `invoice_payments` y UI en `invoices/show` ya existen. Revisar y completar si falta algo.
+### G.4 — Tests SetupChecklist + EmptyStates ✅ (commit `807d6ca`)
+- `SetupChecklistTest` — 11 tests · `EmptyStatesTest` — 8 tests
 
-- [ ] Revisar `Livewire\App\Invoices\Show` — confirmar `openPaymentModal()`, `savePayment()`, `deletePayment()` implementados
-- [ ] Confirmar que saldo pendiente (`amount_due`) se calcula como `total - sum(payments)`
-- [ ] Confirmar que status cambia a `paid` automáticamente cuando `amount_due = 0`
-- [ ] Verificar protección multi-tenant en `invoice_payments`
-- [ ] Tests Feature: `InvoicePartialPaymentsTest`
-
-### G.3 — Panel Admin: métricas de negocio
-> Dashboard admin existe (Clinics/Index, Clinics/Show, Plans, Settings) pero sin métricas de negocio.
-
-- [ ] KPIs en Dashboard Admin: total clínicas, activas este mes, free vs paid por plan, nuevas últimos 30 días
-- [ ] Gráfica de registros de clínicas por semana (últimos 3 meses)
-- [ ] Tabla de clínicas recientes: plan, estado, fecha registro, último login del owner
-- [ ] i18n ES/EN en `lang/{es,en}/admin.php`
-
-### G.4 — Tests Feature pendientes de Sprint F
-> F.1 y F.2 quedaron marcados como pendientes de tests.
-
-- [ ] `SetupChecklistTest` — visible solo para owner, pasos se marcan, dismiss, auto-dismiss al completar todos
-- [ ] `EmptyStatesTest` — empty state aparece cuando no hay datos en cada módulo principal
-
-### G.5 — Revisar módulo Recetas
-> El módulo existe (está en nav). Determinar si está completo para v1 o necesita mejoras.
-
-- [ ] Revisar componentes actuales: Index, Show, Create, Edit
-- [ ] Verificar permisos correctos (`prescriptions.create`, etc.)
-- [ ] Identificar si falta algo crítico para una receta médica básica (campos, PDF, firma)
-- [ ] Decidir: ¿Sprint G o diferir?
+### G.5 — Módulo Recetas ✅ (ya completo — 14 tests en `PrescriptionsTest`)
+- Index, Show, Create, Edit implementados con permisos correctos
+- Folio RX-XXXX por clínica, QR payload, PDF via DomPDF
+- Policy `PrescriptionPolicy` + multi-tenant isolation
 
 ---
 

@@ -1,26 +1,30 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-05-25
-> **Fase actual:** Sprint G — Pulido, Pagos y Admin (EN CURSO)
-> **Métricas:** 567 tests · 1235 assertions · Pint clean
+> **Fase actual:** Sprint H — por definir (Sprint G completado)
+> **Métricas:** 588 tests · 1270 assertions · Pint clean
 > **Stack:** Laravel 12 · Livewire 3 · Alpine.js · Tailwind · MySQL 8
 
 ---
 
-## 🚀 Sprint G — EN CURSO
+## ✅ Sprint G — COMPLETADO (2026-05-25)
 
-### G.1 — Fixes de branding (pendiente)
-- Nav público: logo + texto redundante cuando hay logo configurado
-- Auth views: usan SVG hardcoded en lugar del logo configurado en Admin
+### G.1 — Branding público/auth ✅
+- Nav público muestra solo logo-imagen cuando hay logo configurado
+- Auth views usan `<x-app-logo>` (lee `branding.logo_url`)
 
-### G.2 — Pagos parciales (pendiente — revisar)
-- Tabla `invoice_payments` ya migrada
-- UI en `invoices/show` ya existe (`openPaymentModal`)
-- Verificar que la lógica PHP está completa
+### G.2 — Pagos parciales facturación ✅
+- `InvoicePartialPaymentsTest` — 19 tests · modal pago, saldo pendiente, cierre automático
 
-### G.3 — Admin métricas (pendiente)
-### G.4 — Tests F.1 + F.2 (pendiente)
-### G.5 — Revisar Recetas (pendiente)
+### G.3 — Admin métricas ✅
+- KPIs + gráfica semanal 12 semanas + último login owner
+- Fix: `last_login_at` ahora actualiza en evento `Login`
+
+### G.4 — Tests SetupChecklist + EmptyStates ✅
+- 19 tests nuevos (11 + 8)
+
+### G.5 — Módulo Recetas ✅ (ya estaba completo)
+- 14 tests en `PrescriptionsTest` · PDF, folio, QR, policy
 
 ---
 
