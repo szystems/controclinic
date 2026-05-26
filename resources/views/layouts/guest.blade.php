@@ -41,7 +41,20 @@
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
+            <!-- Language toggle -->
+            <div class="flex items-center justify-center space-x-1 mt-4 text-sm font-medium">
+                <a href="{{ route('lang.switch', 'es') }}"
+                   class="px-2 py-0.5 rounded transition-colors {{ app()->getLocale() === 'es' ? 'text-indigo-600 font-semibold' : 'text-gray-400 hover:text-gray-600' }}">
+                    ES
+                </a>
+                <span class="text-gray-300 select-none">|</span>
+                <a href="{{ route('lang.switch', 'en') }}"
+                   class="px-2 py-0.5 rounded transition-colors {{ app()->getLocale() === 'en' ? 'text-indigo-600 font-semibold' : 'text-gray-400 hover:text-gray-600' }}">
+                    EN
+                </a>
+            </div>
+
+            <div class="w-full sm:max-w-md mt-4 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
                 {{ $slot }}
             </div>
         </div>
