@@ -99,8 +99,8 @@
                             <rect width="32" height="32" rx="8" fill="currentColor"/>
                             <path d="M16 8v16M8 16h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
                         </svg>
+                        <span class="text-xl font-bold text-gray-900">{{ $appName }}</span>
                     @endif
-                    <span class="text-xl font-bold text-gray-900">{{ $appName }}</span>
                 </a>
 
                 <!-- Desktop Navigation -->
@@ -193,8 +193,8 @@
                                 <rect width="32" height="32" rx="8" fill="currentColor"/>
                                 <path d="M16 8v16M8 16h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
                             </svg>
+                            <span class="text-xl font-bold text-white">{{ $appName }}</span>
                         @endif
-                        <span class="text-xl font-bold text-white">{{ $appName }}</span>
                     </a>
                     <p class="text-sm">
                         Software de gestión para clínicas médicas. Simple, potente y accesible.
