@@ -107,6 +107,43 @@ v1.4 (Plantillas SOAP, archivos paciente, agenda diaria, catálogo) · v1.3 (2FA
 
 ---
 
+## ⚠️ Pre-lanzamiento — Obligatorio antes de publicar
+
+> Estas tareas no son de código puro. Son requisitos legales/de contenido que deben resolverse
+> antes de abrir la app al público. Ninguna bloquea el desarrollo actual.
+
+### PL.1 — Textos legales reales
+> `lang/es/legal.php` contiene texto placeholder con aviso "versión preliminar pendiente de revisión legal".
+> La app maneja datos médicos de pacientes — Privacy Policy y Terms of Service deben ser documentos reales.
+
+- [ ] Redactar o adaptar Privacy Policy real para datos médicos (HIPAA-like / GDPR-like según países objetivo)
+- [ ] Redactar o adaptar Terms of Service definitivos
+- [ ] Actualizar `lang/es/legal.php` con el texto final
+- [ ] Crear `lang/en/legal.php` con la versión EN (si se lanza en inglés)
+
+### PL.2 — Traducciones del sitio público (EN)
+> Las páginas públicas (`home`, `pricing`, `contact`) tienen texto hardcodeado en español.
+> El middleware ya detecta el idioma del navegador, pero no hay nada que traducir aún.
+
+- [ ] Definir primero el contenido FINAL de home.blade.php (testimonios reales, números reales)
+- [ ] Crear `lang/es/public.php` y `lang/en/public.php`
+- [ ] Reemplazar texto hardcodeado en `home`, `pricing`, `contact` por `__('public.clave')`
+- [ ] Nota: `privacy.blade.php` y `terms.blade.php` ya usan `__()` — solo falta el contenido en lang/
+
+### PL.3 — Contenido marketing real en home
+> home.blade.php tiene placeholders evidentes que deben ser reemplazados por datos reales:
+> - Testimonios ficticios (Dra. María González, Dr. Juan Pablo Méndez, etc.)
+> - "Más de 500 clínicas" — número inventado
+> - Logos de clientes ficticios (ClinicaPlus, MediCare, SaludTotal)
+> - FAQ: verificar si "50% descuento para estudiantes" es una promesa real
+
+- [ ] Reemplazar testimonios placeholder por testimonios reales (o eliminar sección si no hay aún)
+- [ ] Ajustar número de clínicas a uno real o eliminar el claim
+- [ ] Eliminar logos ficticios o reemplazar por clientes reales
+- [ ] Confirmar/ajustar FAQ antes de publicar
+
+---
+
 ## 📌 Decisiones pendientes del usuario
 
 1. **Servidor de producción**: Hetzner (preferido) vs DigitalOcean vs Network Solutions — decidir antes de Sprint CI/CD

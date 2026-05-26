@@ -330,4 +330,55 @@ class InvoicesTest extends TestCase
 
         $this->assertEquals(100.00, (float) $invoice->total);
     }
+
+    public function test_delete_payment_recalculates_status(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $invoice = $this->createInvoice($clinic, $patient); // total = 100
+
+        $component = Livewire::actingAs($owner)
+            ->test(InvoicesShow::class, ['clinic' => $clinic, 'invoice' => $invoice]);
+
+        // Registrar pago parcial
+        $component->call('openPaymentModal')
+            ->set('pay_amount', 60)
+            ->set('pay_method', 'cash')
+            ->set('pay_date', now()->toDateString())
+            ->call('recordPayment');
+
+        $invoice->refresh();
+        $this->assertEquals(Invoice::STATUS_PARTIAL, $invoice->status);
+
+        $paymentId = $invoice->payments()->first()->id;
+
+        // Eliminar el pago → debe volver a pending
+        $component->call('deletePayment', $paymentId);
+
+        $invoice->refresh();
+        $this->assertEquals(0.00, (float) $invoice->paid_amount);
+        $this->assertEquals(Invoice::STATUS_PENDING, $invoice->status);
+    }
+
+    public function test_delete_payment_from_other_clinic_is_blocked(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        [$otherClinic] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $invoice = $this->createInvoice($clinic, $patient);
+
+        // Registrar pago en la factura correcta
+        Livewire::actingAs($owner)
+            ->test(InvoicesShow::class, ['clinic' => $clinic, 'invoice' => $invoice])
+            ->call('openPaymentModal')
+            ->set('pay_amount', 50)
+            ->set('pay_method', 'cash')
+            ->set('pay_date', now()->toDateString())
+            ->call('recordPayment');
+
+        // Intentar acceder a la factura desde otra clínica → 404
+        Livewire::actingAs($owner)
+            ->test(InvoicesShow::class, ['clinic' => $otherClinic, 'invoice' => $invoice])
+            ->assertStatus(404);
+    }
 }
