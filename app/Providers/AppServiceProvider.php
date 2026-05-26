@@ -6,6 +6,7 @@ use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TenantMiddleware;
 use App\Listeners\PaddleEventListener;
 use App\Models\Clinic;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
@@ -38,6 +39,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Paddle webhook event listeners
         Event::subscribe(PaddleEventListener::class);
+
+        // Registrar último acceso al autenticarse
+        Event::listen(Login::class, function (Login $event) {
+            $event->user->updateLastLogin(request()->ip());
+        });
 
         // Livewire persistent middleware: garantiza que TenantMiddleware y SetLocale
         // se re-ejecuten en cada POST /livewire/update, manteniendo `current_clinic`
