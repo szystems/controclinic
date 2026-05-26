@@ -206,4 +206,8 @@ return [
     'seo_ga_id' => 'Google Analytics 4 ID',
     'seo_gtm_id' => 'Google Tag Manager ID',
     'save_seo' => 'Save SEO',
+    'weekly_registrations' => 'Clinic registrations per week',
+    'last_12_weeks' => 'Last 12 weeks',
+    'last_login' => 'Last login',
+    'never' => 'Never',
 ];

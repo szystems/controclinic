@@ -190,7 +190,35 @@
                 </div>
             </div>
 
-            {{-- Recent Transactions --}}
+            {{-- Weekly Registrations Chart --}}
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ __('admin.weekly_registrations') }}</h3>
+                @php
+                    $maxCount = max(max(array_column($weeklyRegistrations, 'count')), 1);
+                @endphp
+                <div class="flex items-end gap-1 h-24">
+                    @foreach($weeklyRegistrations as $week)
+                        @php $height = max(4, round(($week['count'] / $maxCount) * 96)); @endphp
+                        <div class="flex-1 flex flex-col items-center gap-1 group" title="{{ $week['label'] }}: {{ $week['count'] }}">
+                            <span class="text-xs text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">{{ $week['count'] }}</span>
+                            <div class="w-full rounded-t bg-indigo-500 dark:bg-indigo-400 hover:bg-indigo-600 transition-colors"
+                                 style="height: {{ $height }}px"></div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="flex gap-1 mt-1">
+                    @foreach($weeklyRegistrations as $i => $week)
+                        <div class="flex-1 text-center">
+                            @if($i % 3 === 0)
+                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ $week['label'] }}</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">{{ __('admin.last_12_weeks') }}</p>
+            </div>
+
+            {{-- Recent Transactions -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ __('admin.recent_transactions') }}</h3>
@@ -265,6 +293,7 @@
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.owner') }}</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.plan') }}</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('general.status') }}</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.last_login') }}</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.created') }}</th>
                                 </tr>
                             </thead>
@@ -292,6 +321,9 @@
                                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200') }}">
                                                 {{ $clinic->status === 'active' ? __('general.active') : ($clinic->status === 'trial' ? __('admin.trial') : __('admin.suspended')) }}
                                             </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $clinic->owner?->last_login_at?->diffForHumans() ?? __('admin.never') }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                                             {{ $clinic->created_at->diffForHumans() }}

@@ -206,4 +206,8 @@ return [
     'seo_ga_id' => 'Google Analytics 4 ID',
     'seo_gtm_id' => 'Google Tag Manager ID',
     'save_seo' => 'Guardar SEO',
+    'weekly_registrations' => 'Registros de clínicas por semana',
+    'last_12_weeks' => 'Últimas 12 semanas',
+    'last_login' => 'Último acceso',
+    'never' => 'Nunca',
 ];

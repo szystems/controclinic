@@ -54,10 +54,25 @@ class Dashboard extends Component
 
     public function getRecentClinicsProperty()
     {
-        return Clinic::with('owner', 'plan')
+        return Clinic::with(['owner:id,name,last_login_at', 'plan:id,name,is_free'])
             ->latest()
             ->take(10)
             ->get();
+    }
+
+    public function getWeeklyRegistrationsProperty(): array
+    {
+        $weeks = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $start = now()->startOfWeek()->subWeeks($i);
+            $end = $start->copy()->endOfWeek();
+            $weeks[] = [
+                'label' => $start->format('d/m'),
+                'count' => Clinic::whereBetween('created_at', [$start, $end])->count(),
+            ];
+        }
+
+        return $weeks;
     }
 
     public function getActivePlansProperty()
@@ -173,6 +188,7 @@ class Dashboard extends Component
     public function render()
     {
         return view('livewire.admin.dashboard', [
+            'weeklyRegistrations' => $this->weeklyRegistrations,
             'totalClinics' => $this->totalClinics,
             'activeClinics' => $this->activeClinics,
             'suspendedClinics' => $this->suspendedClinics,
