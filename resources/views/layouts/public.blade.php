@@ -93,7 +93,7 @@
                 <!-- Logo -->
                 <a href="{{ route('home') }}" class="flex items-center space-x-2">
                     @if($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="{{ $appName }}" class="h-8 w-auto" />
+                        <img src="{{ $logoUrl }}" alt="{{ $appName }}" class="h-10 w-auto" />
                     @else
                         <svg class="w-8 h-8 text-indigo-600" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="32" height="32" rx="8" fill="currentColor"/>

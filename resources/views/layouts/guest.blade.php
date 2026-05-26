@@ -30,9 +30,14 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-            <div>
-                <a href="/" wire:navigate>
-                    <x-app-logo class="w-20 h-20" />
+            <div class="w-full sm:max-w-md px-6">
+                <a href="/" wire:navigate class="block">
+                    @php $guestLogoUrl = \App\Models\AppSetting::get('branding.logo_url'); @endphp
+                    @if($guestLogoUrl)
+                        <img src="{{ $guestLogoUrl }}" alt="{{ config('app.name') }}" class="w-full h-auto max-h-28 object-contain" />
+                    @else
+                        <x-application-logo class="w-24 h-24 mx-auto block" />
+                    @endif
                 </a>
             </div>
 
