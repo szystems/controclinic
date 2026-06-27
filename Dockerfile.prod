@@ -1,0 +1,95 @@
+# ControClinic — production image (Laravel 12 + Vite + PHP 8.3)
+# Multi-stage: node-builder → php-base → php-builder → app
+
+# =============================================================================
+# Stage 1: Frontend assets (Vite)
+# =============================================================================
+FROM node:20-alpine AS node-builder
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+COPY resources ./resources
+COPY public ./public
+
+RUN npm run build
+
+# =============================================================================
+# Stage 2: PHP runtime base
+# =============================================================================
+FROM php:8.3-fpm AS php-base
+
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    libicu-dev \
+    zip \
+    unzip \
+    netcat-openbsd \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+        pdo_mysql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip \
+        intl \
+        opcache \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY docker/php/php.prod.ini /usr/local/etc/php/conf.d/custom.ini
+
+# =============================================================================
+# Stage 3: Composer dependencies
+# =============================================================================
+FROM php-base AS php-builder
+
+WORKDIR /var/www/html
+
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --optimize-autoloader \
+    --no-scripts \
+    --prefer-dist
+
+# =============================================================================
+# Stage 4: Application image
+# =============================================================================
+FROM php-base AS app
+
+WORKDIR /var/www/html
+
+COPY . .
+COPY --from=php-builder /var/www/html/vendor ./vendor
+COPY --from=node-builder /app/public/build ./public/build
+
+RUN composer dump-autoload --optimize \
+    && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/php/entrypoint-worker.sh /usr/local/bin/entrypoint-worker.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/entrypoint-worker.sh
+
+EXPOSE 9000
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]

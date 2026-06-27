@@ -1,0 +1,227 @@
+# ControClinic — Docker Compose for Coolify (Hetzner VPS)
+# HTTP service in Coolify UI: controclinic-webserver, port 80
+# Domains: configure FQDN in Coolify UI (not manual Traefik files)
+
+services:
+  controclinic-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      target: app
+    container_name: controclinic-app
+    restart: always
+    working_dir: /var/www/html
+    environment:
+      APP_NAME: ControClinic
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_URL: https://controclinic.com
+      APP_LOCALE: es
+      APP_FALLBACK_LOCALE: en
+      FILESYSTEM_DISK: local
+      LOG_CHANNEL: stack
+      LOG_LEVEL: error
+      DB_CONNECTION: mysql
+      DB_HOST: controclinic-mysql
+      DB_PORT: '3306'
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      SESSION_SECURE_COOKIE: 'true'
+      QUEUE_CONNECTION: redis
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: controclinic-redis
+      REDIS_PASSWORD: null
+      REDIS_PORT: '6379'
+      MAIL_MAILER: smtp
+      MAIL_FROM_NAME: ControClinic
+      APP_KEY: ${APP_KEY}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      PADDLE_SELLER_ID: ${PADDLE_SELLER_ID}
+      PADDLE_CLIENT_SIDE_TOKEN: ${PADDLE_CLIENT_SIDE_TOKEN}
+      PADDLE_API_KEY: ${PADDLE_API_KEY}
+      PADDLE_WEBHOOK_SECRET: ${PADDLE_WEBHOOK_SECRET}
+      PADDLE_SANDBOX: ${PADDLE_SANDBOX:-true}
+      SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN}
+    volumes:
+      - public_root:/var/www/html/public
+      - app_storage:/var/www/html/storage
+      - app_bootstrap:/var/www/html/bootstrap/cache
+    depends_on:
+      controclinic-mysql:
+        condition: service_healthy
+      controclinic-redis:
+        condition: service_healthy
+    networks:
+      - controclinic_network
+      - coolify
+
+  controclinic-webserver:
+    image: nginx:1.25-alpine
+    container_name: controclinic-webserver
+    restart: always
+    volumes:
+      - ./docker/nginx/default.coolify.conf:/etc/nginx/conf.d/default.conf:ro
+      - public_root:/var/www/html/public:ro
+      - app_storage:/var/www/html/storage/app:ro
+    depends_on:
+      - controclinic-app
+    networks:
+      - controclinic_network
+      - coolify
+
+  controclinic-mysql:
+    image: mysql:8.0
+    container_name: controclinic-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - controclinic_network
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  controclinic-redis:
+    image: redis:7-alpine
+    container_name: controclinic-redis
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - controclinic_network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  controclinic-queue:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      target: app
+    container_name: controclinic-queue
+    restart: always
+    working_dir: /var/www/html
+    entrypoint: ['/usr/local/bin/entrypoint-worker.sh']
+    command: ['php', 'artisan', 'queue:work', 'redis', '--sleep=3', '--tries=3', '--max-time=3600']
+    environment:
+      APP_NAME: ControClinic
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_URL: https://controclinic.com
+      APP_LOCALE: es
+      APP_FALLBACK_LOCALE: en
+      FILESYSTEM_DISK: local
+      LOG_LEVEL: error
+      DB_CONNECTION: mysql
+      DB_HOST: controclinic-mysql
+      DB_PORT: '3306'
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: controclinic-redis
+      REDIS_PASSWORD: null
+      REDIS_PORT: '6379'
+      APP_KEY: ${APP_KEY}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ControClinic
+      SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN}
+    volumes:
+      - public_root:/var/www/html/public
+      - app_storage:/var/www/html/storage
+      - app_bootstrap:/var/www/html/bootstrap/cache
+    depends_on:
+      controclinic-app:
+        condition: service_started
+    networks:
+      - controclinic_network
+
+  controclinic-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      target: app
+    container_name: controclinic-scheduler
+    restart: always
+    working_dir: /var/www/html
+    entrypoint: ['/usr/local/bin/entrypoint-worker.sh']
+    command: ['sh', '-c', 'while true; do php artisan schedule:run --no-interaction; sleep 60; done']
+    environment:
+      APP_NAME: ControClinic
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_URL: https://controclinic.com
+      APP_LOCALE: es
+      APP_FALLBACK_LOCALE: en
+      FILESYSTEM_DISK: local
+      LOG_LEVEL: error
+      DB_CONNECTION: mysql
+      DB_HOST: controclinic-mysql
+      DB_PORT: '3306'
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: controclinic-redis
+      REDIS_PASSWORD: null
+      REDIS_PORT: '6379'
+      APP_KEY: ${APP_KEY}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ControClinic
+      SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN}
+    volumes:
+      - public_root:/var/www/html/public
+      - app_storage:/var/www/html/storage
+      - app_bootstrap:/var/www/html/bootstrap/cache
+    depends_on:
+      controclinic-app:
+        condition: service_started
+    networks:
+      - controclinic_network
+
+volumes:
+  public_root:
+  app_storage:
+  app_bootstrap:
+  mysql_data:
+  redis_data:
+
+networks:
+  controclinic_network:
+    driver: bridge
+  coolify:
+    external: true

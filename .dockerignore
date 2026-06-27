@@ -1,5 +1,6 @@
 .git
 .github
+.cursor
 .context
 node_modules
 vendor
@@ -8,7 +9,14 @@ storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
 .env
+.env.*
+!.env.example
 .env.backup
 *.md
 docker-compose.yml
 Dockerfile
+tests
+phpunit.xml
+.phpunit.result.cache
+phpstan.neon
+phpstan-baseline.neon
