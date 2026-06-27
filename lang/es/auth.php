@@ -10,6 +10,8 @@ return [
     'confirm_password' => 'Confirmar Contraseña',
     'create_clinic' => 'Crear mi Clínica',
     'already_registered' => '¿Ya tienes cuenta?',
+    'not_registered' => '¿No tienes cuenta?',
+    'create_free_clinic' => 'Crear clínica gratis',
     'free_plan_info' => 'Comenzarás con el plan gratuito. Puedes actualizar en cualquier momento.',
 
     // Login
@@ -22,6 +24,8 @@ return [
     'verification_sent' => 'Se ha enviado un nuevo enlace de verificación a tu correo.',
     'check_email' => 'Antes de continuar, revisa tu correo para el enlace de verificación.',
     'resend_verification' => 'Reenviar correo de verificación',
+    'verification_send_failed' => 'No pudimos enviar el correo de verificación. Inténtalo de nuevo más tarde o contacta a soporte.',
+    'logout' => 'Cerrar sesión',
     'terms_acceptance' => 'He leído y acepto los :terms y la :privacy.',
     'terms_link' => 'Términos y Condiciones',
     'privacy_link' => 'Política de Privacidad',

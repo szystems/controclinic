@@ -19,9 +19,13 @@ new #[Layout('layouts.guest')] class extends Component
             return;
         }
 
-        Auth::user()->sendEmailVerificationNotification();
-
-        Session::flash('status', 'verification-link-sent');
+        try {
+            Auth::user()->sendEmailVerificationNotification();
+            Session::flash('status', 'verification-link-sent');
+        } catch (\Throwable $e) {
+            report($e);
+            Session::flash('error', __('auth.verification_send_failed'));
+        }
     }
 
     /**
@@ -46,13 +50,19 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-4 font-medium text-sm text-red-600 dark:text-red-400">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="mt-4 flex items-center justify-between">
         <x-primary-button wire:click="sendVerification">
             {{ __('auth.resend_verification') }}
         </x-primary-button>
 
         <button wire:click="logout" type="submit" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-            {{ __('Log Out') }}
+            {{ __('auth.logout') }}
         </button>
     </div>
 </div>

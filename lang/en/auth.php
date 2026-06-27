@@ -10,6 +10,8 @@ return [
     'confirm_password' => 'Confirm Password',
     'create_clinic' => 'Create my Clinic',
     'already_registered' => 'Already have an account?',
+    'not_registered' => "Don't have an account?",
+    'create_free_clinic' => 'Create your free clinic',
     'free_plan_info' => 'You\'ll start with the free plan. You can upgrade anytime.',
 
     // Login
@@ -22,6 +24,8 @@ return [
     'verification_sent' => 'A new verification link has been sent to your email.',
     'check_email' => 'Before continuing, please check your email for a verification link.',
     'resend_verification' => 'Resend Verification Email',
+    'verification_send_failed' => 'We could not send the verification email. Please try again later or contact support.',
+    'logout' => 'Log Out',
     'terms_acceptance' => 'I have read and agree to the :terms and :privacy.',
     'terms_link' => 'Terms and Conditions',
     'privacy_link' => 'Privacy Policy',

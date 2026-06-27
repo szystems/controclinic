@@ -1,132 +1,131 @@
-# 📝 Tareas Pendientes
+# 📝 Tareas — Ruta a v1.0
 
-> Actualizado: 2026-05-25
-> Estado: 588 tests / 1270 asserts · Pint clean · Sprint G completado
-> Sprints completados: A ✅ B ✅ C ✅ F.1→F.10 ✅ G ✅
+> Actualizado: 2026-06-27
+> **Orden de ejecución:** ver [LAUNCH-PLAN.md](LAUNCH-PLAN.md) (documento maestro).
+> Estado: 588 tests · Pint clean · Módulos clínicos completos · Objetivo **1.0.0**
 
----
-
-## ✅ Sprint G — Pulido, Pagos y Admin (COMPLETADO — 2026-05-25)
-
-### G.1 — Fixes de branding ✅ (commits `db0521c`, `7dab2af`, `208d061`, `a6638b9`)
-- Nav público: logo sin texto redundante cuando hay logo configurado
-- Auth views: `<x-app-logo>` en lugar de SVG hardcoded
-
-### G.2 — Pagos parciales en Facturación ✅ (commit `f025372` — 19 tests)
-- `openPaymentModal()`, `savePayment()`, `deletePayment()` implementados
-- `amount_due = total - sum(payments)` · status → `paid` automático cuando amount_due = 0
-- `InvoicePartialPaymentsTest` — 19 tests pasando
-
-### G.3 — Panel Admin: métricas ✅ (commit `e282731` + `eed6104`)
-- KPIs: total clínicas, activas, free/paid, nuevas 30 días
-- Gráfica semanal últimas 12 semanas · Tabla recientes con último login
-- Fix: `last_login_at` ahora se registra via `Event::listen(Login::class, ...)`
-
-### G.4 — Tests SetupChecklist + EmptyStates ✅ (commit `807d6ca`)
-- `SetupChecklistTest` — 11 tests · `EmptyStatesTest` — 8 tests
-
-### G.5 — Módulo Recetas ✅ (ya completo — 14 tests en `PrescriptionsTest`)
-- Index, Show, Create, Edit implementados con permisos correctos
-- Folio RX-XXXX por clínica, QR payload, PDF via DomPDF
-- Policy `PrescriptionPolicy` + multi-tenant isolation
+Leyenda: `[ ]` pendiente · `[~]` en progreso · `[x]` hecho
 
 ---
 
-## 🔜 Backlog — Ordenado por prioridad
+## Fase A — Infraestructura y dominio → [LAUNCH-PLAN § A](LAUNCH-PLAN.md#fase-a--infraestructura-y-dominio)
 
-### B.1 — Paddle checkout en onboarding (BLOQUEADO — esperando business number)
-> Sin cuenta Paddle activa no se puede implementar.
+### A.1 — Dominio y correo (Cloudflare + Network Solutions)
+- [x] Registrar **controclinic.com** (Network Solutions)
+- [x] Añadir zona en Cloudflare · nameservers apuntando a CF
+- [x] Email Routing: `support@controclinic.com` → Outlook
+- [x] MX, SPF, DKIM, DMARC en Cloudflare (Email Routing)
+- [ ] Web3Forms contacto: mantener `szystemscorreos@outlook.com` (no bloqueante)
+- [x] TTL / SSL Full (strict) · A + www → VPS
 
-- [ ] Integrar Paddle JS con price IDs de los 4 planes en paso 5 del onboarding
-- [ ] Trial expiry emails automáticos: 7 días antes, 3 días antes, día de vencimiento
+### A.2 — Docker / Coolify (código)
+- [x] `Dockerfile.prod` multi-stage
+- [x] `docker/php/entrypoint.sh` + `entrypoint-worker.sh`
+- [x] `docker-compose.coolify.yml` — servicios prefijados `controclinic-*`
+- [x] `docker/nginx/Dockerfile.coolify` — nginx config embebida (fix bind mount Coolify)
+- [x] `config/*.php`: `env('VAR') ?: 'default'` · `trustProxies(at:'*')`
 
-### B.2 — Métricas de conversión con Paddle
-> Requiere cuenta Paddle activa para datos de ingresos reales.
+### A.3 — Deploy y cutover
+- [x] App en Coolify · env secretas (APP_KEY, DB_*)
+- [ ] Smoke test prod: login, uploads, queue, scheduler, registro
+- [x] FQDN Coolify: `https://controclinic.com,https://www.controclinic.com`
+- [x] Cutover DNS A → `5.78.235.235`
+- [ ] **Resend** (`MAIL_*`) operativo · probar emails transaccionales
+- [ ] Snapshot Hetzner post-deploy
 
-- [ ] Free → paid conversion rate en Admin Dashboard
-- [ ] MRR, ARR, churn mensual una vez activo Paddle
-
-### B.3 — Recordatorios WhatsApp/SMS
-> Email ya funciona completamente. SMS/WA diferido por costo operativo.
-> Evaluar Twilio vs Meta Cloud API cuando haya clientes reales que lo pidan.
-
-### B.4 — Social login (Google / Microsoft)
-> DIFERIDO para v2.
-> Razón: el registro tiene pasos de onboarding adicionales (nombre clínica, especialidad, etc.)
-> que no existen en el flujo OAuth estándar. Complicaría la UX actual sin valor proporcional para v1.
-
-### B.5 — CI/CD + Deployment
-> DIFERIDO hasta elegir servidor.
-> Candidatos: Hetzner (preferido), DigitalOcean, Network Solutions.
-
-- [ ] GitHub Actions: correr tests en cada PR, Pint check, npm build
-- [ ] Deploy automático a VPS via SSH + artisan migrate --force
-- [ ] Dockerización para producción (`docker-compose.prod.yml`)
-- [ ] Documentación de deployment (variables de entorno, SSL, queue worker, scheduler)
-
-### B.6 — Múltiples sedes
-> DIFERIDO hasta tener al menos 1 cliente que lo solicite.
-> Schema ya preparado sin costo adicional: `clinics.parent_clinic_id` + `appointments.branch_id`.
-
-- [ ] UI en Settings: crear/editar sedes hijas
-- [ ] Selector de sede en Appointments/Create|Edit
-- [ ] Filtros por sede en calendario, reportes, listados
+Detalle operativo: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ---
 
-## ✅ Completados
+## Fase B — Planes BD fuente única → [LAUNCH-PLAN § B](LAUNCH-PLAN.md#fase-b--planes-en-bd-como-fuente-única)
 
-### Sprint F — UX & Onboarding (2026-05-21) ✅
-F.1 Setup Checklist · F.2 Empty States · F.3 Página pública enriquecida
-F.4 Tour Driver.js · F.5 Ayuda contextual + /help · F.6 Onboarding mejorado
-F.7 Custom domain · F.8 Demo data toggle · F.9 Skeleton screens · F.10 Atajos de teclado
-
-### Sprints anteriores ✅
-Sprint A (Admin branding/SEO) · Sprint B (Landing pública + 4 tiers pricing)
-Sprint C (Pulido listados + filtros avanzados) · Bloque 0 (Hardening + DB forward-compat + Backup + Sentry)
-v1.4 (Plantillas SOAP, archivos paciente, agenda diaria, catálogo) · v1.3 (2FA TOTP)
-
----
-
-## ⚠️ Pre-lanzamiento — Obligatorio antes de publicar
-
-> Estas tareas no son de código puro. Son requisitos legales/de contenido que deben resolverse
-> antes de abrir la app al público. Ninguna bloquea el desarrollo actual.
-
-### PL.1 — Textos legales reales
-> `lang/es/legal.php` contiene texto placeholder con aviso "versión preliminar pendiente de revisión legal".
-> La app maneja datos médicos de pacientes — Privacy Policy y Terms of Service deben ser documentos reales.
-
-- [ ] Redactar o adaptar Privacy Policy real para datos médicos (HIPAA-like / GDPR-like según países objetivo)
-- [ ] Redactar o adaptar Terms of Service definitivos
-- [ ] Actualizar `lang/es/legal.php` con el texto final
-- [ ] Crear `lang/en/legal.php` con la versión EN (si se lanza en inglés)
-
-### PL.2 — Traducciones del sitio público (EN)
-> Las páginas públicas (`home`, `pricing`, `contact`) tienen texto hardcodeado en español.
-> El middleware ya detecta el idioma del navegador, pero no hay nada que traducir aún.
-
-- [ ] Definir primero el contenido FINAL de home.blade.php (testimonios reales, números reales)
-- [ ] Crear `lang/es/public.php` y `lang/en/public.php`
-- [ ] Reemplazar texto hardcodeado en `home`, `pricing`, `contact` por `__('public.clave')`
-- [ ] Nota: `privacy.blade.php` y `terms.blade.php` ya usan `__()` — solo falta el contenido en lang/
-
-### PL.3 — Contenido marketing real en home
-> home.blade.php tiene placeholders evidentes que deben ser reemplazados por datos reales:
-> - Testimonios ficticios (Dra. María González, Dr. Juan Pablo Méndez, etc.)
-> - "Más de 500 clínicas" — número inventado
-> - Logos de clientes ficticios (ClinicaPlus, MediCare, SaludTotal)
-> - FAQ: verificar si "50% descuento para estudiantes" es una promesa real
-
-- [ ] Reemplazar testimonios placeholder por testimonios reales (o eliminar sección si no hay aún)
-- [ ] Ajustar número de clínicas a uno real o eliminar el claim
-- [ ] Eliminar logos ficticios o reemplazar por clientes reales
-- [ ] Confirmar/ajustar FAQ antes de publicar
+- [ ] Migración `plan_type` (añadir `practica`, `clinica`) o usar solo `plan_id`
+- [ ] Registro: `plan_id` del Free + límites copiados desde `plans`
+- [ ] Eliminar fallback `Clinic::PLAN_LIMITS` como fuente principal
+- [ ] `trial_days = 0` en todos los planes · sin trial en Paddle checkout
+- [ ] Definir límites Free finales en BD (Admin Plans)
+- [ ] Plan privado descuento: `is_private` + `requires_code` + prices Paddle
+- [ ] UI canje de código en billing
+- [ ] Tests planes/límites/registro/upgrade
 
 ---
 
-## 📌 Decisiones pendientes del usuario
+## Fase C — Marca y freemium → [LAUNCH-PLAN § C](LAUNCH-PLAN.md#fase-c--marca-y-mensaje-freemium)
 
-1. **Servidor de producción**: Hetzner (preferido) vs DigitalOcean vs Network Solutions — decidir antes de Sprint CI/CD
-2. **Paddle business number**: en trámite → desbloquea B.1 (checkout real) y B.2 (MRR/churn)
-3. **Recetas G.5**: revisar en Sprint G si el módulo actual es suficiente para v1
+- [ ] Footer: ControClinic by SZ Systems (ADR-011)
+- [ ] Emails: firma y remitente alineados
+- [ ] Home/pricing: mensaje freemium (sin "14 días") — ADR-012
+- [ ] FAQ pricing coherente con Free permanente
+- [ ] Checkout Paddle: branding ControClinic
+- [x] Login: enlace a registro freemium (`/register`) — no obligar volver al home
+
+---
+
+## Fase D — Paddle → [LAUNCH-PLAN § D](LAUNCH-PLAN.md#fase-d--paddle-monetización)
+
+- [ ] Cuenta Paddle sandbox — SZ Systems
+- [ ] Productos `ControClinic — Solo/Práctica/Clínica` · mensual + anual · sin trial
+- [ ] `.env` / Coolify: credenciales y price IDs (nunca en repo)
+- [ ] Enlazar price IDs en tabla `plans`
+- [ ] Checkout billing + webhooks
+- [ ] Tests `PaddleEventListener` y billing
+- [ ] Sandbox E2E → activar live (Fase F)
+
+---
+
+## Fase E — Legal y marketing → [LAUNCH-PLAN § E](LAUNCH-PLAN.md#fase-e--legal-marketing-y-presencia)
+
+- [ ] Privacy Policy y Terms reales (SZ Systems responsable)
+- [ ] `lang/es/legal.php` + `lang/en/legal.php`
+- [ ] Marketing home real (testimonios, claims, logos)
+- [ ] `lang/{es,en}/public.php` — sitio bilingüe
+- [ ] ControClinic en szystems.com
+
+---
+
+## Fase G — Panel Admin operaciones → [LAUNCH-PLAN § G](LAUNCH-PLAN.md#fase-g--panel-admin-operaciones-de-plataforma)
+
+> **Prioridad:** alta · **Momento:** tras A8, antes de F1 · Paralelo con B/C
+
+### G.1 — CRUD Super Admins
+- [ ] `Admin/Users/Index` — listar usuarios `is_super_admin=true` (nombre, email, activo, último login)
+- [ ] `Admin/Users/Create` — alta super admin (password temporal o generada)
+- [ ] `Admin/Users/Edit` — editar nombre, email, `is_active`; reset password por otro admin
+- [ ] Eliminar/desactivar — soft delete; guard: no último admin, no auto-eliminación
+- [ ] Rutas + nav en `layouts/admin.blade.php`
+- [ ] `SuperAdminPolicy` + activity log + tests
+
+### G.2 — Perfil y contraseña (usuario en sesión en `/admin`)
+- [ ] `Admin/Profile` — cambiar contraseña (actual + nueva + confirmar)
+- [ ] Enlace "Mi cuenta" en menú usuario admin (hoy solo logout)
+- [ ] Reutilizar lógica de `App\Livewire\App\Profile\Index::updatePassword()`
+- [ ] Tests perfil admin
+
+**Nota:** usuarios de clínica ya tienen cambio de contraseña en `/app/{clinic}/profile` — no duplicar ahí.
+
+---
+
+## Fase F — Go-live → [LAUNCH-PLAN § F](LAUNCH-PLAN.md#fase-f--go-live-release-100)
+
+- [ ] E2E prod: registro → onboarding → uso → upgrade
+- [ ] Multi-tenant · 2FA · invitaciones · portal booking
+- [ ] Sentry · rate limiters · backups
+- [ ] Paddle live · tag `v1.0.0` · apertura pública
+
+---
+
+## ✅ Decisiones cerradas (referencia)
+
+Ver tabla completa en [LAUNCH-PLAN.md § Decisiones cerradas](LAUNCH-PLAN.md#-decisiones-cerradas-2026-06-21).
+
+---
+
+## 🌅 Post-v1 (diferido)
+
+MRR/ARR/churn · SMS/WhatsApp · Social login · Múltiples sedes · App móvil · API · IA
+
+---
+
+## 📌 Historial — Sprints completados (pre-v1)
+
+Sprints A→G · Bloque 0 · v1.3 (2FA) · v1.4 (SOAP, archivos, agenda, catálogo) · F.1–F.10 · G.1–G.5

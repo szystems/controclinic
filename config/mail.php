@@ -14,7 +14,11 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    /*
+    | When MAIL_HOST is not configured (e.g. before Resend setup), fall back to log
+    | so registration and notifications never 500 on a missing SMTP server.
+    */
+    'default' => env('MAIL_HOST') ? (env('MAIL_MAILER') ?: 'smtp') : 'log',
 
     /*
     |--------------------------------------------------------------------------
@@ -111,8 +115,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS') ?: 'noreply@controclinic.com',
+        'name' => env('MAIL_FROM_NAME') ?: (env('APP_NAME') ?: 'ControClinic'),
     ],
 
 ];

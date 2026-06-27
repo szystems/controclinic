@@ -18,7 +18,9 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSeeVolt('pages.auth.login');
+            ->assertSeeVolt('pages.auth.login')
+            ->assertSee(__('auth.not_registered'))
+            ->assertSee(__('auth.create_free_clinic'));
     }
 
     public function test_users_can_authenticate_using_the_login_screen(): void

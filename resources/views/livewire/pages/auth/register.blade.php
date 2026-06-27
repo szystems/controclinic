@@ -80,8 +80,13 @@ new #[Layout('layouts.guest')] class extends Component
             return $user;
         });
 
-        event(new Registered($user));
         Auth::login($user);
+
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         // Full page redirect (not SPA navigate) because session changes after login
         $this->redirect(route('verification.notice'));
