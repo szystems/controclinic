@@ -376,6 +376,10 @@ Route::prefix('admin')
         Route::get('/plans/{plan}/edit', Edit::class)->name('plans.edit');
         Route::get('/clinics', App\Livewire\Admin\Clinics\Index::class)->name('clinics.index');
         Route::get('/clinics/{clinic}', Show::class)->name('clinics.show');
+        Route::get('/users', App\Livewire\Admin\Users\Index::class)->name('users.index');
+        Route::get('/users/create', App\Livewire\Admin\Users\Create::class)->name('users.create');
+        Route::get('/users/{user}/edit', App\Livewire\Admin\Users\Edit::class)->name('users.edit');
+        Route::get('/profile', App\Livewire\Admin\Profile\Index::class)->name('profile');
         Route::get('/settings', App\Livewire\Admin\Settings\Index::class)->name('settings');
     });
 

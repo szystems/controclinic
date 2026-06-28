@@ -6,10 +6,13 @@ use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TenantMiddleware;
 use App\Listeners\PaddleEventListener;
 use App\Models\Clinic;
+use App\Models\User;
+use App\Policies\SuperAdminPolicy;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(User::class, SuperAdminPolicy::class);
+
         // Route model binding: resolver {clinic} por slug, o por public_portal_slug si no se encuentra
         Route::bind('clinic', function (string $value) {
             return Clinic::where('slug', $value)

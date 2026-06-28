@@ -55,6 +55,10 @@
                                    class="{{ request()->routeIs('admin.plans.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
                                     {{ __('admin.plans') }}
                                 </a>
+                                <a href="{{ route('admin.users.index') }}" wire:navigate
+                                   class="{{ request()->routeIs('admin.users.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
+                                    {{ __('admin.super_admins') }}
+                                </a>
                                 <a href="{{ route('admin.settings') }}" wire:navigate
                                    class="{{ request()->routeIs('admin.settings') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
                                     {{ __('admin.settings') }}
@@ -128,6 +132,10 @@
                                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('general.signed_in_as') }}</p>
                                         <p class="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">{{ auth()->user()->email }}</p>
                                     </div>
+                                    <a href="{{ route('admin.profile') }}" wire:navigate
+                                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                        {{ __('admin.my_account') }}
+                                    </a>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit"

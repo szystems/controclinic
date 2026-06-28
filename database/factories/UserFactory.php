@@ -64,4 +64,12 @@ class UserFactory extends Factory
         return $this->state(fn () => ['role' => 'assistant'])
             ->afterCreating(fn ($user) => $user->assignRole('assistant'));
     }
+
+    public function superAdmin(): static
+    {
+        return $this->state(fn () => [
+            'is_super_admin' => true,
+            'clinic_id' => null,
+        ]);
+    }
 }

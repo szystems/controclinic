@@ -70,7 +70,7 @@ E (legal + marketing) ─┘
 | A5 | Código: `Dockerfile.prod`, `entrypoint.sh`, `docker-compose.coolify.yml` (`controclinic-*`) | Dev | [x] |
 | A6 | Código: `config/*.php` con `env() ?: default` · `trustProxies(at:'*')` | Dev | [x] |
 | A7 | Coolify: app ControClinic · env secretas · deploy exitoso | Dev | [x] |
-| A8 | Smoke test prod: login, registro, uploads, queue, scheduler, locale, HTTPS | Dev | [ ] |
+| A8 | Smoke test prod: login, registro, uploads, queue, scheduler, locale, HTTPS | Dev | [~] registro 500 corregido (mail sin SMTP) |
 | A9 | DNS **A/@/www → 5.78.235.235** (proxied) · FQDN en Coolify | Usuario+Dev | [x] |
 | A10 | Configurar **Resend** (`MAIL_*`) en Coolify · probar reset password / email cita | Dev | [ ] |
 | A11 | Snapshot Hetzner post-deploy exitoso | Usuario | [ ] |

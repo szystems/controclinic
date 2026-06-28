@@ -1,9 +1,48 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-05-25
-> **Fase actual:** Sprint H — por definir (Sprint G completado)
+> **Última actualización:** 2026-06-27
+> **Fase actual:** 🟡 **Fase A** (~85%) + **Fase G** identificada (ver [LAUNCH-PLAN.md](LAUNCH-PLAN.md))
+> **Siguiente paso:** **A8** smoke test prod · **G** CRUD super admins + cambio contraseña en panel admin
 > **Métricas:** 588 tests · 1270 assertions · Pint clean
 > **Stack:** Laravel 12 · Livewire 3 · Alpine.js · Tailwind · MySQL 8
+> **Producción:** ✅ `https://controclinic.com` · Hetzner `5.78.235.235` + Coolify + Cloudflare
+
+---
+
+## 🚀 Progreso hacia v1.0
+
+| Fase | Nombre | Estado |
+|------|--------|--------|
+| **A** | Infraestructura y dominio | 🟡 ~85% |
+| **B** | Planes BD — fuente única | 🔜 |
+| **C** | Marca y mensaje freemium | 🔜 |
+| **D** | Paddle — monetización | 🔜 |
+| **E** | Legal, marketing, szystems.com | 🔜 |
+| **G** | Panel Admin — operaciones plataforma | 🔜 |
+| **F** | Go-live → **v1.0.0** | 🔜 |
+
+Seguimiento detallado: **[LAUNCH-PLAN.md](LAUNCH-PLAN.md)** · Tareas: [TASKS.md](TASKS.md)
+
+**Decisiones cerradas:** freemium sin trial · dominio NS + DNS Cloudflare · email CF Routing · deploy Coolify · Paddle=SZ Systems · límites en tabla `plans`.
+
+ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (dominio/correo — ver nota* en LAUNCH-PLAN)
+
+---
+
+## 🌐 Producción — deploy 2026-06-27
+
+| Item | Estado |
+|------|--------|
+| Dominio + SSL | ✅ controclinic.com + www |
+| Coolify app | ✅ `controclinic:main-ybwfwifzqp47cu1et7pi0vz6` |
+| Contenedores | ✅ app, webserver, mysql, redis, queue, scheduler |
+| Health check | ✅ `/up` → 200 |
+| Login | ✅ `/login` → 200 |
+| Seed prod | 🟡 Roles + planes + super admin (DemoClinicSeeder falló — `fake()` no en prod) |
+| MAIL saliente | ❌ Resend pendiente |
+| Password admin prod | ⚠️ Default del seeder — **bloqueado hasta Fase G2** |
+
+**Gap operativo:** panel `/admin` sin módulo de super admins ni cambio de contraseña en sesión (usuarios clínica sí tienen `/app/profile`).
 
 ---
 
@@ -126,7 +165,7 @@
 | Reportes | ✅ Gráficas + CSV export | ReportsTest |
 | Staff | ✅ Index, Create, Edit, permisos custom, invitaciones | StaffManagementTest, ExportTest |
 | Settings | ✅ General, Catálogo, Plantillas SOAP, Página Pública | RecordTemplatesTest |
-| Admin | ✅ Dashboard, Clínicas, Planes, Settings branding/SEO | AdminPanelTest, AdminSettingsTest |
+| Admin | ✅ Dashboard, Clínicas, Planes, Settings · ❌ Super Admins CRUD · ❌ perfil/contraseña en `/admin` | AdminPanelTest |
 | Perfil | ✅ Perfil, 2FA, Transferencia ownership | ProfileTest, ProfileActivityTest |
 | Agenda | ✅ Bloqueo horarios (doctor_unavailabilities) | DoctorScheduleTest |
 | Auditoría | ✅ AuditLog Index filtros + paginación | AuditLogTest |
@@ -142,8 +181,10 @@
 
 | Item | Estado | Razón |
 |------|--------|-------|
-| Paddle checkout | Bloqueado | Esperando business number |
+| Paddle checkout | ▶️ Fase D | Business number obtenido · cuenta SZ Systems |
+| CI/CD + Deploy | ✅ Fase A (prod live) | Hetzner + Coolify |
+| Admin super users + password | ▶️ Fase G | Bloquea operación segura en prod |
+| Métricas MRR/ARR/churn | Post-v1 | Requiere Paddle live con datos reales |
 | Social login | Diferido v2 | Incompatible con onboarding actual |
 | SMS/WhatsApp | Diferido | Costo operativo, pedir cuando haya clientes |
 | Múltiples sedes | Diferido | Schema listo, esperar demanda real |
-| CI/CD + Deploy | Diferido | Decidir servidor primero (Hetzner preferido) |

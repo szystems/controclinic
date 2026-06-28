@@ -263,6 +263,11 @@ class User extends Authenticatable implements MustVerifyEmail
         ]);
     }
 
+    public function scopeSuperAdmins($query)
+    {
+        return $query->where('is_super_admin', true);
+    }
+
     // ==================== METHODS ====================
 
     public function updateLastLogin(?string $ip = null): void
