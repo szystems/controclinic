@@ -194,7 +194,7 @@
         <x-skeleton-table wire:loading :rows="8" :cols="6" :header="false" class="mt-0" />
 
         {{-- Table --}}
-        <div wire:loading.remove class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div wire:loading.remove class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             @if($appointments->count() > 0)
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -310,24 +310,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                {{-- Dropdown de acciones --}}
-                                <div x-data="{ open: false }" class="relative inline-block text-left" @click.stop>
-                                    <button type="button" @click="open = !open" @click.outside="open = false"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-200 dark:hover:bg-gray-700 transition-colors">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
-                                        </svg>
-                                    </button>
-
-                                    <div x-show="open"
-                                         x-transition:enter="transition ease-out duration-100"
-                                         x-transition:enter-start="opacity-0 scale-95"
-                                         x-transition:enter-end="opacity-100 scale-100"
-                                         x-transition:leave="transition ease-in duration-75"
-                                         x-transition:leave-start="opacity-100 scale-100"
-                                         x-transition:leave-end="opacity-0 scale-95"
-                                         class="absolute right-0 z-20 mt-1 w-52 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black/10 divide-y divide-gray-100 dark:divide-gray-700"
-                                         x-cloak>
+                                <x-table-row-menu>
 
                                         {{-- Sección: Ver / Editar --}}
                                         <div class="py-1">
@@ -454,8 +437,7 @@
                                             </div>
                                             @endcan
                                         @endif
-                                    </div>
-                                </div>
+                                </x-table-row-menu>
                             </td>
                         </tr>
                         @endforeach

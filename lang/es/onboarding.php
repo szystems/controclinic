@@ -10,6 +10,7 @@ return [
     'step_branding' => 'Marca',
     'step_schedule' => 'Horarios',
     'step_plan' => 'Plan',
+    'step_progress' => 'Paso :current de :total — :label',
 
     // Step 1: Clinic Info
     'clinic_info_title' => 'Información de la Clínica',

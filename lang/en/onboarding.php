@@ -10,6 +10,7 @@ return [
     'step_branding' => 'Branding',
     'step_schedule' => 'Schedule',
     'step_plan' => 'Plan',
+    'step_progress' => 'Step :current of :total — :label',
 
     // Step 1: Clinic Info
     'clinic_info_title' => 'Clinic Information',

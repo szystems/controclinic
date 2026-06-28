@@ -11,34 +11,46 @@
         </div>
 
         <!-- Progress Bar -->
+        @php
+            $stepLabels = [
+                1 => __('onboarding.step_clinic'),
+                2 => __('onboarding.step_localization'),
+                3 => __('onboarding.step_branding'),
+                4 => __('onboarding.step_schedule'),
+                5 => __('onboarding.step_plan'),
+            ];
+        @endphp
         <div class="mb-8">
-            <div class="flex items-center justify-between mb-2">
-                @for ($i = 1; $i <= $totalSteps; $i++)
-                    <div class="flex items-center {{ $i < $totalSteps ? 'flex-1' : '' }}">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 text-sm font-semibold transition-colors
-                            {{ $i < $currentStep ? 'bg-primary text-white border-primary' : '' }}
-                            {{ $i === $currentStep ? 'bg-primary text-white border-primary ring-4 ring-primary/20' : '' }}
-                            {{ $i > $currentStep ? 'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600' : '' }}">
-                            @if ($i < $currentStep)
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            @else
-                                {{ $i }}
+            <div class="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div class="flex items-center justify-between min-w-[20rem] sm:min-w-0 mb-2">
+                    @for ($i = 1; $i <= $totalSteps; $i++)
+                        <div class="flex items-center {{ $i < $totalSteps ? 'flex-1' : '' }}">
+                            <div class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 text-xs sm:text-sm font-semibold transition-colors shrink-0
+                                {{ $i < $currentStep ? 'bg-primary text-white border-primary' : '' }}
+                                {{ $i === $currentStep ? 'bg-primary text-white border-primary ring-4 ring-primary/20' : '' }}
+                                {{ $i > $currentStep ? 'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600' : '' }}">
+                                @if ($i < $currentStep)
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                @else
+                                    {{ $i }}
+                                @endif
+                            </div>
+                            @if ($i < $totalSteps)
+                                <div class="flex-1 h-1 mx-1 sm:mx-2 rounded {{ $i < $currentStep ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700' }}"></div>
                             @endif
                         </div>
-                        @if ($i < $totalSteps)
-                            <div class="flex-1 h-1 mx-2 rounded {{ $i < $currentStep ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700' }}"></div>
-                        @endif
-                    </div>
-                @endfor
+                    @endfor
+                </div>
             </div>
-            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                <span>{{ __('onboarding.step_clinic') }}</span>
-                <span>{{ __('onboarding.step_localization') }}</span>
-                <span>{{ __('onboarding.step_branding') }}</span>
-                <span>{{ __('onboarding.step_schedule') }}</span>
-                <span>{{ __('onboarding.step_plan') }}</span>
+            <p class="sm:hidden text-center text-xs text-gray-500 dark:text-gray-400">
+                {{ __('onboarding.step_progress', ['current' => $currentStep, 'total' => $totalSteps, 'label' => $stepLabels[$currentStep] ?? '']) }}
+            </p>
+            <div class="hidden sm:flex justify-between text-xs text-gray-500 dark:text-gray-400 gap-2">
+                @foreach ($stepLabels as $label)
+                    <span class="text-center flex-1">{{ $label }}</span>
+                @endforeach
             </div>
         </div>
 
@@ -109,32 +121,10 @@
                     <div class="space-y-4">
                         <div>
                             <x-input-label for="timezone" :value="__('onboarding.timezone')" />
-                            <select wire:model="timezone" id="timezone" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                <option value="America/Guatemala">America/Guatemala (GMT-6)</option>
-                                <option value="America/Mexico_City">America/Mexico_City (GMT-6)</option>
-                                <option value="America/Bogota">America/Bogota (GMT-5)</option>
-                                <option value="America/Lima">America/Lima (GMT-5)</option>
-                                <option value="America/Santiago">America/Santiago (GMT-4)</option>
-                                <option value="America/Argentina/Buenos_Aires">America/Buenos_Aires (GMT-3)</option>
-                                <option value="America/Sao_Paulo">America/Sao_Paulo (GMT-3)</option>
-                                <option value="America/New_York">America/New_York (GMT-5)</option>
-                                <option value="America/Chicago">America/Chicago (GMT-6)</option>
-                                <option value="America/Denver">America/Denver (GMT-7)</option>
-                                <option value="America/Los_Angeles">America/Los_Angeles (GMT-8)</option>
-                                <option value="Europe/Madrid">Europe/Madrid (GMT+1)</option>
-                                <option value="America/Costa_Rica">America/Costa_Rica (GMT-6)</option>
-                                <option value="America/Panama">America/Panama (GMT-5)</option>
-                                <option value="America/Tegucigalpa">America/Tegucigalpa (GMT-6)</option>
-                                <option value="America/El_Salvador">America/El_Salvador (GMT-6)</option>
-                                <option value="America/Managua">America/Managua (GMT-6)</option>
-                                <option value="America/Santo_Domingo">America/Santo_Domingo (GMT-4)</option>
-                                <option value="America/Caracas">America/Caracas (GMT-4)</option>
-                                <option value="America/Guayaquil">America/Guayaquil (GMT-5)</option>
-                                <option value="America/La_Paz">America/La_Paz (GMT-4)</option>
-                                <option value="America/Asuncion">America/Asuncion (GMT-4)</option>
-                                <option value="America/Montevideo">America/Montevideo (GMT-3)</option>
-                                <option value="America/Toronto">America/Toronto (GMT-5)</option>
-                            </select>
+                            <x-timezone-select
+                                wireModel="timezone"
+                                class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+                            />
                             <x-input-error :messages="$errors->get('timezone')" class="mt-1" />
                         </div>
 

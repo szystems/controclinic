@@ -161,14 +161,7 @@
                         <label for="id_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             {{ __('patients.id_type') }}
                         </label>
-                        <select wire:model="id_type" id="id_type"
-                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="">{{ __('general.select') }}</option>
-                            <option value="DPI">DPI</option>
-                            <option value="Pasaporte">{{ __('patients.passport') }}</option>
-                            <option value="Licencia">{{ __('patients.license') }}</option>
-                            <option value="Otro">{{ __('general.other') }}</option>
-                        </select>
+                        <x-patient-id-type-select wireModel="id_type" id="id_type" :current-value="$id_type" />
                     </div>
                     <div>
                         <label for="id_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

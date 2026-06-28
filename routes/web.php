@@ -219,7 +219,16 @@ Route::get('dashboard', function () {
     ->middleware(['auth', 'verified', '2fa'])
     ->name('dashboard');
 
-Route::view('profile', 'profile')
+Route::get('profile', function () {
+    $user = auth()->user();
+    $clinic = $user?->clinic;
+
+    if (! $clinic) {
+        return redirect()->route('dashboard');
+    }
+
+    return redirect()->route('app.profile', ['clinic' => $clinic->slug]);
+})
     ->middleware(['auth', '2fa'])
     ->name('profile');
 

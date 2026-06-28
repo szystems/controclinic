@@ -250,64 +250,7 @@
                                 </div>
                                 <div>
                                     <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('settings.localization.timezone') }}</label>
-                                    <select wire:model="timezone" id="timezone" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <optgroup label="🇨🇦 Canadá">
-                                            <option value="America/Vancouver">Vancouver / Victoria (GMT-8)</option>
-                                            <option value="America/Edmonton">Edmonton / Calgary (GMT-7)</option>
-                                            <option value="America/Winnipeg">Winnipeg (GMT-6)</option>
-                                            <option value="America/Toronto">Toronto (GMT-5)</option>
-                                            <option value="America/Halifax">Halifax (GMT-4)</option>
-                                            <option value="America/St_Johns">St. John's (GMT-3:30)</option>
-                                        </optgroup>
-                                        <optgroup label="🇺🇸 Estados Unidos">
-                                            <option value="America/Los_Angeles">Los Ángeles / Seattle (GMT-8)</option>
-                                            <option value="America/Denver">Denver (GMT-7)</option>
-                                            <option value="America/Phoenix">Phoenix (GMT-7)</option>
-                                            <option value="America/Chicago">Chicago (GMT-6)</option>
-                                            <option value="America/New_York">Nueva York (GMT-5)</option>
-                                            <option value="Pacific/Honolulu">Hawái (GMT-10)</option>
-                                            <option value="America/Anchorage">Alaska (GMT-9)</option>
-                                        </optgroup>
-                                        <optgroup label="🇲🇽 México">
-                                            <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
-                                            <option value="America/Tijuana">Tijuana (GMT-8)</option>
-                                            <option value="America/Cancun">Cancún (GMT-5)</option>
-                                            <option value="America/Hermosillo">Hermosillo (GMT-7)</option>
-                                        </optgroup>
-                                        <optgroup label="🌎 Centroamérica">
-                                            <option value="America/Guatemala">Guatemala (GMT-6)</option>
-                                            <option value="America/El_Salvador">El Salvador (GMT-6)</option>
-                                            <option value="America/Tegucigalpa">Honduras (GMT-6)</option>
-                                            <option value="America/Managua">Nicaragua (GMT-6)</option>
-                                            <option value="America/Costa_Rica">Costa Rica (GMT-6)</option>
-                                            <option value="America/Panama">Panamá (GMT-5)</option>
-                                        </optgroup>
-                                        <optgroup label="🌎 Caribe">
-                                            <option value="America/Havana">Cuba (GMT-5)</option>
-                                            <option value="America/Santo_Domingo">Rep. Dominicana (GMT-4)</option>
-                                            <option value="America/Puerto_Rico">Puerto Rico (GMT-4)</option>
-                                        </optgroup>
-                                        <optgroup label="🌎 Sudamérica">
-                                            <option value="America/Bogota">Colombia (GMT-5)</option>
-                                            <option value="America/Lima">Perú (GMT-5)</option>
-                                            <option value="America/Guayaquil">Ecuador (GMT-5)</option>
-                                            <option value="America/Caracas">Venezuela (GMT-4)</option>
-                                            <option value="America/La_Paz">Bolivia (GMT-4)</option>
-                                            <option value="America/Santiago">Chile (GMT-3)</option>
-                                            <option value="America/Argentina/Buenos_Aires">Argentina (GMT-3)</option>
-                                            <option value="America/Sao_Paulo">Brasil - São Paulo (GMT-3)</option>
-                                            <option value="America/Montevideo">Uruguay (GMT-3)</option>
-                                            <option value="America/Asuncion">Paraguay (GMT-4)</option>
-                                        </optgroup>
-                                        <optgroup label="🇪🇺 Europa">
-                                            <option value="Europe/Madrid">España (GMT+1)</option>
-                                            <option value="Europe/London">Reino Unido (GMT+0)</option>
-                                            <option value="Europe/Paris">Francia (GMT+1)</option>
-                                            <option value="Europe/Berlin">Alemania (GMT+1)</option>
-                                            <option value="Europe/Rome">Italia (GMT+1)</option>
-                                            <option value="Europe/Lisbon">Portugal (GMT+0)</option>
-                                        </optgroup>
-                                    </select>
+                                    <x-timezone-select wireModel="timezone" id="timezone" class="mt-1" />
                                     @error('timezone') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                                 </div>
                                 <div>

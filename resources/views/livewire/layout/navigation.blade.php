@@ -258,7 +258,7 @@ new class extends Component
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile')" wire:navigate>
+                        <x-dropdown-link :href="route('app.profile', $clinicSlug)" wire:navigate>
                             {{ __('general.profile') }}
                         </x-dropdown-link>
 
@@ -496,9 +496,9 @@ new class extends Component
                                     'external' => false,
                                 ],
                                 [
-                                    'href'   => route('profile'),
+                                    'href'   => route('app.profile', $clinicSlug),
                                     'label'  => __('general.profile'),
-                                    'active' => request()->routeIs('profile'),
+                                    'active' => request()->routeIs('app.profile'),
                                     'icon'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>',
                                     'external' => false,
                                 ],
