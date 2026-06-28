@@ -7,7 +7,7 @@ while ! nc -z "${DB_HOST}" "${DB_PORT:-3306}" 2>/dev/null; do
 done
 echo "==> MySQL is ready."
 
-php artisan storage:link || true
+php artisan storage:link --force --relative || php artisan storage:link --force || true
 php artisan migrate --force
 
 echo "==> Caching configuration..."

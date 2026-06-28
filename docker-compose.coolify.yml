@@ -72,7 +72,7 @@ services:
     restart: always
     volumes:
       - public_root:/var/www/html/public:ro
-      - app_storage:/var/www/html/storage/app:ro
+      - app_storage:/var/www/html/storage:ro
     depends_on:
       - controclinic-app
     networks:
