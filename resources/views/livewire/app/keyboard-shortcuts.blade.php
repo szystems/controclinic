@@ -58,11 +58,7 @@
             }
         },
     }"
-    x-init="
-        const _kbHandler = (e) => handleKey(e);
-        window.addEventListener('keydown', _kbHandler);
-        $cleanup(() => window.removeEventListener('keydown', _kbHandler));
-    "
+    @keydown.window="handleKey($event)"
 >
     {{-- Botón flotante para abrir el modal (desktop, esquina inferior derecha) --}}
     <button

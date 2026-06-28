@@ -10,13 +10,16 @@ if (config('cashier.client_side_token')) {
     $seller['seller'] = (int) config('cashier.seller_id');
 }
 
-if (isset($seller['pwAuth']) && Auth::check() && $customer = Auth::user()->customer) {
+$canInitialize = isset($seller['token']) || isset($seller['seller']);
+
+if ($canInitialize && isset($seller['pwAuth']) && Auth::check() && $customer = Auth::user()->customer) {
     $seller['pwCustomer'] = ['id' => $customer->paddle_id];
 }
 
 $nonce = $nonce ?? '';
 ?>
 
+@if ($canInitialize)
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js" @if ($nonce) nonce="{{ $nonce }}" @endif></script>
 
 @if (config('cashier.sandbox'))
@@ -28,3 +31,4 @@ $nonce = $nonce ?? '';
 <script type="text/javascript" @if ($nonce) nonce="{{ $nonce }}" @endif>
     Paddle.Initialize(@json($seller));
 </script>
+@endif

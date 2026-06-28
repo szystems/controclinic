@@ -61,7 +61,9 @@
                 --color-secondary: {{ $hexToRgb($secondaryColor) }};
             }
         </style>
-        @paddleJS
+        @if (request()->routeIs('app.billing.*') && (config('cashier.client_side_token') || config('cashier.seller_id')))
+            @paddleJS
+        @endif
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
