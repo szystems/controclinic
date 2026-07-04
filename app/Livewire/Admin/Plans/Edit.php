@@ -152,18 +152,31 @@ class Edit extends Component
 
     private function syncClinicLimits(): void
     {
-        Clinic::where('plan_id', $this->plan->id)->update([
+        $payload = [
+            'plan_id' => $this->plan->id,
             'max_patients' => $this->unlimited_patients ? null : $this->max_patients,
             'max_appointments_per_month' => $this->unlimited_appointments ? null : $this->max_appointments_per_month,
             'max_doctors' => $this->unlimited_doctors ? null : $this->max_doctors,
             'max_staff' => $this->unlimited_staff ? null : $this->max_staff,
             'max_storage_bytes' => $this->unlimited_storage ? null : $this->max_storage_bytes,
-        ]);
+        ];
+
+        Clinic::query()
+            ->where('plan_id', $this->plan->id)
+            ->orWhere(function ($query) {
+                $query->whereNull('plan_id')->where('plan_type', $this->plan->slug);
+            })
+            ->update($payload);
     }
 
     public function getAffectedClinicsProperty(): int
     {
-        return Clinic::where('plan_id', $this->plan->id)->count();
+        return Clinic::query()
+            ->where('plan_id', $this->plan->id)
+            ->orWhere(function ($query) {
+                $query->whereNull('plan_id')->where('plan_type', $this->plan->slug);
+            })
+            ->count();
     }
 
     public function render()

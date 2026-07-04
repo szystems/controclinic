@@ -92,6 +92,12 @@
                         </select>
                         @error('role') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
 
+                        @if(!$currentClinic->canAddDoctor() && $currentClinic->canAddStaff())
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                {{ __('staff.owner_occupies_doctor_slot') }}
+                            </p>
+                        @endif
+
                         @if(!$currentClinic->canAddDoctor() && !$currentClinic->canAddStaff())
                             <div class="mt-2">
                                 <x-upgrade-nudge type="inline" :clinic-slug="$currentClinic->slug" />

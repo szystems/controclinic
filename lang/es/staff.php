@@ -67,6 +67,7 @@ return [
     'doctors_unlimited' => 'Doctores: :current (ilimitados)',
     'staff_unlimited' => 'Personal: :current (ilimitados)',
     'doctor_limit_reached' => 'Has alcanzado el límite de doctores de tu plan',
+    'owner_occupies_doctor_slot' => 'Tu plan incluye un doctor (tú, como propietario). Puedes invitar asistente, secretaria o recepcionista abajo.',
     'staff_limit_reached' => 'Has alcanzado el límite de personal de tu plan',
     'no_staff_in_plan' => 'Tu plan no incluye personal adicional',
     'upgrade_for_doctors' => 'Mejora tu plan para agregar más doctores',

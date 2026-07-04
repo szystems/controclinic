@@ -194,11 +194,25 @@ class Clinic extends Model
 
     // ==================== PLAN & LIMITS ====================
 
+    public function resolvePlan(): ?Plan
+    {
+        if ($this->plan_id) {
+            return $this->relationLoaded('plan') ? $this->plan : $this->plan()->first();
+        }
+
+        if ($this->plan_type) {
+            return Plan::findBySlug($this->plan_type);
+        }
+
+        return null;
+    }
+
     public function getPlanLimits(): array
     {
-        // Prefer Plan model from DB, fallback to constants
-        if ($this->plan_id && $this->relationLoaded('plan') ? $this->plan : $this->plan()->exists()) {
-            return $this->plan->getLimitsArray();
+        $plan = $this->resolvePlan();
+
+        if ($plan) {
+            return $plan->getLimitsArray();
         }
 
         return self::PLAN_LIMITS[$this->plan_type] ?? self::PLAN_LIMITS['free'];
@@ -258,7 +272,9 @@ class Clinic extends Model
         }
 
         // El owner cuenta como doctor a efectos del límite del plan
-        return $this->practitioners()->count() < $limits['max_doctors'];
+        $used = $this->practitioners()->count() + $this->pendingDoctorInvitationsCount();
+
+        return $used < $limits['max_doctors'];
     }
 
     public function canAddStaff(): bool
@@ -271,7 +287,21 @@ class Clinic extends Model
             return true;
         }
 
-        return $this->staff()->count() < $limits['max_staff'];
+        return $this->staff()->count() + $this->pendingStaffInvitationsCount() < $limits['max_staff'];
+    }
+
+    public function pendingStaffInvitationsCount(): int
+    {
+        return $this->pendingInvitations()
+            ->whereIn('role', ['assistant', 'secretary', 'receptionist'])
+            ->count();
+    }
+
+    public function pendingDoctorInvitationsCount(): int
+    {
+        return $this->pendingInvitations()
+            ->where('role', 'doctor')
+            ->count();
     }
 
     public function isOnTrial(): bool

@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
+use App\Models\Plan;
 use App\Models\User;
+use Database\Seeders\PlansSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -184,6 +186,23 @@ class PlanLimitsTest extends TestCase
         $this->assertEquals(5, $limits['max_appointments_per_month']);
         $this->assertEquals(1, $limits['max_doctors']);
         $this->assertEquals(0, $limits['max_staff']);
+    }
+
+    public function test_get_plan_limits_reads_db_plan_without_plan_id(): void
+    {
+        $this->seed(PlansSeeder::class);
+
+        $freePlan = Plan::where('slug', 'free')->firstOrFail();
+        $freePlan->update(['max_staff' => 2]);
+
+        $clinic = Clinic::factory()->onboarded()->create([
+            'plan_type' => 'free',
+            'plan_id' => null,
+            'is_manual_plan' => true,
+        ]);
+
+        $this->assertEquals(2, $clinic->fresh()->getPlanLimits()['max_staff']);
+        $this->assertTrue($clinic->canAddStaff());
     }
 
     public function test_get_plan_limits_returns_null_for_unlimited(): void

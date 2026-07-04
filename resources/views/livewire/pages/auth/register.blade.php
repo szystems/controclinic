@@ -55,6 +55,7 @@ new #[Layout('layouts.guest')] class extends Component
                 'name' => $validated['clinic_name'],
                 'slug' => $slug,
                 'email' => $validated['email'],
+                'plan_id' => \App\Models\Plan::getFreePlan()?->id,
                 'plan_type' => 'free',
                 'status' => 'active',
                 'is_manual_plan' => true, // Registro voluntario en plan free → acceso completo dentro de límites
