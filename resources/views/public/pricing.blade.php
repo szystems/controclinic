@@ -50,55 +50,15 @@
         </div>
     </section>
 
-    {{-- Add-ons Section --}}
-    <section class="py-20 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-2xl font-bold text-gray-900">Add-ons opcionales</h2>
-                <p class="text-gray-600 mt-2">Amplía tu plan según tus necesidades</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl p-6 border border-gray-200">
-                    <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900">Doctor adicional</h3>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">+$15<span class="text-sm text-gray-500 font-normal">/mes</span></p>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 border border-gray-200">
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900">Asistente adicional</h3>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">+$5<span class="text-sm text-gray-500 font-normal">/mes</span></p>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 border border-gray-200">
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900">SMS/WhatsApp</h3>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">+$10<span class="text-sm text-gray-500 font-normal">/mes</span></p>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 border border-gray-200">
-                    <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900">Dominio personalizado</h3>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">+$25<span class="text-sm text-gray-500 font-normal">/mes</span></p>
-                </div>
-            </div>
+    {{-- Custom plan (replaces Enterprise card on public pricing) --}}
+    <section class="py-16 bg-gray-50 border-y border-gray-100">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-900 mb-3">{{ __('public.custom_plan_title') }}</h2>
+            <p class="text-gray-600 mb-6">{{ __('public.custom_plan_body') }}</p>
+            <a href="{{ route('contact', ['subject' => 'enterprise']) }}"
+               class="inline-flex items-center justify-center px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl transition">
+                {{ __('public.custom_plan_cta') }}
+            </a>
         </div>
     </section>
 

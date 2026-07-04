@@ -40,6 +40,8 @@ return [
     // Plan descriptions
     'free_description' => 'To get started',
     'solo_description' => 'For individual doctors',
+    'practica_description' => 'For clinics with multiple doctors',
+    'clinica_description' => 'For medium clinics and established practices',
     'group_description' => 'For medical groups',
     'enterprise_description' => 'For large clinics',
 
@@ -57,9 +59,14 @@ return [
     'feature' => 'Feature',
 
     // Comparison row labels
+    'row_doctors' => 'Doctors included',
+    'row_staff' => 'Staff included',
     'row_users' => 'Users included',
     'row_patients' => 'Patients',
     'row_appointments' => 'Appointments per month',
+    'row_medical_records' => 'Medical records',
+    'row_prescriptions' => 'Prescriptions',
+    'row_reports' => 'Reports',
     'row_email_reminders' => 'Email reminders',
     'row_sms_reminders' => 'SMS reminders',
     'row_whatsapp_reminders' => 'WhatsApp reminders',

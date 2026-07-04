@@ -12,7 +12,7 @@
     <footer class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <p class="text-center text-xs text-gray-500 dark:text-gray-400">
-                {{ __('public.app_footer_brand', ['app' => $appName]) }}
+                <x-brand-credit :app="$appName" link-class="underline hover:text-gray-700 dark:hover:text-gray-200" />
             </p>
         </div>
     </footer>
@@ -33,7 +33,9 @@
                         @endif
                     </a>
                     <p class="text-sm">{{ __('public.footer_tagline') }}</p>
-                    <p class="text-xs text-gray-500 mt-3">{{ __('public.footer_brand_line', ['app' => $appName]) }}</p>
+                    <p class="text-xs text-gray-500 mt-3">
+                        <x-brand-credit :app="$appName" link-class="underline hover:text-gray-300" />
+                    </p>
                 </div>
 
                 <div>

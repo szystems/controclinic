@@ -3,23 +3,7 @@
 ])
 
 @php
-    $comparisonRows = [
-        'row_users',
-        'row_patients',
-        'row_appointments',
-        'row_email_reminders',
-        'row_sms_reminders',
-        'row_whatsapp_reminders',
-        'row_booking',
-        'row_basic_reports',
-        'row_advanced_reports',
-        'row_custom_branding',
-        'row_api',
-        'row_white_label',
-        'row_email_support',
-        'row_priority_support',
-        'row_24_7_support',
-    ];
+    $comparisonRows = \App\Models\Plan::publicComparisonRows();
 
     $popularIndex = null;
     foreach ($plans as $i => $plan) {

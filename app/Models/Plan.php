@@ -10,6 +10,42 @@ class Plan extends Model
 {
     use HasFactory;
 
+    /**
+     * Features shown on public pricing (v1 — exclude roadmap items like AI, SMS, API).
+     *
+     * @var list<string>
+     */
+    public const V1_FEATURE_KEYS = [
+        'basic_forms',
+        'basic_portal',
+        'custom_portal',
+        'multi_doctor_portal',
+        'booking',
+        'booking_advanced',
+        'audit_logs',
+        '2fa',
+        'compliance',
+    ];
+
+    /**
+     * Comparison rows for public pricing table (limits + v1 capabilities only).
+     *
+     * @return list<string>
+     */
+    public static function publicComparisonRows(): array
+    {
+        return [
+            'row_doctors',
+            'row_staff',
+            'row_patients',
+            'row_appointments',
+            'row_medical_records',
+            'row_prescriptions',
+            'row_reports',
+            'row_email_support',
+        ];
+    }
+
     protected $fillable = [
         'name',
         'slug',
@@ -105,6 +141,14 @@ class Plan extends Model
                 $q->where('is_private', false)
                     ->orWhereIn('slug', $unlocked);
             });
+    }
+
+    /**
+     * Plans on the public /pricing page (excludes enterprise until custom quoting exists).
+     */
+    public function scopeForPublicPricing($query)
+    {
+        return $query->active()->public()->where('is_enterprise', false);
     }
 
     public static function findByAccessCode(string $code): ?self
@@ -269,45 +313,73 @@ class Plan extends Model
     }
 
     /**
-     * Generate display features list from plan limits + feature keys.
-     * Returns translated strings ready for display.
+     * Generate display features from DB limits + v1 feature keys (or highlight_features override).
+     *
+     * @return list<string>
      */
     public function getDisplayFeaturesAttribute(): array
     {
-        $items = [];
-
-        // Users
-        $totalUsers = $this->total_users;
-        if ($totalUsers === null) {
-            $items[] = __('features.users_unlimited');
-        } else {
-            $items[] = trans_choice('features.users_count', $totalUsers);
+        if (! empty($this->highlight_features)) {
+            return collect($this->highlight_features)
+                ->map(fn ($key) => $this->translateFeatureKey((string) $key))
+                ->filter()
+                ->values()
+                ->all();
         }
 
-        // Patients
+        $items = [];
+
+        if ($this->max_doctors === null) {
+            $items[] = __('features.doctors_unlimited');
+        } elseif ($this->max_doctors > 0) {
+            $items[] = trans_choice('features.doctors_count', $this->max_doctors, ['count' => $this->max_doctors]);
+        }
+
+        if ($this->max_staff === null) {
+            $items[] = __('features.staff_unlimited');
+        } elseif ($this->max_staff > 0) {
+            $items[] = trans_choice('features.staff_count', $this->max_staff, ['count' => $this->max_staff]);
+        }
+
         if ($this->max_patients === null) {
             $items[] = __('features.patients_unlimited');
         } else {
             $items[] = __('features.patients_count', ['count' => $this->max_patients]);
         }
 
-        // Appointments
         if ($this->max_appointments_per_month === null) {
             $items[] = __('features.appointments_unlimited');
         } else {
             $items[] = __('features.appointments_count', ['count' => $this->max_appointments_per_month]);
         }
 
-        // Feature keys from JSON
-        foreach ($this->features ?? [] as $featureKey) {
-            $translated = __("features.{$featureKey}");
-            // Only add if translation exists (not the key itself)
-            if ($translated !== "features.{$featureKey}") {
+        foreach ($this->v1FeatureKeys() as $featureKey) {
+            $translated = $this->translateFeatureKey($featureKey);
+            if ($translated) {
                 $items[] = $translated;
             }
         }
 
         return $items;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function v1FeatureKeys(): array
+    {
+        return array_values(array_intersect($this->features ?? [], self::V1_FEATURE_KEYS));
+    }
+
+    protected function translateFeatureKey(string $featureKey): ?string
+    {
+        if (! in_array($featureKey, self::V1_FEATURE_KEYS, true)) {
+            return null;
+        }
+
+        $translated = __("features.{$featureKey}");
+
+        return $translated !== "features.{$featureKey}" ? $translated : null;
     }
 
     /**
@@ -317,27 +389,37 @@ class Plan extends Model
     public function getComparisonValue(string $row): string|bool
     {
         return match ($row) {
-            'row_users' => $this->total_users === null
-                ? __('features.users_unlimited')
-                : (string) $this->total_users,
+            'row_doctors' => $this->max_doctors === null
+                ? __('features.doctors_unlimited')
+                : (string) $this->max_doctors,
+            'row_staff' => $this->max_staff === null
+                ? __('features.staff_unlimited')
+                : (string) $this->max_staff,
             'row_patients' => $this->max_patients === null
                 ? __('features.patients_unlimited')
                 : (string) $this->max_patients,
             'row_appointments' => $this->max_appointments_per_month === null
                 ? __('features.appointments_unlimited')
                 : (string) $this->max_appointments_per_month,
-            'row_email_reminders' => $this->hasFeature('booking') || $this->hasFeature('booking_advanced') || $this->is_enterprise,
-            'row_sms_reminders' => $this->hasFeature('booking_advanced') || $this->is_enterprise,
-            'row_whatsapp_reminders' => $this->is_enterprise,
-            'row_booking' => $this->hasFeature('booking') || $this->hasFeature('booking_advanced'),
-            'row_basic_reports' => $this->hasFeature('booking') || $this->hasFeature('booking_advanced') || $this->is_enterprise,
-            'row_advanced_reports' => $this->hasFeature('audit_logs') || $this->is_enterprise,
-            'row_custom_branding' => $this->hasFeature('multi_doctor_portal') || $this->is_enterprise,
-            'row_api' => $this->hasFeature('api'),
-            'row_white_label' => $this->hasFeature('white_label'),
+            'row_medical_records' => true,
+            'row_prescriptions' => ! $this->is_free,
+            'row_reports' => true,
             'row_email_support' => true,
-            'row_priority_support' => $this->hasFeature('audit_logs') || $this->is_enterprise,
-            'row_24_7_support' => $this->is_enterprise,
+            // Legacy rows (kept for backwards compatibility if referenced elsewhere)
+            'row_users' => $this->total_users === null
+                ? __('features.users_unlimited')
+                : (string) $this->total_users,
+            'row_email_reminders' => $this->hasFeature('booking') || $this->hasFeature('booking_advanced'),
+            'row_sms_reminders' => false,
+            'row_whatsapp_reminders' => false,
+            'row_booking' => $this->hasFeature('booking') || $this->hasFeature('booking_advanced'),
+            'row_basic_reports' => true,
+            'row_advanced_reports' => $this->hasFeature('audit_logs'),
+            'row_custom_branding' => $this->hasFeature('custom_portal') || $this->hasFeature('multi_doctor_portal'),
+            'row_api' => false,
+            'row_white_label' => false,
+            'row_priority_support' => false,
+            'row_24_7_support' => false,
             default => false,
         };
     }

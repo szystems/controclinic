@@ -107,7 +107,6 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('home') }}#features" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_features') }}</a>
                     <a href="{{ route('pricing') }}" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_pricing') }}</a>
-                    <a href="{{ route('home') }}#testimonials" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_testimonials') }}</a>
                     <a href="{{ route('contact') }}" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_contact') }}</a>
                 </div>
 
@@ -168,7 +167,6 @@
                 <div class="flex flex-col space-y-4">
                     <a href="{{ route('home') }}#features" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_features') }}</a>
                     <a href="{{ route('pricing') }}" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_pricing') }}</a>
-                    <a href="{{ route('home') }}#testimonials" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_testimonials') }}</a>
                     <a href="{{ route('contact') }}" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('public.nav_contact') }}</a>
                     <hr class="border-gray-100">
                     @auth

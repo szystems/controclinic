@@ -40,6 +40,8 @@ return [
     // Plan descriptions
     'free_description' => 'Para empezar a probar',
     'solo_description' => 'Para médicos individuales',
+    'practica_description' => 'Para clínicas con varios doctores',
+    'clinica_description' => 'Para clínicas medianas y consultorios consolidados',
     'group_description' => 'Para grupos médicos',
     'enterprise_description' => 'Para clínicas grandes',
 
@@ -57,9 +59,14 @@ return [
     'feature' => 'Característica',
 
     // Comparison row labels
+    'row_doctors' => 'Doctores incluidos',
+    'row_staff' => 'Personal incluido',
     'row_users' => 'Usuarios incluidos',
     'row_patients' => 'Pacientes',
     'row_appointments' => 'Citas por mes',
+    'row_medical_records' => 'Historiales clínicos',
+    'row_prescriptions' => 'Recetas médicas',
+    'row_reports' => 'Reportes',
     'row_email_reminders' => 'Recordatorios email',
     'row_sms_reminders' => 'Recordatorios SMS',
     'row_whatsapp_reminders' => 'Recordatorios WhatsApp',

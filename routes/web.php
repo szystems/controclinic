@@ -126,7 +126,7 @@ Route::get('/', function () {
 
 Route::get('/pricing', function () {
     return view('public.pricing', [
-        'plans' => Plan::active()->public()->ordered()->get(),
+        'plans' => Plan::forPublicPricing()->ordered()->get(),
     ]);
 })->name('pricing');
 

@@ -18,7 +18,7 @@ return [
     // Home hero
     'home_hero_title' => 'Run your clinic',
     'home_hero_highlight' => 'without the hassle',
-    'home_hero_subtitle' => 'All-in-one software for medical clinics. Schedule appointments, manage patients, send reminders, and grow your practice.',
+    'home_hero_subtitle' => 'All-in-one software for medical clinics. Schedule appointments, manage patients, medical records, and prescriptions in one place.',
     'home_cta_start' => 'Start Free',
     'home_cta_demo' => 'Watch Demo',
     'home_trust_no_card' => 'No credit card',
@@ -27,12 +27,29 @@ return [
 
     // Home CTA section
     'home_cta_title' => 'Ready to modernize your clinic?',
-    'home_cta_body' => 'Join hundreds of doctors who already streamlined their practice with ControClinic. Start free today.',
+    'home_cta_body' => 'Set up your clinic in minutes and try it with the permanent Free plan—no card required.',
     'home_cta_button' => 'Create my free account',
     'home_cta_pricing' => 'View Pricing',
 
-    // Testimonial
-    'home_testimonial_3_quote' => 'I started on the Free plan and loved it. The price is very accessible for an independent doctor like me. Support always responds quickly.',
+    // Home features (v1)
+    'home_features_title' => 'Everything your clinic needs',
+    'home_features_subtitle' => 'Features available today—no roadmap promises.',
+    'home_feat_calendar_title' => 'Appointment scheduling',
+    'home_feat_calendar_body' => 'Per-doctor calendar, appointment statuses, and email reminders.',
+    'home_feat_patients_title' => 'Patient management',
+    'home_feat_patients_body' => 'Records, contact info, and clinical data organized per clinic.',
+    'home_feat_records_title' => 'Medical records',
+    'home_feat_records_body' => 'Consultation notes, diagnoses, and follow-up in one place.',
+    'home_feat_prescriptions_title' => 'Prescriptions',
+    'home_feat_prescriptions_body' => 'Issue and review prescriptions linked to the patient chart.',
+
+    // Brand
+    'product_of' => 'A product of',
+
+    // Custom plan (public pricing)
+    'custom_plan_title' => 'Need more capacity?',
+    'custom_plan_body' => 'If your clinic outgrows our standard plans, contact us and we will put together a custom proposal.',
+    'custom_plan_cta' => 'Contact sales',
 
     // Pricing
     'pricing_title' => 'Simple plans, transparent pricing',
@@ -72,9 +89,5 @@ return [
     'footer_contact' => 'Contact',
     'footer_privacy' => 'Privacy',
     'footer_terms' => 'Terms of Use',
-    'footer_brand_line' => ':app · A product of SZ Systems · Victoria, BC',
     'footer_copyright' => '© :year :app. All rights reserved.',
-
-    // App footer
-    'app_footer_brand' => ':app · A product of SZ Systems · Victoria, BC',
 ];

@@ -29,10 +29,15 @@ class PublicLandingTest extends TestCase
 
     public function test_home_and_pricing_show_brand_footer(): void
     {
-        $brandLine = __('public.footer_brand_line', ['app' => 'ControClinic']);
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Szystems', false)
+            ->assertSee('https://szystems.com', false);
 
-        $this->get(route('home'))->assertOk()->assertSee($brandLine, false);
-        $this->get(route('pricing'))->assertOk()->assertSee($brandLine, false);
+        $this->get(route('pricing'))
+            ->assertOk()
+            ->assertSee('Szystems', false)
+            ->assertSee('https://szystems.com', false);
     }
 
     public function test_pricing_faq_uses_freemium_copy_not_trial(): void
@@ -50,10 +55,21 @@ class PublicLandingTest extends TestCase
     {
         $this->get(route('pricing'))
             ->assertOk()
+            ->assertSee('Free', false)
             ->assertSee('Solo', false)
             ->assertSee('Práctica', false)
             ->assertSee('Clínica', false)
-            ->assertSee('Enterprise', false);
+            ->assertDontSee('Enterprise', false)
+            ->assertSee(__('public.custom_plan_title'), false);
+    }
+
+    public function test_pricing_cards_show_doctor_limits_from_database(): void
+    {
+        $this->get(route('pricing'))
+            ->assertOk()
+            ->assertSee(__('features.doctors_count', ['count' => 1]), false)
+            ->assertSee(__('features.doctors_count', ['count' => 3]), false)
+            ->assertSee(__('features.doctors_count', ['count' => 8]), false);
     }
 
     public function test_pricing_page_hides_private_plans(): void

@@ -18,7 +18,7 @@ return [
     // Home hero
     'home_hero_title' => 'Gestiona tu clínica',
     'home_hero_highlight' => 'sin complicaciones',
-    'home_hero_subtitle' => 'El software todo-en-uno para clínicas médicas. Agenda citas, gestiona pacientes, envía recordatorios y haz crecer tu práctica médica.',
+    'home_hero_subtitle' => 'El software todo-en-uno para clínicas médicas. Agenda citas, gestiona pacientes, historiales clínicos y recetas en un solo lugar.',
     'home_cta_start' => 'Comenzar Gratis',
     'home_cta_demo' => 'Ver Demo',
     'home_trust_no_card' => 'Sin tarjeta de crédito',
@@ -27,12 +27,29 @@ return [
 
     // Home CTA section
     'home_cta_title' => '¿Listo para modernizar tu clínica?',
-    'home_cta_body' => 'Únete a cientos de médicos que ya optimizaron su práctica con ControClinic. Comienza gratis hoy.',
+    'home_cta_body' => 'Crea tu clínica en minutos y pruébalo con el plan Free, sin tarjeta ni límite de tiempo.',
     'home_cta_button' => 'Crear mi cuenta gratis',
     'home_cta_pricing' => 'Ver Precios',
 
-    // Testimonial (freemium-aligned)
-    'home_testimonial_3_quote' => 'Empecé con el plan Free y quedé encantado. El precio es muy accesible para un médico independiente como yo. El soporte siempre responde rápido.',
+    // Home features (v1)
+    'home_features_title' => 'Todo lo que necesitas para tu clínica',
+    'home_features_subtitle' => 'Funciones disponibles hoy, sin promesas de roadmap.',
+    'home_feat_calendar_title' => 'Agenda de citas',
+    'home_feat_calendar_body' => 'Calendario por doctor, estados de cita y recordatorios por correo.',
+    'home_feat_patients_title' => 'Gestión de pacientes',
+    'home_feat_patients_body' => 'Expediente, contacto y datos clínicos organizados por clínica.',
+    'home_feat_records_title' => 'Historiales clínicos',
+    'home_feat_records_body' => 'Notas de consulta, diagnósticos y seguimiento en un solo lugar.',
+    'home_feat_prescriptions_title' => 'Recetas médicas',
+    'home_feat_prescriptions_body' => 'Emite y consulta recetas vinculadas al historial del paciente.',
+
+    // Brand
+    'product_of' => 'Un producto de',
+
+    // Custom plan (public pricing)
+    'custom_plan_title' => '¿Necesitas más capacidad?',
+    'custom_plan_body' => 'Si tu clínica supera los planes estándar, contáctanos y armamos una propuesta a medida.',
+    'custom_plan_cta' => 'Contactar ventas',
 
     // Pricing
     'pricing_title' => 'Planes simples, precios transparentes',
@@ -72,9 +89,5 @@ return [
     'footer_contact' => 'Contacto',
     'footer_privacy' => 'Privacidad',
     'footer_terms' => 'Términos de Uso',
-    'footer_brand_line' => ':app · A product of SZ Systems · Victoria, BC',
     'footer_copyright' => '© :year :app. Todos los derechos reservados.',
-
-    // App footer (compact)
-    'app_footer_brand' => ':app · A product of SZ Systems · Victoria, BC',
 ];
