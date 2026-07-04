@@ -239,7 +239,7 @@
         <x-skeleton-card wire:loading :count="6" :lines="3" />
         <div wire:loading.remove class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($files as $file)
-                <div class="group relative rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-md transition-shadow">
+                <div class="group relative flex flex-col h-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-md transition-shadow">
                     {{-- Thumbnail / type preview --}}
                     @if($file->isImage())
                         <a href="{{ route('app.patient-files.show', ['clinic' => $currentClinic->slug, 'file' => $file->id]) }}"
@@ -265,7 +265,7 @@
                         </div>
                     @endif
 
-                    <div class="p-4">
+                    <div class="flex flex-col flex-1 p-4">
                     {{-- Category badge --}}
                     <div class="flex items-start justify-between mb-3">
                         <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full
@@ -303,7 +303,7 @@
                     @endif
 
                     {{-- Meta --}}
-                    <div class="text-xs text-gray-400 dark:text-gray-500 space-y-0.5 mb-3">
+                    <div class="text-xs text-gray-400 dark:text-gray-500 space-y-0.5">
                         <div>{{ $file->created_at->format('d/m/Y H:i') }}</div>
                         @if($file->uploadedBy)
                             <div>{{ $file->uploadedBy->name }}</div>
@@ -311,7 +311,7 @@
                     </div>
 
                     {{-- Actions --}}
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 mt-auto pt-4">
                         @if($file->isImage() || $file->isPdf())
                             <a href="{{ route('app.patient-files.show', ['clinic' => $currentClinic->slug, 'file' => $file->id]) }}"
                                target="_blank"
