@@ -1,8 +1,8 @@
 # 📝 Tareas — Ruta a v1.0
 
-> Actualizado: 2026-06-27
+> Actualizado: 2026-07-04
 > **Orden de ejecución:** ver [LAUNCH-PLAN.md](LAUNCH-PLAN.md) (documento maestro).
-> Estado: 588 tests · Pint clean · Módulos clínicos completos · Objetivo **1.0.0**
+> Estado: ~591 tests · Módulos clínicos completos · Objetivo **1.0.0**
 
 Leyenda: `[ ]` pendiente · `[~]` en progreso · `[x]` hecho
 
@@ -23,17 +23,33 @@ Leyenda: `[ ]` pendiente · `[~]` en progreso · `[x]` hecho
 - [x] `docker/php/entrypoint.sh` + `entrypoint-worker.sh`
 - [x] `docker-compose.coolify.yml` — servicios prefijados `controclinic-*`
 - [x] `docker/nginx/Dockerfile.coolify` — nginx config embebida (fix bind mount Coolify)
+- [x] Volumen nginx `app_storage` + `location /storage/` (uploads prod)
 - [x] `config/*.php`: `env('VAR') ?: 'default'` · `trustProxies(at:'*')`
 
 ### A.3 — Deploy y cutover
 - [x] App en Coolify · env secretas (APP_KEY, DB_*)
-- [ ] Smoke test prod: login, uploads, queue, scheduler, registro
+- [~] Smoke test prod (ver desglose A8 abajo)
 - [x] FQDN Coolify: `https://controclinic.com,https://www.controclinic.com`
 - [x] Cutover DNS A → `5.78.235.235`
-- [ ] **Resend** (`MAIL_*`) operativo · probar emails transaccionales
-- [ ] Snapshot Hetzner post-deploy
+- [x] **Resend** (`MAIL_*`) operativo · `php artisan mail:test` (A10)
+- [ ] Snapshot Hetzner post-deploy (A11 — manual en consola)
+- [x] Script + systemd post-deploy Traefik health (A12)
 
 Detalle operativo: [DEPLOYMENT.md](DEPLOYMENT.md)
+
+### A.8 — Smoke test prod (desglose)
+- [x] Login / HTTPS / health `/up`
+- [x] Registro (fix mail sin SMTP en prod)
+- [x] Uploads archivos (`/storage/`)
+- [x] Onboarding completo (fix pantalla negra, stepper móvil)
+- [x] Locale silencioso (registro + onboarding + settings)
+- [x] Perfil clínica `/app/{slug}/profile`
+- [x] UX listados (timezones, tipos doc, menús tablas)
+- [x] Plantillas consulta — checklist + guía setup + auto-carga default
+- [x] Queue worker procesando jobs en prod (`ops:health --queue`)
+- [x] Scheduler heartbeat (`ops:health` + cache `ops.scheduler_last_run`)
+- [x] Emails transaccionales Resend SMTP verificado
+- [ ] Rotar credenciales expuestas en chat (Resend, admin password)
 
 ---
 
@@ -85,23 +101,21 @@ Detalle operativo: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## Fase G — Panel Admin operaciones → [LAUNCH-PLAN § G](LAUNCH-PLAN.md#fase-g--panel-admin-operaciones-de-plataforma)
 
-> **Prioridad:** alta · **Momento:** tras A8, antes de F1 · Paralelo con B/C
+> **Estado código:** ✅ implementado (`4b9f350`) · **Pendiente:** verificar en prod + cambiar password default
 
 ### G.1 — CRUD Super Admins
-- [ ] `Admin/Users/Index` — listar usuarios `is_super_admin=true` (nombre, email, activo, último login)
-- [ ] `Admin/Users/Create` — alta super admin (password temporal o generada)
-- [ ] `Admin/Users/Edit` — editar nombre, email, `is_active`; reset password por otro admin
-- [ ] Eliminar/desactivar — soft delete; guard: no último admin, no auto-eliminación
-- [ ] Rutas + nav en `layouts/admin.blade.php`
-- [ ] `SuperAdminPolicy` + activity log + tests
+- [x] `Admin/Users/Index` — listar usuarios `is_super_admin=true`
+- [x] `Admin/Users/Create` — alta super admin
+- [x] `Admin/Users/Edit` — editar nombre, email, `is_active`; reset password
+- [x] Eliminar/desactivar — guards último admin / auto-eliminación
+- [x] Rutas + nav en `layouts/admin.blade.php`
+- [x] Tests `AdminSuperAdminsTest`
 
 ### G.2 — Perfil y contraseña (usuario en sesión en `/admin`)
-- [ ] `Admin/Profile` — cambiar contraseña (actual + nueva + confirmar)
-- [ ] Enlace "Mi cuenta" en menú usuario admin (hoy solo logout)
-- [ ] Reutilizar lógica de `App\Livewire\App\Profile\Index::updatePassword()`
-- [ ] Tests perfil admin
-
-**Nota:** usuarios de clínica ya tienen cambio de contraseña en `/app/{clinic}/profile` — no duplicar ahí.
+- [x] `Admin/Profile` — cambiar contraseña
+- [x] Enlace "Mi cuenta" en menú usuario admin
+- [x] Tests perfil admin
+- [ ] Cambiar password default super admin en prod
 
 ---
 
@@ -128,4 +142,4 @@ MRR/ARR/churn · SMS/WhatsApp · Social login · Múltiples sedes · App móvil 
 
 ## 📌 Historial — Sprints completados (pre-v1)
 
-Sprints A→G · Bloque 0 · v1.3 (2FA) · v1.4 (SOAP, archivos, agenda, catálogo) · F.1–F.10 · G.1–G.5
+Sprints A→G · Bloque 0 · v1.3 (2FA) · v1.4 (SOAP, archivos, agenda, catálogo) · F.1–F.10 · G.1–G.5 · **2026-07-04:** A8 UX, locale, plantillas onboarding, perfil fix

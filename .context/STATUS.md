@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-06-27
-> **Fase actual:** 🟡 **Fase A** (~85%) + **Fase G** identificada (ver [LAUNCH-PLAN.md](LAUNCH-PLAN.md))
-> **Siguiente paso:** **A8** smoke test prod · **G** CRUD super admins + cambio contraseña en panel admin
-> **Métricas:** 588 tests · 1270 assertions · Pint clean
+> **Última actualización:** 2026-07-04
+> **Fase actual:** 🟡 **Fase A** (~98%) — solo snapshot Hetzner (A11 manual)
+> **Siguiente paso:** **Fase B** (planes BD) + **Fase C** (copy freemium)
+> **Métricas:** ~591 tests · Pint clean (local sin PHP; verificar en CI/prod)
 > **Stack:** Laravel 12 · Livewire 3 · Alpine.js · Tailwind · MySQL 8
 > **Producción:** ✅ `https://controclinic.com` · Hetzner `5.78.235.235` + Coolify + Cloudflare
 
@@ -13,12 +13,12 @@
 
 | Fase | Nombre | Estado |
 |------|--------|--------|
-| **A** | Infraestructura y dominio | 🟡 ~85% |
+| **A** | Infraestructura y dominio | 🟡 ~98% |
 | **B** | Planes BD — fuente única | 🔜 |
 | **C** | Marca y mensaje freemium | 🔜 |
 | **D** | Paddle — monetización | 🔜 |
 | **E** | Legal, marketing, szystems.com | 🔜 |
-| **G** | Panel Admin — operaciones plataforma | 🔜 |
+| **G** | Panel Admin — operaciones plataforma | ✅ código listo (verificar prod) |
 | **F** | Go-live → **v1.0.0** | 🔜 |
 
 Seguimiento detallado: **[LAUNCH-PLAN.md](LAUNCH-PLAN.md)** · Tareas: [TASKS.md](TASKS.md)
@@ -29,7 +29,7 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 
 ---
 
-## 🌐 Producción — deploy 2026-06-27
+## 🌐 Producción — sesión 2026-07-04
 
 | Item | Estado |
 |------|--------|
@@ -37,12 +37,55 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 | Coolify app | ✅ `controclinic:main-ybwfwifzqp47cu1et7pi0vz6` |
 | Contenedores | ✅ app, webserver, mysql, redis, queue, scheduler |
 | Health check | ✅ `/up` → 200 |
-| Login | ✅ `/login` → 200 |
-| Seed prod | 🟡 Roles + planes + super admin (DemoClinicSeeder falló — `fake()` no en prod) |
-| MAIL saliente | ❌ Resend pendiente |
-| Password admin prod | ⚠️ Default del seeder — **bloqueado hasta Fase G2** |
+| Login / app | ✅ Operativo (post-deploy requiere restart proxy manual*) |
+| Uploads `/storage/` | ✅ Volumen nginx + location (commit `aa0fe5c`) |
+| Seed prod | 🟡 Roles + planes + super admin (DemoClinicSeeder no en prod) |
+| MAIL saliente | ✅ Resend SMTP · `php artisan mail:test` |
+| Post-deploy auto | ✅ `scripts/post-deploy-health.sh` + systemd watcher |
+| Password admin prod | ⚠️ Cambiar vía `/admin/profile` si no lo hiciste |
 
-**Gap operativo:** panel `/admin` sin módulo de super admins ni cambio de contraseña en sesión (usuarios clínica sí tienen `/app/profile`).
+**\*Gap operativo recurrente:** tras deploy Coolify, Traefik (`coolify-proxy`) a veces queda sin backend → **503 "no available server"**. Fix manual: `docker restart coolify-proxy controclinic-webserver`. **Pendiente:** automatizar post-deploy health check + restart.
+
+**Últimos deploys:** `8882d3a` plantillas onboarding · `a5952ad` fix perfil 500 · `5c86307` onboarding pantalla negra · `cd5a6da` locale silencioso · `e046f8a` smoke A8 UX.
+
+---
+
+## ✅ Sesión 2026-07-04 — Smoke test A8 + UX clínica
+
+### Infra / estabilidad
+- **Uploads prod** — volumen `app_storage` en nginx + `location /storage/`
+- **Errores consola** — Paddle solo en billing; atajos teclado sin listeners duplicados
+- **HTTPS post-deploy** — patrón Traefik desincronizado documentado; restart manual funciona
+
+### Onboarding y locale
+- **Detección locale silenciosa** (`ClinicLocaleResolver`) — CF-IPCountry + Accept-Language + timezone browser; fallback US
+- **Onboarding pantalla negra** — tour Driver.js desactivado en wizard; spinner `wire:loading`; timezone solo paso 2
+- **Stepper móvil** responsive en onboarding
+
+### UX smoke test (A8)
+- **Zonas horarias** unificadas (`config/timezones.php`, `<x-timezone-select>`)
+- **Tipos documento** internacionales (`<x-patient-id-type-select>`)
+- **Menú puntitos** tablas — `<x-table-row-menu>`, sin `overflow-hidden` que cortaba
+- **Perfil clínica** — ruta `app.profile`; fix layout Livewire (`->layout('layouts.app')`)
+- **Perfil 500** corregido en prod
+
+### Plantillas de consulta — onboarding (commit `8882d3a`) ✅
+- **Setup Checklist** — paso 7: "Crea tu primera plantilla" (entre horarios y primer paciente)
+- **Guía en `/settings/templates?from=setup`** — banner educativo + plantilla sugerida "Consulta general"
+- **Recordatorio** en formulario nueva consulta cuando no hay plantillas
+- **Auto-carga** plantilla predeterminada al crear consulta (alinea copy existente)
+- Tests: `SetupChecklistTest`, `RecordTemplatesTest` ampliados
+
+---
+
+## ✅ Fase G — Panel Admin operaciones (código — commit `4b9f350`)
+
+| Item | Estado |
+|------|--------|
+| CRUD Super Admins | ✅ `Admin/Users/{Index,Create,Edit}` |
+| Perfil admin + cambio contraseña | ✅ `Admin/Profile/Index` |
+| Tests | ✅ `AdminSuperAdminsTest` |
+| Verificar en prod | 🟡 Cambiar password default super admin |
 
 ---
 
@@ -69,8 +112,9 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 
 ## ✅ Sprint F — UX & Onboarding (COMPLETADO 2026-05-21)
 
-### F.1 — Setup Checklist ✅ (2026-05-20)
-- `App\Livewire\App\Dashboard\SetupChecklist` — 6 pasos, anillo SVG, collapsible/dismissible
+### F.1 — Setup Checklist ✅ (2026-05-20, ampliado 2026-07-04)
+- `App\Livewire\App\Dashboard\SetupChecklist` — **7 pasos**, anillo SVG, collapsible/dismissible
+- Pasos: logo · horarios · **plantilla consulta** · paciente · cita · staff · página pública
 - Solo visible para owner. Traducciones `lang/{es,en}/setup_checklist.php`
 
 ### F.2 — Empty States ✅ (2026-05-20)
@@ -164,8 +208,8 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 | Recetas | ✅ Módulo básico | PrescriptionsTest (por revisar en G.5) |
 | Reportes | ✅ Gráficas + CSV export | ReportsTest |
 | Staff | ✅ Index, Create, Edit, permisos custom, invitaciones | StaffManagementTest, ExportTest |
-| Settings | ✅ General, Catálogo, Plantillas SOAP, Página Pública | RecordTemplatesTest |
-| Admin | ✅ Dashboard, Clínicas, Planes, Settings · ❌ Super Admins CRUD · ❌ perfil/contraseña en `/admin` | AdminPanelTest |
+| Settings | ✅ General, Catálogo, Plantillas SOAP (+ guía setup), Página Pública | RecordTemplatesTest |
+| Admin | ✅ Dashboard, Clínicas, Planes, Settings, **Super Admins CRUD**, **/admin/profile** | AdminPanelTest, AdminSuperAdminsTest |
 | Perfil | ✅ Perfil, 2FA, Transferencia ownership | ProfileTest, ProfileActivityTest |
 | Agenda | ✅ Bloqueo horarios (doctor_unavailabilities) | DoctorScheduleTest |
 | Auditoría | ✅ AuditLog Index filtros + paginación | AuditLogTest |
@@ -181,10 +225,12 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 
 | Item | Estado | Razón |
 |------|--------|-------|
+| Post-deploy Traefik restart | ▶️ Fase A | 503 recurrente tras Coolify deploy — automatizar |
 | Paddle checkout | ▶️ Fase D | Business number obtenido · cuenta SZ Systems |
 | CI/CD + Deploy | ✅ Fase A (prod live) | Hetzner + Coolify |
-| Admin super users + password | ▶️ Fase G | Bloquea operación segura en prod |
+| Admin password prod | 🟡 Verificar | G2 implementado — cambiar en `/admin/profile` |
 | Métricas MRR/ARR/churn | Post-v1 | Requiere Paddle live con datos reales |
 | Social login | Diferido v2 | Incompatible con onboarding actual |
 | SMS/WhatsApp | Diferido | Costo operativo, pedir cuando haya clientes |
 | Múltiples sedes | Diferido | Schema listo, esperar demanda real |
+| Tour plantillas | Opcional | Mencionar plantillas en Driver.js (complemento al checklist) |

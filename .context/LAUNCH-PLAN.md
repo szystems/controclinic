@@ -1,7 +1,7 @@
 # 🚀 Plan de acción — ControClinic v1.0
 
 > **Documento maestro de seguimiento** hasta el lanzamiento público.
-> Actualizado: 2026-06-27 · Objetivo: **release 1.0.0**
+> Actualizado: 2026-07-04 · Objetivo: **release 1.0.0**
 > Detalle por área: [TASKS.md](TASKS.md) · Infra: [DEPLOYMENT.md](DEPLOYMENT.md) · ADRs: [DECISIONS.md](DECISIONS.md)
 
 ---
@@ -10,15 +10,15 @@
 
 | Fase | Nombre | Estado | Bloquea lanzamiento |
 |------|--------|--------|---------------------|
-| **A** | Infraestructura y dominio | 🟡 ~85% | Parcial (mail saliente + smoke test) |
+| **A** | Infraestructura y dominio | 🟡 ~92% | Parcial (Resend + snapshot + post-deploy) |
 | **B** | Planes BD — fuente única | 🔜 pendiente | Sí (límites y billing) |
 | **C** | Marca y mensaje freemium | 🔜 pendiente | Sí (confianza / conversión) |
 | **D** | Paddle — monetización | 🔜 pendiente | Sí (cobro real) |
 | **E** | Legal, marketing y szystems.com | 🔜 pendiente | Sí (apertura pública) |
-| **G** | Panel Admin — operaciones plataforma | 🔜 pendiente | Sí (seguridad operativa prod) |
+| **G** | Panel Admin — operaciones plataforma | ✅ código | Verificar prod + password |
 | **F** | Go-live y release 1.0.0 | 🔜 pendiente | Sí |
 
-**Siguiente paso:** **A8** (smoke test prod) en paralelo con **G** (admin usuarios + contraseña). Luego **A10** (Resend) y **B/C**.
+**Siguiente paso:** Cerrar **A8** (Resend A10, snapshot A11, queue/scheduler) → **B** + **C** en paralelo → **D** → **E** → **F**.
 
 ---
 
@@ -70,12 +70,13 @@ E (legal + marketing) ─┘
 | A5 | Código: `Dockerfile.prod`, `entrypoint.sh`, `docker-compose.coolify.yml` (`controclinic-*`) | Dev | [x] |
 | A6 | Código: `config/*.php` con `env() ?: default` · `trustProxies(at:'*')` | Dev | [x] |
 | A7 | Coolify: app ControClinic · env secretas · deploy exitoso | Dev | [x] |
-| A8 | Smoke test prod: login, registro, uploads, queue, scheduler, locale, HTTPS | Dev | [~] registro 500 corregido (mail sin SMTP) |
+| A8 | Smoke test prod: login, registro, uploads, onboarding, locale, perfil, plantillas, HTTPS | Dev | [~] mayoría OK · pendiente queue/scheduler/Resend |
 | A9 | DNS **A/@/www → 5.78.235.235** (proxied) · FQDN en Coolify | Usuario+Dev | [x] |
-| A10 | Configurar **Resend** (`MAIL_*`) en Coolify · probar reset password / email cita | Dev | [ ] |
-| A11 | Snapshot Hetzner post-deploy exitoso | Usuario | [ ] |
+| A10 | Configurar **Resend** (`MAIL_*`) en Coolify · `php artisan mail:test` | Dev | [x] |
+| A11 | Snapshot Hetzner post-deploy exitoso | Usuario | [ ] manual |
+| A12 | Post-deploy: health check + restart Traefik si 503 | Dev | [x] |
 
-**Producción (2026-06-27):** `https://controclinic.com/up` → 200 · 6 contenedores `controclinic-*` Up · Super Admin seedeado (`admin@controclinic.com` — **cambiar password vía Fase G2**).
+**Producción (2026-07-04):** `https://controclinic.com` operativo · deploy `8882d3a` · Super Admin: cambiar password en `/admin/profile`.
 
 **Web3Forms (formulario contacto):** mantener `szystemscorreos@outlook.com` — no bloqueante.
 
@@ -150,25 +151,19 @@ E (legal + marketing) ─┘
 ## Fase G — Panel Admin: operaciones de plataforma
 
 > Objetivo: operación segura del SaaS en producción — gestionar super admins y cuenta propia desde `/admin`.
-> **Momento ideal:** tras **A8** (smoke test), **antes de F1** (E2E go-live). Paralelo con **B/C**.
-> **Gap detectado (2026-06-27):** el panel admin tiene Dashboard, Clínicas, Planes y Settings, pero **no** CRUD de usuarios super admin ni cambio de contraseña del usuario en sesión. Los usuarios de clínica **sí** tienen cambio de contraseña en `/app/profile` (`App\Livewire\App\Profile\Index`).
+> **Estado (2026-07-04):** ✅ implementado en código (`4b9f350`). Pendiente: verificar en prod y rotar password default.
 
 | # | Tarea | Estado |
 |---|-------|--------|
-| G1 | **CRUD Super Admins** — `Admin/Users/Index`, `Create`, `Edit` · listar `is_super_admin=true` | [ ] |
-| G2 | Crear super admin: nombre, email, password temporal · email verificado · activity log | [ ] |
-| G3 | Editar super admin: nombre, email, `is_active` · reset password (admin → otro usuario) | [ ] |
-| G4 | Eliminar/desactivar super admin · soft delete · no eliminar último admin ni a uno mismo | [ ] |
-| G5 | **Perfil admin** — `Admin/Profile` o sección en layout admin: cambiar contraseña (actual + nueva + confirmar) | [ ] |
-| G6 | Nav admin: enlace "Mi cuenta" / "Cambiar contraseña" en menú usuario (hoy solo logout) | [ ] |
-| G7 | Policy `SuperAdminPolicy` · permisos · tests `AdminSuperAdminsTest` + perfil | [ ] |
-| G8 | Traducciones `lang/{es,en}/admin.php` · i18n completo | [ ] |
-
-**Notas técnicas:**
-- Rutas bajo `Route::prefix('admin')` + middleware `EnsureIsAdmin`.
-- Patrón Livewire: `app/Livewire/Admin/Users/{Index,Create,Edit}.php` (igual que Clinics/Plans).
-- Reutilizar validación de `App\Livewire\App\Profile\Index::updatePassword()` en G5.
-- Super admins pueden no tener `clinic_id`; no depender de rutas `/app/{clinic}/profile`.
+| G1 | **CRUD Super Admins** — `Admin/Users/Index`, `Create`, `Edit` | [x] |
+| G2 | Crear super admin: nombre, email, password | [x] |
+| G3 | Editar super admin: nombre, email, `is_active` · reset password | [x] |
+| G4 | Eliminar/desactivar super admin · guards último admin / self | [x] |
+| G5 | **Perfil admin** — cambiar contraseña | [x] |
+| G6 | Nav admin: enlace "Mi cuenta" | [x] |
+| G7 | Tests `AdminSuperAdminsTest` + perfil | [x] |
+| G8 | Traducciones `lang/{es,en}/admin.php` | [~] verificar cobertura |
+| G9 | Cambiar password super admin en prod | [ ] |
 
 ---
 

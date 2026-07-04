@@ -15,10 +15,14 @@ return [
     */
 
     /*
-    | When MAIL_HOST is not configured (e.g. before Resend setup), fall back to log
-    | so registration and notifications never 500 on a missing SMTP server.
+    | When mail is not configured, fall back to log so registration never 500s.
+    | Resend: SMTP (MAIL_HOST=smtp.resend.com) or native driver (RESEND_API_KEY).
     */
-    'default' => env('MAIL_HOST') ? (env('MAIL_MAILER') ?: 'smtp') : 'log',
+    'default' => match (true) {
+        filled(env('RESEND_API_KEY')) => env('MAIL_MAILER') ?: 'resend',
+        filled(env('MAIL_HOST')) => env('MAIL_MAILER') ?: 'smtp',
+        default => env('MAIL_MAILER') ?: 'log',
+    },
 
     /*
     |--------------------------------------------------------------------------
