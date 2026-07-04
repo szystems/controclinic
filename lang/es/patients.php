@@ -199,6 +199,7 @@ return [
     'tab_facturacion' => 'Facturación',
     'tab_notas' => 'Notas internas',
     'tab_actividad' => 'Actividad',
+    'tab_count' => ':count registros',
     'no_internal_notes' => 'No hay notas internas registradas.',
     'add_internal_notes' => 'Agregar notas internas',
     'no_activity' => 'Sin actividad registrada.',

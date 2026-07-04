@@ -4,6 +4,7 @@ namespace App\Livewire\App\Patients;
 
 use App\Models\Invoice;
 use App\Models\Patient;
+use App\Models\PatientFile;
 use App\Models\Prescription;
 use App\Models\Tag;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -40,6 +41,16 @@ class Show extends Component
         'actividad' => 'patients.view',
     ];
 
+    /** Pestañas que muestran contador de registros */
+    public const COUNTABLE_TABS = [
+        'citas',
+        'historial',
+        'recetas',
+        'archivos',
+        'facturacion',
+        'actividad',
+    ];
+
     public function mount(Patient $patient): void
     {
         abort_if($patient->clinic_id !== app('current_clinic')->id, 404);
@@ -57,6 +68,48 @@ class Show extends Component
         if (array_key_exists($tab, self::TABS)) {
             $this->tab = $tab;
         }
+    }
+
+    public function getTabCountsProperty(): array
+    {
+        $user = auth()->user();
+        $counts = [];
+
+        $this->patient->loadCount([
+            'appointments',
+            'medicalRecords',
+            'prescriptions',
+            'files',
+            'invoices',
+        ]);
+
+        if ($user->can('appointments.view')) {
+            $counts['citas'] = $this->patient->appointments_count;
+        }
+
+        if ($user->can('records.view')) {
+            $counts['historial'] = $this->patient->medical_records_count;
+        }
+
+        if ($user->can('prescriptions.view')) {
+            $counts['recetas'] = $this->patient->prescriptions_count;
+        }
+
+        if ($user->can('viewAny', PatientFile::class)) {
+            $counts['archivos'] = $this->patient->files_count;
+        }
+
+        if ($user->can('invoices.view')) {
+            $counts['facturacion'] = $this->patient->invoices_count;
+        }
+
+        if ($user->can('patients.view')) {
+            $counts['actividad'] = Activity::where('subject_type', Patient::class)
+                ->where('subject_id', $this->patient->id)
+                ->count();
+        }
+
+        return $counts;
     }
 
     public function confirmDelete(): void
@@ -295,6 +348,7 @@ class Show extends Component
             'clinicTags' => $this->clinicTags,
             'assignedTagIds' => $this->assignedTagIds,
             'tagColors' => Tag::COLORS,
+            'tabCounts' => $this->tabCounts,
         ])->layout('layouts.app');
     }
 }

@@ -124,6 +124,11 @@ class Patient extends Model
         return $this->hasMany(PatientFile::class);
     }
 
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class);
+    }
+
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable')

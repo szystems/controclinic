@@ -199,6 +199,7 @@ return [
     'tab_facturacion' => 'Billing',
     'tab_notas' => 'Internal Notes',
     'tab_actividad' => 'Activity',
+    'tab_count' => ':count records',
     'no_internal_notes' => 'No internal notes recorded.',
     'add_internal_notes' => 'Add internal notes',
     'no_activity' => 'No activity recorded.',

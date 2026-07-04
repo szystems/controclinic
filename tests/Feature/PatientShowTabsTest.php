@@ -245,4 +245,30 @@ class PatientShowTabsTest extends TestCase
             ->test(PatientsShow::class, ['patient' => $patient])
             ->assertStatus(404);
     }
+
+    /** @test */
+    public function test_tabs_show_record_counts(): void
+    {
+        [$clinic, $user] = $this->makeClinicWithUser('owner');
+        $patient = $this->makePatient($clinic);
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id]);
+        $doctor->assignRole('doctor');
+
+        Appointment::factory()->count(2)->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+        ]);
+
+        MedicalRecord::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(PatientsShow::class, ['patient' => $patient])
+            ->assertSeeHtml('aria-label="2 records"')
+            ->assertSeeHtml('aria-label="1 records"');
+    }
 }
