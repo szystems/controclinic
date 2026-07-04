@@ -24,12 +24,17 @@ class CheckPlanLimits
         }
 
         // Plan pagado sin suscripción Paddle válida → downgrade a free
-        if ($clinic->plan_type !== 'free' && ! $clinic->is_manual_plan) {
+        if (! $clinic->isOnFreePlan() && ! $clinic->is_manual_plan) {
             $subscription = $clinic->subscription();
             $valid = $subscription && ($subscription->active() || $subscription->onTrial() || $subscription->pastDue());
 
             if (! $valid) {
-                $clinic->update(['plan_type' => 'free']);
+                $freePlan = \App\Models\Plan::getFreePlan();
+                if ($freePlan) {
+                    $clinic->applyPlan($freePlan);
+                } else {
+                    $clinic->update(['plan_type' => 'free', 'plan_id' => null]);
+                }
 
                 if (! $request->session()->has('warning')) {
                     $request->session()->flash('warning', __('billing.subscription_expired'));

@@ -15,10 +15,12 @@ class Index extends Component
 
     public string $selectedPlan = '';
 
+    public string $promoCode = '';
+
     public function mount(Clinic $clinic): void
     {
         $this->clinic = $clinic;
-        $this->selectedPlan = $clinic->plan_type === 'free' ? '' : $clinic->plan_type;
+        $this->selectedPlan = $this->clinic->isOnFreePlan() ? '' : $this->clinic->planSlug();
     }
 
     public function getSubscriptionProperty()
@@ -33,14 +35,13 @@ class Index extends Component
 
     public function getCurrentPlanProperty(): string
     {
-        return $this->clinic->plan_type;
+        return $this->clinic->planSlug();
     }
 
     public function getPlansProperty()
     {
-        return Plan::active()
+        return Plan::billingVisibleFor($this->clinic)
             ->ordered()
-            ->where('is_free', false)
             ->get();
     }
 
@@ -56,9 +57,28 @@ class Index extends Component
             return null;
         }
 
-        return $this->billingCycle === 'yearly'
-            ? $plan->paddle_yearly_price_id
-            : $plan->paddle_monthly_price_id;
+        return $plan->paddlePriceIdForCycle($this->billingCycle);
+    }
+
+    public function redeemPromoCode(): void
+    {
+        $this->validate([
+            'promoCode' => ['required', 'string', 'max:64'],
+        ]);
+
+        $plan = Plan::findByAccessCode($this->promoCode);
+
+        if (! $plan) {
+            $this->addError('promoCode', __('billing.promo_code_invalid'));
+
+            return;
+        }
+
+        $this->clinic->unlockPlan($plan);
+        $this->clinic->refresh();
+        $this->promoCode = '';
+
+        session()->flash('success', __('billing.promo_code_applied', ['plan' => $plan->name]));
     }
 
     public function checkout(string $planSlug): void
@@ -69,21 +89,21 @@ class Index extends Component
             return;
         }
 
-        $plan = Plan::where('slug', $planSlug)->first();
+        $plan = Plan::where('slug', $planSlug)->where('is_active', true)->first();
 
-        if (! $plan) {
+        if (! $plan || $plan->is_free) {
             session()->flash('error', __('billing.plan_not_available'));
 
             return;
         }
 
-        $priceId = $this->billingCycle === 'yearly'
-            ? $plan->paddle_yearly_price_id
-            : $plan->paddle_monthly_price_id;
+        if ($plan->is_private && ! $this->clinic->hasUnlockedPlan($plan)) {
+            session()->flash('error', __('billing.plan_requires_code'));
 
-        if (! $priceId) {
-            $priceId = config("cashier.prices.{$planSlug}.{$this->billingCycle}");
+            return;
         }
+
+        $priceId = $this->resolvePaddlePriceId($plan, $planSlug);
 
         if (! $priceId) {
             session()->flash('error', __('billing.plan_not_available'));
@@ -93,7 +113,7 @@ class Index extends Component
 
         $this->selectedPlan = $planSlug;
 
-        // Create transaction via Paddle API (bypasses domain check)
+        // ADR-012: no trial period — checkout uses price ID only (no trial_days).
         $email = $this->clinic->owner->email ?? auth()->user()->email;
         $customer = $this->clinic->customer;
 
@@ -115,7 +135,6 @@ class Index extends Component
             if ($customer) {
                 $payload['customer_id'] = $customer->paddle_id;
             } else {
-                // Create customer first or let Paddle auto-create
                 $payload['customer'] = ['email' => $email];
             }
 
@@ -148,21 +167,15 @@ class Index extends Component
             return;
         }
 
-        $plan = Plan::where('slug', $planSlug)->first();
+        $plan = Plan::where('slug', $planSlug)->where('is_active', true)->first();
 
-        if (! $plan) {
+        if (! $plan || ($plan->is_private && ! $this->clinic->hasUnlockedPlan($plan))) {
             session()->flash('error', __('billing.plan_not_available'));
 
             return;
         }
 
-        $priceId = $this->billingCycle === 'yearly'
-            ? $plan->paddle_yearly_price_id
-            : $plan->paddle_monthly_price_id;
-
-        if (! $priceId) {
-            $priceId = config("cashier.prices.{$planSlug}.{$this->billingCycle}");
-        }
+        $priceId = $this->resolvePaddlePriceId($plan, $planSlug);
 
         if (! $priceId) {
             session()->flash('error', __('billing.plan_not_available'));
@@ -171,10 +184,7 @@ class Index extends Component
         }
 
         $this->clinic->subscription()->swap($priceId);
-        $this->clinic->update([
-            'plan_id' => $plan->id,
-            'plan_type' => $planSlug,
-        ]);
+        $this->clinic->applyPlan($plan);
 
         session()->flash('success', __('billing.plan_changed'));
     }
@@ -203,6 +213,17 @@ class Index extends Component
     {
         $url = $this->clinic->customerPortalUrl();
         $this->redirect($url, navigate: false);
+    }
+
+    protected function resolvePaddlePriceId(Plan $plan, string $planSlug): ?string
+    {
+        $priceId = $plan->paddlePriceIdForCycle($this->billingCycle);
+
+        if ($priceId) {
+            return $priceId;
+        }
+
+        return config("cashier.prices.{$planSlug}.{$this->billingCycle}");
     }
 
     public function render()

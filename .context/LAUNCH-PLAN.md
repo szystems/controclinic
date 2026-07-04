@@ -1,7 +1,7 @@
 # 🚀 Plan de acción — ControClinic v1.0
 
 > **Documento maestro de seguimiento** hasta el lanzamiento público.
-> Actualizado: 2026-07-04 · Objetivo: **release 1.0.0**
+> Actualizado: 2026-07-04 (tarde) · Objetivo: **release 1.0.0**
 > Detalle por área: [TASKS.md](TASKS.md) · Infra: [DEPLOYMENT.md](DEPLOYMENT.md) · ADRs: [DECISIONS.md](DECISIONS.md)
 
 ---
@@ -10,15 +10,17 @@
 
 | Fase | Nombre | Estado | Bloquea lanzamiento |
 |------|--------|--------|---------------------|
-| **A** | Infraestructura y dominio | 🟡 ~92% | Parcial (Resend + snapshot + post-deploy) |
-| **B** | Planes BD — fuente única | 🔜 pendiente | Sí (límites y billing) |
+| **A** | Infraestructura y dominio | ✅ ~99% (A11 snapshot manual) | No |
+| **B** | Planes BD — fuente única | 🟡 ~25% en curso | Sí (límites y billing) |
 | **C** | Marca y mensaje freemium | 🔜 pendiente | Sí (confianza / conversión) |
 | **D** | Paddle — monetización | 🔜 pendiente | Sí (cobro real) |
 | **E** | Legal, marketing y szystems.com | 🔜 pendiente | Sí (apertura pública) |
 | **G** | Panel Admin — operaciones plataforma | ✅ código | Verificar prod + password |
 | **F** | Go-live y release 1.0.0 | 🔜 pendiente | Sí |
 
-**Siguiente paso:** Cerrar **A8** (Resend A10, snapshot A11, queue/scheduler) → **B** + **C** en paralelo → **D** → **E** → **F**.
+**Siguiente paso:** **Fase B** (cerrar fuente única planes) + **Fase C** en paralelo (copy freemium) → **D** → **E** → **F**.
+
+**Pendiente manual usuario:** A11 snapshot Hetzner · rotar passwords (admin + credenciales expuestas).
 
 ---
 
@@ -35,7 +37,7 @@
 | DNS / app | **Cloudflare** (DNS, SSL, WAF) + **Hetzner/Coolify** (app en prod) | ADR-013 |
 | Correo recibir | **Cloudflare Email Routing** — `support@` → Outlook | — |
 | Correo contacto (Web3Forms) | `szystemscorreos@outlook.com` (backend, no visible) | — |
-| Correo transaccional app | **Resend** (pendiente) — `noreply@controclinic.com` | — |
+| Correo transaccional app | **Resend** ✅ — `noreply@controclinic.com` · `mail:test` | — |
 | Paddle | Cuenta a nombre de **SZ Systems**; productos `ControClinic — {Plan}` | ADR-011 |
 
 ---
@@ -70,13 +72,13 @@ E (legal + marketing) ─┘
 | A5 | Código: `Dockerfile.prod`, `entrypoint.sh`, `docker-compose.coolify.yml` (`controclinic-*`) | Dev | [x] |
 | A6 | Código: `config/*.php` con `env() ?: default` · `trustProxies(at:'*')` | Dev | [x] |
 | A7 | Coolify: app ControClinic · env secretas · deploy exitoso | Dev | [x] |
-| A8 | Smoke test prod: login, registro, uploads, onboarding, locale, perfil, plantillas, HTTPS | Dev | [~] mayoría OK · pendiente queue/scheduler/Resend |
+| A8 | Smoke test prod: login, registro, uploads, onboarding, locale, perfil, plantillas, staff, paciente, archivos | Dev | [x] |
 | A9 | DNS **A/@/www → 5.78.235.235** (proxied) · FQDN en Coolify | Usuario+Dev | [x] |
 | A10 | Configurar **Resend** (`MAIL_*`) en Coolify · `php artisan mail:test` | Dev | [x] |
 | A11 | Snapshot Hetzner post-deploy exitoso | Usuario | [ ] manual |
 | A12 | Post-deploy: health check + restart Traefik si 503 | Dev | [x] |
 
-**Producción (2026-07-04):** `https://controclinic.com` operativo · deploy `8882d3a` · Super Admin: cambiar password en `/admin/profile`.
+**Producción (2026-07-04):** `https://controclinic.com` operativo · último deploy `7a5f564` · smoke tests manuales OK · Super Admin: cambiar password en `/admin/profile`.
 
 **Web3Forms (formulario contacto):** mantener `szystemscorreos@outlook.com` — no bloqueante.
 
@@ -89,14 +91,16 @@ E (legal + marketing) ─┘
 
 | # | Tarea | Estado |
 |---|-------|--------|
-| B1 | Migración: ampliar `clinics.plan_type` (incluir `practica`, `clinica`) o deprecar enum a favor de solo `plan_id` | [ ] |
-| B2 | Registro: asignar `plan_id` del plan Free + copiar límites desde BD | [ ] |
-| B3 | `Clinic::getPlanLimits()`: priorizar siempre `plan` vía `plan_id`; eliminar fallback `PLAN_LIMITS` | [ ] |
-| B4 | `trial_days = 0` en seeder y Admin; no pasar trial a checkout Paddle | [ ] |
-| B5 | Ajustar límites Free en BD (Admin Plans / seeder) — valores finales de producción | [ ] |
-| B6 | Crear plan privado con descuento (`is_private=true`, `requires_code=true`) + price IDs Paddle | [ ] |
-| B7 | Implementar canje de código → mostrar plan en billing + checkout | [ ] |
-| B8 | Tests: registro con `plan_id` · upgrade cambia límites · enum/slug practica/clinica | [ ] |
+| B1 | Migración: ampliar `clinics.plan_type` (incluir `practica`, `clinica`) o deprecar enum a favor de solo `plan_id` | [x] |
+| B2 | Registro: asignar `plan_id` del plan Free + copiar límites desde BD | [x] |
+| B3 | `Clinic::getPlanLimits()`: priorizar siempre `plan` vía `plan_id`; eliminar fallback `PLAN_LIMITS` | [x] BD first · `emergencyPlanLimits()` solo si `plans` vacío |
+| B4 | `trial_days = 0` en seeder y Admin; no pasar trial a checkout Paddle | [x] |
+| B5 | Ajustar límites Free en BD (Admin Plans / seeder) — valores finales de producción | [x] max_staff=1 · 5 citas/mes |
+| B6 | Crear plan privado con descuento (`is_private=true`, `requires_code=true`) + price IDs Paddle | [x] `solo-estudiante` · price IDs en Fase D |
+| B7 | Implementar canje de código → mostrar plan en billing + checkout | [x] |
+| B8 | Tests: registro con `plan_id` · upgrade cambia límites · enum/slug practica/clinica | [x] |
+
+**Hecho fuera de tabla B:** `clinics:backfill-plan-ids` (prod) · `Admin/Plans/Edit::syncClinicLimits()` · invitaciones pendientes en cupo staff/doctor (`82107eb`).
 
 ---
 

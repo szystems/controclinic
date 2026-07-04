@@ -56,6 +56,13 @@ return [
     'subscription_resumed' => 'Suscripción reanudada exitosamente.',
     'subscription_expired' => 'Tu suscripción ha expirado. Se ha aplicado el plan gratuito.',
     'account_suspended' => 'Tu cuenta está suspendida. Por favor, actualiza tu método de pago.',
+    'promo_code_title' => 'Código promocional',
+    'promo_code_hint' => 'Si tienes un código de acceso a un plan privado, ingrésalo aquí.',
+    'promo_code_placeholder' => 'Ej. CC-ESTUDIANTE',
+    'promo_code_apply' => 'Aplicar código',
+    'promo_code_invalid' => 'El código no es válido o ha expirado.',
+    'promo_code_applied' => 'Plan :plan desbloqueado. Ya puedes suscribirte desde la lista de abajo.',
+    'plan_requires_code' => 'Este plan requiere un código de acceso válido.',
 
     // Transaction history
     'transaction_history' => 'Historial de Transacciones',

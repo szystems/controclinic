@@ -121,6 +121,9 @@ return [
     'trial' => 'Prueba',
     'popular' => 'Popular',
     'enterprise' => 'Empresarial',
+    'private_plan' => 'Plan privado',
+    'requires_code' => 'Requiere código de acceso',
+    'access_code' => 'Código de acceso',
 
     // Plan types
     'plan_type_free' => 'Gratis',

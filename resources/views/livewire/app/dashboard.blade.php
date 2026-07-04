@@ -17,7 +17,7 @@
             <div class="flex items-center gap-2">
                 @php
                     $isCourtesyFree = $clinic->plan_type === 'free' && $clinic->is_manual_plan;
-                    $isPaidPlan = $clinic->plan_type !== 'free';
+                    $isPaidPlan = ! $clinic->isOnFreePlan();
                     $accessLevel = $clinic->accessLevel();
                 @endphp
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium

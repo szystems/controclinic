@@ -282,7 +282,7 @@ Un único Job `SendAppointmentNotification` (`ShouldQueue`) recibe `(appointment
 ## ADR-010: Plan Free como Cortesía (no autoservicio)
 
 **Fecha:** 2026-04-28
-**Estado:** Aceptada
+**Estado:** ⚠️ Deprecada — sustituida por ADR-012 (freemium permanente)
 
 ### Contexto
 Inicialmente el plan Free aparecía en `/pricing` y el onboarding como una opción gratis. Esto canibalizaba el plan Solo y atraía cuentas zombi.
@@ -301,6 +301,177 @@ Inicialmente el plan Free aparecía en `/pricing` y el onboarding como una opci�
 - ✅ Funnel más limpio.
 - ✅ Cortesías controladas.
 - ⚠️ Hay que migrar clínicas Free preexistentes (mantenerlas con `is_manual_plan = true`).
+
+> **NOTA (2026-06-21):** Esta decisión quedó **deprecada**. El registro actual ya crea
+> clínicas en plan Free permanente (`plan_type='free'`, `is_manual_plan=true`, `status='active'`),
+> NO en Solo con trial de 14 días. Ver **ADR-012** para el modelo vigente (freemium permanente).
+
+---
+
+## ADR-011: Modelo de marca — SZ Systems (entidad legal) / ControClinic (producto)
+
+**Fecha:** 2026-06-21
+**Estado:** Aceptada
+
+### Contexto
+La empresa está registrada legalmente en Canadá como **SZ Systems**. ControClinic es uno de
+sus productos SaaS. El business number para activar Paddle pertenece a SZ Systems, no a
+"ControClinic". Hay que definir cómo se relacionan ambas marcas en pagos, legales y UX, y
+cómo dar confianza al comprador (que verá un cargo de SZ Systems por un producto ControClinic).
+
+### Opciones Consideradas
+1. **Crear todo a nombre de ControClinic** — requeriría registrar ControClinic como entidad; innecesario.
+2. **Modelo casa-marca**: SZ Systems = entidad legal/merchant; ControClinic = marca de producto.
+3. **Fusionar marcas** (solo SZ Systems) — diluye el producto, peor para marketing.
+
+### Decisión
+Adoptar el **modelo casa-marca** (opción 2):
+- **Entidad legal / Merchant of Record (Paddle) / titular de contratos y dominio:** SZ Systems.
+- **Marca de producto (app, dominio controclinic.com, marketing, UX):** ControClinic.
+- En Paddle: cuenta a nombre de SZ Systems; **productos** nombrados `ControClinic — {Plan}`.
+- En la app: footer/emails/legales muestran **"ControClinic by SZ Systems"** (Victoria, BC, Canada).
+- Privacy/Terms nombran a **SZ Systems** como responsable del tratamiento de datos.
+- szystems.com da espacio destacado a ControClinic para reforzar la cadena de confianza.
+
+### Razones
+- Es el patrón estándar de SaaS (entidad legal cobra, producto tiene su marca).
+- No hay impedimento legal: Paddle como Merchant of Record cobra a nombre de SZ Systems.
+- El usuario reconoce el cargo si el recibo y la app explicitan "ControClinic by SZ Systems".
+
+### Consecuencias
+- ✅ Cobro legalmente correcto sin registrar una segunda entidad.
+- ✅ Marca de producto fuerte e independiente.
+- ⚠️ Hay que mostrar explícitamente la relación SZ Systems ↔ ControClinic para evitar disputas/chargebacks por "cargo no reconocido".
+
+---
+
+## ADR-012: Freemium permanente (modelo de adquisición)
+
+**Fecha:** 2026-06-21
+**Estado:** Aceptada (sustituye a ADR-010)
+
+### Contexto
+ADR-010 definía: registro → plan Solo con trial de 14 días, Free solo por admin. Pero el
+código de registro vigente crea clínicas en **Free permanente** (`is_manual_plan=true`,
+acceso completo dentro de límites). Además el sitio público todavía promete "14 días de prueba
+gratis", lo que **contradice** el comportamiento real y confunde al usuario.
+
+### Opciones Consideradas
+1. **Trial 14 días al registro** (ADR-010 original) — presión temporal, fricción, abandono al día 15.
+2. **Freemium permanente** — registro gratis sin límite de tiempo; se sube de plan al topar límites o querer features.
+3. **Híbrido** — Free permanente + trial de plan pago al hacer upgrade.
+
+### Decisión
+Adoptar **freemium permanente** (opción 2), **sin trial en planes de pago** (decisión 2026-06-21):
+- El registro crea una clínica **Free permanente** (sin caducidad), acceso completo dentro de los límites del tier Free (tabla `plans`).
+- El upgrade a plan pago implica **cobro inmediato** — no hay trial de 14 días (el Free ya cumple esa función).
+- `trial_days = 0` en todos los planes; Paddle checkout sin periodo de prueba.
+- El mensaje público: **"Empieza gratis. Sin tarjeta. Sin límite de tiempo."**
+- Se elimina todo copy de "14 días de prueba" que implique caducidad al registrarse.
+- Se mantiene la lógica de acceso de ADR-008 (Free no-cortesía caducado → read-only) intacta.
+
+### Razones
+- Menor fricción de adquisición; el usuario prueba con datos reales y convierte cuando ve valor.
+- Coherente con el "sin tarjeta de crédito" que ya aparece en el home.
+- Elimina la incoherencia código ↔ marketing actual.
+
+### Consecuencias
+- ✅ Mensaje único y veraz en todo el producto.
+- ✅ Mejor top-of-funnel.
+- ⚠️ Requiere definir límites Free **definitivos** para producción (hoy "ilimitado en dev").
+- ⚠️ Hay que actualizar home, pricing, FAQ, onboarding y `auth.free_plan_info`.
+
+---
+
+## ADR-014: Dominio y correo — controclinic.com en iPage
+
+**Fecha:** 2026-06-21
+**Estado:** Aceptada
+
+### Contexto
+SZ Systems mantiene iPage desde hace 10+ años por dominios de clientes con cientos de buzones
+de correo (costo de migrar prohibitive). ControClinic necesita dominio propio, correo
+profesional (@controclinic.com) y la app en Hetzner — no en hosting iPage.
+
+### Opciones Consideradas
+1. **Cloudflare Registrar** — dominio más barato, sin buzones incluidos.
+2. **iPage** — renovación posiblemente más cara, buzones ilimitados @controclinic.com.
+3. **iPage solo correo + dominio en CF** — fragmentado, depende de si iPage acepta dominio externo.
+
+### Decisión
+- Registrar **`controclinic.com` en iPage** (mismo flujo que otros dominios SZ Systems).
+- **Nameservers → Cloudflare** (DNS, CDN, SSL, WAF).
+- **App → Hetzner VPS** (`5.78.235.235`) vía Coolify — la web NO se aloja en iPage.
+- **Correo → iPage**: buzones `support@`, `noreply@` (SMTP Laravel en producción).
+- **Formulario contacto (Web3Forms):** `szystemscorreos@outlook.com` (backend, no visible al usuario).
+- Transferencia a Cloudflare Registrar **diferida** a cuando ya no se necesite correo iPage para este dominio.
+
+### Razones
+- iPage ya es costo fijo del negocio; marginal solo renovación del dominio.
+- Buzones profesionales sin costo extra ni nuevo proveedor.
+- Mismo playbook probado: `asonataxela.com`, `clinicaselvalle.com`.
+
+### Consecuencias
+- ✅ Operación familiar · correo y DNS alineados con el resto de SZ Systems.
+- ⚠️ Renovación posiblemente más cara que CF (~$10/año) — aceptable vs complejidad.
+- ⚠️ Checklist DNS: MX iPage + A Hetzner + SPF/DKIM en Cloudflare.
+
+---
+
+## ADR-013: Despliegue en producción — Hetzner + Coolify + Cloudflare
+
+**Fecha:** 2026-06-21
+**Estado:** Aceptada
+
+### Contexto
+ControClinic debe salir a producción para pruebas reales con dominio propio antes del
+lanzamiento. SZ Systems ya opera infraestructura consolidada (workspace `migracion`):
+VPS Hetzner `5.78.235.235` + Coolify + Cloudflare.
+
+### Decisión
+Desplegar en la **misma infraestructura** siguiendo `migracion/runbooks/03-laravel-a-vps-coolify.md`:
+- Dominio registrado en **iPage** (ADR-014); DNS en **Cloudflare**.
+- Build `Dockerfile.prod`; `docker-compose.coolify.yml` con servicios **`controclinic-*`**.
+- Routing por labels Traefik nativos (Coolify UI).
+- Detalle en [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### Consecuencias
+- ✅ Reutiliza plantillas y lecciones de producción.
+- ⚠️ Respetar prefijado de contenedores y `trustProxies` (evitar cross-serving).
+
+---
+
+## ADR-015: Un plan BD = un tier; Paddle mensual y anual en el mismo registro
+
+**Fecha:** 2026-07-04  
+**Estado:** Aceptada
+
+### Contexto
+Los tiers (Free, Solo, Práctica, Clínica) se definen en la tabla `plans` con límites y precios. Paddle Billing usa **Productos** y **Prices** separados por intervalo de facturación.
+
+### Opciones Consideradas
+1. **Un registro `plans` por tier** con `monthly_price`, `yearly_price`, `paddle_monthly_price_id`, `paddle_yearly_price_id` y un `paddle_product_id` compartido
+2. **Dos registros `plans` por tier** (Solo Mensual / Solo Anual) con límites duplicados
+
+### Decisión
+**Opción 1:** un solo registro por tier en `plans`. En Paddle:
+- 1 **Product** por tier (ej. `ControClinic — Solo`)
+- 2 **Prices** en ese producto: recurrente mensual + recurrente anual
+- La BD guarda ambos price IDs en el mismo row; checkout elige según `billingCycle`
+
+Los límites (`max_patients`, `max_doctors`, etc.) y `features` son **idénticos** para mensual y anual — solo cambia el precio.
+
+Un **plan distinto en BD** solo cuando el tier es distinto (ej. plan privado con descuento `is_private` + `requires_code`), no por ciclo de cobro.
+
+### Razones
+- Evita duplicar límites y features en Admin Plans
+- `PaddleEventListener` resuelve el plan con `Plan::findByPaddlePriceId()` (mensual o anual → mismo slug)
+- Alineado con Laravel Cashier Paddle y el billing UI existente
+
+### Consecuencias
+- ✅ Admin edita un tier una vez; sync a clínicas vía `syncClinicLimits()`
+- ✅ Checkout: `$plan->paddlePriceIdForCycle('monthly'|'yearly')`
+- ⚠️ Plan promocional con precio distinto requiere **otro row** (slug distinto) con sus propios price IDs Paddle
 
 ---
 

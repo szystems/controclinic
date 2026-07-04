@@ -51,6 +51,12 @@ class Edit extends Component
 
     public bool $is_enterprise = false;
 
+    public bool $is_private = false;
+
+    public bool $requires_code = false;
+
+    public ?string $access_code = null;
+
     // Toggles for unlimited
     public bool $unlimited_patients = false;
 
@@ -85,6 +91,9 @@ class Edit extends Component
         $this->is_popular = $plan->is_popular ?? false;
         $this->is_free = $plan->is_free ?? false;
         $this->is_enterprise = $plan->is_enterprise ?? false;
+        $this->is_private = $plan->is_private ?? false;
+        $this->requires_code = $plan->requires_code ?? false;
+        $this->access_code = $plan->access_code;
 
         $this->unlimited_patients = $plan->max_patients === null;
         $this->unlimited_appointments = $plan->max_appointments_per_month === null;
@@ -109,6 +118,7 @@ class Edit extends Component
             'paddle_yearly_price_id' => 'nullable|string|max:255',
             'paddle_product_id' => 'nullable|string|max:255',
             'trial_days' => 'required|integer|min:0',
+            'access_code' => 'nullable|string|max:64',
             'sort_order' => 'required|integer|min:0',
         ];
     }
@@ -141,6 +151,9 @@ class Edit extends Component
             'is_popular' => $this->is_popular,
             'is_free' => $this->is_free,
             'is_enterprise' => $this->is_enterprise,
+            'is_private' => $this->is_private,
+            'requires_code' => $this->requires_code,
+            'access_code' => $this->requires_code ? ($this->access_code ?: null) : null,
         ]);
 
         // Sync limits to clinics on this plan

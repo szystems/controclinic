@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Clinic;
+use App\Models\Plan;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,12 +52,10 @@ new #[Layout('layouts.guest')] class extends Component
             // Create the clinic
             $localeDefaults = app(\App\Services\ClinicLocaleResolver::class)->resolve(request());
 
-            $clinic = Clinic::create([
+            $clinic = Clinic::create(array_merge([
                 'name' => $validated['clinic_name'],
                 'slug' => $slug,
                 'email' => $validated['email'],
-                'plan_id' => \App\Models\Plan::getFreePlan()?->id,
-                'plan_type' => 'free',
                 'status' => 'active',
                 'is_manual_plan' => true, // Registro voluntario en plan free → acceso completo dentro de límites
                 'country' => $localeDefaults['country'],
@@ -67,7 +66,7 @@ new #[Layout('layouts.guest')] class extends Component
                     'phone_country_code' => $localeDefaults['phone_country_code'],
                 ]),
                 'branding' => ['primary_color' => '#4f46e5', 'secondary_color' => '#10b981'],
-            ]);
+            ], Plan::registrationAttributesFrom(Plan::getFreePlan())));
 
             // Create the user linked to clinic
             $user = User::create([

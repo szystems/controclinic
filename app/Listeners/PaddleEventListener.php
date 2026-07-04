@@ -29,16 +29,7 @@ class PaddleEventListener
                 return;
             }
 
-            $clinic->update([
-                'plan_id' => $plan->id,
-                'plan_type' => $plan->slug,
-                'status' => 'active',
-                'max_patients' => $plan->max_patients,
-                'max_appointments_per_month' => $plan->max_appointments_per_month,
-                'max_doctors' => $plan->max_doctors,
-                'max_staff' => $plan->max_staff,
-                'max_storage_bytes' => $plan->max_storage_bytes,
-            ]);
+            $clinic->applyPlan($plan, activate: true);
         }
     }
 
@@ -57,15 +48,7 @@ class PaddleEventListener
             if ($clinic->is_manual_plan) {
                 return;
             }
-            $clinic->update([
-                'plan_id' => $plan->id,
-                'plan_type' => $plan->slug,
-                'max_patients' => $plan->max_patients,
-                'max_appointments_per_month' => $plan->max_appointments_per_month,
-                'max_doctors' => $plan->max_doctors,
-                'max_staff' => $plan->max_staff,
-                'max_storage_bytes' => $plan->max_storage_bytes,
-            ]);
+            $clinic->applyPlan($plan);
         }
     }
 
@@ -93,15 +76,13 @@ class PaddleEventListener
         }
 
         // Try to find plan by Paddle price ID in DB
-        $plan = Plan::where('paddle_monthly_price_id', $priceId)
-            ->orWhere('paddle_yearly_price_id', $priceId)
-            ->first();
+        $plan = Plan::findByPaddlePriceId($priceId);
 
         if ($plan) {
             return $plan;
         }
 
-        // Fallback: resolve from config
+        // Fallback: resolve from config (legacy env mapping)
         $prices = config('cashier.prices', []);
 
         foreach ($prices as $slug => $cycles) {

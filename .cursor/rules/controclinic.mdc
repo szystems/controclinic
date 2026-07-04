@@ -13,7 +13,9 @@ ControClinic is a multi-tenant SaaS for medical clinics built with Laravel 12 + 
 ## Must Read
 
 Before making changes, review these context files:
+- `.context/LAUNCH-PLAN.md` - Ordered action plan to v1.0 launch
 - `.context/STATUS.md` - Current project state
+- `.context/TASKS.md` - Task detail by phase
 - `.context/CONVENTIONS.md` - Code standards
 - `.context/MODELS.md` - Model documentation
 

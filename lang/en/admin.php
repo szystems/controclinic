@@ -121,6 +121,9 @@ return [
     'trial' => 'Trial',
     'popular' => 'Popular',
     'enterprise' => 'Enterprise',
+    'private_plan' => 'Private plan',
+    'requires_code' => 'Requires access code',
+    'access_code' => 'Access code',
 
     // Plan types
     'plan_type_free' => 'Free',

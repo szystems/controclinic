@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Clinic;
+use App\Models\Plan;
+use Database\Seeders\PlansSeeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -65,21 +67,38 @@ class ClinicFactory extends Factory
 
     public function withPlan(string $plan): static
     {
-        $limits = Clinic::PLAN_LIMITS[$plan] ?? Clinic::PLAN_LIMITS['free'];
+        return $this->state(function () use ($plan) {
+            if (Plan::count() === 0) {
+                (new PlansSeeder)->run();
+            }
 
-        return $this->state(fn () => [
-            'plan_type' => $plan,
-            // Plan Free en factories legacy: marcar como cortesía admin para que tenga acceso full
-            // (ADR-010 + ADR-008). Si un test necesita Free no-cortesía, usa $clinic->update(['is_manual_plan' => false]).
-            'is_manual_plan' => $plan === 'free',
-            'manual_plan_reason' => $plan === 'free' ? 'Test fixture' : null,
-            'status' => 'active',
-            'trial_ends_at' => null,
-            'max_patients' => $limits['max_patients'],
-            'max_appointments_per_month' => $limits['max_appointments_per_month'],
-            'max_doctors' => $limits['max_doctors'],
-            'max_staff' => $limits['max_staff'],
-            'max_storage_bytes' => $limits['max_storage_bytes'],
-        ]);
+            $planModel = Plan::findBySlug($plan);
+
+            if ($planModel) {
+                return array_merge([
+                    'plan_id' => $planModel->id,
+                    'plan_type' => $planModel->slug,
+                    'is_manual_plan' => $plan === 'free',
+                    'manual_plan_reason' => $plan === 'free' ? 'Test fixture' : null,
+                    'status' => 'active',
+                    'trial_ends_at' => null,
+                ], $planModel->limitsForClinicColumns());
+            }
+
+            $limits = Clinic::emergencyPlanLimits();
+
+            return [
+                'plan_type' => $plan,
+                'is_manual_plan' => $plan === 'free',
+                'manual_plan_reason' => $plan === 'free' ? 'Test fixture' : null,
+                'status' => 'active',
+                'trial_ends_at' => null,
+                'max_patients' => $limits['max_patients'],
+                'max_appointments_per_month' => $limits['max_appointments_per_month'],
+                'max_doctors' => $limits['max_doctors'],
+                'max_staff' => $limits['max_staff'],
+                'max_storage_bytes' => $limits['max_storage_bytes'],
+            ];
+        });
     }
 }

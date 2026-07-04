@@ -56,6 +56,13 @@ return [
     'subscription_resumed' => 'Subscription resumed successfully.',
     'subscription_expired' => 'Your subscription has expired. The free plan has been applied.',
     'account_suspended' => 'Your account is suspended. Please update your payment method.',
+    'promo_code_title' => 'Promo code',
+    'promo_code_hint' => 'If you have an access code for a private plan, enter it here.',
+    'promo_code_placeholder' => 'E.g. CC-STUDENT',
+    'promo_code_apply' => 'Apply code',
+    'promo_code_invalid' => 'The code is invalid or has expired.',
+    'promo_code_applied' => ':plan plan unlocked. You can subscribe from the list below.',
+    'plan_requires_code' => 'This plan requires a valid access code.',
 
     // Transaction history
     'transaction_history' => 'Transaction History',

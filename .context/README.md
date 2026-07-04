@@ -15,6 +15,7 @@ Esta carpeta contiene documentación estructurada para mantener el contexto del 
 | `PROJECT.md` | Información general del proyecto | Cuando cambie info básica |
 | `ARCHITECTURE.md` | Estructura técnica y patrones | Cuando cambie arquitectura |
 | `STATUS.md` | Estado actual y progreso | **Frecuentemente** |
+| `LAUNCH-PLAN.md` | **Plan de acción ordenado hasta v1.0** | **Frecuentemente** |
 | `CONVENTIONS.md` | Estándares y convenciones de código | Cuando se definan nuevas |
 | `MODELS.md` | Documentación detallada de modelos | Cuando cambien modelos |
 | `ROADMAP.md` | Plan de desarrollo por fases | Mensualmente |
@@ -28,8 +29,9 @@ Esta carpeta contiene documentación estructurada para mantener el contexto del 
 
 ### Al iniciar trabajo en el proyecto:
 1. Lee `STATUS.md` para ver el estado actual
-2. Revisa `TASKS.md` para ver qué está pendiente
-3. Consulta `CONVENTIONS.md` si tienes dudas de estilo
+2. Revisa **`LAUNCH-PLAN.md`** para el orden de ejecución y siguiente paso
+3. Consulta `TASKS.md` para el detalle de tareas por fase
+4. Consulta `CONVENTIONS.md` si tienes dudas de estilo
 
 ### Al completar una feature:
 1. Actualiza `STATUS.md` moviendo items a "Completado"
@@ -60,4 +62,5 @@ El archivo `AI_INSTRUCTIONS.md` contiene instrucciones específicas para AI assi
 
 Esta documentación es un **documento vivo**. Debe actualizarse regularmente para mantener su valor.
 
-**Responsable:** Desarrollador principal  \n**Frecuencia mínima de revisión:** Semanal  \n**Última revisión:** 2026-03-23", "oldString": "**Responsable:** Desarrollador principal  \n**Frecuencia mínima de revisión:** Semanal  \n**Última revisión:** 2026-01-28
+**Frecuencia mínima de revisión:** Semanal  
+**Última revisión:** 2026-07-04

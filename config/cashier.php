@@ -115,6 +115,10 @@ return [
             'monthly' => env('PADDLE_PRICE_GROUP_MONTHLY'),
             'yearly' => env('PADDLE_PRICE_GROUP_YEARLY'),
         ],
+        'solo_estudiante' => [
+            'monthly' => env('PADDLE_PRICE_SOLO_ESTUDIANTE_MONTHLY'),
+            'yearly' => env('PADDLE_PRICE_SOLO_ESTUDIANTE_YEARLY'),
+        ],
         'enterprise' => [
             'monthly' => env('PADDLE_PRICE_ENTERPRISE_MONTHLY'),
             'yearly' => env('PADDLE_PRICE_ENTERPRISE_YEARLY'),

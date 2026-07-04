@@ -141,11 +141,20 @@ class PlanLimitsTest extends TestCase
 
     // ===== Clinic Model: canAddStaff() =====
 
-    public function test_free_clinic_cannot_add_staff(): void
+    public function test_free_clinic_can_add_staff_when_under_limit(): void
     {
         [$clinic, $user] = $this->createClinicWithOwner('free');
 
-        // Free plan: max_staff = 0
+        // Free plan: max_staff = 1
+        $this->assertTrue($clinic->canAddStaff());
+    }
+
+    public function test_free_clinic_cannot_add_staff_when_at_limit(): void
+    {
+        [$clinic, $user] = $this->createClinicWithOwner('free');
+
+        User::factory()->assistant()->create(['clinic_id' => $clinic->id]);
+
         $this->assertFalse($clinic->canAddStaff());
     }
 
@@ -185,7 +194,7 @@ class PlanLimitsTest extends TestCase
         $this->assertEquals(25, $limits['max_patients']);
         $this->assertEquals(5, $limits['max_appointments_per_month']);
         $this->assertEquals(1, $limits['max_doctors']);
-        $this->assertEquals(0, $limits['max_staff']);
+        $this->assertEquals(1, $limits['max_staff']);
     }
 
     public function test_get_plan_limits_reads_db_plan_without_plan_id(): void
@@ -220,11 +229,61 @@ class PlanLimitsTest extends TestCase
     public function test_unknown_plan_falls_back_to_free(): void
     {
         [$clinic, $user] = $this->createClinicWithOwner('free');
-        $clinic->plan_type = 'nonexistent';
+        $clinic->update([
+            'plan_type' => 'nonexistent',
+            'plan_id' => null,
+            'max_patients' => null,
+            'max_appointments_per_month' => null,
+            'max_doctors' => null,
+            'max_staff' => null,
+            'max_storage_bytes' => null,
+        ]);
 
-        $limits = $clinic->getPlanLimits();
+        $limits = $clinic->fresh()->getPlanLimits();
 
         $this->assertEquals(25, $limits['max_patients']);
+    }
+
+    public function test_paddle_price_id_resolves_same_plan_for_monthly_or_yearly(): void
+    {
+        $this->seed(PlansSeeder::class);
+
+        $solo = Plan::where('slug', 'solo')->firstOrFail();
+        $solo->update([
+            'paddle_monthly_price_id' => 'pri_monthly_test',
+            'paddle_yearly_price_id' => 'pri_yearly_test',
+        ]);
+
+        $this->assertSame($solo->id, Plan::findByPaddlePriceId('pri_monthly_test')?->id);
+        $this->assertSame($solo->id, Plan::findByPaddlePriceId('pri_yearly_test')?->id);
+        $this->assertSame('pri_monthly_test', $solo->paddlePriceIdForCycle('monthly'));
+        $this->assertSame('pri_yearly_test', $solo->paddlePriceIdForCycle('yearly'));
+    }
+
+    public function test_registration_attributes_copy_limits_from_free_plan(): void
+    {
+        $this->seed(PlansSeeder::class);
+
+        $freePlan = Plan::getFreePlan();
+        $attrs = Plan::registrationAttributesFrom($freePlan);
+
+        $this->assertSame($freePlan->id, $attrs['plan_id']);
+        $this->assertSame('free', $attrs['plan_type']);
+        $this->assertSame($freePlan->max_patients, $attrs['max_patients']);
+        $this->assertSame(1, $attrs['max_staff']);
+    }
+
+    public function test_practica_and_clinica_plan_slugs_resolve_limits_from_db(): void
+    {
+        $this->seed(PlansSeeder::class);
+
+        $practicaClinic = Clinic::factory()->onboarded()->withPlan('practica')->create();
+        $clinicaClinic = Clinic::factory()->onboarded()->withPlan('clinica')->create();
+
+        $this->assertSame('practica', $practicaClinic->planSlug());
+        $this->assertSame(3, $practicaClinic->getPlanLimits()['max_doctors']);
+        $this->assertSame('clinica', $clinicaClinic->planSlug());
+        $this->assertSame(8, $clinicaClinic->getPlanLimits()['max_doctors']);
     }
 
     // ===== Clinic Model: hasFeature() =====

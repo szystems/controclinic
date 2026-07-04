@@ -116,6 +116,22 @@
 
         <!-- Plans Section (only if not enterprise) -->
         @if ($this->currentPlan !== 'enterprise')
+            {{-- Promo code for private plans --}}
+            <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">{{ __('billing.promo_code_title') }}</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ __('billing.promo_code_hint') }}</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" wire:model="promoCode"
+                           placeholder="{{ __('billing.promo_code_placeholder') }}"
+                           class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 uppercase">
+                    <button type="button" wire:click="redeemPromoCode" wire:loading.attr="disabled"
+                            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition disabled:opacity-50">
+                        {{ __('billing.promo_code_apply') }}
+                    </button>
+                </div>
+                @error('promoCode') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+            </div>
+
             <div class="mb-6">
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ __('billing.available_plans') }}</h2>

@@ -36,6 +36,7 @@ class Plan extends Model
         'is_enterprise',
         'is_private',
         'requires_code',
+        'access_code',
     ];
 
     protected $casts = [
@@ -91,6 +92,37 @@ class Plan extends Model
         return $query->where('is_private', false);
     }
 
+    /**
+     * Plans shown on the in-app billing page for a clinic.
+     */
+    public function scopeBillingVisibleFor($query, Clinic $clinic)
+    {
+        $unlocked = $clinic->unlockedPlanSlugs();
+
+        return $query->active()
+            ->where('is_free', false)
+            ->where(function ($q) use ($unlocked) {
+                $q->where('is_private', false)
+                    ->orWhereIn('slug', $unlocked);
+            });
+    }
+
+    public static function findByAccessCode(string $code): ?self
+    {
+        $normalized = strtoupper(trim($code));
+
+        if ($normalized === '') {
+            return null;
+        }
+
+        return static::query()
+            ->where('requires_code', true)
+            ->where('is_active', true)
+            ->whereNotNull('access_code')
+            ->whereRaw('UPPER(access_code) = ?', [$normalized])
+            ->first();
+    }
+
     // ==================== HELPERS ====================
 
     public function getRouteKeyName(): string
@@ -133,6 +165,63 @@ class Plan extends Model
     public static function getFreePlan(): ?self
     {
         return static::where('is_free', true)->first();
+    }
+
+    /**
+     * Resolve a plan from a Paddle price ID (monthly or yearly on the same product).
+     */
+    public static function findByPaddlePriceId(string $priceId): ?self
+    {
+        return static::query()
+            ->where('paddle_monthly_price_id', $priceId)
+            ->orWhere('paddle_yearly_price_id', $priceId)
+            ->first();
+    }
+
+    public function paddlePriceIdForCycle(string $cycle): ?string
+    {
+        return $cycle === 'yearly'
+            ? $this->paddle_yearly_price_id
+            : $this->paddle_monthly_price_id;
+    }
+
+    /**
+     * Denormalized limit columns to copy onto a clinic row.
+     *
+     * @return array<string, int|null>
+     */
+    public function limitsForClinicColumns(): array
+    {
+        return [
+            'max_patients' => $this->max_patients,
+            'max_appointments_per_month' => $this->max_appointments_per_month,
+            'max_doctors' => $this->max_doctors,
+            'max_staff' => $this->max_staff,
+            'max_storage_bytes' => $this->max_storage_bytes,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function registrationAttributesFrom(?self $plan): array
+    {
+        $plan ??= static::getFreePlan();
+
+        if (! $plan) {
+            return [
+                'plan_id' => null,
+                'plan_type' => 'free',
+            ];
+        }
+
+        return array_merge(
+            [
+                'plan_id' => $plan->id,
+                'plan_type' => $plan->slug,
+            ],
+            $plan->limitsForClinicColumns()
+        );
     }
 
     /**

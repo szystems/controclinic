@@ -84,44 +84,6 @@ class Clinic extends Model
         'custom_domain_verified_at' => 'datetime',
     ];
 
-    /**
-     * Plan limits configuration
-     */
-    public const PLAN_LIMITS = [
-        'free' => [
-            'max_patients' => 25,
-            'max_appointments_per_month' => 5,
-            'max_doctors' => 1,
-            'max_staff' => 0,
-            'max_storage_bytes' => 524288000, // 500MB
-            'features' => ['basic_forms', 'basic_portal'],
-        ],
-        'solo' => [
-            'max_patients' => null, // Unlimited
-            'max_appointments_per_month' => null,
-            'max_doctors' => 1,
-            'max_staff' => 1,
-            'max_storage_bytes' => null, // Fair use
-            'features' => ['ai', 'mobile_basic', '2fa', 'compliance', 'custom_portal', 'booking'],
-        ],
-        'group' => [
-            'max_patients' => null,
-            'max_appointments_per_month' => null,
-            'max_doctors' => 5,
-            'max_staff' => 3,
-            'max_storage_bytes' => null,
-            'features' => ['ai', 'ai_collaborative', 'mobile_advanced', '2fa', 'compliance', 'audit_logs', 'multi_doctor_portal', 'booking_advanced'],
-        ],
-        'enterprise' => [
-            'max_patients' => null,
-            'max_appointments_per_month' => null,
-            'max_doctors' => null,
-            'max_staff' => null,
-            'max_storage_bytes' => null,
-            'features' => ['ai', 'ai_custom', 'mobile_enterprise', '2fa', 'compliance', 'audit_logs', 'api', 'white_label', 'bi', 'custom_domain'],
-        ],
-    ];
-
     // ==================== RELATIONSHIPS ====================
 
     public function plan(): BelongsTo
@@ -207,6 +169,74 @@ class Clinic extends Model
         return null;
     }
 
+    public function planSlug(): string
+    {
+        return $this->resolvePlan()?->slug ?? $this->plan_type ?? 'free';
+    }
+
+    public function isOnFreePlan(): bool
+    {
+        $plan = $this->resolvePlan();
+
+        if ($plan) {
+            return (bool) $plan->is_free;
+        }
+
+        return $this->plan_type === 'free';
+    }
+
+    public function isEnterprisePlan(): bool
+    {
+        return (bool) ($this->resolvePlan()?->is_enterprise ?? $this->plan_type === 'enterprise');
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function unlockedPlanSlugs(): array
+    {
+        $slugs = data_get($this->settings, 'billing.unlocked_plan_slugs', []);
+
+        return is_array($slugs) ? array_values(array_unique($slugs)) : [];
+    }
+
+    public function hasUnlockedPlan(Plan $plan): bool
+    {
+        return in_array($plan->slug, $this->unlockedPlanSlugs(), true);
+    }
+
+    public function unlockPlan(Plan $plan): void
+    {
+        if ($this->hasUnlockedPlan($plan)) {
+            return;
+        }
+
+        $settings = $this->settings ?? [];
+        $settings['billing']['unlocked_plan_slugs'] = array_merge(
+            $this->unlockedPlanSlugs(),
+            [$plan->slug]
+        );
+
+        $this->update(['settings' => $settings]);
+    }
+
+    public function applyPlan(Plan $plan, bool $activate = false): void
+    {
+        $payload = array_merge(
+            [
+                'plan_id' => $plan->id,
+                'plan_type' => $plan->slug,
+            ],
+            $plan->limitsForClinicColumns()
+        );
+
+        if ($activate) {
+            $payload['status'] = 'active';
+        }
+
+        $this->update($payload);
+    }
+
     public function getPlanLimits(): array
     {
         $plan = $this->resolvePlan();
@@ -215,7 +245,49 @@ class Clinic extends Model
             return $plan->getLimitsArray();
         }
 
-        return self::PLAN_LIMITS[$this->plan_type] ?? self::PLAN_LIMITS['free'];
+        if ($this->hasDenormalizedLimits()) {
+            return [
+                'max_patients' => $this->max_patients,
+                'max_appointments_per_month' => $this->max_appointments_per_month,
+                'max_doctors' => $this->max_doctors,
+                'max_staff' => $this->max_staff,
+                'max_storage_bytes' => $this->max_storage_bytes,
+                'features' => Plan::getFreePlan()?->features ?? [],
+            ];
+        }
+
+        $freePlan = Plan::getFreePlan();
+        if ($freePlan) {
+            return $freePlan->getLimitsArray();
+        }
+
+        return self::emergencyPlanLimits();
+    }
+
+    protected function hasDenormalizedLimits(): bool
+    {
+        return $this->max_patients !== null
+            || $this->max_appointments_per_month !== null
+            || $this->max_doctors !== null
+            || $this->max_staff !== null
+            || $this->max_storage_bytes !== null;
+    }
+
+    /**
+     * Last-resort limits when the plans table has not been seeded.
+     *
+     * @return array<string, mixed>
+     */
+    public static function emergencyPlanLimits(): array
+    {
+        return [
+            'max_patients' => 25,
+            'max_appointments_per_month' => 5,
+            'max_doctors' => 1,
+            'max_staff' => 1,
+            'max_storage_bytes' => 524288000,
+            'features' => ['basic_forms', 'basic_portal'],
+        ];
     }
 
     public function hasFeature(string $feature): bool
@@ -344,7 +416,7 @@ class Clinic extends Model
 
         // Free no-cortesía (auto-downgrade desde plan pagado caducado): read-only
         // Plan free de cortesía (asignado por admin con is_manual_plan=true) sí mantiene escritura
-        if ($this->plan_type === 'free' && ! $this->is_manual_plan) {
+        if ($this->isOnFreePlan() && ! $this->is_manual_plan) {
             return self::ACCESS_READ_ONLY;
         }
 

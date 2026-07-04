@@ -176,7 +176,23 @@
                                 <input type="checkbox" wire:model="is_enterprise" class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
                                 <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('admin.enterprise') }}</span>
                             </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" wire:model.live="is_private" class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('admin.private_plan') }}</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" wire:model.live="requires_code" class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('admin.requires_code') }}</span>
+                            </label>
                         </div>
+                        @if($requires_code)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.access_code') }}</label>
+                            <input type="text" wire:model="access_code" maxlength="64"
+                                class="mt-1 block w-full max-w-xs rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono uppercase">
+                            @error('access_code') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                        </div>
+                        @endif
                     </div>
                 </div>
 

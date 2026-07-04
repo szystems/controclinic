@@ -1,8 +1,9 @@
 # 📝 Tareas — Ruta a v1.0
 
-> Actualizado: 2026-07-04
+> Actualizado: 2026-07-04 (tarde)
 > **Orden de ejecución:** ver [LAUNCH-PLAN.md](LAUNCH-PLAN.md) (documento maestro).
-> Estado: ~591 tests · Módulos clínicos completos · Objetivo **1.0.0**
+> **Fase actual:** B (planes BD) · Fase A cerrada salvo tareas manuales
+> Estado: ~591+ tests · Objetivo **1.0.0** · Prod deploy `7a5f564`
 
 Leyenda: `[ ]` pendiente · `[~]` en progreso · `[x]` hecho
 
@@ -28,7 +29,7 @@ Leyenda: `[ ]` pendiente · `[~]` en progreso · `[x]` hecho
 
 ### A.3 — Deploy y cutover
 - [x] App en Coolify · env secretas (APP_KEY, DB_*)
-- [~] Smoke test prod (ver desglose A8 abajo)
+- [x] Smoke test prod completo (A8 — ver desglose abajo)
 - [x] FQDN Coolify: `https://controclinic.com,https://www.controclinic.com`
 - [x] Cutover DNS A → `5.78.235.235`
 - [x] **Resend** (`MAIL_*`) operativo · `php artisan mail:test` (A10)
@@ -37,32 +38,39 @@ Leyenda: `[ ]` pendiente · `[~]` en progreso · `[x]` hecho
 
 Detalle operativo: [DEPLOYMENT.md](DEPLOYMENT.md)
 
-### A.8 — Smoke test prod (desglose)
+### A.8 — Smoke test prod (desglose) ✅
 - [x] Login / HTTPS / health `/up`
-- [x] Registro (fix mail sin SMTP en prod)
-- [x] Uploads archivos (`/storage/`)
-- [x] Onboarding completo (fix pantalla negra, stepper móvil)
-- [x] Locale silencioso (registro + onboarding + settings)
-- [x] Perfil clínica `/app/{slug}/profile`
-- [x] UX listados (timezones, tipos doc, menús tablas)
-- [x] Plantillas consulta — checklist + guía setup + auto-carga default
-- [x] Queue worker procesando jobs en prod (`ops:health --queue`)
-- [x] Scheduler heartbeat (`ops:health` + cache `ops.scheduler_last_run`)
-- [x] Emails transaccionales Resend SMTP verificado
+- [x] Registro · onboarding · locale · perfil clínica
+- [x] Uploads archivos · plantillas consulta · UX listados
+- [x] Queue worker + scheduler (`ops:health --queue`)
+- [x] Emails transaccionales Resend SMTP
+- [x] Staff invitaciones · vista paciente · archivos (pruebas manuales 2026-07-04)
 - [ ] Rotar credenciales expuestas en chat (Resend, admin password)
+
+### A.9 — UX prod desplegada (2026-07-04 tarde)
+- [x] Contadores pestañas paciente (`4a70f13`)
+- [x] Thumbnails archivos paciente (`5b683a7`)
+- [x] Tarjetas archivos — botones al fondo (`7a5f564`)
+- [x] Staff invite — límites plan + aviso invitación pendiente (`82107eb`, `c75f287`)
 
 ---
 
 ## Fase B — Planes BD fuente única → [LAUNCH-PLAN § B](LAUNCH-PLAN.md#fase-b--planes-en-bd-como-fuente-única)
 
-- [ ] Migración `plan_type` (añadir `practica`, `clinica`) o usar solo `plan_id`
-- [ ] Registro: `plan_id` del Free + límites copiados desde `plans`
-- [ ] Eliminar fallback `Clinic::PLAN_LIMITS` como fuente principal
-- [ ] `trial_days = 0` en todos los planes · sin trial en Paddle checkout
-- [ ] Definir límites Free finales en BD (Admin Plans)
-- [ ] Plan privado descuento: `is_private` + `requires_code` + prices Paddle
-- [ ] UI canje de código en billing
-- [ ] Tests planes/límites/registro/upgrade
+> **Código completo** — pendiente deploy + `migrate` + `db:seed --class=PlansSeeder` en prod
+
+- [x] `Clinic::resolvePlan()` + `getPlanLimits()` desde BD — `emergencyPlanLimits()` solo emergencia
+- [x] Registro: `plan_id` + límites copiados (`Plan::registrationAttributesFrom`)
+- [x] `clinics:backfill-plan-ids` + ejecutado en prod
+- [x] Admin Plans: `syncClinicLimits()` + campos `is_private`, `requires_code`, `access_code`
+- [x] Invitaciones pendientes cuentan en límite staff/doctor
+- [x] `PlansSeeder` trial_days=0 · Free max_staff=1 · tiers practica/clinica · `solo-estudiante`
+- [x] ADR-015 Paddle mensual/anual mismo row
+- [x] `Plan::findByPaddlePriceId()` · `billingVisibleFor()` · `findByAccessCode()`
+- [x] Billing: canje código promo + gate checkout plan privado
+- [x] `CheckPlanLimits`: downgrade vía `applyPlan(free)` 
+- [x] Tests: PlanLimitsTest + BillingTest (promo, practica/clinica)
+- [ ] Eliminar por completo `Clinic::emergencyPlanLimits()` cuando prod siempre tenga plans (opcional)
 
 ---
 
@@ -142,4 +150,4 @@ MRR/ARR/churn · SMS/WhatsApp · Social login · Múltiples sedes · App móvil 
 
 ## 📌 Historial — Sprints completados (pre-v1)
 
-Sprints A→G · Bloque 0 · v1.3 (2FA) · v1.4 (SOAP, archivos, agenda, catálogo) · F.1–F.10 · G.1–G.5 · **2026-07-04:** A8 UX, locale, plantillas onboarding, perfil fix
+Sprints A→G · Bloque 0 · v1.3 (2FA) · v1.4 (SOAP, archivos, agenda, catálogo) · F.1–F.10 · G.1–G.5 · **2026-07-04:** Fase A cerrada · UX paciente/staff/archivos · inicio Fase B
