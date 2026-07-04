@@ -76,6 +76,8 @@ class Index extends Component
     // Step 5: Plan selection
     public string $selectedPlan = 'free';
 
+    public bool $browserTimezoneRefined = false;
+
     public const PHONE_CODES = [
         'GT' => ['code' => '+502', 'flag' => '🇬🇹', 'name' => 'Guatemala'],
         'MX' => ['code' => '+52', 'flag' => '🇲🇽', 'name' => 'México'],
@@ -214,6 +216,8 @@ class Index extends Component
         if ($this->currentStep < $this->totalSteps) {
             $this->currentStep++;
         }
+
+        $this->clinic->refresh();
     }
 
     public function previousStep(): void
@@ -272,11 +276,11 @@ class Index extends Component
     {
         match ($this->currentStep) {
             1 => $this->validate([
-                'phone_country' => ['required', 'string', 'size:2'],
+                'phone_country' => ['required', 'string', 'size:2', 'in:'.implode(',', array_keys(self::PHONE_CODES))],
                 'phone_number' => ['nullable', 'string', 'max:20'],
                 'address' => ['nullable', 'string', 'max:255'],
                 'city' => ['nullable', 'string', 'max:100'],
-                'country' => ['required', 'string', 'size:2'],
+                'country' => ['required', 'string', 'size:2', 'in:'.implode(',', array_keys(self::PHONE_CODES))],
             ]),
             2 => $this->validate([
                 'timezone' => ['required', 'string', 'timezone'],
@@ -327,13 +331,13 @@ class Index extends Component
         match ($this->currentStep) {
             1 => $this->clinic->update([
                 'phone' => $this->phone_number
-                    ? (self::PHONE_CODES[$this->phone_country]['code'].' '.$this->phone_number)
+                    ? ($this->phoneCountryDialCode().' '.$this->phone_number)
                     : null,
                 'address' => $this->address ?: null,
                 'city' => $this->city ?: null,
                 'country' => $this->country,
                 'settings' => array_merge($this->clinic->settings ?? [], [
-                    'phone_country_code' => ltrim(self::PHONE_CODES[$this->phone_country]['code'], '+'),
+                    'phone_country_code' => ltrim($this->phoneCountryDialCode(), '+'),
                 ]),
             ]),
             2 => $this->clinic->update([
@@ -400,14 +404,29 @@ class Index extends Component
 
     public function refineTimezoneFromBrowser(string $timezone): void
     {
-        if ($this->clinic->onboarding_completed_at) {
+        if ($this->browserTimezoneRefined || $this->clinic->onboarding_completed_at) {
             return;
         }
+
+        $this->browserTimezoneRefined = true;
 
         $resolver = app(ClinicLocaleResolver::class);
         if ($resolver->isSupportedTimezone($timezone)) {
             $this->timezone = $timezone;
         }
+    }
+
+    protected function phoneCountryDialCode(): string
+    {
+        if (isset(self::PHONE_CODES[$this->phone_country])) {
+            return self::PHONE_CODES[$this->phone_country]['code'];
+        }
+
+        if (isset(self::PHONE_CODES[$this->country])) {
+            return self::PHONE_CODES[$this->country]['code'];
+        }
+
+        return self::PHONE_CODES['US']['code'];
     }
 
     protected function applyDetectedDefaultsIfNeeded(): void

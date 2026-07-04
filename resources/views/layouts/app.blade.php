@@ -156,9 +156,9 @@
             <livewire:app.tour.launcher />
         @endauth
 
-        {{-- Keyboard shortcuts (F.10) --}}
+        {{-- Keyboard shortcuts (F.10) — not during clinic setup wizard --}}
         @auth
-            @if($clinic instanceof \App\Models\Clinic)
+            @if($clinic instanceof \App\Models\Clinic && ! request()->routeIs('app.onboarding.*'))
                 <livewire:app.keyboard-shortcuts :clinic="$clinic" />
             @endif
         @endauth

@@ -25,9 +25,9 @@ class OnboardingTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
-    private function makeClinicWithOwner(): array
+    private function makeClinicWithOwner(array $clinicAttributes = []): array
     {
-        $clinic = Clinic::factory()->create(['onboarding_completed_at' => null]);
+        $clinic = Clinic::factory()->create(array_merge(['onboarding_completed_at' => null], $clinicAttributes));
         $owner = User::factory()->create(['clinic_id' => $clinic->id]);
         $clinic->update(['owner_id' => $owner->id]);
         $owner->assignRole('owner');
@@ -149,5 +149,33 @@ class OnboardingTest extends TestCase
 
         $clinic->refresh();
         $this->assertNotNull($clinic->onboarding_completed_at);
+    }
+
+    #[Test]
+    public function owner_can_advance_from_step_1_to_step_2(): void
+    {
+        [$clinic, $owner] = $this->makeClinicWithOwner([
+            'country' => 'CA',
+            'timezone' => 'America/Toronto',
+            'currency' => 'CAD',
+            'locale' => 'en',
+        ]);
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->set('phone_country', 'CA')
+            ->set('phone_number', '6045551234')
+            ->set('address', '123 Main St')
+            ->set('city', 'Vancouver')
+            ->set('country', 'CA')
+            ->call('nextStep')
+            ->assertHasNoErrors()
+            ->assertSet('currentStep', 2)
+            ->assertSet('timezone', 'America/Toronto');
+
+        $clinic->refresh();
+        $this->assertSame('CA', $clinic->country);
+        $this->assertSame('+1 6045551234', $clinic->phone);
     }
 }

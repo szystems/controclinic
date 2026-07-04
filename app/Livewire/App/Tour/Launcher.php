@@ -37,6 +37,13 @@ class Launcher extends Component
         $tourDone = ! empty($prefs['tour_completed_at']);
         $tourSkipped = ! empty($prefs['tour_skipped_at']);
 
+        // Never auto-start on clinic setup — dashboard nav targets do not exist yet.
+        if (request()->routeIs('app.onboarding.*')) {
+            $this->autoStart = false;
+
+            return;
+        }
+
         // Auto-start only if the user has never completed or skipped the tour
         $this->autoStart = ! $tourDone && ! $tourSkipped;
     }

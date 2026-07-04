@@ -1034,14 +1034,3 @@
         </div>
     </div>
 </div>
-
-@script
-<script>
-    try {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (timezone) {
-            $wire.refineTimezoneFromBrowser(timezone);
-        }
-    } catch (e) {}
-</script>
-@endscript
