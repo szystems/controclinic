@@ -59,11 +59,22 @@
             <div x-data="{
                     dragging: false,
                     fileNames: [],
+                    previews: [],
                     uploading: false,
                     progress: 0,
+                    clearPreviews() {
+                        this.previews.forEach(p => p.url && URL.revokeObjectURL(p.url));
+                        this.previews = [];
+                    },
                     handleFiles(files) {
                         if (!files || files.length === 0) return;
+                        this.clearPreviews();
                         this.fileNames = Array.from(files).map(f => f.name);
+                        Array.from(files).forEach(f => {
+                            if (f.type.startsWith('image/')) {
+                                this.previews.push({ name: f.name, url: URL.createObjectURL(f) });
+                            }
+                        });
                         this.uploading = true;
                         this.progress = 0;
                         $wire.uploadMultiple(
@@ -75,6 +86,7 @@
                         );
                     }
                 }"
+                 x-on:destroy="clearPreviews()"
                  @dragover.prevent="dragging = true"
                  @dragleave.prevent="dragging = false"
                  @drop.prevent="dragging = false; handleFiles($event.dataTransfer.files)"
@@ -97,7 +109,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
-                        <p class="text-sm text-indigo-600 dark:text-indigo-400">Subiendo… <span x-text="progress + '%'"></span></p>
+                        <p class="text-sm text-indigo-600 dark:text-indigo-400">{{ __('files.uploading') }} <span x-text="progress + '%'"></span></p>
                     </div>
                 </template>
 
@@ -112,14 +124,25 @@
                 </template>
 
                 <template x-if="!uploading && fileNames.length > 0">
-                    <div class="space-y-1">
-                        <svg class="mx-auto w-7 h-7 text-green-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="space-y-3">
+                        <template x-if="previews.length > 0">
+                            <div class="flex flex-wrap justify-center gap-2">
+                                <template x-for="preview in previews" :key="preview.url">
+                                    <div class="w-20 h-20 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm">
+                                        <img :src="preview.url"
+                                             :alt="preview.name"
+                                             class="w-full h-full object-cover">
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <svg class="mx-auto w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                         <template x-for="name in fileNames" :key="name">
                             <p class="text-xs text-gray-700 dark:text-gray-300 truncate" x-text="name"></p>
                         </template>
-                        <p class="text-xs text-gray-400 mt-1">Haz clic para cambiar</p>
+                        <p class="text-xs text-gray-400">{{ __('files.change_files') }}</p>
                     </div>
                 </template>
             </div>
@@ -216,7 +239,33 @@
         <x-skeleton-card wire:loading :count="6" :lines="3" />
         <div wire:loading.remove class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($files as $file)
-                <div class="group relative rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 hover:shadow-md transition-shadow">
+                <div class="group relative rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-md transition-shadow">
+                    {{-- Thumbnail / type preview --}}
+                    @if($file->isImage())
+                        <a href="{{ route('app.patient-files.show', ['clinic' => $currentClinic->slug, 'file' => $file->id]) }}"
+                           target="_blank"
+                           class="block aspect-[4/3] bg-gray-100 dark:bg-gray-900/50 overflow-hidden">
+                            <img src="{{ route('app.patient-files.show', ['clinic' => $currentClinic->slug, 'file' => $file->id]) }}"
+                                 alt="{{ __('files.preview_alt', ['name' => $file->name]) }}"
+                                 loading="lazy"
+                                 class="w-full h-full object-cover transition-transform group-hover:scale-[1.02]">
+                        </a>
+                    @else
+                        <div class="aspect-[4/3] flex items-center justify-center
+                            {{ $file->isPdf() ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-900/40' }}">
+                            @if($file->isPdf())
+                                <svg class="w-12 h-12 text-red-400 dark:text-red-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                            @else
+                                <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="p-4">
                     {{-- Category badge --}}
                     <div class="flex items-start justify-between mb-3">
                         <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full
@@ -241,30 +290,11 @@
                         @endcan
                     </div>
 
-                    {{-- File type icon --}}
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center
-                            {{ $file->isImage() ? 'bg-purple-100 dark:bg-purple-900/30' : ($file->isPdf() ? 'bg-red-100 dark:bg-red-900/30' : 'bg-gray-100 dark:bg-gray-700') }}">
-                            @if($file->isImage())
-                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                            @elseif($file->isPdf())
-                                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                </svg>
-                            @else
-                                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                            @endif
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" title="{{ $file->name }}">
-                                {{ $file->name }}
-                            </p>
-                            <p class="text-xs text-gray-400">{{ $file->formattedSize() }}</p>
-                        </div>
+                    <div class="mb-3 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" title="{{ $file->name }}">
+                            {{ $file->name }}
+                        </p>
+                        <p class="text-xs text-gray-400">{{ $file->formattedSize() }}</p>
                     </div>
 
                     {{-- Notes --}}
@@ -293,6 +323,7 @@
                            class="{{ ($file->isImage() || $file->isPdf()) ? '' : 'flex-1 text-center' }} text-xs font-medium px-2 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             {{ __('files.download') }}
                         </a>
+                    </div>
                     </div>
                 </div>
             @endforeach
