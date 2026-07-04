@@ -199,10 +199,6 @@ class Clinic extends Model
             return false;
         }
 
-        if ($this->isOnFreePlan() && $this->is_manual_plan) {
-            return false;
-        }
-
         $currentSort = $this->resolvePlan()?->sort_order ?? 0;
 
         return Plan::query()
