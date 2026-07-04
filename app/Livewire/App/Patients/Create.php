@@ -118,8 +118,9 @@ class Create extends Component
     {
         $this->currentClinic = $clinic;
         $settings = $clinic->settings ?? [];
-        $this->phone_country_code = $settings['phone_country_code'] ?? '502';
-        $this->phone_country_code_secondary = $settings['phone_country_code'] ?? '502';
+        $settings = $this->currentClinic->settings ?? [];
+        $this->phone_country_code = $settings['phone_country_code'] ?? config('clinic_locale.fallback.phone_country_code', '1');
+        $this->phone_country_code_secondary = $this->phone_country_code;
     }
 
     public function getDoctorsProperty()

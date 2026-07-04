@@ -3,6 +3,7 @@
 namespace App\Livewire\App\Settings;
 
 use App\Models\Clinic;
+use App\Services\ClinicLocaleResolver;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -36,9 +37,9 @@ class Index extends Component
     public ?string $description = '';
 
     // Localization
-    public string $locale = 'es';
+    public string $locale = 'en';
 
-    public string $timezone = 'America/Guatemala';
+    public string $timezone = 'America/New_York';
 
     public string $currency = 'USD';
 
@@ -46,7 +47,7 @@ class Index extends Component
 
     public string $time_format = '24h';
 
-    public string $phone_country_code = '502';
+    public string $phone_country_code = '1';
 
     // Appointments
     public int $appointment_duration = 30;
@@ -202,7 +203,7 @@ class Index extends Component
         $this->phone = $this->clinic->phone ?? '';
         $this->address = $this->clinic->address ?? '';
         $this->city = $this->clinic->city ?? '';
-        $this->country = $this->clinic->country ?? 'GT';
+        $this->country = $this->clinic->country ?? config('clinic_locale.fallback.country', 'US');
 
         $settings = $this->clinic->settings ?? [];
         $branding = $this->clinic->branding ?? [];
@@ -211,12 +212,14 @@ class Index extends Component
         $this->description = $settings['description'] ?? '';
 
         // Localization
-        $this->locale = $this->clinic->locale ?? 'es';
-        $this->timezone = $this->clinic->timezone ?? 'America/Guatemala';
-        $this->currency = $this->clinic->currency ?? 'USD';
+        $this->locale = $this->clinic->locale ?? config('clinic_locale.fallback.locale', 'en');
+        $this->timezone = $this->clinic->timezone ?? config('clinic_locale.fallback.timezone', 'America/New_York');
+        $this->currency = $this->clinic->currency ?? config('clinic_locale.fallback.currency', 'USD');
         $this->date_format = $settings['date_format'] ?? 'd/m/Y';
         $this->time_format = $settings['time_format'] ?? '24h';
-        $this->phone_country_code = $settings['phone_country_code'] ?? '502';
+        $this->phone_country_code = $settings['phone_country_code'] ?? config('clinic_locale.fallback.phone_country_code', '1');
+
+        $this->applyDetectedDefaultsIfNeeded();
 
         // Appointments
         $this->appointment_duration = $settings['appointment_duration'] ?? 30;
@@ -707,6 +710,35 @@ class Index extends Component
         fclose($f);
 
         return $output;
+    }
+
+    public function refineTimezoneFromBrowser(string $timezone): void
+    {
+        if ($this->clinic->onboarding_completed_at) {
+            return;
+        }
+
+        $resolver = app(ClinicLocaleResolver::class);
+        if ($resolver->isSupportedTimezone($timezone)) {
+            $this->timezone = $timezone;
+        }
+    }
+
+    protected function applyDetectedDefaultsIfNeeded(): void
+    {
+        $resolver = app(ClinicLocaleResolver::class);
+
+        if (! $resolver->usesLegacyDefaults($this->clinic)) {
+            return;
+        }
+
+        $defaults = $resolver->resolve(request());
+
+        $this->country = $defaults['country'];
+        $this->timezone = $defaults['timezone'];
+        $this->currency = $defaults['currency'];
+        $this->locale = $defaults['locale'];
+        $this->phone_country_code = $defaults['phone_country_code'];
     }
 
     public function render()

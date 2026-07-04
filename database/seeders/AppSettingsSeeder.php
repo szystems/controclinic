@@ -76,7 +76,7 @@ class AppSettingsSeeder extends Seeder
             [
                 'group' => 'defaults',
                 'key' => 'defaults.locale',
-                'value' => 'es',
+                'value' => 'en',
                 'type' => 'string',
                 'is_public' => true,
                 'description' => 'Idioma por defecto para nuevas clínicas (es|en)',
@@ -84,7 +84,7 @@ class AppSettingsSeeder extends Seeder
             [
                 'group' => 'defaults',
                 'key' => 'defaults.timezone',
-                'value' => 'America/Bogota',
+                'value' => 'America/New_York',
                 'type' => 'string',
                 'is_public' => false,
                 'description' => 'Zona horaria por defecto para nuevas clínicas',

@@ -49,6 +49,8 @@ new #[Layout('layouts.guest')] class extends Component
             }
 
             // Create the clinic
+            $localeDefaults = app(\App\Services\ClinicLocaleResolver::class)->resolve(request());
+
             $clinic = Clinic::create([
                 'name' => $validated['clinic_name'],
                 'slug' => $slug,
@@ -56,7 +58,13 @@ new #[Layout('layouts.guest')] class extends Component
                 'plan_type' => 'free',
                 'status' => 'active',
                 'is_manual_plan' => true, // Registro voluntario en plan free → acceso completo dentro de límites
-                'settings' => Clinic::getDefaultSettings(),
+                'country' => $localeDefaults['country'],
+                'timezone' => $localeDefaults['timezone'],
+                'currency' => $localeDefaults['currency'],
+                'locale' => $localeDefaults['locale'],
+                'settings' => array_merge(Clinic::getDefaultSettings(), [
+                    'phone_country_code' => $localeDefaults['phone_country_code'],
+                ]),
                 'branding' => ['primary_color' => '#4f46e5', 'secondary_color' => '#10b981'],
             ]);
 
@@ -68,6 +76,7 @@ new #[Layout('layouts.guest')] class extends Component
                 'clinic_id' => $clinic->id,
                 'role' => User::ROLE_OWNER,
                 'is_active' => true,
+                'locale' => $localeDefaults['locale'],
                 'terms_accepted_at' => now(),
             ]);
 

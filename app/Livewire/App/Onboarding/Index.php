@@ -4,6 +4,7 @@ namespace App\Livewire\App\Onboarding;
 
 use App\Models\Clinic;
 use App\Models\Plan;
+use App\Services\ClinicLocaleResolver;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -19,7 +20,7 @@ class Index extends Component
     public int $totalSteps = 5;
 
     // Step 1: Clinic Info
-    public string $phone_country = 'GT';
+    public string $phone_country = 'US';
 
     public string $phone_number = '';
 
@@ -27,14 +28,14 @@ class Index extends Component
 
     public string $city = '';
 
-    public string $country = 'GT';
+    public string $country = 'US';
 
     // Step 2: Localization
-    public string $timezone = 'America/Guatemala';
+    public string $timezone = 'America/New_York';
 
     public string $currency = 'USD';
 
-    public string $locale = 'es';
+    public string $locale = 'en';
 
     // Step 3: Branding
     public string $primary_color = '#4f46e5';
@@ -96,6 +97,7 @@ class Index extends Component
         'BO' => ['code' => '+591', 'flag' => '🇧🇴', 'name' => 'Bolivia'],
         'PY' => ['code' => '+595', 'flag' => '🇵🇾', 'name' => 'Paraguay'],
         'UY' => ['code' => '+598', 'flag' => '🇺🇾', 'name' => 'Uruguay'],
+        'GB' => ['code' => '+44', 'flag' => '🇬🇧', 'name' => 'Reino Unido'],
     ];
 
     public function getPlansProperty()
@@ -111,15 +113,17 @@ class Index extends Component
         $this->parsePhone($clinic->phone);
         $this->address = $clinic->address ?? '';
         $this->city = $clinic->city ?? '';
-        $this->country = $clinic->country ?? 'GT';
+        $this->country = $clinic->country ?? config('clinic_locale.fallback.country', 'US');
 
         if (! $this->phone_number) {
-            $this->phone_country = $this->country;
+            $this->phone_country = $this->mapPhoneCountry($clinic) ?? $this->country;
         }
 
-        $this->timezone = $clinic->timezone ?? 'America/Guatemala';
-        $this->currency = $clinic->currency ?? 'USD';
-        $this->locale = $clinic->locale ?? 'es';
+        $this->timezone = $clinic->timezone ?? config('clinic_locale.fallback.timezone', 'America/New_York');
+        $this->currency = $clinic->currency ?? config('clinic_locale.fallback.currency', 'USD');
+        $this->locale = $clinic->locale ?? config('clinic_locale.fallback.locale', 'en');
+
+        $this->applyDetectedDefaultsIfNeeded();
 
         $branding = $clinic->branding ?? [];
         $this->primary_color = $branding['primary_color'] ?? '#4f46e5';
@@ -328,6 +332,9 @@ class Index extends Component
                 'address' => $this->address ?: null,
                 'city' => $this->city ?: null,
                 'country' => $this->country,
+                'settings' => array_merge($this->clinic->settings ?? [], [
+                    'phone_country_code' => ltrim(self::PHONE_CODES[$this->phone_country]['code'], '+'),
+                ]),
             ]),
             2 => $this->clinic->update([
                 'timezone' => $this->timezone,
@@ -389,6 +396,57 @@ class Index extends Component
         }
 
         return $branding;
+    }
+
+    public function refineTimezoneFromBrowser(string $timezone): void
+    {
+        if ($this->clinic->onboarding_completed_at) {
+            return;
+        }
+
+        $resolver = app(ClinicLocaleResolver::class);
+        if ($resolver->isSupportedTimezone($timezone)) {
+            $this->timezone = $timezone;
+        }
+    }
+
+    protected function applyDetectedDefaultsIfNeeded(): void
+    {
+        $resolver = app(ClinicLocaleResolver::class);
+
+        if (! $resolver->usesLegacyDefaults($this->clinic)) {
+            return;
+        }
+
+        $this->applyDefaultsToForm($resolver->resolve(request()));
+    }
+
+    /**
+     * @param  array{country: string, phone_country: string, phone_country_code: string, timezone: string, currency: string, locale: string}  $defaults
+     */
+    protected function applyDefaultsToForm(array $defaults): void
+    {
+        $this->country = $defaults['country'];
+        $this->phone_country = $defaults['phone_country'];
+        $this->timezone = $defaults['timezone'];
+        $this->currency = $defaults['currency'];
+        $this->locale = $defaults['locale'];
+    }
+
+    protected function mapPhoneCountry(Clinic $clinic): ?string
+    {
+        $numericCode = $clinic->settings['phone_country_code'] ?? null;
+        if (! $numericCode) {
+            return null;
+        }
+
+        foreach (self::PHONE_CODES as $iso => $data) {
+            if (ltrim($data['code'], '+') === (string) $numericCode) {
+                return $iso;
+            }
+        }
+
+        return null;
     }
 
     public function render()

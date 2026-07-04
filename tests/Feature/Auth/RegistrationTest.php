@@ -42,8 +42,31 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
 
-        // Verify clinic and user were created
         $this->assertDatabaseHas('clinics', ['name' => 'Test Clinic']);
         $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
+    }
+
+    public function test_registration_applies_detected_locale_defaults(): void
+    {
+        $this->withHeaders([
+            'CF-IPCountry' => 'CA',
+            'Accept-Language' => 'en-CA,en;q=0.9',
+        ]);
+
+        Volt::test('pages.auth.register')
+            ->set('clinic_name', 'Canadian Clinic')
+            ->set('name', 'Canadian Owner')
+            ->set('email', 'canada@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('terms_accepted', true)
+            ->call('register');
+
+        $this->assertDatabaseHas('clinics', [
+            'name' => 'Canadian Clinic',
+            'country' => 'CA',
+            'currency' => 'CAD',
+            'locale' => 'en',
+        ]);
     }
 }

@@ -1,0 +1,173 @@
+<?php
+
+/**
+ * Regional defaults for new clinics.
+ * Used by ClinicLocaleResolver (Cloudflare country + browser hints).
+ */
+return [
+    'fallback' => [
+        'country' => 'US',
+        'phone_country' => 'US',
+        'phone_country_code' => '1',
+        'timezone' => 'America/New_York',
+        'currency' => 'USD',
+        'locale' => 'en',
+    ],
+
+    'countries' => [
+        'US' => [
+            'phone_country' => 'US',
+            'phone_country_code' => '1',
+            'timezone' => 'America/New_York',
+            'currency' => 'USD',
+            'locale' => 'en',
+        ],
+        'CA' => [
+            'phone_country' => 'CA',
+            'phone_country_code' => '1',
+            'timezone' => 'America/Toronto',
+            'currency' => 'CAD',
+            'locale' => 'en',
+        ],
+        'MX' => [
+            'phone_country' => 'MX',
+            'phone_country_code' => '52',
+            'timezone' => 'America/Mexico_City',
+            'currency' => 'MXN',
+            'locale' => 'es',
+        ],
+        'GT' => [
+            'phone_country' => 'GT',
+            'phone_country_code' => '502',
+            'timezone' => 'America/Guatemala',
+            'currency' => 'GTQ',
+            'locale' => 'es',
+        ],
+        'SV' => [
+            'phone_country' => 'SV',
+            'phone_country_code' => '503',
+            'timezone' => 'America/El_Salvador',
+            'currency' => 'USD',
+            'locale' => 'es',
+        ],
+        'HN' => [
+            'phone_country' => 'HN',
+            'phone_country_code' => '504',
+            'timezone' => 'America/Tegucigalpa',
+            'currency' => 'HNL',
+            'locale' => 'es',
+        ],
+        'NI' => [
+            'phone_country' => 'NI',
+            'phone_country_code' => '505',
+            'timezone' => 'America/Managua',
+            'currency' => 'NIO',
+            'locale' => 'es',
+        ],
+        'CR' => [
+            'phone_country' => 'CR',
+            'phone_country_code' => '506',
+            'timezone' => 'America/Costa_Rica',
+            'currency' => 'CRC',
+            'locale' => 'es',
+        ],
+        'PA' => [
+            'phone_country' => 'PA',
+            'phone_country_code' => '507',
+            'timezone' => 'America/Panama',
+            'currency' => 'USD',
+            'locale' => 'es',
+        ],
+        'CO' => [
+            'phone_country' => 'CO',
+            'phone_country_code' => '57',
+            'timezone' => 'America/Bogota',
+            'currency' => 'COP',
+            'locale' => 'es',
+        ],
+        'PE' => [
+            'phone_country' => 'PE',
+            'phone_country_code' => '51',
+            'timezone' => 'America/Lima',
+            'currency' => 'PEN',
+            'locale' => 'es',
+        ],
+        'EC' => [
+            'phone_country' => 'EC',
+            'phone_country_code' => '593',
+            'timezone' => 'America/Guayaquil',
+            'currency' => 'USD',
+            'locale' => 'es',
+        ],
+        'CL' => [
+            'phone_country' => 'CL',
+            'phone_country_code' => '56',
+            'timezone' => 'America/Santiago',
+            'currency' => 'CLP',
+            'locale' => 'es',
+        ],
+        'AR' => [
+            'phone_country' => 'AR',
+            'phone_country_code' => '54',
+            'timezone' => 'America/Argentina/Buenos_Aires',
+            'currency' => 'ARS',
+            'locale' => 'es',
+        ],
+        'UY' => [
+            'phone_country' => 'UY',
+            'phone_country_code' => '598',
+            'timezone' => 'America/Montevideo',
+            'currency' => 'UYU',
+            'locale' => 'es',
+        ],
+        'PY' => [
+            'phone_country' => 'PY',
+            'phone_country_code' => '595',
+            'timezone' => 'America/Asuncion',
+            'currency' => 'PYG',
+            'locale' => 'es',
+        ],
+        'BO' => [
+            'phone_country' => 'BO',
+            'phone_country_code' => '591',
+            'timezone' => 'America/La_Paz',
+            'currency' => 'BOB',
+            'locale' => 'es',
+        ],
+        'VE' => [
+            'phone_country' => 'VE',
+            'phone_country_code' => '58',
+            'timezone' => 'America/Caracas',
+            'currency' => 'USD',
+            'locale' => 'es',
+        ],
+        'DO' => [
+            'phone_country' => 'DO',
+            'phone_country_code' => '1',
+            'timezone' => 'America/Santo_Domingo',
+            'currency' => 'DOP',
+            'locale' => 'es',
+        ],
+        'PR' => [
+            'phone_country' => 'US',
+            'phone_country_code' => '1',
+            'timezone' => 'America/Puerto_Rico',
+            'currency' => 'USD',
+            'locale' => 'es',
+        ],
+        'ES' => [
+            'phone_country' => 'ES',
+            'phone_country_code' => '34',
+            'timezone' => 'Europe/Madrid',
+            'currency' => 'EUR',
+            'locale' => 'es',
+        ],
+        'GB' => [
+            'phone_country' => 'GB',
+            'phone_country_code' => '44',
+            'timezone' => 'Europe/London',
+            'currency' => 'GBP',
+            'locale' => 'en',
+        ],
+    ],
+];
