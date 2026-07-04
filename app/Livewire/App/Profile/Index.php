@@ -125,6 +125,6 @@ class Index extends Component
     {
         return view('livewire.app.profile.index', [
             'activities' => $this->activities,
-        ]);
+        ])->layout('layouts.app');
     }
 }
