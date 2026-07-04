@@ -31,7 +31,7 @@
                 </div>
 
                 {{-- Pricing Cards (Dynamic from DB) --}}
-                <div class="mt-12 grid lg:grid-cols-{{ max(1, $plans->count()) }} gap-8 max-w-7xl mx-auto">
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-{{ max(1, min(4, $plans->count())) }} gap-6 lg:gap-8 max-w-7xl mx-auto min-w-0">
                     @foreach ($plans as $plan)
                         <x-plan-card :plan="$plan" context="pricing" />
                     @endforeach
@@ -84,9 +84,9 @@
                 @foreach($faqs as $index => $faq)
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
                         <button @click="open = open === {{ $index }} ? null : {{ $index }}"
-                                class="w-full flex items-center justify-between p-6 text-left">
-                            <span class="font-medium text-gray-900">{{ $faq['q'] }}</span>
-                            <svg class="w-5 h-5 text-gray-500 transition-transform"
+                                class="w-full flex items-center justify-between gap-3 p-4 sm:p-6 text-left">
+                            <span class="font-medium text-gray-900 min-w-0 flex-1">{{ $faq['q'] }}</span>
+                            <svg class="w-5 h-5 text-gray-500 shrink-0 transition-transform"
                                  :class="open === {{ $index }} ? 'rotate-180' : ''"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>

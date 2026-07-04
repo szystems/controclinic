@@ -14,7 +14,7 @@
     }
 @endphp
 
-<div class="overflow-x-auto">
+<div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full">
     <table class="w-full">
         <thead>
             <tr class="border-b border-gray-200">

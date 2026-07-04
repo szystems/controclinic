@@ -33,7 +33,7 @@
                         @endif
                     </a>
                     <p class="text-sm">{{ __('public.footer_tagline') }}</p>
-                    <p class="text-xs text-gray-500 mt-3">
+                    <p class="text-xs text-gray-500 mt-3 break-words">
                         <x-brand-credit :app="$appName" link-class="underline hover:text-gray-300" />
                     </p>
                 </div>

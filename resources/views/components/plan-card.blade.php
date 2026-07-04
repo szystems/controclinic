@@ -127,7 +127,7 @@
 
 @else
     {{-- Pricing: public marketing card --}}
-    <div class="{{ $isPopular ? 'bg-indigo-600 rounded-2xl p-8 text-left relative shadow-xl lg:scale-105' : 'bg-white rounded-2xl border border-gray-200 p-8 text-left hover:shadow-lg transition-shadow' }}">
+    <div class="{{ $isPopular ? 'bg-indigo-600 rounded-2xl p-6 sm:p-8 text-left relative shadow-xl lg:scale-105 min-w-0 max-w-full' : 'bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 text-left hover:shadow-lg transition-shadow min-w-0 max-w-full' }}">
         @if ($isPopular)
             <div class="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span class="bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 text-xs font-bold px-4 py-1 rounded-full">
