@@ -11,8 +11,8 @@
 | Fase | Nombre | Estado | Bloquea lanzamiento |
 |------|--------|--------|---------------------|
 | **A** | Infraestructura y dominio | ✅ ~99% (A11 snapshot manual) | No |
-| **B** | Planes BD — fuente única | ✅ |
-| **C** | Marca y mensaje freemium | ✅ |
+| **B** | Planes BD — fuente única | ✅ | Sí (límites y billing) |
+| **C** | Marca y mensaje freemium | ✅ | Sí (confianza / conversión) |
 | **D** | Paddle — monetización | 🔜 pendiente | Sí (cobro real) |
 | **E** | Legal, marketing y szystems.com | 🔜 pendiente | Sí (apertura pública) |
 | **G** | Panel Admin — operaciones plataforma | ✅ código | Verificar prod + password |
