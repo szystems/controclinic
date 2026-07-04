@@ -28,6 +28,31 @@
             </div>
         </div>
 
+        @if($this->pendingStaffInvitations->isNotEmpty() && ! $this->canInviteStaff)
+            <div class="mb-4 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 p-4">
+                <p class="text-sm font-medium text-amber-900 dark:text-amber-100">
+                    {{ __('staff.pending_invitation_uses_slot') }}
+                </p>
+                <ul class="mt-2 space-y-1 text-sm text-amber-800 dark:text-amber-200">
+                    @foreach($this->pendingStaffInvitations as $pending)
+                        <li>
+                            {{ $pending->name }} · {{ $pending->email }}
+                            · {{ __('staff.role_' . $pending->role) }}
+                        </li>
+                    @endforeach
+                </ul>
+                <a href="{{ route('app.staff.index', ['clinic' => $currentClinic->slug]) }}#pending-invitations"
+                   wire:navigate
+                   class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-amber-900 dark:text-amber-100 underline">
+                    {{ __('staff.manage_pending_invitations') }}
+                </a>
+            </div>
+        @elseif(! $this->canInviteDoctor && ! $this->canInviteStaff)
+            <div class="mb-4">
+                <x-upgrade-nudge type="banner" :clinic-slug="$currentClinic->slug" />
+            </div>
+        @endif
+
         {{-- Flash Messages --}}
         @if (session()->has('error'))
         <div class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
@@ -81,27 +106,27 @@
                         <select wire:model.live="role" id="role"
                                 class="block w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="">{{ __('staff.select_role') }}</option>
-                            @if($currentClinic->canAddDoctor())
-                                <option value="doctor">{{ __('staff.role_doctor') }}</option>
-                            @endif
-                            @if($currentClinic->canAddStaff())
-                                <option value="assistant">{{ __('staff.role_assistant') }}</option>
-                                <option value="secretary">{{ __('staff.role_secretary') }}</option>
-                                <option value="receptionist">{{ __('staff.role_receptionist') }}</option>
-                            @endif
+                            <option value="doctor">{{ __('staff.role_doctor') }}</option>
+                            <option value="assistant">{{ __('staff.role_assistant') }}</option>
+                            <option value="secretary">{{ __('staff.role_secretary') }}</option>
+                            <option value="receptionist">{{ __('staff.role_receptionist') }}</option>
                         </select>
                         @error('role') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
 
-                        @if(!$currentClinic->canAddDoctor() && $currentClinic->canAddStaff())
+                        @if(!$this->canInviteDoctor && $this->canInviteStaff)
                             <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                                 {{ __('staff.owner_occupies_doctor_slot') }}
                             </p>
                         @endif
 
-                        @if(!$currentClinic->canAddDoctor() && !$currentClinic->canAddStaff())
-                            <div class="mt-2">
-                                <x-upgrade-nudge type="inline" :clinic-slug="$currentClinic->slug" />
-                            </div>
+                        @if($role === 'doctor' && ! $this->canInviteDoctor)
+                            <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                                {{ __('staff.doctor_limit_reached') }}
+                            </p>
+                        @elseif(in_array($role, ['assistant', 'secretary', 'receptionist'], true) && ! $this->canInviteStaff)
+                            <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                                {{ __('staff.staff_limit_reached') }}
+                            </p>
                         @endif
                     </div>
                 </div>
@@ -118,7 +143,11 @@
                     {{ __('general.cancel') }}
                 </a>
                 <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                        @disabled(
+                            ($role === 'doctor' && ! $this->canInviteDoctor)
+                            || (in_array($role, ['assistant', 'secretary', 'receptionist'], true) && ! $this->canInviteStaff)
+                        )
+                        class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed">
                     <span wire:loading.remove wire:target="save" class="inline-flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>

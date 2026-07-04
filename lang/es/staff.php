@@ -68,6 +68,8 @@ return [
     'staff_unlimited' => 'Personal: :current (ilimitados)',
     'doctor_limit_reached' => 'Has alcanzado el límite de doctores de tu plan',
     'owner_occupies_doctor_slot' => 'Tu plan incluye un doctor (tú, como propietario). Puedes invitar asistente, secretaria o recepcionista abajo.',
+    'pending_invitation_uses_slot' => 'Tu cupo de personal ya está reservado por una invitación pendiente. Reenvíala, edítala o cancélala para invitar a otra persona.',
+    'manage_pending_invitations' => 'Gestionar invitaciones pendientes',
     'staff_limit_reached' => 'Has alcanzado el límite de personal de tu plan',
     'no_staff_in_plan' => 'Tu plan no incluye personal adicional',
     'upgrade_for_doctors' => 'Mejora tu plan para agregar más doctores',

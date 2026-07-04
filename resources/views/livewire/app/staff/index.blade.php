@@ -112,7 +112,7 @@
         {{-- Pending Invitations --}}
         @can('users.manage')
         @if($pendingInvitations->count())
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+        <div id="pending-invitations" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

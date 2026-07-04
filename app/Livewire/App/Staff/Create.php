@@ -45,6 +45,49 @@ class Create extends Component
         $this->currentClinic = $clinic;
     }
 
+    public function getPendingStaffInvitationsProperty()
+    {
+        return $this->currentClinic->pendingInvitations()
+            ->whereIn('role', ['assistant', 'secretary', 'receptionist'])
+            ->with('inviter')
+            ->get();
+    }
+
+    public function getPendingDoctorInvitationsProperty()
+    {
+        return $this->currentClinic->pendingInvitations()
+            ->where('role', 'doctor')
+            ->with('inviter')
+            ->get();
+    }
+
+    public function getCanInviteDoctorProperty(): bool
+    {
+        return $this->currentClinic->canAddDoctor();
+    }
+
+    public function getCanInviteStaffProperty(): bool
+    {
+        return $this->currentClinic->canAddStaff();
+    }
+
+    public function updatedEmail(): void
+    {
+        if (! $this->email) {
+            return;
+        }
+
+        $pending = ClinicInvitation::query()
+            ->where('clinic_id', $this->currentClinic->id)
+            ->where('email', $this->email)
+            ->pending()
+            ->first();
+
+        if ($pending) {
+            $this->addError('email', __('invitations.duplicate_pending'));
+        }
+    }
+
     public function save(): void
     {
         if (! auth()->user()->can('users.manage')) {

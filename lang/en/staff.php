@@ -68,6 +68,8 @@ return [
     'staff_unlimited' => 'Staff: :current (unlimited)',
     'doctor_limit_reached' => 'You have reached the doctor limit for your plan',
     'owner_occupies_doctor_slot' => 'Your plan includes one doctor (you, as owner). You can invite assistant, secretary, or receptionist roles below.',
+    'pending_invitation_uses_slot' => 'Your staff slot is already reserved by a pending invitation. Resend it, edit it, or cancel it to invite someone else.',
+    'manage_pending_invitations' => 'Manage pending invitations',
     'staff_limit_reached' => 'You have reached the staff limit for your plan',
     'no_staff_in_plan' => 'Your plan does not include additional staff',
     'upgrade_for_doctors' => 'Upgrade your plan to add more doctors',
