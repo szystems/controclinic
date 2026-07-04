@@ -42,11 +42,15 @@ class RecordTemplates extends Component
     // Delete confirm
     public ?string $confirmDeleteId = null;
 
+    public bool $showSetupGuide = false;
+
     public function mount(): void
     {
         $this->clinic = app('current_clinic');
         $this->clinicSlug = $this->clinic->slug;
         abort_unless(auth()->user()->can('templates.manage'), 403);
+
+        $this->showSetupGuide = request()->query('from') === 'setup';
     }
 
     // ==================== COMPUTED ====================
@@ -80,6 +84,37 @@ class RecordTemplates extends Component
         $this->resetForm();
         $this->editingId = null;
         $this->showModal = true;
+        $this->showSetupGuide = false;
+    }
+
+    public function createSuggested(): void
+    {
+        abort_unless(auth()->user()->can('templates.manage'), 403);
+
+        if (RecordTemplate::where('clinic_id', $this->clinic->id)->exists()) {
+            return;
+        }
+
+        RecordTemplate::create([
+            'clinic_id' => $this->clinic->id,
+            'created_by_user_id' => auth()->id(),
+            'name' => __('templates.suggested_name'),
+            'record_type' => MedicalRecord::TYPE_CONSULTATION,
+            'chief_complaint' => __('templates.suggested_chief_complaint'),
+            'present_illness' => __('templates.suggested_present_illness'),
+            'physical_examination' => __('templates.suggested_physical_examination'),
+            'assessment' => __('templates.suggested_assessment'),
+            'plan' => __('templates.suggested_plan'),
+            'is_default' => true,
+        ]);
+
+        $this->showSetupGuide = false;
+        session()->flash('success', __('templates.suggested_created'));
+    }
+
+    public function dismissSetupGuide(): void
+    {
+        $this->showSetupGuide = false;
     }
 
     public function edit(string $id): void
@@ -155,6 +190,13 @@ class RecordTemplates extends Component
         }
 
         $this->closeModal();
+    }
+
+    // ==================== SETUP GUIDE ====================
+
+    public function getShowSetupGuideBannerProperty(): bool
+    {
+        return $this->showSetupGuide && $this->templates->isEmpty();
     }
 
     // ==================== DELETE ====================

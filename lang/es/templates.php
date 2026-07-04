@@ -29,4 +29,30 @@ return [
     'no_templates' => 'No hay plantillas para este tipo de consulta.',
     'default_badge' => 'Por defecto',
     'created_by' => 'Creada por',
+
+    // Guía de configuración (checklist del dashboard)
+    'setup_title' => 'Las plantillas de consulta te ahorran tiempo',
+    'setup_description' => 'Las plantillas pre-rellenan el formulario clínico — motivo, exploración, diagnóstico y plan — para documentar más rápido y con consistencia en cada visita.',
+    'setup_benefit_1' => 'Pre-rellena los campos SOAP con un clic al crear una consulta',
+    'setup_benefit_2' => 'Crea plantillas distintas por tipo de visita (control, seguimiento, procedimiento…)',
+    'setup_benefit_3' => 'Marca una como predeterminada — se carga sola en nuevas consultas',
+    'setup_suggested_btn' => 'Empezar con plantilla sugerida',
+    'setup_create_btn' => 'Crear la mía',
+    'setup_dismiss' => 'Lo haré después',
+
+    // Plantilla inicial sugerida
+    'suggested_name' => 'Consulta general',
+    'suggested_created' => '¡Plantilla inicial creada! Puedes editarla cuando quieras.',
+    'suggested_chief_complaint' => 'Motivo de consulta (personaliza según tu especialidad)',
+    'suggested_present_illness' => 'Inicio, duración, síntomas asociados, factores que alivian o empeoran.',
+    'suggested_physical_examination' => 'Aspecto general, signos vitales, sistemas revisados según indicación.',
+    'suggested_assessment' => 'Impresión clínica / diagnóstico presuntivo.',
+    'suggested_plan' => 'Tratamiento, seguimiento, indicaciones al paciente e interconsultas si aplica.',
+
+    // Recordatorio en formulario de nueva consulta
+    'create_reminder_title' => 'Agiliza tus notas con plantillas',
+    'create_reminder_body' => 'Crea plantillas de consulta para pre-rellenar este formulario automáticamente en cada visita.',
+    'create_reminder_type_body' => 'Aún no hay plantilla para este tipo de visita. Crea una para pre-rellenar estos campos.',
+    'create_reminder_link' => 'Configurar plantillas',
+    'default_loaded_hint' => 'Plantilla predeterminada aplicada. Puedes cambiarla arriba o editar los campos abajo.',
 ];

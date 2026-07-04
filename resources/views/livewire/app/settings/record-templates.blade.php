@@ -33,8 +33,71 @@
                 </div>
             @endif
 
+            {{-- Setup guide (from dashboard checklist) --}}
+            @if($this->showSetupGuideBanner)
+                <div class="mb-6 rounded-xl border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 p-5 sm:p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100">
+                                {{ __('templates.setup_title') }}
+                            </h3>
+                            <p class="mt-1 text-sm text-indigo-700 dark:text-indigo-300">
+                                {{ __('templates.setup_description') }}
+                            </p>
+                            <ul class="mt-3 space-y-1.5 text-xs sm:text-sm text-indigo-600 dark:text-indigo-400">
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    {{ __('templates.setup_benefit_1') }}
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    {{ __('templates.setup_benefit_2') }}
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    {{ __('templates.setup_benefit_3') }}
+                                </li>
+                            </ul>
+                            <div class="mt-4 flex flex-col xs:flex-row flex-wrap gap-2">
+                                <button wire:click="createSuggested"
+                                        wire:loading.attr="disabled"
+                                        wire:target="createSuggested"
+                                        class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition">
+                                    <span wire:loading.remove wire:target="createSuggested">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                        </svg>
+                                    </span>
+                                    <span wire:loading wire:target="createSuggested">
+                                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                                        </svg>
+                                    </span>
+                                    {{ __('templates.setup_suggested_btn') }}
+                                </button>
+                                <button wire:click="create"
+                                        class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-lg border border-indigo-200 dark:border-indigo-700 transition">
+                                    {{ __('templates.setup_create_btn') }}
+                                </button>
+                                <button wire:click="dismissSetupGuide"
+                                        class="inline-flex items-center justify-center px-3 py-2 text-xs text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-200 transition">
+                                    {{ __('templates.setup_dismiss') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             {{-- Empty state --}}
             @if($this->templates->isEmpty())
+                @unless($this->showSetupGuideBanner)
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
                     <svg class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -48,6 +111,7 @@
                         {{ __('templates.new') }}
                     </button>
                 </div>
+                @endunless
             @else
                 {{-- Templates grouped by record_type --}}
                 @php

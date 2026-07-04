@@ -8,6 +8,7 @@ return [
     // Steps
     'step_logo' => 'Sube el logo de tu clínica',
     'step_schedule' => 'Configura los horarios de atención',
+    'step_template' => 'Crea tu primera plantilla de consulta',
     'step_patient' => 'Registra tu primer paciente',
     'step_appointment' => 'Agenda tu primera cita',
     'step_staff' => 'Invita a un miembro del equipo',

@@ -37,9 +37,40 @@
                         </div>
                     </div>
 
+                    {{-- Template reminder when none exist for this type --}}
+                    @if($this->templatesForType->isEmpty() && auth()->user()->can('templates.manage'))
+                        <div class="mt-4 rounded-lg border border-dashed border-indigo-300 dark:border-indigo-700 bg-indigo-50/80 dark:bg-indigo-900/20 p-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                <div class="flex items-start gap-3 flex-1 min-w-0">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+                                            {{ __('templates.create_reminder_title') }}
+                                        </p>
+                                        <p class="mt-0.5 text-xs text-indigo-700 dark:text-indigo-300">
+                                            {{ $this->clinicHasTemplates ? __('templates.create_reminder_type_body') : __('templates.create_reminder_body') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <a href="{{ route('app.settings.templates', $clinicSlug) }}{{ $this->clinicHasTemplates ? '' : '?from=setup' }}"
+                                   wire:navigate
+                                   class="flex-shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg transition">
+                                    {{ __('templates.create_reminder_link') }}
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- Template selector --}}
                     @if($this->templatesForType->isNotEmpty())
-                        <div class="mt-4 flex items-end gap-2 p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                        <div class="mt-4 flex flex-col sm:flex-row sm:items-end gap-2 p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
                             <div class="flex-1">
                                 <label class="block text-xs font-medium text-indigo-700 dark:text-indigo-300 mb-1">
                                     {{ __('templates.load_template') }}
@@ -56,10 +87,18 @@
                             </div>
                             <button type="button" wire:click="loadTemplate"
                                     @if(!$selectedTemplateId) disabled @endif
-                                    class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition">
+                                    class="w-full sm:w-auto px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition">
                                 {{ __('templates.load_template') }}
                             </button>
                         </div>
+                        @if($this->defaultTemplateLoaded)
+                            <p class="mt-2 text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                {{ __('templates.default_loaded_hint') }}
+                            </p>
+                        @endif
                     @endif
                 </section>
 

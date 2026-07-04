@@ -29,4 +29,30 @@ return [
     'no_templates' => 'No templates for this consultation type.',
     'default_badge' => 'Default',
     'created_by' => 'Created by',
+
+    // Setup guide (dashboard checklist)
+    'setup_title' => 'Consultation templates save you time',
+    'setup_description' => 'Templates pre-fill the clinical notes form — reason for visit, exam, diagnosis, and plan — so you document faster and stay consistent across visits.',
+    'setup_benefit_1' => 'Pre-fill SOAP fields in one click when creating a record',
+    'setup_benefit_2' => 'Create different templates per visit type (check-up, follow-up, procedure…)',
+    'setup_benefit_3' => 'Mark one as default — it loads automatically on new consultations',
+    'setup_suggested_btn' => 'Start with suggested template',
+    'setup_create_btn' => 'Create my own',
+    'setup_dismiss' => "I'll do this later",
+
+    // Suggested starter template
+    'suggested_name' => 'General consultation',
+    'suggested_created' => 'Starter template created! You can edit it anytime.',
+    'suggested_chief_complaint' => 'Reason for visit (customize for your specialty)',
+    'suggested_present_illness' => 'Onset, duration, associated symptoms, relieving/aggravating factors.',
+    'suggested_physical_examination' => 'General appearance, vital signs, systems reviewed as indicated.',
+    'suggested_assessment' => 'Clinical impression / working diagnosis.',
+    'suggested_plan' => 'Treatment, follow-up, patient instructions, and referrals if needed.',
+
+    // Reminder on new record form
+    'create_reminder_title' => 'Speed up your notes with templates',
+    'create_reminder_body' => 'Create consultation templates to pre-fill this form automatically on every visit.',
+    'create_reminder_type_body' => 'No template for this visit type yet. Create one to pre-fill these fields.',
+    'create_reminder_link' => 'Set up templates',
+    'default_loaded_hint' => 'Default template applied. You can change it above or edit the fields below.',
 ];

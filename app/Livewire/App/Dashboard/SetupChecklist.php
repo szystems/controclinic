@@ -3,6 +3,7 @@
 namespace App\Livewire\App\Dashboard;
 
 use App\Models\Clinic;
+use App\Models\RecordTemplate;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -19,6 +20,7 @@ class SetupChecklist extends Component
     public static array $STEPS = [
         'logo' => ['icon' => 'photo',        'perm' => null],
         'schedule' => ['icon' => 'clock',         'perm' => null],
+        'template' => ['icon' => 'document',      'perm' => 'templates.manage'],
         'patient' => ['icon' => 'users',         'perm' => 'patients.create'],
         'appointment' => ['icon' => 'calendar',      'perm' => 'appointments.create'],
         'staff' => ['icon' => 'user-add',      'perm' => 'users.manage'],
@@ -56,6 +58,7 @@ class SetupChecklist extends Component
         return [
             'logo' => ! empty($branding['logo']),
             'schedule' => array_key_exists('working_days', $settings),
+            'template' => RecordTemplate::where('clinic_id', $clinic->id)->exists(),
             'patient' => $clinic->patients()->exists(),
             'appointment' => $clinic->appointments()->exists(),
             'staff' => $clinic->users()->where('users.id', '!=', $clinic->owner_id)->exists(),
@@ -92,6 +95,7 @@ class SetupChecklist extends Component
         return [
             'logo' => route('app.settings.index', $slug),
             'schedule' => route('app.settings.index', $slug),
+            'template' => route('app.settings.templates', $slug).'?from=setup',
             'patient' => route('app.patients.create', $slug),
             'appointment' => route('app.appointments.create', $slug),
             'staff' => route('app.staff.create', $slug),

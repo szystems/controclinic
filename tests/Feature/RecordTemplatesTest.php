@@ -209,6 +209,45 @@ class RecordTemplatesTest extends TestCase
             ->assertSet('plan', 'Reposo 3 días');
     }
 
+    public function test_default_template_auto_loads_on_create_form(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = Patient::factory()->create(['clinic_id' => $clinic->id]);
+        $template = $this->createTemplate($clinic, $owner, [
+            'is_default' => true,
+            'chief_complaint' => 'Carga automática',
+            'plan' => 'Plan predeterminado',
+        ]);
+
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($owner)
+            ->test(CreateRecord::class, ['patient' => $patient])
+            ->assertSet('selectedTemplateId', $template->id)
+            ->assertSet('chiefComplaint', 'Carga automática')
+            ->assertSet('plan', 'Plan predeterminado');
+    }
+
+    public function test_owner_can_create_suggested_template_from_setup(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($owner)
+            ->withQueryParams(['from' => 'setup'])
+            ->test(RecordTemplates::class)
+            ->assertSet('showSetupGuide', true)
+            ->call('createSuggested')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('record_templates', [
+            'clinic_id' => $clinic->id,
+            'name' => __('templates.suggested_name'),
+            'is_default' => true,
+        ]);
+    }
+
     public function test_cannot_load_template_from_another_clinic(): void
     {
         [$clinic, $owner] = $this->createClinicWithOwner();

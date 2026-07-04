@@ -6,6 +6,7 @@ use App\Livewire\App\Dashboard\SetupChecklist;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
+use App\Models\RecordTemplate;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -81,10 +82,29 @@ class SetupChecklistTest extends TestCase
         $status = $component->get('stepsStatus');
         $this->assertFalse($status['logo']);
         $this->assertFalse($status['schedule']);
+        $this->assertFalse($status['template']);
         $this->assertFalse($status['patient']);
         $this->assertFalse($status['appointment']);
         $this->assertFalse($status['staff']);
         $this->assertFalse($status['public_page']);
+    }
+
+    public function test_template_step_marks_done_when_template_exists(): void
+    {
+        [$clinic, $owner] = $this->makeOwner();
+        RecordTemplate::create([
+            'clinic_id' => $clinic->id,
+            'created_by_user_id' => $owner->id,
+            'name' => 'Consulta general',
+            'record_type' => 'consultation',
+            'is_default' => true,
+        ]);
+
+        $component = Livewire::actingAs($owner)
+            ->test(SetupChecklist::class, ['clinic' => $clinic]);
+
+        $status = $component->get('stepsStatus');
+        $this->assertTrue($status['template']);
     }
 
     public function test_patient_step_marks_done_when_patient_exists(): void
@@ -132,7 +152,7 @@ class SetupChecklistTest extends TestCase
     public function test_progress_percent_reflects_completed_steps(): void
     {
         [$clinic, $owner] = $this->makeOwner();
-        // Completar 3 de 6 pasos: patient, appointment, staff
+        // Completar 3 de 7 pasos: patient, appointment, staff
         $patient = Patient::factory()->create(['clinic_id' => $clinic->id]);
         Appointment::factory()->create([
             'clinic_id' => $clinic->id,
@@ -146,7 +166,7 @@ class SetupChecklistTest extends TestCase
             ->test(SetupChecklist::class, ['clinic' => $clinic]);
 
         $this->assertEquals(3, $component->get('completedCount'));
-        $this->assertEquals(50, $component->get('progressPercent'));
+        $this->assertEquals(43, $component->get('progressPercent'));
     }
 
     // ── Colapsar / expandir ────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ return [
     // Steps
     'step_logo' => 'Upload your clinic logo',
     'step_schedule' => 'Set your working hours',
+    'step_template' => 'Create your first consultation template',
     'step_patient' => 'Add your first patient',
     'step_appointment' => 'Schedule your first appointment',
     'step_staff' => 'Invite a team member',

@@ -104,6 +104,14 @@ class Create extends Component
                 ]];
             }
         }
+
+        $this->loadDefaultTemplateForCurrentType();
+    }
+
+    public function updatedRecordType(): void
+    {
+        $this->clearSoapFields();
+        $this->loadDefaultTemplateForCurrentType();
     }
 
     public function addDiagnosis(): void
@@ -124,11 +132,7 @@ class Create extends Component
             return;
         }
 
-        $this->chiefComplaint = $template->chief_complaint ?? $this->chiefComplaint;
-        $this->presentIllness = $template->present_illness ?? $this->presentIllness;
-        $this->physicalExamination = $template->physical_examination ?? $this->physicalExamination;
-        $this->assessment = $template->assessment ?? $this->assessment;
-        $this->plan = $template->plan ?? $this->plan;
+        $this->applyTemplateFields($template);
 
         $this->dispatch('template-loaded');
     }
@@ -141,6 +145,21 @@ class Create extends Component
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->get();
+    }
+
+    public function getClinicHasTemplatesProperty(): bool
+    {
+        return RecordTemplate::where('clinic_id', $this->patient->clinic_id)->exists();
+    }
+
+    public function getDefaultTemplateLoadedProperty(): bool
+    {
+        if (! $this->selectedTemplateId) {
+            return false;
+        }
+
+        return $this->templatesForType
+            ->firstWhere('id', $this->selectedTemplateId)?->is_default ?? false;
     }
 
     public function removeDiagnosis(int $index): void
@@ -276,5 +295,45 @@ class Create extends Component
     public function render()
     {
         return view('livewire.app.medical-records.create');
+    }
+
+    private function loadDefaultTemplateForCurrentType(): void
+    {
+        if (! auth()->user()->can('templates.use')) {
+            return;
+        }
+
+        $template = RecordTemplate::query()
+            ->where('clinic_id', $this->patient->clinic_id)
+            ->where('record_type', $this->recordType)
+            ->where('is_default', true)
+            ->first();
+
+        if (! $template) {
+            $this->selectedTemplateId = null;
+
+            return;
+        }
+
+        $this->selectedTemplateId = $template->id;
+        $this->applyTemplateFields($template);
+    }
+
+    private function clearSoapFields(): void
+    {
+        $this->chiefComplaint = '';
+        $this->presentIllness = '';
+        $this->physicalExamination = '';
+        $this->assessment = '';
+        $this->plan = '';
+    }
+
+    private function applyTemplateFields(RecordTemplate $template): void
+    {
+        $this->chiefComplaint = $template->chief_complaint ?? '';
+        $this->presentIllness = $template->present_illness ?? '';
+        $this->physicalExamination = $template->physical_examination ?? '';
+        $this->assessment = $template->assessment ?? '';
+        $this->plan = $template->plan ?? '';
     }
 }
