@@ -22,7 +22,26 @@ class PublicLandingTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('Comenzar', false);
+            ->assertSee(__('public.home_cta_start'), false)
+            ->assertSee(__('public.freemium_badge'), false)
+            ->assertDontSee('14 días', false);
+    }
+
+    public function test_home_and_pricing_show_brand_footer(): void
+    {
+        $brandLine = __('public.footer_brand_line', ['app' => 'ControClinic']);
+
+        $this->get(route('home'))->assertOk()->assertSee($brandLine, false);
+        $this->get(route('pricing'))->assertOk()->assertSee($brandLine, false);
+    }
+
+    public function test_pricing_faq_uses_freemium_copy_not_trial(): void
+    {
+        $this->get(route('pricing'))
+            ->assertOk()
+            ->assertSee(__('public.faq_free_plan_q'), false)
+            ->assertDontSee('14 días de prueba', false)
+            ->assertDontSee('termina mi prueba gratuita', false);
     }
 
     // ==================== PRICING ====================

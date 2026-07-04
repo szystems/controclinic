@@ -36,6 +36,7 @@
 {{-- Footer --}}
 <x-slot:footer>
 <x-mail::footer>
+{{ __('public.footer_brand_line', ['app' => $appName]) }}<br>
 © {{ date('Y') }} {{ $appName }}. {{ __('mail.all_rights_reserved') }}
 </x-mail::footer>
 </x-slot:footer>

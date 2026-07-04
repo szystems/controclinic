@@ -1,11 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
 > **Última actualización:** 2026-07-04 (noche)
-> **Fase actual:** ✅ **Fase A cerrada** (pendiente solo A11 snapshot + rotación credenciales manual)
-> **Siguiente paso:** **Fase C** (copy freemium) + **Fase D** (Paddle sandbox)
-> **Métricas:** ~591+ tests · Módulos clínicos completos
-> **Stack:** Laravel 12 · Livewire 3 · Alpine.js · Tailwind · MySQL 8
-> **Producción:** ✅ `https://controclinic.com` · Hetzner `5.78.235.235` + Coolify + Cloudflare · último deploy `7a5f564` · **Fase B local sin deploy**
+> **Fase actual:** **Fase C** en curso · **Fase B** ✅ desplegada (`4652748`)
+> **Siguiente paso:** **Fase D** (Paddle sandbox) tras cerrar C
+> **Producción:** ✅ `https://controclinic.com` · último deploy `4652748`
 
 ---
 
@@ -14,8 +12,8 @@
 | Fase | Nombre | Estado |
 |------|--------|--------|
 | **A** | Infraestructura y dominio | ✅ ~99% (A11 snapshot manual) |
-| **B** | Planes BD — fuente única | ✅ código listo · deploy pendiente |
-| **C** | Marca y mensaje freemium | 🔜 |
+| **B** | Planes BD — fuente única | ✅ desplegada |
+| **C** | Marca y mensaje freemium | ✅ desplegada |
 | **D** | Paddle — monetización | 🔜 |
 | **E** | Legal, marketing, szystems.com | 🔜 |
 | **G** | Panel Admin — operaciones plataforma | ✅ código · 🟡 password prod |

@@ -76,12 +76,15 @@ Detalle operativo: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## Fase C — Marca y freemium → [LAUNCH-PLAN § C](LAUNCH-PLAN.md#fase-c--marca-y-mensaje-freemium)
 
-- [ ] Footer: ControClinic by SZ Systems (ADR-011)
-- [ ] Emails: firma y remitente alineados
-- [ ] Home/pricing: mensaje freemium (sin "14 días") — ADR-012
-- [ ] FAQ pricing coherente con Free permanente
-- [ ] Checkout Paddle: branding ControClinic
-- [x] Login: enlace a registro freemium (`/register`) — no obligar volver al home
+> **Completada** — deploy pendiente commit
+
+- [x] Footer público + app: `ControClinic · A product of SZ Systems · Victoria, BC` (ADR-011)
+- [x] Emails: firma en layout mail + `mail.all_rights_reserved`
+- [x] Home/pricing: freemium ADR-012 vía `lang/*/public.php` (sin "14 días")
+- [x] FAQ pricing: plan Free permanente + `#faq` anchor
+- [x] `/pricing` → `Plan::active()->public()` (ya verificado + tests)
+- [x] Login: enlace registro freemium
+- [ ] Checkout Paddle branding (Fase D)
 
 ---
 

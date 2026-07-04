@@ -1,17 +1,17 @@
 <x-public-layout>
     @php
-        $title = 'Precios';
-        $description = 'Planes flexibles para clínicas de todos los tamaños. Desde consultorios individuales hasta hospitales.';
+        $title = __('public.nav_pricing');
+        $description = __('public.pricing_subtitle');
     @endphp
 
     {{-- Hero Section --}}
     <section class="pt-32 pb-16 lg:pt-40 bg-gradient-to-b from-indigo-50 to-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-                Planes simples, precios transparentes
+                {{ __('public.pricing_title') }}
             </h1>
             <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                Elige el plan que mejor se adapte a tu clínica. Todos incluyen 14 días de prueba gratis.
+                {{ __('public.pricing_subtitle') }}
             </p>
 
             {{-- Billing Toggle --}}
@@ -20,18 +20,18 @@
                     <button @click="annual = false"
                             :class="annual ? 'text-gray-600' : 'bg-white text-gray-900 shadow'"
                             class="px-6 py-2 rounded-full text-sm font-medium transition-all">
-                        Mensual
+                        {{ __('billing.monthly') }}
                     </button>
                     <button @click="annual = true"
                             :class="annual ? 'bg-white text-gray-900 shadow' : 'text-gray-600'"
                             class="px-6 py-2 rounded-full text-sm font-medium transition-all">
-                        Anual
+                        {{ __('billing.yearly') }}
                         <span class="ml-1 text-xs text-green-600 font-semibold">-20%</span>
                     </button>
                 </div>
 
                 {{-- Pricing Cards (Dynamic from DB) --}}
-                <div class="mt-12 grid lg:grid-cols-{{ $plans->count() }} gap-8 max-w-7xl mx-auto">
+                <div class="mt-12 grid lg:grid-cols-{{ max(1, $plans->count()) }} gap-8 max-w-7xl mx-auto">
                     @foreach ($plans as $plan)
                         <x-plan-card :plan="$plan" context="pricing" />
                     @endforeach
@@ -103,39 +103,21 @@
     </section>
 
     {{-- FAQ Section --}}
-    <section class="py-20 bg-white">
+    <section id="faq" class="py-20 bg-white">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-2xl font-bold text-gray-900 text-center mb-12">
-                Preguntas frecuentes
+                {{ __('public.pricing_faq_title') }}
             </h2>
 
             <div x-data="{ open: null }" class="space-y-4">
                 @php
                     $faqs = [
-                        [
-                            'q' => '¿Puedo cambiar de plan en cualquier momento?',
-                            'a' => 'Sí, puedes actualizar o degradar tu plan cuando quieras. Los cambios se aplican inmediatamente y el cobro se prorratea según los días restantes del período.'
-                        ],
-                        [
-                            'q' => '¿Qué pasa cuando termina mi prueba gratuita?',
-                            'a' => 'Después de 14 días, puedes continuar con el plan Free (con límites) o elegir un plan de pago. No perderás ningún dato.'
-                        ],
-                        [
-                            'q' => '¿Los precios incluyen impuestos?',
-                            'a' => 'Los precios mostrados no incluyen impuestos locales. El impuesto aplicable se calculará según tu ubicación al momento del pago.'
-                        ],
-                        [
-                            'q' => '¿Ofrecen descuentos para estudiantes?',
-                            'a' => 'Sí, ofrecemos 50% de descuento para estudiantes de medicina con correo institucional válido. Contáctanos para más información.'
-                        ],
-                        [
-                            'q' => '¿Cómo funciona la cancelación?',
-                            'a' => 'Puedes cancelar tu suscripción en cualquier momento desde tu panel de configuración. Seguirás teniendo acceso hasta el final del período pagado.'
-                        ],
-                        [
-                            'q' => '¿Qué métodos de pago aceptan?',
-                            'a' => 'Aceptamos tarjetas de crédito y débito (Visa, Mastercard, American Express) a través de Paddle, nuestra plataforma segura de pagos.'
-                        ],
+                        ['q' => __('public.faq_change_plan_q'), 'a' => __('public.faq_change_plan_a')],
+                        ['q' => __('public.faq_free_plan_q'), 'a' => __('public.faq_free_plan_a')],
+                        ['q' => __('public.faq_taxes_q'), 'a' => __('public.faq_taxes_a')],
+                        ['q' => __('public.faq_students_q'), 'a' => __('public.faq_students_a')],
+                        ['q' => __('public.faq_cancel_q'), 'a' => __('public.faq_cancel_a')],
+                        ['q' => __('public.faq_payment_q'), 'a' => __('public.faq_payment_a')],
                     ];
                 @endphp
 
@@ -165,17 +147,17 @@
     <section class="py-20 bg-indigo-600">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl font-bold text-white mb-4">
-                ¿Tienes más preguntas?
+                {{ __('public.pricing_cta_title') }}
             </h2>
             <p class="text-xl text-indigo-100 mb-8">
-                Nuestro equipo está listo para ayudarte a elegir el plan perfecto para tu clínica.
+                {{ __('public.pricing_cta_body') }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('contact') }}" class="inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-100 text-indigo-600 font-semibold rounded-xl transition-all">
-                    Contactar Ventas
+                    {{ __('public.pricing_cta_contact') }}
                 </a>
                 <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-8 py-4 bg-transparent hover:bg-indigo-500 text-white font-semibold rounded-xl border-2 border-white/30 transition-all">
-                    Comenzar Prueba Gratis
+                    {{ __('public.pricing_cta_register') }}
                 </a>
             </div>
         </div>

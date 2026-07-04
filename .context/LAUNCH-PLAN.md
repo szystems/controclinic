@@ -11,14 +11,14 @@
 | Fase | Nombre | Estado | Bloquea lanzamiento |
 |------|--------|--------|---------------------|
 | **A** | Infraestructura y dominio | ✅ ~99% (A11 snapshot manual) | No |
-| **B** | Planes BD — fuente única | 🟡 ~25% en curso | Sí (límites y billing) |
-| **C** | Marca y mensaje freemium | 🔜 pendiente | Sí (confianza / conversión) |
+| **B** | Planes BD — fuente única | ✅ |
+| **C** | Marca y mensaje freemium | ✅ |
 | **D** | Paddle — monetización | 🔜 pendiente | Sí (cobro real) |
 | **E** | Legal, marketing y szystems.com | 🔜 pendiente | Sí (apertura pública) |
 | **G** | Panel Admin — operaciones plataforma | ✅ código | Verificar prod + password |
 | **F** | Go-live y release 1.0.0 | 🔜 pendiente | Sí |
 
-**Siguiente paso:** **Fase B** (cerrar fuente única planes) + **Fase C** en paralelo (copy freemium) → **D** → **E** → **F**.
+**Siguiente paso:** **Fase D** (Paddle sandbox) → **E** → **F**.
 
 **Pendiente manual usuario:** A11 snapshot Hetzner · rotar passwords (admin + credenciales expuestas).
 
@@ -108,11 +108,11 @@ E (legal + marketing) ─┘
 
 | # | Tarea | Estado |
 |---|-------|--------|
-| C1 | Footer app + público: **ControClinic · A product of SZ Systems · Victoria, BC** | [ ] |
-| C2 | Emails transaccionales: firma y remitente alineados con marca | [ ] |
-| C3 | Home + pricing: quitar "14 días de prueba" → **"Empieza gratis. Sin tarjeta. Sin límite de tiempo."** | [ ] |
-| C4 | FAQ pricing: reescribir preguntas sobre trial / plan Free | [ ] |
-| C5 | Verificar `/pricing` y billing leen tiers solo de `Plan::active()->public()` | [ ] |
+| C1 | Footer app + público: **ControClinic · A product of SZ Systems · Victoria, BC** | [x] |
+| C2 | Emails transaccionales: firma y remitente alineados con marca | [x] |
+| C3 | Home + pricing: quitar "14 días de prueba" → **"Empieza gratis. Sin tarjeta. Sin límite de tiempo."** | [x] |
+| C4 | FAQ pricing: reescribir preguntas sobre trial / plan Free | [x] |
+| C5 | Verificar `/pricing` y billing leen tiers solo de `Plan::active()->public()` | [x] |
 | C6 | **Login → registro:** enlace "Crear clínica gratis" en `/login` (hoy solo desde home) | [x] |
 
 ---

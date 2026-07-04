@@ -14,23 +14,23 @@
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        Prueba gratis por 14 días
+                        {{ __('public.freemium_badge') }}
                     </div>
 
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
-                        Gestiona tu clínica
+                        {{ __('public.home_hero_title') }}
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                            sin complicaciones
+                            {{ __('public.home_hero_highlight') }}
                         </span>
                     </h1>
 
                     <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0">
-                        El software todo-en-uno para clínicas médicas. Agenda citas, gestiona pacientes, envía recordatorios y haz crecer tu práctica médica.
+                        {{ __('public.home_hero_subtitle') }}
                     </p>
 
                     <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                         <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 transition-all">
-                            Comenzar Gratis
+                            {{ __('public.home_cta_start') }}
                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                             </svg>
@@ -39,7 +39,7 @@
                             <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
                             </svg>
-                            Ver Demo
+                            {{ __('public.home_cta_demo') }}
                         </a>
                     </div>
 
@@ -49,19 +49,19 @@
                             <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            Sin tarjeta de crédito
+                            {{ __('public.home_trust_no_card') }}
                         </div>
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            Configuración en 5 min
+                            {{ __('public.home_trust_setup') }}
                         </div>
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            Cancela cuando quieras
+                            {{ __('public.home_trust_forever') }}
                         </div>
                     </div>
                 </div>
@@ -395,7 +395,7 @@
                         @endfor
                     </div>
                     <p class="text-gray-600 mb-6">
-                        "Lo probé gratis durante 2 semanas y quedé encantado. El precio es muy accesible para un médico independiente como yo. El soporte siempre responde rápido."
+                        "{{ __('public.home_testimonial_3_quote') }}"
                     </p>
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold">
@@ -419,24 +419,24 @@
 
         <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-                ¿Listo para modernizar tu clínica?
+                {{ __('public.home_cta_title') }}
             </h2>
             <p class="text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">
-                Únete a cientos de médicos que ya optimizaron su práctica con ControClinic. Comienza gratis hoy.
+                {{ __('public.home_cta_body') }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-100 text-indigo-600 text-lg font-semibold rounded-xl shadow-lg transition-all">
-                    Comenzar Prueba Gratis
+                    {{ __('public.home_cta_button') }}
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                     </svg>
                 </a>
                 <a href="{{ route('pricing') }}" class="inline-flex items-center justify-center px-8 py-4 bg-transparent hover:bg-indigo-500 text-white text-lg font-semibold rounded-xl border-2 border-white/30 hover:border-transparent transition-all">
-                    Ver Precios
+                    {{ __('public.home_cta_pricing') }}
                 </a>
             </div>
             <p class="mt-6 text-indigo-200 text-sm">
-                14 días gratis • Sin tarjeta de crédito • Cancela cuando quieras
+                {{ __('public.freemium_subline') }}
             </p>
         </div>
     </section>

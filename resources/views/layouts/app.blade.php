@@ -85,6 +85,10 @@
             <main>
                 {{ $slot }}
             </main>
+
+            @auth
+                <x-site-footer variant="app" />
+            @endauth
         </div>
 
         <!-- Toast Notifications -->
