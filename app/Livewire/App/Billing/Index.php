@@ -45,6 +45,12 @@ class Index extends Component
             ->get();
     }
 
+    public function getIsPaddleReadyProperty(): bool
+    {
+        return (bool) config('cashier.api_key')
+            && (config('cashier.client_side_token') || config('cashier.seller_id'));
+    }
+
     public function getPriceIdProperty(): ?string
     {
         if (! $this->selectedPlan || $this->selectedPlan === 'free' || $this->selectedPlan === 'enterprise') {
@@ -89,6 +95,12 @@ class Index extends Component
             return;
         }
 
+        if (! $this->isPaddleReady) {
+            session()->flash('error', __('billing.paddle_not_configured'));
+
+            return;
+        }
+
         $plan = Plan::where('slug', $planSlug)->where('is_active', true)->first();
 
         if (! $plan || $plan->is_free) {
@@ -106,7 +118,7 @@ class Index extends Component
         $priceId = $this->resolvePaddlePriceId($plan, $planSlug);
 
         if (! $priceId) {
-            session()->flash('error', __('billing.plan_not_available'));
+            session()->flash('error', __('billing.plan_price_not_configured', ['plan' => $plan->name]));
 
             return;
         }

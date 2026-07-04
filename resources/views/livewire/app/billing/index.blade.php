@@ -22,6 +22,11 @@
                 <p class="text-sm text-amber-700 dark:text-amber-300">{{ session('warning') }}</p>
             </div>
         @endif
+        @if (! $this->isPaddleReady)
+            <div class="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p class="text-sm text-amber-800 dark:text-amber-200">{{ __('billing.paddle_not_configured') }}</p>
+            </div>
+        @endif
 
         <!-- Current Plan Card -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
@@ -177,7 +182,12 @@
             @endif
 
             {{-- Paddle Checkout via JS --}}
+            @if ($this->isPaddleReady)
             <div x-data x-on:open-paddle-checkout.window="
+                if (typeof Paddle === 'undefined') {
+                    console.error('Paddle.js is not loaded');
+                    return;
+                }
                 Paddle.Checkout.open({
                     transactionId: $event.detail.transactionId,
                     settings: {
@@ -188,6 +198,7 @@
                     }
                 });
             "></div>
+            @endif
         @endif
 
         <!-- Transaction History -->

@@ -286,6 +286,17 @@ class PlanLimitsTest extends TestCase
         $this->assertSame(8, $clinicaClinic->getPlanLimits()['max_doctors']);
     }
 
+    public function test_can_upgrade_plan_when_higher_tier_exists(): void
+    {
+        [$freeClinic] = $this->createClinicWithOwner('free');
+        [$soloClinic] = $this->createClinicWithOwner('solo');
+        [$enterpriseClinic] = $this->createClinicWithOwner('enterprise');
+
+        $this->assertTrue($freeClinic->canUpgradePlan());
+        $this->assertTrue($soloClinic->canUpgradePlan());
+        $this->assertFalse($enterpriseClinic->canUpgradePlan());
+    }
+
     // ===== Clinic Model: hasFeature() =====
 
     public function test_free_plan_has_basic_features(): void

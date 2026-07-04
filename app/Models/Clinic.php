@@ -191,6 +191,32 @@ class Clinic extends Model
     }
 
     /**
+     * Whether the clinic can move to a higher tier (billing page has something to offer).
+     */
+    public function canUpgradePlan(): bool
+    {
+        if ($this->isEnterprisePlan()) {
+            return false;
+        }
+
+        if ($this->isOnFreePlan() && $this->is_manual_plan) {
+            return false;
+        }
+
+        $currentSort = $this->resolvePlan()?->sort_order ?? 0;
+
+        return Plan::query()
+            ->active()
+            ->where('is_free', false)
+            ->where('sort_order', '>', $currentSort)
+            ->where(function ($query) {
+                $query->where('is_private', false)
+                    ->orWhereIn('slug', $this->unlockedPlanSlugs());
+            })
+            ->exists();
+    }
+
+    /**
      * @return list<string>
      */
     public function unlockedPlanSlugs(): array

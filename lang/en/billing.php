@@ -63,6 +63,9 @@ return [
     'promo_code_invalid' => 'The code is invalid or has expired.',
     'promo_code_applied' => ':plan plan unlocked. You can subscribe from the list below.',
     'plan_requires_code' => 'This plan requires a valid access code.',
+    'paddle_not_configured' => 'Online payments are not active in this environment yet. We are configuring Paddle (Phase D); checkout will work once credentials and price IDs are in place.',
+    'plan_price_not_configured' => 'The :plan plan does not have a Paddle price configured yet. Contact us or try again later.',
+    'checkout_loading' => 'Preparing checkout…',
 
     // Transaction history
     'transaction_history' => 'Transaction History',

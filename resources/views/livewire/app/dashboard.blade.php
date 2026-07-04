@@ -26,8 +26,8 @@
                     @endif">
                     {{ $clinic->plan?->name ?? __('admin.plan_type_' . $clinic->plan_type) }}
                 </span>
-                {{-- Upgrade button: hide if courtesy free or already in read-only (global banner already shows it) --}}
-                @if(($clinic->plan_type === 'free' && ! $clinic->is_manual_plan && $accessLevel === \App\Models\Clinic::ACCESS_FULL) || $clinic->plan_type === 'solo')
+                {{-- Upgrade: any tier with a higher plan available (owner only, full access) --}}
+                @if($clinic->canUpgradePlan() && $accessLevel === \App\Models\Clinic::ACCESS_FULL)
                     @if(auth()->user()->hasRole('owner'))
                         <a href="{{ route('app.billing.index', $clinic->slug) }}" wire:navigate
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition shadow-sm">

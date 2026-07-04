@@ -115,8 +115,11 @@
             </button>
         @elseif ($onCheckout)
             <button wire:click="{{ $onCheckout }}('{{ $plan->slug }}')"
-                class="w-full py-2.5 px-4 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-lg transition">
-                {{ __('billing.upgrade_to', ['plan' => $plan->name]) }}
+                wire:loading.attr="disabled"
+                wire:target="{{ $onCheckout }}"
+                class="w-full py-2.5 px-4 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-lg transition disabled:opacity-60">
+                <span wire:loading.remove wire:target="{{ $onCheckout }}">{{ __('billing.upgrade_to', ['plan' => $plan->name]) }}</span>
+                <span wire:loading wire:target="{{ $onCheckout }}">{{ __('billing.checkout_loading') }}</span>
             </button>
         @endif
         </div>

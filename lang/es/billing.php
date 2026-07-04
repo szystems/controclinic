@@ -63,6 +63,9 @@ return [
     'promo_code_invalid' => 'El código no es válido o ha expirado.',
     'promo_code_applied' => 'Plan :plan desbloqueado. Ya puedes suscribirte desde la lista de abajo.',
     'plan_requires_code' => 'Este plan requiere un código de acceso válido.',
+    'paddle_not_configured' => 'Los pagos en línea aún no están activos en este entorno. Estamos configurando Paddle (Fase D); los botones de pago funcionarán cuando estén las credenciales y los price IDs.',
+    'plan_price_not_configured' => 'El plan :plan aún no tiene precio configurado en Paddle. Contáctanos o inténtalo más tarde.',
+    'checkout_loading' => 'Preparando pago…',
 
     // Transaction history
     'transaction_history' => 'Historial de Transacciones',
