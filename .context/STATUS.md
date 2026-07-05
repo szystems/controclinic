@@ -59,12 +59,13 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 - **Default payment link** configurado en Paddle (obligatorio para crear transacciones).
 - **Checkout E2E:** alta de suscripción funciona (deploy `704f0e1` carga Paddle.js async tras `wire:navigate`; `a03ff0c` vincula customer antes del checkout para que el webhook resuelva la clínica).
 
-### Hallazgos de auditoría (ADR-016) — pendientes
-- 🔴 **`changePlan()`** hace `swap()` sin confirmación ni cobro de diferencia (prorrateo diferido silencioso).
-- 🔴 **Práctica y Clínica comparten** `paddle_product_id` + price IDs → cobro/resolución ambiguos. Falta crear Product/Prices propios de Clínica.
-- 🟠 **`Clinic::customerPortalUrl()` no existe** → botón "Gestionar pago" y "Ver facturas" rompen (suprimido en phpstan-baseline).
-- 🟠 Verificar webhooks end-to-end con evento real (el alta inicial se sincronizó manualmente).
-- 🟡 `checkout()` usa Guzzle crudo en vez de `Cashier::api()`; política de prorrateo no explícita; `resumeSubscription()` no cubre `paused`/grace.
+### Hallazgos de auditoría (ADR-016) — RESUELTOS · deploy `2a9dfb6`
+- ✅ **Bug crítico webhooks:** `subscription.updated`/`canceled` daban **500** (`$event->billable` no existe en esos eventos → solo `SubscriptionCreated` lo trae). Resuelto usando `$event->subscription->billable`. Verificado en prod: replay del webhook fallido ahora responde **200**.
+- ✅ **`changePlan()`**: upgrade cobra diferencia prorrateada inmediata (`swapAndInvoice`), downgrade al final del ciclo (`swap`), con manejo de errores y feedback al usuario.
+- ✅ **Práctica/Clínica ya no comparten IDs**: Clínica corregida a su propio producto `pro_01kwsvqr21s5am9rp9rab1kdxa` (mensual `pri_...vt3`, anual `pri_...x21`, $99/$990). Validación en Admin impide reusar price IDs entre planes o mensual=anual.
+- ✅ **`Clinic::customerPortalUrl()`** implementado (management URLs de Paddle + fallback a billing). Verificado devuelve URL real.
+- ✅ **`checkout()`** ahora vía `Cashier::api()` (sin Guzzle crudo); `cancel/resume` cubren grace/paused con try/catch.
+- 🟡 Tests billing/admin añadidos — correr en CI/dev (prod es `--no-dev`, sin phpunit).
 
 ---
 
