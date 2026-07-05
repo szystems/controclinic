@@ -22,12 +22,9 @@ class PaddleEventListener
         $plan = $this->resolvePlanFromPrice($event->subscription);
 
         if ($plan) {
-            // Don't override manually assigned plans
-            if ($clinic->is_manual_plan) {
-                $clinic->update(['status' => 'active']);
-
-                return;
-            }
+            // A real Paddle subscription supersedes any admin-granted (manual) plan:
+            // the clinic is now a paying customer, so Paddle becomes the source of truth.
+            $this->clearManualFlag($clinic);
 
             $clinic->applyPlan($plan, activate: true);
         }
@@ -45,10 +42,10 @@ class PaddleEventListener
         $plan = $this->resolvePlanFromPrice($event->subscription);
 
         if ($plan) {
-            // Don't override manually assigned plans
-            if ($clinic->is_manual_plan) {
-                return;
-            }
+            // The clinic has a live Paddle subscription; reflect its changes even if it
+            // was previously flagged manual (see handleSubscriptionCreated).
+            $this->clearManualFlag($clinic);
+
             $clinic->applyPlan($plan);
         }
     }
@@ -64,6 +61,16 @@ class PaddleEventListener
 
         // Don't immediately downgrade — subscription stays valid until grace period ends.
         // The CheckPlanLimits middleware handles the downgrade when the subscription actually expires.
+    }
+
+    /**
+     * A clinic backed by a real Paddle subscription is no longer an admin-granted (manual) plan.
+     */
+    private function clearManualFlag(Clinic $clinic): void
+    {
+        if ($clinic->is_manual_plan) {
+            $clinic->update(['is_manual_plan' => false]);
+        }
     }
 
     /**

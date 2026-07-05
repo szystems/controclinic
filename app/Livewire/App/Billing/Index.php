@@ -212,10 +212,13 @@ class Index extends Component
                 $subscription->swap($priceId);
             }
 
+            // Quien llega aquí es suscriptor real de Paddle: ya no es un plan manual del admin.
             // La fuente de verdad es Paddle (webhook subscription.updated); reflejamos local para UX inmediata.
-            if (! $this->clinic->is_manual_plan) {
-                $this->clinic->applyPlan($plan);
+            if ($this->clinic->is_manual_plan) {
+                $this->clinic->update(['is_manual_plan' => false]);
             }
+
+            $this->clinic->applyPlan($plan);
 
             $this->clinic->refresh();
             $this->selectedPlan = $planSlug;

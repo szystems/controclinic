@@ -496,6 +496,7 @@ Al probar Paddle sandbox en producción surgieron inconsistencias entre el estad
 - **Prorrateo explícito:** upgrade cobra la diferencia (proración inmediata); downgrade aplica al final del ciclo. No depender del default silencioso.
 - **Portal de cliente:** usar `management_urls` de la suscripción de Paddle (update payment method / cancel) en lugar de un método inexistente.
 - **Fuente de verdad:** Paddle manda; la app sincroniza en webhooks. `applyPlan()` solo local para reflejar; no invertir el flujo.
+- **`is_manual_plan` vs suscripción Paddle:** el flag manual solo aplica a clínicas de cortesía **sin** suscripción Paddle. Cuando llega un evento `subscription.created`/`updated` (la clínica tiene suscripción real), el listener **limpia** `is_manual_plan` y aplica el plan de Paddle. Antes, el flag bloqueaba la sincronización de suscriptores reales (Paddle actualizaba pero la app no).
 
 ### Consecuencias
 - ✅ Estado consistente app ↔ Paddle; webhooks idempotentes con customer vinculado.
