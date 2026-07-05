@@ -127,9 +127,13 @@ class Index extends Component
 
         // ADR-012: no trial period — checkout uses price ID only (no trial_days).
         $email = $this->clinic->owner->email ?? auth()->user()->email;
-        $customer = $this->clinic->customer;
 
         try {
+            $customer = $this->clinic->customer ?? $this->clinic->createAsCustomer([
+                'email' => $email,
+                'name' => $this->clinic->owner->name ?? $this->clinic->name,
+            ]);
+
             $apiKey = config('cashier.api_key');
             $baseUrl = config('cashier.sandbox')
                 ? 'https://sandbox-api.paddle.com'
@@ -137,18 +141,13 @@ class Index extends Component
 
             $payload = [
                 'items' => [['price_id' => $priceId, 'quantity' => 1]],
+                'customer_id' => $customer->paddle_id,
                 'custom_data' => [
                     'clinic_id' => $this->clinic->id,
                     'plan_type' => $planSlug,
                     'billing_cycle' => $this->billingCycle,
                 ],
             ];
-
-            if ($customer) {
-                $payload['customer_id'] = $customer->paddle_id;
-            } else {
-                $payload['customer'] = ['email' => $email];
-            }
 
             $http = new Client;
             $response = $http->post("{$baseUrl}/transactions", [
