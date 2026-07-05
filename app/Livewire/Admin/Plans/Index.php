@@ -9,7 +9,11 @@ class Index extends Component
 {
     public bool $showInactive = false;
 
-    public function deletePlan(int $planId): void
+    public ?int $confirmDeletePlanId = null;
+
+    public ?string $confirmDeletePlanName = null;
+
+    public function askDeletePlan(int $planId): void
     {
         $plan = Plan::query()->withCount('clinics')->findOrFail($planId);
 
@@ -19,8 +23,34 @@ class Index extends Component
             return;
         }
 
+        $this->confirmDeletePlanId = $plan->id;
+        $this->confirmDeletePlanName = $plan->name;
+    }
+
+    public function cancelDeletePlan(): void
+    {
+        $this->confirmDeletePlanId = null;
+        $this->confirmDeletePlanName = null;
+    }
+
+    public function deletePlan(): void
+    {
+        if (! $this->confirmDeletePlanId) {
+            return;
+        }
+
+        $plan = Plan::query()->withCount('clinics')->findOrFail($this->confirmDeletePlanId);
+
+        if (! $plan->canBeDeleted()) {
+            session()->flash('error', $plan->deletionBlockReason());
+            $this->cancelDeletePlan();
+
+            return;
+        }
+
         $plan->delete();
 
+        $this->cancelDeletePlan();
         session()->flash('success', __('admin.plan_deleted'));
     }
 

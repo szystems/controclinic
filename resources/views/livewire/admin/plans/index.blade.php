@@ -1,14 +1,20 @@
 <div>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('admin.plans_management') }}
             </h2>
-            <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <input type="checkbox" wire:model.live="showInactive"
-                       class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
-                {{ __('admin.show_inactive_plans') }}
-            </label>
+            <div class="flex flex-wrap items-center gap-4">
+                <a href="{{ route('admin.plans.create') }}" wire:navigate
+                   class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                    {{ __('admin.create_plan') }}
+                </a>
+                <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <input type="checkbox" wire:model.live="showInactive"
+                           class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                    {{ __('admin.show_inactive_plans') }}
+                </label>
+            </div>
         </div>
     </x-slot>
 
@@ -92,8 +98,7 @@
                                             </a>
                                             @if($plan->canBeDeleted())
                                                 <button type="button"
-                                                        wire:click="deletePlan({{ $plan->id }})"
-                                                        wire:confirm="{{ __('admin.plan_delete_confirm') }}"
+                                                        wire:click="askDeletePlan({{ $plan->id }})"
                                                         class="text-sm text-red-600 hover:text-red-500 dark:text-red-400">
                                                     {{ __('general.delete') }}
                                                 </button>
@@ -108,4 +113,25 @@
             </div>
         </div>
     </div>
+
+    @if($confirmDeletePlanId)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('admin.delete_plan') }}</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    {{ __('admin.plan_delete_confirm_named', ['name' => $confirmDeletePlanName]) }}
+                </p>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" wire:click="cancelDeletePlan"
+                            class="text-sm px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {{ __('general.cancel') }}
+                    </button>
+                    <button type="button" wire:click="deletePlan"
+                            class="text-sm font-medium px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white">
+                        {{ __('admin.delete_plan') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

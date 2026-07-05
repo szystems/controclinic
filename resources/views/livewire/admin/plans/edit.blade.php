@@ -212,10 +212,9 @@
             @if($plan->canBeDeleted())
                 <div class="mt-8 bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 border border-red-200 dark:border-red-900/50">
                     <h3 class="text-lg font-medium text-red-700 dark:text-red-400 mb-2">{{ __('admin.delete_plan') }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ __('admin.plan_delete_confirm') }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ __('admin.plan_delete_confirm_named', ['name' => $plan->name]) }}</p>
                     <button type="button"
-                            wire:click="deletePlan"
-                            wire:confirm="{{ __('admin.plan_delete_confirm') }}"
+                            wire:click="askDeletePlan"
                             class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700">
                         {{ __('admin.delete_plan') }}
                     </button>
@@ -223,6 +222,27 @@
             @elseif($reason = $plan->deletionBlockReason())
                 <div class="mt-8 bg-gray-50 dark:bg-gray-800/50 shadow-sm sm:rounded-lg p-6 border border-gray-200 dark:border-gray-700">
                     <p class="text-sm text-gray-600 dark:text-gray-400">{{ $reason }}</p>
+                </div>
+            @endif
+
+            @if($showDeleteConfirm)
+                <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('admin.delete_plan') }}</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            {{ __('admin.plan_delete_confirm_named', ['name' => $plan->name]) }}
+                        </p>
+                        <div class="flex gap-2 justify-end">
+                            <button type="button" wire:click="cancelDeletePlan"
+                                    class="text-sm px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                {{ __('general.cancel') }}
+                            </button>
+                            <button type="button" wire:click="deletePlan"
+                                    class="text-sm font-medium px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white">
+                                {{ __('admin.delete_plan') }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>

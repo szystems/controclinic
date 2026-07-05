@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\Admin\Plans\Create as PlansCreate;
 use App\Livewire\Admin\Plans\Edit as PlansEdit;
 use App\Livewire\Admin\Plans\Index as PlansIndex;
 use App\Models\Clinic;
@@ -56,7 +57,9 @@ class AdminPlansManagementTest extends TestCase
         Livewire::actingAs($admin)
             ->test(PlansIndex::class)
             ->set('showInactive', true)
-            ->call('deletePlan', $plan->id)
+            ->call('askDeletePlan', $plan->id)
+            ->assertSet('confirmDeletePlanId', $plan->id)
+            ->call('deletePlan')
             ->assertSessionHas('success');
 
         $this->assertDatabaseMissing('plans', ['id' => $plan->id]);
@@ -69,7 +72,7 @@ class AdminPlansManagementTest extends TestCase
 
         Livewire::actingAs($admin)
             ->test(PlansIndex::class)
-            ->call('deletePlan', $plan->id)
+            ->call('askDeletePlan', $plan->id)
             ->assertSessionHas('error');
 
         $this->assertDatabaseHas('plans', ['id' => $plan->id]);
@@ -83,7 +86,7 @@ class AdminPlansManagementTest extends TestCase
 
         Livewire::actingAs($admin)
             ->test(PlansIndex::class)
-            ->call('deletePlan', $plan->id)
+            ->call('askDeletePlan', $plan->id)
             ->assertSessionHas('error');
 
         $this->assertDatabaseHas('plans', ['id' => $plan->id]);
@@ -96,9 +99,31 @@ class AdminPlansManagementTest extends TestCase
 
         Livewire::actingAs($admin)
             ->test(PlansEdit::class, ['plan' => $plan])
+            ->call('askDeletePlan')
+            ->assertSet('showDeleteConfirm', true)
             ->call('deletePlan')
             ->assertRedirect(route('admin.plans.index'));
 
         $this->assertDatabaseMissing('plans', ['id' => $plan->id]);
+    }
+
+    public function test_admin_can_create_plan(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        Livewire::actingAs($admin)
+            ->test(PlansCreate::class)
+            ->set('name', 'Nuevo Plan')
+            ->set('slug', 'nuevo-plan')
+            ->set('monthly_price', '25.00')
+            ->set('yearly_price', '250.00')
+            ->call('save')
+            ->assertRedirect(route('admin.plans.edit', Plan::where('slug', 'nuevo-plan')->first()));
+
+        $this->assertDatabaseHas('plans', [
+            'slug' => 'nuevo-plan',
+            'name' => 'Nuevo Plan',
+            'monthly_price' => '25.00',
+        ]);
     }
 }

@@ -68,6 +68,8 @@ class Edit extends Component
 
     public bool $unlimited_storage = false;
 
+    public bool $showDeleteConfirm = false;
+
     public function mount(Plan $plan): void
     {
         $this->plan = $plan;
@@ -123,10 +125,27 @@ class Edit extends Component
         ];
     }
 
+    public function askDeletePlan(): void
+    {
+        if (! $this->plan->canBeDeleted()) {
+            session()->flash('error', $this->plan->deletionBlockReason());
+
+            return;
+        }
+
+        $this->showDeleteConfirm = true;
+    }
+
+    public function cancelDeletePlan(): void
+    {
+        $this->showDeleteConfirm = false;
+    }
+
     public function deletePlan(): void
     {
         if (! $this->plan->canBeDeleted()) {
             session()->flash('error', $this->plan->deletionBlockReason());
+            $this->cancelDeletePlan();
 
             return;
         }

@@ -9,6 +9,7 @@ use App\Http\Middleware\TenantMiddleware;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Admin\Clinics\Show;
 use App\Livewire\Admin\Plans\Edit;
+use App\Livewire\Admin\Plans\Create as PlansCreate;
 use App\Livewire\App\Appointments\Calendar as AppointmentsCalendar;
 use App\Livewire\App\Appointments\Create as AppointmentsCreate;
 use App\Livewire\App\Appointments\Edit as AppointmentsEdit;
@@ -382,6 +383,7 @@ Route::prefix('admin')
     ->group(function () {
         Route::get('/', App\Livewire\Admin\Dashboard::class)->name('dashboard');
         Route::get('/plans', App\Livewire\Admin\Plans\Index::class)->name('plans.index');
+        Route::get('/plans/create', PlansCreate::class)->name('plans.create');
         Route::get('/plans/{plan}/edit', Edit::class)->name('plans.edit');
         Route::get('/clinics', App\Livewire\Admin\Clinics\Index::class)->name('clinics.index');
         Route::get('/clinics/{clinic}', Show::class)->name('clinics.show');
