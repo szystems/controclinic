@@ -43,7 +43,7 @@ class AdminPanelTest extends TestCase
     {
         Plan::create(['name' => 'Free', 'slug' => 'free', 'sort_order' => 0, 'is_active' => true, 'is_free' => true, 'max_patients' => 25, 'max_appointments_per_month' => 5]);
         Plan::create(['name' => 'Solo', 'slug' => 'solo', 'monthly_price' => '29.00', 'yearly_price' => '276.00', 'sort_order' => 1, 'is_active' => true]);
-        Plan::create(['name' => 'Group', 'slug' => 'group', 'monthly_price' => '79.00', 'yearly_price' => '756.00', 'sort_order' => 2, 'is_active' => true, 'is_popular' => true]);
+        Plan::create(['name' => 'Group', 'slug' => 'group', 'monthly_price' => '79.00', 'yearly_price' => '756.00', 'sort_order' => 2, 'is_active' => false, 'is_popular' => true]);
     }
 
     // ==================== MIDDLEWARE ====================
@@ -105,6 +105,8 @@ class AdminPanelTest extends TestCase
             ->test(PlansIndex::class)
             ->assertSee('Free')
             ->assertSee('Solo')
+            ->assertDontSee('Group')
+            ->set('showInactive', true)
             ->assertSee('Group')
             ->assertStatus(200);
     }

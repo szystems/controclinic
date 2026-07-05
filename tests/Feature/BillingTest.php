@@ -133,8 +133,8 @@ class BillingTest extends TestCase
     public function test_private_plan_hidden_until_promo_code_redeemed(): void
     {
         Plan::create([
-            'name' => 'Solo Estudiante',
-            'slug' => 'solo-estudiante',
+            'name' => 'Friendly',
+            'slug' => 'friendly',
             'monthly_price' => '9.00',
             'sort_order' => 5,
             'is_active' => true,
@@ -147,20 +147,20 @@ class BillingTest extends TestCase
 
         Livewire::actingAs($user)
             ->test(BillingIndex::class, ['clinic' => $clinic])
-            ->assertDontSee('Solo Estudiante')
+            ->assertDontSee('Friendly')
             ->set('promoCode', 'cc-test')
             ->call('redeemPromoCode')
             ->assertHasNoErrors()
-            ->assertSee('Solo Estudiante');
+            ->assertSee('Friendly');
 
-        $this->assertTrue($clinic->fresh()->hasUnlockedPlan(Plan::where('slug', 'solo-estudiante')->first()));
+        $this->assertTrue($clinic->fresh()->hasUnlockedPlan(Plan::where('slug', 'friendly')->first()));
     }
 
     public function test_invalid_promo_code_shows_error(): void
     {
         Plan::create([
-            'name' => 'Solo Estudiante',
-            'slug' => 'solo-estudiante',
+            'name' => 'Friendly',
+            'slug' => 'friendly',
             'sort_order' => 5,
             'is_active' => true,
             'is_private' => true,
@@ -180,8 +180,8 @@ class BillingTest extends TestCase
     public function test_checkout_private_plan_without_unlock_flashes_error(): void
     {
         Plan::create([
-            'name' => 'Solo Estudiante',
-            'slug' => 'solo-estudiante',
+            'name' => 'Friendly',
+            'slug' => 'friendly',
             'monthly_price' => '9.00',
             'paddle_monthly_price_id' => 'pri_test',
             'sort_order' => 5,
@@ -195,7 +195,7 @@ class BillingTest extends TestCase
 
         Livewire::actingAs($user)
             ->test(BillingIndex::class, ['clinic' => $clinic])
-            ->call('checkout', 'solo-estudiante')
+            ->call('checkout', 'friendly')
             ->assertNotDispatched('open-paddle-checkout')
             ->assertSessionHas('error', __('billing.plan_requires_code'));
     }

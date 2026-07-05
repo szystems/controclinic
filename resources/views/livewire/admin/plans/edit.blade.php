@@ -208,6 +208,23 @@
                     </button>
                 </div>
             </form>
+
+            @if($plan->canBeDeleted())
+                <div class="mt-8 bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 border border-red-200 dark:border-red-900/50">
+                    <h3 class="text-lg font-medium text-red-700 dark:text-red-400 mb-2">{{ __('admin.delete_plan') }}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ __('admin.plan_delete_confirm') }}</p>
+                    <button type="button"
+                            wire:click="deletePlan"
+                            wire:confirm="{{ __('admin.plan_delete_confirm') }}"
+                            class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700">
+                        {{ __('admin.delete_plan') }}
+                    </button>
+                </div>
+            @elseif($reason = $plan->deletionBlockReason())
+                <div class="mt-8 bg-gray-50 dark:bg-gray-800/50 shadow-sm sm:rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $reason }}</p>
+                </div>
+            @endif
         </div>
     </div>
 </div>

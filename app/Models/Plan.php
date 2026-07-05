@@ -102,6 +102,41 @@ class Plan extends Model
         return $this->hasMany(Clinic::class);
     }
 
+    /**
+     * Slugs that must never be deleted from the admin panel.
+     *
+     * @var list<string>
+     */
+    public const PROTECTED_SLUGS = ['free'];
+
+    public function isProtected(): bool
+    {
+        return in_array($this->slug, self::PROTECTED_SLUGS, true);
+    }
+
+    public function canBeDeleted(): bool
+    {
+        if ($this->isProtected()) {
+            return false;
+        }
+
+        return $this->clinics()->count() === 0;
+    }
+
+    public function deletionBlockReason(): ?string
+    {
+        if ($this->isProtected()) {
+            return __('admin.plan_delete_protected');
+        }
+
+        $count = $this->clinics()->count();
+        if ($count > 0) {
+            return __('admin.plan_delete_has_clinics', ['count' => $count]);
+        }
+
+        return null;
+    }
+
     // ==================== SCOPES ====================
 
     public function scopeActive($query)

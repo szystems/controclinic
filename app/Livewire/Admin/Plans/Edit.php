@@ -123,6 +123,20 @@ class Edit extends Component
         ];
     }
 
+    public function deletePlan(): void
+    {
+        if (! $this->plan->canBeDeleted()) {
+            session()->flash('error', $this->plan->deletionBlockReason());
+
+            return;
+        }
+
+        $this->plan->delete();
+
+        session()->flash('success', __('admin.plan_deleted'));
+        $this->redirect(route('admin.plans.index'), navigate: true);
+    }
+
     public function save(): void
     {
         $this->validate();

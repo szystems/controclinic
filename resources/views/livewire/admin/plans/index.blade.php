@@ -1,8 +1,15 @@
 <div>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('admin.plans_management') }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('admin.plans_management') }}
+            </h2>
+            <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <input type="checkbox" wire:model.live="showInactive"
+                       class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                {{ __('admin.show_inactive_plans') }}
+            </label>
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -26,10 +33,19 @@
                                     <td class="px-6 py-4">
                                         <div class="flex items-center">
                                             <div>
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white flex flex-wrap items-center gap-1">
                                                     {{ $plan->name }}
                                                     @if($plan->is_popular)
-                                                        <span class="ml-1 px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 rounded">{{ __('admin.popular') }}</span>
+                                                        <span class="px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 rounded">{{ __('admin.popular') }}</span>
+                                                    @endif
+                                                    @if($plan->is_enterprise)
+                                                        <span class="px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded">{{ __('admin.enterprise') }}</span>
+                                                    @endif
+                                                    @if($plan->is_private)
+                                                        <span class="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded">{{ __('admin.badge_private') }}</span>
+                                                    @endif
+                                                    @if($plan->requires_code)
+                                                        <span class="px-1.5 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 rounded">{{ __('admin.badge_code') }}</span>
                                                     @endif
                                                 </div>
                                                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ $plan->slug }}</div>
@@ -69,10 +85,20 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-right" @click.stop>
-                                        <a href="{{ route('admin.plans.edit', $plan) }}" wire:navigate
-                                           class="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                                            {{ __('general.edit') }}
-                                        </a>
+                                        <div class="flex items-center justify-end gap-3">
+                                            <a href="{{ route('admin.plans.edit', $plan) }}" wire:navigate
+                                               class="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                                                {{ __('general.edit') }}
+                                            </a>
+                                            @if($plan->canBeDeleted())
+                                                <button type="button"
+                                                        wire:click="deletePlan({{ $plan->id }})"
+                                                        wire:confirm="{{ __('admin.plan_delete_confirm') }}"
+                                                        class="text-sm text-red-600 hover:text-red-500 dark:text-red-400">
+                                                    {{ __('general.delete') }}
+                                                </button>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
