@@ -51,6 +51,11 @@ return [
 
     // Messages
     'plan_changed' => 'Plan updated successfully.',
+    'plan_upgraded' => 'Plan upgraded to :plan. The prorated difference was charged to your payment method.',
+    'plan_downgrade_scheduled' => 'Change to :plan scheduled. It will take effect at the end of your current billing period.',
+    'already_on_plan' => 'You are already on this plan.',
+    'change_plan_failed' => 'Could not change the plan. Check your payment method or try again later.',
+    'portal_unavailable' => 'Could not open the billing portal. Please try again in a few minutes.',
     'plan_not_available' => 'This plan is not available at this time.',
     'subscription_cancelled' => 'Subscription cancelled. Your plan will remain active until the end of the billing period.',
     'subscription_resumed' => 'Subscription resumed successfully.',

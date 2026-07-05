@@ -177,6 +177,26 @@ class BillingTest extends TestCase
             ->assertHasErrors(['promoCode']);
     }
 
+    public function test_customer_portal_url_falls_back_to_billing_when_no_subscription(): void
+    {
+        [$clinic, $user] = $this->createClinicWithOwner('free');
+
+        $this->assertSame(
+            route('app.billing.index', ['clinic' => $clinic->slug]),
+            $clinic->customerPortalUrl()
+        );
+    }
+
+    public function test_resume_does_nothing_when_no_subscription(): void
+    {
+        [$clinic, $user] = $this->createClinicWithOwner('free');
+
+        Livewire::actingAs($user)
+            ->test(BillingIndex::class, ['clinic' => $clinic])
+            ->call('resumeSubscription')
+            ->assertStatus(200);
+    }
+
     public function test_checkout_private_plan_without_unlock_flashes_error(): void
     {
         Plan::create([

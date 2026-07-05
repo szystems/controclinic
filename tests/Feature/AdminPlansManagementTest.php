@@ -126,4 +126,41 @@ class AdminPlansManagementTest extends TestCase
             'monthly_price' => '25.00',
         ]);
     }
+
+    public function test_admin_cannot_reuse_paddle_price_id_across_plans(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        Plan::create([
+            'name' => 'Práctica', 'slug' => 'practica', 'sort_order' => 3, 'is_active' => true,
+            'paddle_monthly_price_id' => 'pri_practica_month',
+            'paddle_yearly_price_id' => 'pri_practica_year',
+        ]);
+
+        $clinica = Plan::create([
+            'name' => 'Clínica', 'slug' => 'clinica', 'sort_order' => 4, 'is_active' => true,
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test(PlansEdit::class, ['plan' => $clinica])
+            ->set('paddle_monthly_price_id', 'pri_practica_month')
+            ->call('save')
+            ->assertHasErrors('paddle_monthly_price_id');
+    }
+
+    public function test_admin_cannot_use_same_price_id_for_monthly_and_yearly(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        $plan = Plan::create([
+            'name' => 'Clínica', 'slug' => 'clinica', 'sort_order' => 4, 'is_active' => true,
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test(PlansEdit::class, ['plan' => $plan])
+            ->set('paddle_monthly_price_id', 'pri_same')
+            ->set('paddle_yearly_price_id', 'pri_same')
+            ->call('save')
+            ->assertHasErrors('paddle_monthly_price_id');
+    }
 }

@@ -146,6 +146,7 @@ return [
     // Paddle subscription
     'paddle_subscription' => 'Paddle Subscription',
     'no_paddle_subscription' => 'No active Paddle subscription',
+    'paddle_price_id_duplicate' => 'This Paddle Price ID is already used by the :plan plan. Each plan must have its own Paddle price.',
     'paying_plan' => 'Paying for',
     'amount' => 'Amount',
     'cancels_at' => 'Cancels at',

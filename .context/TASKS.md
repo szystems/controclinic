@@ -90,13 +90,21 @@ Detalle operativo: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## Fase D — Paddle → [LAUNCH-PLAN § D](LAUNCH-PLAN.md#fase-d--paddle-monetización)
 
-- [ ] Cuenta Paddle sandbox — SZ Systems
-- [ ] Productos `ControClinic — Solo/Práctica/Clínica` · mensual + anual · sin trial
-- [ ] `.env` / Coolify: credenciales y price IDs (nunca en repo)
-- [ ] Enlazar price IDs en tabla `plans`
-- [ ] Checkout billing + webhooks
-- [ ] Tests `PaddleEventListener` y billing
-- [ ] Sandbox E2E → activar live (Fase F)
+- [x] Cuenta Paddle sandbox — SZ Systems
+- [x] Productos `ControClinic — Solo/Práctica/Clínica/Friendly` · mensual + anual · sin trial
+- [x] `.env` / Coolify: credenciales y price IDs (nunca en repo)
+- [x] Enlazar price IDs en tabla `plans` (Admin Planes)
+- [x] Webhook + firma + Website Approval + Default payment link
+- [x] Checkout billing (alta) E2E funcionando
+- [ ] **Optimización ADR-016** (auditoría 2026-07-05):
+  - [ ] `changePlan()` con confirmación de precio + manejo de errores
+  - [ ] Clínica: Product/Prices propios en Paddle + validación IDs únicos en Admin
+  - [ ] `Clinic::customerPortalUrl()` real (management_urls)
+  - [ ] `checkout()` vía `Cashier::api()`; política de prorrateo explícita
+  - [ ] `resumeSubscription()` cubrir `paused`/grace; limpiar config legacy
+- [ ] Tests `PaddleEventListener` y billing (swap, cancel, webhook)
+- [ ] Verificar webhooks E2E con evento real (Paddle → View logs)
+- [ ] Sandbox E2E completo → activar live (Fase F)
 
 ---
 

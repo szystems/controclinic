@@ -51,6 +51,11 @@ return [
 
     // Messages
     'plan_changed' => 'Plan actualizado exitosamente.',
+    'plan_upgraded' => 'Plan actualizado a :plan. Se cobró la diferencia prorrateada a tu método de pago.',
+    'plan_downgrade_scheduled' => 'Cambio a :plan programado. Se aplicará al final de tu período de facturación actual.',
+    'already_on_plan' => 'Ya estás en este plan.',
+    'change_plan_failed' => 'No se pudo cambiar el plan. Revisa tu método de pago o inténtalo más tarde.',
+    'portal_unavailable' => 'No se pudo abrir el portal de pago. Inténtalo de nuevo en unos minutos.',
     'plan_not_available' => 'Este plan no está disponible en este momento.',
     'subscription_cancelled' => 'Suscripción cancelada. Tu plan seguirá activo hasta el final del período de facturación.',
     'subscription_resumed' => 'Suscripción reanudada exitosamente.',

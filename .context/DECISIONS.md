@@ -475,6 +475,36 @@ Un **plan distinto en BD** solo cuando el tier es distinto (ej. plan privado con
 
 ---
 
+## ADR-016: Flujo de billing Paddle — checkout, cambios de plan y prorrateo
+
+**Fecha:** 2026-07-05
+**Estado:** Aceptada
+
+### Contexto
+Al probar Paddle sandbox en producción surgieron inconsistencias entre el estado en Paddle, el estado local (`clinics.plan_type` + Cashier `subscriptions`) y la experiencia del usuario. Auditoría completa del flujo (`App\Livewire\App\Billing\Index`, `PaddleEventListener`, `CheckPlanLimits`).
+
+### Hallazgos que motivan la decisión
+1. **Alta (clínica sin suscripción):** el webhook `subscription.created` no encontraba la clínica porque no existía el registro `customers` local. Se creaba solo al abrir checkout con `customer` ya presente.
+2. **Cambio de plan (`changePlan`):** hacía `subscription->swap()` (PATCH a Paddle con `prorated_next_billing_period`) sin overlay ni confirmación de precio, y sin `try/catch`.
+3. **Datos:** Práctica y Clínica compartían el mismo `paddle_product_id` y price IDs → cobro y resolución de plan ambiguos.
+4. **Portal:** `Clinic::customerPortalUrl()` no existía (botón "Gestionar pago" rompía).
+
+### Decisión
+- **Vincular customer antes del checkout:** `checkout()` llama `createAsCustomer()` si no hay customer, de modo que todo webhook posterior resuelva la clínica (`Cashier::findBillable`).
+- **`price_id` único por tier:** cada tier tiene su propio Product + Prices en Paddle. Validación en Admin Plans impide duplicar `paddle_monthly_price_id` / `paddle_yearly_price_id` entre planes.
+- **Cambio de plan con confirmación:** los upgrades/downgrades muestran confirmación del precio; el cambio se refleja en Paddle vía Cashier y en la app vía webhook `subscription.updated` (fuente de verdad = Paddle).
+- **Prorrateo explícito:** upgrade cobra la diferencia (proración inmediata); downgrade aplica al final del ciclo. No depender del default silencioso.
+- **Portal de cliente:** usar `management_urls` de la suscripción de Paddle (update payment method / cancel) en lugar de un método inexistente.
+- **Fuente de verdad:** Paddle manda; la app sincroniza en webhooks. `applyPlan()` solo local para reflejar; no invertir el flujo.
+
+### Consecuencias
+- ✅ Estado consistente app ↔ Paddle; webhooks idempotentes con customer vinculado.
+- ✅ Sin cobros ambiguos entre tiers; Admin no puede duplicar price IDs.
+- ⚠️ Requiere crear Product/Prices propios de Clínica en Paddle (los previos coincidían con Práctica).
+- ⚠️ El cambio de plan real refleja tras el webhook; la UI debe manejar el estado "pendiente".
+
+---
+
 ## Template para nuevas decisiones
 
 ```markdown

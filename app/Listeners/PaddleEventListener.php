@@ -35,7 +35,8 @@ class PaddleEventListener
 
     public function handleSubscriptionUpdated(SubscriptionUpdated $event): void
     {
-        $clinic = $event->billable;
+        // SubscriptionUpdated only exposes the subscription + payload (no billable).
+        $clinic = $event->subscription->billable;
 
         if (! $clinic instanceof Clinic) {
             return;
@@ -54,7 +55,8 @@ class PaddleEventListener
 
     public function handleSubscriptionCanceled(SubscriptionCanceled $event): void
     {
-        $clinic = $event->billable;
+        // SubscriptionCanceled only exposes the subscription + payload (no billable).
+        $clinic = $event->subscription->billable;
 
         if (! $clinic instanceof Clinic) {
             return;

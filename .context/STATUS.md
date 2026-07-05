@@ -1,9 +1,9 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-07-04 (noche)
-> **Fase actual:** **Fase C** en curso · **Fase B** ✅ desplegada (`4652748`)
-> **Siguiente paso:** **Fase D** (Paddle sandbox) tras cerrar C
-> **Producción:** ✅ `https://controclinic.com` · último deploy `4652748`
+> **Última actualización:** 2026-07-05
+> **Fase actual:** **Fase D** (Paddle sandbox) en curso — checkout E2E funcionando, auditoría + optimización en progreso
+> **Siguiente paso:** cerrar hallazgos ADR-016 (changePlan, price IDs Clínica, portal cliente)
+> **Producción:** ✅ `https://controclinic.com` · último deploy `a03ff0c`
 
 ---
 
@@ -14,7 +14,7 @@
 | **A** | Infraestructura y dominio | ✅ ~99% (A11 snapshot manual) |
 | **B** | Planes BD — fuente única | ✅ desplegada |
 | **C** | Marca y mensaje freemium | ✅ desplegada |
-| **D** | Paddle — monetización | 🔜 |
+| **D** | Paddle — monetización | 🟡 en curso (sandbox E2E ok · optimización ADR-016) |
 | **E** | Legal, marketing, szystems.com | 🔜 |
 | **G** | Panel Admin — operaciones plataforma | ✅ código · 🟡 password prod |
 | **F** | Go-live → **v1.0.0** | 🔜 |
@@ -46,6 +46,25 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 **Post-deploy:** tras deploy Coolify, Traefik puede dar 503 ~1–6 min; el script A12 reinicia proxy/webserver y recupera solo.
 
 **Últimos deploys:** `7a5f564` archivos UX · `4a70f13` contadores pestañas paciente · `c75f287` staff invite UX · `82107eb` límites plan BD · `dffe0de` infra Fase A.
+
+---
+
+## 🟡 Sesión 2026-07-05 — Fase D Paddle sandbox (en curso)
+
+### Configurado y funcionando
+- **Paddle sandbox:** 4 productos (Solo, Práctica, Clínica, Friendly) con precio mensual + anual, sin trial.
+- **Credenciales en producción** (Coolify `.env` + BD Coolify, vía SSH): `PADDLE_SANDBOX`, `PADDLE_API_KEY`, `PADDLE_CLIENT_SIDE_TOKEN`, `PADDLE_WEBHOOK_SECRET`. Guardadas también en `.env.coolify.secrets` (gitignored).
+- **Webhook** `https://controclinic.com/paddle/webhook` activo (`ntfset_01kwsxt2wr3qhgzsz9rmmyjxyp`), firma validada.
+- **Website Approval:** `controclinic.com` aprobado en Paddle.
+- **Default payment link** configurado en Paddle (obligatorio para crear transacciones).
+- **Checkout E2E:** alta de suscripción funciona (deploy `704f0e1` carga Paddle.js async tras `wire:navigate`; `a03ff0c` vincula customer antes del checkout para que el webhook resuelva la clínica).
+
+### Hallazgos de auditoría (ADR-016) — pendientes
+- 🔴 **`changePlan()`** hace `swap()` sin confirmación ni cobro de diferencia (prorrateo diferido silencioso).
+- 🔴 **Práctica y Clínica comparten** `paddle_product_id` + price IDs → cobro/resolución ambiguos. Falta crear Product/Prices propios de Clínica.
+- 🟠 **`Clinic::customerPortalUrl()` no existe** → botón "Gestionar pago" y "Ver facturas" rompen (suprimido en phpstan-baseline).
+- 🟠 Verificar webhooks end-to-end con evento real (el alta inicial se sincronizó manualmente).
+- 🟡 `checkout()` usa Guzzle crudo en vez de `Cashier::api()`; política de prorrateo no explícita; `resumeSubscription()` no cubre `paused`/grace.
 
 ---
 

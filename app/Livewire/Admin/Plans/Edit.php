@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Plans;
 
 use App\Models\Clinic;
 use App\Models\Plan;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Edit extends Component
@@ -116,13 +117,37 @@ class Edit extends Component
             'max_staff' => 'nullable|integer|min:0',
             'monthly_price' => 'nullable|numeric|min:0',
             'yearly_price' => 'nullable|numeric|min:0',
-            'paddle_monthly_price_id' => 'nullable|string|max:255',
-            'paddle_yearly_price_id' => 'nullable|string|max:255',
+            'paddle_monthly_price_id' => ['nullable', 'string', 'max:255', $this->uniquePaddlePriceRule(), 'different:paddle_yearly_price_id'],
+            'paddle_yearly_price_id' => ['nullable', 'string', 'max:255', $this->uniquePaddlePriceRule()],
             'paddle_product_id' => 'nullable|string|max:255',
             'trial_days' => 'required|integer|min:0',
             'access_code' => 'nullable|string|max:64',
             'sort_order' => 'required|integer|min:0',
         ];
+    }
+
+    /**
+     * A Paddle price ID must not be reused by another plan (monthly or yearly).
+     */
+    protected function uniquePaddlePriceRule(): \Closure
+    {
+        return function (string $attribute, $value, \Closure $fail): void {
+            if (blank($value)) {
+                return;
+            }
+
+            $clash = Plan::query()
+                ->where('id', '!=', $this->plan->id)
+                ->where(function ($query) use ($value) {
+                    $query->where('paddle_monthly_price_id', $value)
+                        ->orWhere('paddle_yearly_price_id', $value);
+                })
+                ->first();
+
+            if ($clash) {
+                $fail(__('admin.paddle_price_id_duplicate', ['plan' => $clash->name]));
+            }
+        };
     }
 
     public function askDeletePlan(): void

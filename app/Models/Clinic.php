@@ -259,6 +259,25 @@ class Clinic extends Model
         $this->update($payload);
     }
 
+    /**
+     * URL to manage billing (update payment method) on Paddle's hosted page.
+     * Falls back to the in-app billing page if there's no live subscription.
+     */
+    public function customerPortalUrl(): string
+    {
+        $subscription = $this->subscription();
+
+        if ($subscription && $subscription->paddle_id) {
+            try {
+                return $subscription->paymentMethodUpdateUrl();
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return route('app.billing.index', ['clinic' => $this->slug]);
+    }
+
     public function getPlanLimits(): array
     {
         $plan = $this->resolvePlan();

@@ -146,6 +146,7 @@ return [
     // Paddle subscription
     'paddle_subscription' => 'Suscripción Paddle',
     'no_paddle_subscription' => 'Sin suscripción activa en Paddle',
+    'paddle_price_id_duplicate' => 'Este Price ID de Paddle ya está en uso por el plan :plan. Cada plan debe tener su propio precio en Paddle.',
     'paying_plan' => 'Plan que paga',
     'amount' => 'Monto',
     'cancels_at' => 'Se cancela el',

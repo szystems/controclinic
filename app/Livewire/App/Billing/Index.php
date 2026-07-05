@@ -4,7 +4,8 @@ namespace App\Livewire\App\Billing;
 
 use App\Models\Clinic;
 use App\Models\Plan;
-use GuzzleHttp\Client;
+use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Exceptions\PaddleException;
 use Livewire\Component;
 
 class Index extends Component
@@ -134,12 +135,7 @@ class Index extends Component
                 'name' => $this->clinic->owner->name ?? $this->clinic->name,
             ]);
 
-            $apiKey = config('cashier.api_key');
-            $baseUrl = config('cashier.sandbox')
-                ? 'https://sandbox-api.paddle.com'
-                : 'https://api.paddle.com';
-
-            $payload = [
+            $response = Cashier::api('POST', 'transactions', [
                 'items' => [['price_id' => $priceId, 'quantity' => 1]],
                 'customer_id' => $customer->paddle_id,
                 'custom_data' => [
@@ -147,28 +143,17 @@ class Index extends Component
                     'plan_type' => $planSlug,
                     'billing_cycle' => $this->billingCycle,
                 ],
-            ];
-
-            $http = new Client;
-            $response = $http->post("{$baseUrl}/transactions", [
-                'headers' => [
-                    'Authorization' => "Bearer {$apiKey}",
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => $payload,
             ]);
 
-            $data = json_decode($response->getBody(), true);
-            $transactionId = $data['data']['id'] ?? null;
+            $transactionId = $response['data']['id'] ?? null;
 
             if ($transactionId) {
                 $this->dispatch('open-paddle-checkout', transactionId: $transactionId);
             } else {
-                session()->flash('error', __('billing.plan_not_available'));
+                $this->dispatch('notify', type: 'error', message: __('billing.checkout_failed'));
             }
         } catch (\Exception $e) {
             $message = $this->resolveCheckoutErrorMessage($e);
-            session()->flash('error', $message);
             $this->dispatch('notify', type: 'error', message: $message);
             logger()->error('Paddle checkout error: '.$e->getMessage());
         }
@@ -176,13 +161,10 @@ class Index extends Component
 
     protected function resolveCheckoutErrorMessage(\Exception $e): string
     {
-        if ($e instanceof \GuzzleHttp\Exception\ClientException && $e->getResponse()) {
-            $body = json_decode((string) $e->getResponse()->getBody(), true);
-            $code = data_get($body, 'error.code');
+        $code = $e instanceof PaddleException ? ($e->getError()['code'] ?? null) : null;
 
-            if ($code === 'transaction_default_checkout_url_not_set') {
-                return __('billing.paddle_default_payment_link_missing');
-            }
+        if ($code === 'transaction_default_checkout_url_not_set') {
+            return __('billing.paddle_default_payment_link_missing');
         }
 
         return __('billing.checkout_failed');
@@ -196,8 +178,8 @@ class Index extends Component
 
         $plan = Plan::where('slug', $planSlug)->where('is_active', true)->first();
 
-        if (! $plan || ($plan->is_private && ! $this->clinic->hasUnlockedPlan($plan))) {
-            session()->flash('error', __('billing.plan_not_available'));
+        if (! $plan || $plan->is_free || ($plan->is_private && ! $this->clinic->hasUnlockedPlan($plan))) {
+            $this->dispatch('notify', type: 'error', message: __('billing.plan_not_available'));
 
             return;
         }
@@ -205,41 +187,100 @@ class Index extends Component
         $priceId = $this->resolvePaddlePriceId($plan, $planSlug);
 
         if (! $priceId) {
-            session()->flash('error', __('billing.plan_not_available'));
+            $this->dispatch('notify', type: 'error', message: __('billing.plan_not_available'));
 
             return;
         }
 
-        $this->clinic->subscription()->swap($priceId);
-        $this->clinic->applyPlan($plan);
+        $subscription = $this->clinic->subscription();
 
-        session()->flash('success', __('billing.plan_changed'));
+        if ($subscription->hasPrice($priceId)) {
+            $this->dispatch('notify', type: 'info', message: __('billing.already_on_plan'));
+
+            return;
+        }
+
+        $currentSort = $this->clinic->resolvePlan()?->sort_order ?? 0;
+        $isUpgrade = $plan->sort_order > $currentSort;
+
+        try {
+            if ($isUpgrade) {
+                // Upgrade: cobra la diferencia prorrateada de inmediato al método de pago en archivo.
+                $subscription->swapAndInvoice($priceId);
+            } else {
+                // Downgrade: se aplica al final del período actual (prorrateo al próximo ciclo).
+                $subscription->swap($priceId);
+            }
+
+            // La fuente de verdad es Paddle (webhook subscription.updated); reflejamos local para UX inmediata.
+            if (! $this->clinic->is_manual_plan) {
+                $this->clinic->applyPlan($plan);
+            }
+
+            $this->clinic->refresh();
+            $this->selectedPlan = $planSlug;
+
+            $message = $isUpgrade
+                ? __('billing.plan_upgraded', ['plan' => $plan->name])
+                : __('billing.plan_downgrade_scheduled', ['plan' => $plan->name]);
+
+            session()->flash('success', $message);
+            $this->dispatch('notify', type: 'success', message: $message);
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: __('billing.change_plan_failed'));
+            logger()->error('Paddle change plan error: '.$e->getMessage());
+        }
     }
 
     public function cancelSubscription(): void
     {
-        if (! $this->isSubscribed) {
+        $subscription = $this->clinic->subscription();
+
+        if (! $subscription || $subscription->canceled()) {
             return;
         }
 
-        $this->clinic->subscription()->cancel();
-        session()->flash('success', __('billing.subscription_cancelled'));
+        try {
+            $subscription->cancel();
+            session()->flash('success', __('billing.subscription_cancelled'));
+            $this->dispatch('notify', type: 'success', message: __('billing.subscription_cancelled'));
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: __('billing.change_plan_failed'));
+            logger()->error('Paddle cancel error: '.$e->getMessage());
+        }
     }
 
     public function resumeSubscription(): void
     {
         $subscription = $this->clinic->subscription();
 
-        if ($subscription && $subscription->canceled()) {
+        // resume() applies to a subscription canceled on grace period or paused.
+        $resumable = $subscription
+            && ($subscription->onGracePeriod() || $subscription->paused() || $subscription->onPausedGracePeriod());
+
+        if (! $resumable) {
+            return;
+        }
+
+        try {
             $subscription->resume();
             session()->flash('success', __('billing.subscription_resumed'));
+            $this->dispatch('notify', type: 'success', message: __('billing.subscription_resumed'));
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: __('billing.change_plan_failed'));
+            logger()->error('Paddle resume error: '.$e->getMessage());
         }
     }
 
     public function redirectToCustomerPortal(): void
     {
-        $url = $this->clinic->customerPortalUrl();
-        $this->redirect($url, navigate: false);
+        try {
+            $url = $this->clinic->customerPortalUrl();
+            $this->redirect($url, navigate: false);
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: __('billing.portal_unavailable'));
+            logger()->error('Paddle customer portal error: '.$e->getMessage());
+        }
     }
 
     protected function resolvePaddlePriceId(Plan $plan, string $planSlug): ?string
