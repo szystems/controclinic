@@ -183,20 +183,33 @@
 
             {{-- Paddle Checkout via JS --}}
             @if ($this->isPaddleReady)
+            @paddleJS
             <div x-data x-on:open-paddle-checkout.window="
-                if (typeof Paddle === 'undefined') {
-                    console.error('Paddle.js is not loaded');
+                const transactionId = $event.detail?.transactionId ?? $event.detail?.[0]?.transactionId;
+                if (! transactionId) {
+                    console.error('Missing Paddle transaction ID');
                     return;
                 }
-                Paddle.Checkout.open({
-                    transactionId: $event.detail.transactionId,
-                    settings: {
-                        allowLogout: false,
-                        displayMode: 'overlay',
-                        theme: 'light',
-                        locale: '{{ app()->getLocale() }}'
+                const settings = {
+                    allowLogout: false,
+                    displayMode: 'overlay',
+                    theme: 'light',
+                    locale: '{{ app()->getLocale() }}'
+                };
+                const openCheckout = () => {
+                    if (typeof Paddle === 'undefined') {
+                        window.dispatchEvent(new CustomEvent('notify', {
+                            detail: { type: 'error', message: @js(__('billing.paddle_js_not_loaded')) }
+                        }));
+                        return;
                     }
-                });
+                    Paddle.Checkout.open({ transactionId, settings });
+                };
+                if (typeof Paddle !== 'undefined') {
+                    openCheckout();
+                } else {
+                    window.addEventListener('paddle:ready', openCheckout, { once: true });
+                }
             "></div>
             @endif
         @endif

@@ -66,6 +66,9 @@ return [
     'paddle_not_configured' => 'Online payments are not active in this environment yet. We are configuring Paddle (Phase D); checkout will work once credentials and price IDs are in place.',
     'plan_price_not_configured' => 'The :plan plan does not have a Paddle price configured yet. Contact us or try again later.',
     'checkout_loading' => 'Preparing checkout…',
+    'checkout_failed' => 'Could not start checkout. Please try again in a few minutes.',
+    'paddle_js_not_loaded' => 'Paddle.js could not be loaded. Reload the page and try again.',
+    'paddle_default_payment_link_missing' => 'Default payment link is missing in Paddle (Checkout → Checkout settings). Set https://controclinic.com and save.',
 
     // Transaction history
     'transaction_history' => 'Transaction History',

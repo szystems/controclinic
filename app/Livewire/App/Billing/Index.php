@@ -168,9 +168,25 @@ class Index extends Component
                 session()->flash('error', __('billing.plan_not_available'));
             }
         } catch (\Exception $e) {
-            session()->flash('error', __('billing.plan_not_available'));
+            $message = $this->resolveCheckoutErrorMessage($e);
+            session()->flash('error', $message);
+            $this->dispatch('notify', type: 'error', message: $message);
             logger()->error('Paddle checkout error: '.$e->getMessage());
         }
+    }
+
+    protected function resolveCheckoutErrorMessage(\Exception $e): string
+    {
+        if ($e instanceof \GuzzleHttp\Exception\ClientException && $e->getResponse()) {
+            $body = json_decode((string) $e->getResponse()->getBody(), true);
+            $code = data_get($body, 'error.code');
+
+            if ($code === 'transaction_default_checkout_url_not_set') {
+                return __('billing.paddle_default_payment_link_missing');
+            }
+        }
+
+        return __('billing.checkout_failed');
     }
 
     public function changePlan(string $planSlug): void

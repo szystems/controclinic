@@ -20,15 +20,42 @@ $nonce = $nonce ?? '';
 ?>
 
 @if ($canInitialize)
-<script src="https://cdn.paddle.com/paddle/v2/paddle.js" @if ($nonce) nonce="{{ $nonce }}" @endif></script>
+<script @if ($nonce) nonce="{{ $nonce }}" @endif>
+(function () {
+    const seller = @json($seller);
+    const sandbox = @json((bool) config('cashier.sandbox'));
 
-@if (config('cashier.sandbox'))
-    <script type="text/javascript" @if ($nonce) nonce="{{ $nonce }}" @endif>
-        Paddle.Environment.set('sandbox');
-    </script>
-@endif
+    function bootPaddle() {
+        if (typeof Paddle === 'undefined') {
+            return false;
+        }
 
-<script type="text/javascript" @if ($nonce) nonce="{{ $nonce }}" @endif>
-    Paddle.Initialize(@json($seller));
+        if (sandbox) {
+            Paddle.Environment.set('sandbox');
+        }
+
+        Paddle.Initialize(seller);
+        window.__paddleReady = true;
+        window.dispatchEvent(new CustomEvent('paddle:ready'));
+
+        return true;
+    }
+
+    if (bootPaddle()) {
+        return;
+    }
+
+    let script = document.querySelector('script[data-paddle-js]');
+
+    if (! script) {
+        script = document.createElement('script');
+        script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+        script.dataset.paddleJs = '1';
+        script.async = true;
+        document.head.appendChild(script);
+    }
+
+    script.addEventListener('load', bootPaddle, { once: true });
+})();
 </script>
 @endif

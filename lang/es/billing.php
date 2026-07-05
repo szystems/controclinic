@@ -66,6 +66,9 @@ return [
     'paddle_not_configured' => 'Los pagos en línea aún no están activos en este entorno. Estamos configurando Paddle (Fase D); los botones de pago funcionarán cuando estén las credenciales y los price IDs.',
     'plan_price_not_configured' => 'El plan :plan aún no tiene precio configurado en Paddle. Contáctanos o inténtalo más tarde.',
     'checkout_loading' => 'Preparando pago…',
+    'checkout_failed' => 'No se pudo iniciar el pago. Inténtalo de nuevo en unos minutos.',
+    'paddle_js_not_loaded' => 'No se pudo cargar Paddle.js. Recarga la página e inténtalo de nuevo.',
+    'paddle_default_payment_link_missing' => 'Falta configurar el Default payment link en Paddle (Checkout → Checkout settings). Usa https://controclinic.com y guarda.',
 
     // Transaction history
     'transaction_history' => 'Historial de Transacciones',
