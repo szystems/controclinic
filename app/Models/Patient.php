@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\BelongsToClinic;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -202,11 +203,24 @@ class Patient extends Model
 
     public function generateMedicalRecordNumber(): string
     {
-        $prefix = strtoupper(substr($this->clinic->slug, 0, 3));
-        $year = now()->format('y');
-        $sequence = $this->clinic->patients()->count() + 1;
+        return DB::transaction(function () {
+            Clinic::whereKey($this->clinic_id)->lockForUpdate()->first();
 
-        return sprintf('%s-%s-%05d', $prefix, $year, $sequence);
+            $prefix = strtoupper(substr($this->clinic->slug, 0, 3));
+            $year = $this->clinic->localNow()->format('y');
+            $like = sprintf('%s-%s-%%', $prefix, $year);
+
+            $max = static::withTrashed()
+                ->where('clinic_id', $this->clinic_id)
+                ->where('medical_record_number', 'like', $like)
+                ->pluck('medical_record_number')
+                ->map(function ($number) {
+                    return preg_match('/-(\d+)$/', (string) $number, $matches) ? (int) $matches[1] : 0;
+                })
+                ->max() ?? 0;
+
+            return sprintf('%s-%s-%05d', $prefix, $year, $max + 1);
+        });
     }
 
     public function updateLastVisit(): void

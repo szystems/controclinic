@@ -5,6 +5,7 @@ namespace App\Livewire\App\Patients;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -150,7 +151,7 @@ class Create extends Component
             return;
         }
 
-        $patient = Patient::create([
+        $patient = new Patient([
             'clinic_id' => $this->currentClinic->id,
             'primary_doctor_id' => $this->primary_doctor_id ?: null,
             'first_name' => $this->first_name,
@@ -187,10 +188,10 @@ class Create extends Component
             'notes' => $this->notes ?: null,
         ]);
 
-        // Generate medical record number
-        $patient->update([
-            'medical_record_number' => $patient->generateMedicalRecordNumber(),
-        ]);
+        DB::transaction(function () use ($patient) {
+            $patient->medical_record_number = $patient->generateMedicalRecordNumber();
+            $patient->save();
+        });
 
         session()->flash('success', __('patients.created_successfully'));
 
