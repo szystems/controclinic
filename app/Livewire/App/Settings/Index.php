@@ -191,6 +191,8 @@ class Index extends Component
 
     public function mount(Clinic $clinic): void
     {
+        abort_unless(auth()->user()?->can('settings.view'), 403);
+
         $this->clinic = $clinic;
         $this->loadClinicData();
     }
@@ -293,6 +295,7 @@ class Index extends Component
 
     public function saveGeneral(): void
     {
+        $this->authorizeSettingsEdit();
         $this->validate([
             'name' => $this->rules()['name'],
             'email' => $this->rules()['email'],
@@ -323,6 +326,7 @@ class Index extends Component
 
     public function saveLocalization(): void
     {
+        $this->authorizeSettingsEdit();
         $this->validate([
             'locale' => $this->rules()['locale'],
             'timezone' => $this->rules()['timezone'],
@@ -349,6 +353,7 @@ class Index extends Component
 
     public function saveAppointments(): void
     {
+        $this->authorizeSettingsEdit();
         $this->validate([
             'appointment_duration' => $this->rules()['appointment_duration'],
             'appointment_buffer' => $this->rules()['appointment_buffer'],
@@ -380,6 +385,7 @@ class Index extends Component
 
     public function saveNotifications(): void
     {
+        $this->authorizeSettingsEdit();
         $this->validate([
             'send_reminders' => $this->rules()['send_reminders'],
             'reminder_hours_before' => $this->rules()['reminder_hours_before'],
@@ -397,6 +403,7 @@ class Index extends Component
 
     public function saveBilling(): void
     {
+        $this->authorizeSettingsEdit();
         $this->validate([
             'billing_enabled' => $this->rules()['billing_enabled'],
             'tax_rate' => $this->rules()['tax_rate'],
@@ -420,6 +427,7 @@ class Index extends Component
 
     public function saveBranding(): void
     {
+        $this->authorizeSettingsEdit();
         $this->validate([
             'logo' => $this->rules()['logo'],
             'primary_color' => $this->rules()['primary_color'],
@@ -451,6 +459,8 @@ class Index extends Component
 
     public function removeLogo(): void
     {
+        $this->authorizeSettingsEdit();
+
         if ($this->currentLogo && Storage::disk('public')->exists($this->currentLogo)) {
             Storage::disk('public')->delete($this->currentLogo);
         }
@@ -462,6 +472,11 @@ class Index extends Component
         $this->currentLogo = null;
 
         session()->flash('success', __('settings.logo_removed'));
+    }
+
+    private function authorizeSettingsEdit(): void
+    {
+        abort_unless(auth()->user()?->can('settings.edit'), 403);
     }
 
     public function savePublicPage(): void
