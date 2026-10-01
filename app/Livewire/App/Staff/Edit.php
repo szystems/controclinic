@@ -5,6 +5,7 @@ namespace App\Livewire\App\Staff;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password as PasswordBroker;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
@@ -58,13 +59,21 @@ class Edit extends Component
         'reports' => ['reports.view', 'reports.export'],
     ];
 
+    /** Direct permissions only the clinic owner may grant. */
+    private const SENSITIVE_EXTRAS = [
+        'users.manage',
+        'billing.manage',
+        'settings.edit',
+        'records.view_confidential',
+    ];
+
     protected function rules(): array
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
-            'role' => ['required', 'in:owner,doctor,assistant,secretary,receptionist'],
+            'role' => ['required', Rule::in($this->assignableRoles())],
             'specialties' => ['nullable', 'string', 'max:500'],
             'license_number' => ['nullable', 'string', 'max:100'],
             'bio' => ['nullable', 'string', 'max:2000'],
@@ -108,11 +117,8 @@ class Edit extends Component
 
             return;
         }
-        // Si el miembro es owner, forzar que su rol siempre sea owner (no se puede cambiar)
-        if ($this->member->isOwner()) {
-            $this->role = 'owner';
-        }
 
+        $this->constrainPrivileges();
         $this->validate();
         // Check if email already exists in this clinic (excluding current user)
         $exists = User::where('clinic_id', $this->member->clinic_id)
@@ -191,6 +197,68 @@ class Edit extends Component
             route('app.staff.index', $clinic->slug),
             navigate: true
         );
+    }
+
+    /**
+     * Roles this actor may write. Owner is never assignable here (only via transfer).
+     * A non-owner editing themselves cannot change their own role.
+     *
+     * @return list<string>
+     */
+    private function assignableRoles(): array
+    {
+        $clinic = $this->member->clinic;
+
+        if ($this->member->id === $clinic->owner_id) {
+            return ['owner'];
+        }
+
+        $actor = auth()->user();
+        if ($actor && $actor->id === $this->member->id && $actor->id !== $clinic->owner_id) {
+            return [$this->member->role];
+        }
+
+        $roles = ['doctor', 'assistant', 'secretary', 'receptionist'];
+        if ($actor && $actor->id === $clinic->owner_id) {
+            $roles[] = 'admin';
+        }
+
+        return $roles;
+    }
+
+    /**
+     * Drop role and permission changes the current user is not allowed to make.
+     * Keeps the save succeeding for the fields they may edit (name, phone, …).
+     */
+    private function constrainPrivileges(): void
+    {
+        $clinic = $this->member->clinic;
+        $actor = auth()->user();
+        if (! $actor) {
+            return;
+        }
+
+        if ($this->member->id === $clinic->owner_id) {
+            $this->role = 'owner';
+        }
+
+        $isClinicOwner = $actor->id === $clinic->owner_id;
+
+        if ($this->member->id === $actor->id && ! $isClinicOwner) {
+            $this->role = $this->member->role;
+            $this->extraPermissions = $this->member->getDirectPermissions()->pluck('name')->all();
+
+            return;
+        }
+
+        if (! $isClinicOwner) {
+            $keptSensitive = array_values(array_intersect(
+                $this->member->getDirectPermissions()->pluck('name')->all(),
+                self::SENSITIVE_EXTRAS
+            ));
+            $nonSensitive = array_values(array_diff($this->extraPermissions, self::SENSITIVE_EXTRAS));
+            $this->extraPermissions = array_values(array_unique([...$nonSensitive, ...$keptSensitive]));
+        }
     }
 
     /** Restaura los permisos extra al estado base del rol (elimina todos los directos). */

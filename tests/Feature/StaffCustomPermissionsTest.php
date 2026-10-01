@@ -163,4 +163,66 @@ class StaffCustomPermissionsTest extends TestCase
             'causer_id' => $owner->id,
         ]);
     }
+
+    public function test_admin_cannot_promote_self_to_owner_or_grant_self_confidential_access(): void
+    {
+        [$clinic, $owner] = $this->bootstrapClinic();
+        $admin = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'admin']);
+        $admin->assignRole('admin');
+
+        Livewire::actingAs($admin)
+            ->test(StaffEdit::class, ['user' => $admin])
+            ->set('role', 'owner')
+            ->set('extraPermissions', ['records.view_confidential'])
+            ->call('save');
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $admin->refresh();
+
+        $this->assertSame('admin', $admin->role);
+        $this->assertFalse($admin->hasDirectPermission('records.view_confidential'));
+        $this->assertSame($owner->id, $clinic->fresh()->owner_id);
+    }
+
+    public function test_admin_cannot_assign_owner_role_or_sensitive_extras(): void
+    {
+        [$clinic] = $this->bootstrapClinic();
+        $admin = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'admin']);
+        $admin->assignRole('admin');
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
+        $doctor->assignRole('doctor');
+
+        Livewire::actingAs($admin)
+            ->test(StaffEdit::class, ['user' => $doctor])
+            ->set('role', 'owner')
+            ->call('save')
+            ->assertHasErrors('role');
+
+        $this->assertSame('doctor', $doctor->fresh()->role);
+
+        Livewire::actingAs($admin)
+            ->test(StaffEdit::class, ['user' => $doctor])
+            ->set('extraPermissions', ['records.view_confidential', 'reports.export'])
+            ->call('save');
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $direct = $doctor->fresh()->getDirectPermissions()->pluck('name')->all();
+        $this->assertNotContains('records.view_confidential', $direct);
+        $this->assertContains('reports.export', $direct);
+    }
+
+    public function test_owner_can_assign_admin_role(): void
+    {
+        [$clinic, $owner] = $this->bootstrapClinic();
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
+        $doctor->assignRole('doctor');
+
+        Livewire::actingAs($owner)
+            ->test(StaffEdit::class, ['user' => $doctor])
+            ->set('role', 'admin')
+            ->call('save');
+
+        $this->assertSame('admin', $doctor->fresh()->role);
+        $this->assertTrue($doctor->fresh()->hasRole('admin'));
+    }
 }

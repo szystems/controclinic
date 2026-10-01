@@ -27,6 +27,7 @@ return [
     'role_secretary' => 'Secretary',
     'role_receptionist' => 'Receptionist',
     'role_owner' => 'Owner',
+    'role_admin' => 'Administrator',
 
     // Status
     'active' => 'Active',

@@ -91,6 +91,9 @@
                                 <option value="assistant">{{ __('staff.role_assistant') }}</option>
                                 <option value="secretary">{{ __('staff.role_secretary') }}</option>
                                 <option value="receptionist">{{ __('staff.role_receptionist') }}</option>
+                                @if(auth()->id() === $member->clinic->owner_id)
+                                    <option value="admin">{{ __('staff.role_admin') }}</option>
+                                @endif
                             </select>
                             @error('role') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                         @endif
