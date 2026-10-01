@@ -54,6 +54,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY docker/php/php.prod.ini /usr/local/etc/php/conf.d/custom.ini
+COPY docker/php/zz-pool.conf /usr/local/etc/php-fpm.d/zz-pool.conf
 
 # =============================================================================
 # Stage 3: Composer dependencies

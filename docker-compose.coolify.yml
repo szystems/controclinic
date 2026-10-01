@@ -123,6 +123,8 @@ services:
       target: app
     container_name: controclinic-queue
     restart: always
+    user: "www-data"
+    stop_grace_period: 70s
     working_dir: /var/www/html
     entrypoint: ['/usr/local/bin/entrypoint-worker.sh']
     command: ['php', 'artisan', 'queue:work', 'redis', '--sleep=3', '--tries=3', '--max-time=3600']
@@ -177,6 +179,7 @@ services:
       target: app
     container_name: controclinic-scheduler
     restart: always
+    user: "www-data"
     working_dir: /var/www/html
     entrypoint: ['/usr/local/bin/entrypoint-worker.sh']
     command: ['sh', '-c', 'while true; do php artisan schedule:run --no-interaction; sleep 60; done']
