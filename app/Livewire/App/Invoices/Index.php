@@ -101,7 +101,7 @@ class Index extends Component
             ->when($this->filterOverdue === 'yes', fn ($q) => $q
                 ->whereIn('status', [Invoice::STATUS_PENDING, Invoice::STATUS_PARTIAL])
                 ->whereNotNull('due_at')
-                ->whereDate('due_at', '<', today())
+                ->whereDate('due_at', '<', $this->currentClinic->localNow()->toDateString())
             )
             ->when($this->filterPaymentMethod, fn ($q) => $q
                 ->whereHas('payments', fn ($p) => $p->where('method', $this->filterPaymentMethod))

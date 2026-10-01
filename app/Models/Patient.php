@@ -105,7 +105,7 @@ class Patient extends Model
     {
         return $this->hasOne(Appointment::class)
             ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_CONFIRMED])
-            ->where('appointment_date', '>=', now()->toDateString())
+            ->where('appointment_date', '>=', $this->clinic->localNow()->toDateString())
             ->orderBy('appointment_date')
             ->orderBy('start_time');
     }
@@ -270,7 +270,7 @@ class Patient extends Model
     public function getUpcomingAppointments(int $limit = 5)
     {
         return $this->appointments()
-            ->where('appointment_date', '>=', now()->toDateString())
+            ->where('appointment_date', '>=', $this->clinic->localNow()->toDateString())
             ->whereIn('status', ['scheduled', 'confirmed'])
             ->orderBy('appointment_date')
             ->orderBy('start_time')

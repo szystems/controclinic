@@ -72,7 +72,7 @@ class Index extends Component
         return DoctorUnavailability::query()
             ->forClinic($this->clinic->id)
             ->forDoctor($this->selectedDoctorId)
-            ->where('date_to', '>=', today()->toDateString())
+            ->where('date_to', '>=', $this->clinic->localNow()->toDateString())
             ->orderBy('date_from')
             ->get();
     }
@@ -86,7 +86,7 @@ class Index extends Component
         return DoctorUnavailability::query()
             ->forClinic($this->clinic->id)
             ->forDoctor($this->selectedDoctorId)
-            ->where('date_to', '<', today()->toDateString())
+            ->where('date_to', '<', $this->clinic->localNow()->toDateString())
             ->orderByDesc('date_from')
             ->limit(10)
             ->get();

@@ -232,7 +232,7 @@ class Show extends Component
     {
         return $this->patient->appointments()
             ->with('doctor')
-            ->where('appointment_date', '>=', now()->toDateString())
+            ->where('appointment_date', '>=', app('current_clinic')->localNow()->toDateString())
             ->whereNotIn('status', ['cancelled', 'completed', 'no_show'])
             ->orderBy('appointment_date')
             ->orderBy('start_time')

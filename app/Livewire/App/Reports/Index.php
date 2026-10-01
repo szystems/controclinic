@@ -376,7 +376,7 @@ class Index extends Component
     {
         $months = collect();
         for ($i = 5; $i >= 0; $i--) {
-            $months->push(Carbon::now()->subMonths($i));
+            $months->push($this->clinic->localNow()->subMonths($i));
         }
 
         $isMysql = DB::getDriverName() === 'mysql';
@@ -387,7 +387,7 @@ class Index extends Component
         $data = Patient::query()
             ->withoutGlobalScope('clinic')
             ->where('clinic_id', $this->clinic->id)
-            ->where('created_at', '>=', Carbon::now()->subMonths(5)->startOfMonth())
+            ->where('created_at', '>=', $this->clinic->localNow()->subMonths(5)->startOfMonth())
             ->selectRaw("{$monthExpr} as month, count(*) as total")
             ->groupBy('month')
             ->pluck('total', 'month')

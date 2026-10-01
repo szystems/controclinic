@@ -115,12 +115,13 @@ class Dashboard extends Component
      */
     public function getBirthdaysThisMonthProperty()
     {
-        $month = now()->month;
+        $local = $this->clinic->localNow();
+        $month = $local->month;
         $isMysql = DB::getDriverName() === 'mysql';
         $monthExpr = $isMysql ? 'MONTH(birth_date)' : "CAST(strftime('%m', birth_date) AS INTEGER)";
         $dayExpr = $isMysql ? 'DAY(birth_date)' : "CAST(strftime('%d', birth_date) AS INTEGER)";
 
-        $today = (int) now()->day;
+        $today = (int) $local->day;
 
         return Patient::query()
             ->where('clinic_id', $this->clinic->id)
@@ -139,7 +140,7 @@ class Dashboard extends Component
      */
     public function getLast14DaysSeriesProperty(): array
     {
-        $start = now()->subDays(13)->startOfDay();
+        $start = $this->clinic->localNow()->subDays(13)->startOfDay();
         $rows = $this->appointmentsBaseQuery()
             ->whereDate('appointment_date', '>=', $start->toDateString())
             ->selectRaw('DATE(appointment_date) as day, count(*) as total')

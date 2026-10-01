@@ -169,7 +169,7 @@ class Index extends Component
      */
     private function buildBaseQuery()
     {
-        $today = now()->toDateString();
+        $today = $this->currentClinic->localNow()->toDateString();
 
         return Patient::query()
             ->where('clinic_id', $this->currentClinic->id)
@@ -216,11 +216,11 @@ class Index extends Component
             })
             ->when($this->ageMin !== '', function ($query) {
                 $query->whereNotNull('birth_date')
-                    ->whereDate('birth_date', '<=', now()->subYears((int) $this->ageMin)->toDateString());
+                    ->whereDate('birth_date', '<=', $this->currentClinic->localNow()->subYears((int) $this->ageMin)->toDateString());
             })
             ->when($this->ageMax !== '', function ($query) {
                 $query->whereNotNull('birth_date')
-                    ->whereDate('birth_date', '>=', now()->subYears((int) $this->ageMax + 1)->addDay()->toDateString());
+                    ->whereDate('birth_date', '>=', $this->currentClinic->localNow()->subYears((int) $this->ageMax + 1)->addDay()->toDateString());
             })
             ->orderBy($this->sortField, $this->sortDirection);
     }

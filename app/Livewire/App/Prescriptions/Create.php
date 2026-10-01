@@ -38,7 +38,7 @@ class Create extends Component
             'diagnosis' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'internalNotes' => ['nullable', 'string', 'max:1000'],
-            'validUntil' => ['nullable', 'date', 'after_or_equal:today'],
+            'validUntil' => ['nullable', 'date', 'after_or_equal:'.app('current_clinic')->localNow()->toDateString()],
             'issuedAt' => ['nullable', 'date'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.medication_name' => ['required', 'string', 'max:200'],
@@ -55,7 +55,7 @@ class Create extends Component
     public function mount(?string $patientId = null): void
     {
         $this->authorize('create', Prescription::class);
-        $this->issuedAt = now()->toDateString();
+        $this->issuedAt = app('current_clinic')->localNow()->toDateString();
         if ($patientId) {
             $this->patientId = $patientId;
             $patient = Patient::find($patientId);
@@ -122,7 +122,7 @@ class Create extends Component
             'diagnosis' => $this->diagnosis ?: null,
             'notes' => $this->notes ?: null,
             'internal_notes' => $this->internalNotes ?: null,
-            'issued_at' => $this->issuedAt ?: now()->toDateString(),
+            'issued_at' => $this->issuedAt ?: $clinic->localNow()->toDateString(),
             'valid_until' => $this->validUntil ?: null,
         ]);
 

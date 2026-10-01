@@ -119,7 +119,14 @@ class Prescription extends Model
 
     public function getIsExpiredAttribute(): bool
     {
-        return $this->valid_until && $this->valid_until->isPast();
+        if (! $this->valid_until) {
+            return false;
+        }
+
+        $today = $this->clinic?->localNow()->toDateString()
+            ?? now()->timezone(config('app.timezone'))->toDateString();
+
+        return $this->valid_until->toDateString() < $today;
     }
 
     // ==================== SCOPES ====================
@@ -168,7 +175,7 @@ class Prescription extends Model
     {
         $this->update([
             'status' => self::STATUS_ISSUED,
-            'issued_at' => $this->issued_at ?? now()->toDateString(),
+            'issued_at' => $this->issued_at ?? $this->clinic->localNow()->toDateString(),
             'folio' => $this->folio ?? static::generateFolio($this->clinic_id),
             'qr_payload' => $this->qr_payload ?? static::generateQrPayload($this->id),
         ]);

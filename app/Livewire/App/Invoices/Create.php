@@ -99,7 +99,7 @@ class Create extends Component
     {
         abort_unless($clinic->billingEnabled(), 403);
         $this->currentClinic = $clinic;
-        $this->issued_at = now()->toDateString();
+        $this->issued_at = $clinic->localNow()->toDateString();
         $this->currency = $clinic->currency ?: 'USD';
 
         $defaultPrice = (float) ($clinic->settings['default_consultation_price'] ?? 0);
