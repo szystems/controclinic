@@ -112,8 +112,8 @@ class Index extends Component
                 }
             }],
             'branding_primary_color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
-            'logo_file' => 'nullable|file|mimes:svg,png|max:2048',
-            'favicon_file' => 'nullable|file|mimes:svg,png,ico|max:512',
+            'logo_file' => 'nullable|file|mimes:png,jpg,webp|max:2048',
+            'favicon_file' => 'nullable|file|mimes:png,jpg,webp,ico|max:512',
         ]);
 
         $userId = Auth::id();

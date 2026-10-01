@@ -250,6 +250,22 @@ class AdminSettingsTest extends TestCase
         Storage::disk('public')->assertExists('branding/'.basename($storedUrl));
     }
 
+    public function test_save_branding_rejects_svg_logo(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createSuperAdmin();
+        $file = UploadedFile::fake()->create('logo.svg', 10, 'image/svg+xml');
+
+        Livewire::actingAs($admin)
+            ->test(SettingsIndex::class)
+            ->set('logo_file', $file)
+            ->call('saveBranding')
+            ->assertHasErrors(['logo_file']);
+
+        Storage::disk('public')->assertDirectoryEmpty('branding');
+    }
+
     public function test_save_branding_rejects_non_image_file(): void
     {
         Storage::fake('public');
