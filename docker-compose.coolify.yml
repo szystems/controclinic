@@ -73,6 +73,8 @@ services:
       - app_storage:/var/www/html/storage:ro
     depends_on:
       - controclinic-app
+    labels:
+      - traefik.docker.network=coolify
     networks:
       - controclinic_network
       - coolify
