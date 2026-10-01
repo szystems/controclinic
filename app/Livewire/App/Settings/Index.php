@@ -794,11 +794,10 @@ class Index extends Component
         $zip->addFromString('staff.csv', $this->arrayToCsv($staffRows));
 
         // --- README ---
-        $readme = "ControClinic — Exportación de datos\n";
-        $readme .= "Clínica: {$clinic->name}\n";
-        $readme .= 'Generado: '.now()->format('d/m/Y H:i')." UTC\n\n";
-        $readme .= "Archivos incluidos:\n";
-        $readme .= "- pacientes.csv\n- citas.csv\n- historiales.csv\n- staff.csv\n";
+        $readme = __('settings.export.readme', [
+            'clinic' => $clinic->name,
+            'generated' => now()->format('d/m/Y H:i'),
+        ]);
         $zip->addFromString('README.txt', $readme);
 
         $zip->close();

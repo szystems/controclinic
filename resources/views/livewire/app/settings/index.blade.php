@@ -28,22 +28,22 @@
         <div class="lg:hidden mb-4">
             <nav class="flex space-x-1 overflow-x-auto pb-2 scrollbar-hide">
                 <button wire:click="setTab('general')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'general' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
-                    General
+                    { __('settings.tab_general') }
                 </button>
                 <button wire:click="setTab('localization')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'localization' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
-                    Localización
+                    { __('settings.tab_localization') }
                 </button>
                 <button wire:click="setTab('appointments')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'appointments' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
-                    Citas
+                    { __('settings.tab_appointments') }
                 </button>
                 <button wire:click="setTab('notifications')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'notifications' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
-                    Notificaciones
+                    { __('settings.tab_notifications') }
                 </button>
                 <button wire:click="setTab('billing')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'billing' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
-                    Facturación
+                    { __('settings.tab_billing') }
                 </button>
                 <button wire:click="setTab('branding')" class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg {{ $activeTab === 'branding' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700' }}">
-                    Marca
+                    { __('settings.tab_branding') }
                 </button>
                 @can('settings.edit')
                 <a href="{{ route('app.settings.catalog', $currentClinic->slug) }}" wire:navigate class="flex-shrink-0 px-3 py-2 text-sm font-medium rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
@@ -77,42 +77,42 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
-                        General
+                        { __('settings.tab_general') }
                     </button>
                     <button wire:click="setTab('localization')"
                             class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'localization' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Localización
+                        { __('settings.tab_localization') }
                     </button>
                     <button wire:click="setTab('appointments')"
                             class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'appointments' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Citas
+                        { __('settings.tab_appointments') }
                     </button>
                     <button wire:click="setTab('notifications')"
                             class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'notifications' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
-                        Notificaciones
+                        { __('settings.tab_notifications') }
                     </button>
                     <button wire:click="setTab('billing')"
                             class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'billing' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
                         </svg>
-                        Facturación
+                        { __('settings.tab_billing') }
                     </button>
                     <button wire:click="setTab('branding')"
                             class="w-full flex items-center px-3 py-2.5 text-left text-sm font-medium {{ $activeTab === 'branding' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-l-4 border-indigo-500' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
                         </svg>
-                        Marca
+                        { __('settings.tab_branding') }
                     </button>
                     @can('settings.edit')
                     <a href="{{ route('app.settings.catalog', $currentClinic->slug) }}" wire:navigate

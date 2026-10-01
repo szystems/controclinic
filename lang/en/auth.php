@@ -16,6 +16,7 @@ return [
 
     // Login
     'login' => 'Log In',
+    'register' => 'Register',
     'or_login' => 'or log in',
     'remember_me' => 'Remember me',
     'forgot_password' => 'Forgot your password?',

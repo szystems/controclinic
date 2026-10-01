@@ -135,18 +135,18 @@ class MedicalRecord extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->record_type) {
-            self::TYPE_CONSULTATION => __('Consulta'),
-            self::TYPE_DIAGNOSIS => __('Diagnóstico'),
-            self::TYPE_PRESCRIPTION => __('Receta'),
-            self::TYPE_LAB_RESULT => __('Resultado de laboratorio'),
-            self::TYPE_IMAGING => __('Imagenología'),
-            self::TYPE_PROCEDURE => __('Procedimiento'),
-            self::TYPE_SURGERY => __('Cirugía'),
-            self::TYPE_REFERRAL => __('Referencia'),
-            self::TYPE_FOLLOW_UP_NOTE => __('Nota de seguimiento'),
-            self::TYPE_VITAL_SIGNS => __('Signos vitales'),
-            self::TYPE_VACCINATION => __('Vacunación'),
-            self::TYPE_OTHER => __('Otro'),
+            self::TYPE_CONSULTATION => __('records.type_consultation'),
+            self::TYPE_DIAGNOSIS => __('records.type_diagnosis'),
+            self::TYPE_PRESCRIPTION => __('records.type_prescription'),
+            self::TYPE_LAB_RESULT => __('records.type_lab_result'),
+            self::TYPE_IMAGING => __('records.type_imaging'),
+            self::TYPE_PROCEDURE => __('records.type_procedure'),
+            self::TYPE_SURGERY => __('records.type_surgery'),
+            self::TYPE_REFERRAL => __('records.type_referral'),
+            self::TYPE_FOLLOW_UP_NOTE => __('records.type_follow_up_note'),
+            self::TYPE_VITAL_SIGNS => __('records.type_vital_signs'),
+            self::TYPE_VACCINATION => __('records.type_vaccination'),
+            self::TYPE_OTHER => __('records.type_other'),
             default => $this->record_type,
         };
     }
@@ -154,10 +154,10 @@ class MedicalRecord extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            self::STATUS_DRAFT => __('Borrador'),
-            self::STATUS_FINAL => __('Finalizado'),
-            self::STATUS_AMENDED => __('Modificado'),
-            self::STATUS_DELETED => __('Eliminado'),
+            self::STATUS_DRAFT => __('records.status_draft'),
+            self::STATUS_FINAL => __('records.status_final'),
+            self::STATUS_AMENDED => __('records.status_amended'),
+            self::STATUS_DELETED => __('records.status_deleted'),
             default => $this->status,
         };
     }
@@ -303,14 +303,14 @@ class MedicalRecord extends Model
     {
         $signs = $this->vital_signs ?? [];
         $labels = [
-            'blood_pressure_systolic' => __('Presión sistólica'),
-            'blood_pressure_diastolic' => __('Presión diastólica'),
-            'heart_rate' => __('Frecuencia cardíaca'),
-            'temperature' => __('Temperatura'),
-            'respiratory_rate' => __('Frecuencia respiratoria'),
-            'oxygen_saturation' => __('Saturación O2'),
-            'weight' => __('Peso'),
-            'height' => __('Altura'),
+            'blood_pressure_systolic' => __('records.vitals_systolic'),
+            'blood_pressure_diastolic' => __('records.vitals_diastolic'),
+            'heart_rate' => __('records.vitals_heart_rate'),
+            'temperature' => __('records.vitals_temperature'),
+            'respiratory_rate' => __('records.vitals_respiratory_rate'),
+            'oxygen_saturation' => __('records.vitals_oxygen'),
+            'weight' => __('records.vitals_weight'),
+            'height' => __('records.vitals_height'),
         ];
 
         $formatted = [];

@@ -161,7 +161,7 @@ return [
     'near_limit_title' => 'Estás cerca del límite de tu plan',
     'near_limit_description' => 'Considera mejorar tu plan para evitar interrupciones.',
     'view_plans' => 'Ver Planes',
-    'upgrade' => 'Upgrade',
+    'upgrade' => 'Mejorar plan',
     'upgrade_to_continue' => 'Mejorar para continuar',
     'upgrade_to_unlock' => 'Activar plan',
     'account_inactive_short' => 'Cuenta inactiva',

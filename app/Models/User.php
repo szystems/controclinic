@@ -150,12 +150,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getRoleLabelAttribute(): string
     {
         return match ($this->role) {
-            self::ROLE_OWNER => __('Propietario'),
-            self::ROLE_DOCTOR => __('Doctor'),
-            self::ROLE_ASSISTANT => __('Asistente'),
-            self::ROLE_SECRETARY => __('Secretaria'),
-            self::ROLE_RECEPTIONIST => __('Recepcionista'),
-            self::ROLE_ADMIN => __('Administrador'),
+            self::ROLE_OWNER => __('staff.role_owner'),
+            self::ROLE_DOCTOR => __('staff.role_doctor'),
+            self::ROLE_ASSISTANT => __('staff.role_assistant'),
+            self::ROLE_SECRETARY => __('staff.role_secretary'),
+            self::ROLE_RECEPTIONIST => __('staff.role_receptionist'),
+            self::ROLE_ADMIN => __('staff.role_admin'),
             default => $this->role,
         };
     }

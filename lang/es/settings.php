@@ -151,10 +151,18 @@ return [
         'export_hint' => 'Solo el propietario de la clínica puede descargar los datos. La generación puede tardar unos segundos.',
     ],
 
+    'tab_general' => 'General',
+    'tab_localization' => 'Localización',
+    'tab_appointments' => 'Citas',
+    'tab_notifications' => 'Notificaciones',
+    'tab_billing' => 'Facturación',
+    'tab_branding' => 'Marca',
+
     'export' => [
         'id' => 'ID',
         'confidential' => 'Confidencial',
         'deleted' => 'Eliminado',
+        'readme' => "ControClinic — Exportación de datos\nClínica: :clinic\nGenerado: :generated UTC\n\nArchivos incluidos:\n- pacientes.csv\n- citas.csv\n- historiales.csv\n- staff.csv\n",
     ],
 
     'custom_domain' => [
