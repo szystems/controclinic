@@ -46,7 +46,8 @@ Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` 
 | Enlaces `href="#"` del pie público | Otto: decir a dónde deben ir |
 | Nombre visible «clinica szarata» | Otto: es el dato guardado, se cambia en Ajustes si quiere mayúsculas |
 | INF-03, INF-05, G0-4 | Paddle, al final |
-| G0-1 panel Coolify, G0-3 firewall, INF-01 paso 2 | Otto |
+| G0-1 dominio HTTPS del panel | Otto: elegir el nombre; el puerto 8000 ya no está abierto al público |
+| G0-3 firewall, INF-01 paso 2 | Otto |
 
 ## 🌐 Producción — 2026-09-07
 
