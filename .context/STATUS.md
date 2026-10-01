@@ -2,7 +2,7 @@
 
 > **Última actualización:** 2026-10-01
 > **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
-> **Siguiente paso:** HARD-04 (`/health` sin datos internos). Paddle al final.
+> **Siguiente paso:** Paddle (INF-03, INF-05, G0-4), al final. Antes, Otto: enlaces del pie público y, si quiere, el nombre visible de la clínica.
 > **Producción:** ✅ `https://controclinic.com`
 
 
@@ -37,12 +37,14 @@ Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` 
 | INF-01 paso 1, INF-02, INF-04 | Cliente MySQL para el respaldo, assets que se refrescan, php-fpm fuera de la red compartida |
 | AUTH-01 a AUTH-08 | Permisos de admin, ajustes, facturación, historial confidencial, horario, ids de otra clínica, solo-lectura y suspender |
 | AUTH-09 | Sin cambio de código: los médicos de una misma clínica ven los pacientes de esa clínica |
-| DATA-01 a DATA-19 y HARD-01 a HARD-03 | Lo anterior, más cabeceras y límites de 2FA, registro, restablecer y recordatorios. La IP de Cloudflare sigue apagada hasta el firewall |
+| DATA-01 a DATA-19 y HARD-01 a HARD-12 | Lo anterior, más cabeceras, límites de acceso, salud, idioma, SVG, nginx, logs, workers y robots. La IP de Cloudflare sigue apagada hasta el firewall. Las migraciones del arranque no se tocaron |
+| TXT-01 | Textos de pestañas, historial, roles, bienvenida y exportación. Faltan los enlaces vacíos del pie y el nombre guardado de la clínica |
 | Página pública | Pie “Desarrollado por Szystems”, reserva arriba del equipo, puesto visible y foto opcional |
 
 | Pendiente | Quién |
 |-----------|--------|
-| G4 desde HARD-04 y TXT-01 | Agente, un ID por commit |
+| Enlaces `href="#"` del pie público | Otto: decir a dónde deben ir |
+| Nombre visible «clinica szarata» | Otto: es el dato guardado, se cambia en Ajustes si quiere mayúsculas |
 | INF-03, INF-05, G0-4 | Paddle, al final |
 | G0-1 panel Coolify, G0-3 firewall, INF-01 paso 2 | Otto |
 
