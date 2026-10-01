@@ -42,6 +42,12 @@ return [
     'debug' => (bool) (env('APP_DEBUG') ?: false),
 
     /*
+    | Stay false until the origin firewall only accepts Cloudflare (G0-3).
+    | Otherwise a direct request can invent CF-Connecting-IP.
+    */
+    'trust_cf_connecting_ip' => (bool) env('TRUST_CF_CONNECTING_IP', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------

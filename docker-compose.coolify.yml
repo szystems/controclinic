@@ -16,6 +16,7 @@ services:
       APP_ENV: production
       APP_DEBUG: 'false'
       APP_URL: https://controclinic.com
+      TRUST_CF_CONNECTING_IP: ${TRUST_CF_CONNECTING_IP:-false}
       APP_LOCALE: es
       APP_FALLBACK_LOCALE: en
       FILESYSTEM_DISK: local
@@ -128,6 +129,7 @@ services:
       APP_ENV: production
       APP_DEBUG: 'false'
       APP_URL: https://controclinic.com
+      TRUST_CF_CONNECTING_IP: ${TRUST_CF_CONNECTING_IP:-false}
       APP_LOCALE: es
       APP_FALLBACK_LOCALE: en
       FILESYSTEM_DISK: local
@@ -179,6 +181,7 @@ services:
       APP_ENV: production
       APP_DEBUG: 'false'
       APP_URL: https://controclinic.com
+      TRUST_CF_CONNECTING_IP: ${TRUST_CF_CONNECTING_IP:-false}
       APP_LOCALE: es
       APP_FALLBACK_LOCALE: en
       FILESYSTEM_DISK: local
