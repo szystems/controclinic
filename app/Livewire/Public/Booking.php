@@ -158,7 +158,7 @@ class Booking extends Component
 
         // Drop slots earlier than min notice
         $minTime = $minDate;
-        $slots = array_values(array_filter($slots, function ($time) use ($date, $minTime) {
+        $slots = array_values(array_filter($slots, function ($time) use ($date, $minTime, $tz) {
             return Carbon::parse($date->toDateString().' '.$time, $tz)->gte($minTime);
         }));
 
