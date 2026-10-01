@@ -12,7 +12,7 @@
     <footer class="mt-auto border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <p class="text-center text-xs text-gray-500 dark:text-gray-400">
-                <x-brand-credit :app="$appName" link-class="underline hover:text-gray-700 dark:hover:text-gray-200" />
+                <x-brand-credit variant="developed" link-class="inline-flex items-center gap-1 font-medium text-gray-700 underline hover:text-gray-900 dark:text-gray-200 dark:hover:text-white" />
             </p>
         </div>
     </footer>

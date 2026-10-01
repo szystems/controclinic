@@ -110,8 +110,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
                 <p>{{ $clinic->name }} © {{ date('Y') }}</p>
                 <p>
-                    {{ __('booking.powered_by') }}
-                    <a href="{{ route('home') }}" class="text-clinic-primary font-medium hover:underline">ControClinic</a>
+                    <x-brand-credit variant="developed" link-class="text-clinic-primary font-medium hover:underline" />
                 </p>
             </div>
         </div>

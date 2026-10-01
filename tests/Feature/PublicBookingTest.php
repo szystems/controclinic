@@ -46,7 +46,23 @@ class PublicBookingTest extends TestCase
     {
         [$clinic] = $this->makeClinicWithDoctor();
 
-        $this->get('/c/'.$clinic->slug)->assertOk()->assertSee($clinic->name);
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee($clinic->name)
+            ->assertSee(__('public.developed_by'), false)
+            ->assertSee('images/szystems-mark.png', false)
+            ->assertSee('https://szystems.com', false)
+            ->assertDontSee(__('booking.powered_by'), false);
+    }
+
+    public function test_dashboard_footer_credits_szystems(): void
+    {
+        $html = view('components.site-footer', ['variant' => 'app'])->render();
+
+        $this->assertStringContainsString(__('public.developed_by'), $html);
+        $this->assertStringContainsString('images/szystems-mark.png', $html);
+        $this->assertStringContainsString('https://szystems.com', $html);
+        $this->assertStringNotContainsString(__('public.product_of'), $html);
     }
 
     public function test_legacy_public_route_works(): void

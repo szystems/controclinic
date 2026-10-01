@@ -45,6 +45,7 @@ return [
 
     // Brand
     'product_of' => 'A product of',
+    'developed_by' => 'Developed by',
 
     // Custom plan (public pricing)
     'custom_plan_title' => 'Need more capacity?',
