@@ -19,7 +19,7 @@
 @else
     <footer class="mt-auto bg-gray-900 text-gray-400">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
                 <div class="col-span-2 md:col-span-1">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2 mb-4">
                         @if($logoUrl)
@@ -43,17 +43,6 @@
                     <ul class="space-y-2 text-sm">
                         <li><a href="{{ route('home') }}#features" class="hover:text-white transition-colors">{{ __('public.footer_features') }}</a></li>
                         <li><a href="{{ route('pricing') }}" class="hover:text-white transition-colors">{{ __('public.footer_pricing') }}</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">{{ __('public.footer_integrations') }}</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">{{ __('public.footer_updates') }}</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="text-white font-semibold mb-4">{{ __('public.footer_resources') }}</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition-colors">{{ __('public.footer_help') }}</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">{{ __('public.footer_guides') }}</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">{{ __('public.footer_blog') }}</a></li>
                         <li><a href="{{ route('contact') }}" class="hover:text-white transition-colors">{{ __('public.footer_contact') }}</a></li>
                     </ul>
                 </div>
