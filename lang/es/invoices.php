@@ -78,6 +78,7 @@ return [
     'invoice_created' => 'Factura creada correctamente',
     'invoice_updated' => 'Factura actualizada',
     'invoice_cancelled' => 'Factura cancelada',
+    'cannot_cancel_with_payments' => 'No se puede cancelar una factura que ya tiene pagos registrados.',
     'invoice_paid' => 'Factura marcada como pagada',
     'cannot_edit_paid' => 'No se puede editar una factura pagada o cancelada',
     'no_invoices' => 'No hay facturas aún',

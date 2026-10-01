@@ -238,7 +238,7 @@ class InvoicesTest extends TestCase
             ->call('openPaymentModal')
             ->set('pay_amount', 60)
             ->set('pay_method', 'cash')
-            ->set('pay_date', now()->toDateString())
+            ->set('pay_date', $clinic->localNow()->toDateString())
             ->call('recordPayment');
 
         $invoice->refresh();
@@ -257,7 +257,7 @@ class InvoicesTest extends TestCase
             ->call('openPaymentModal')
             ->set('pay_amount', 100)
             ->set('pay_method', 'card')
-            ->set('pay_date', now()->toDateString())
+            ->set('pay_date', $clinic->localNow()->toDateString())
             ->call('recordPayment');
 
         $invoice->refresh();
@@ -344,7 +344,7 @@ class InvoicesTest extends TestCase
         $component->call('openPaymentModal')
             ->set('pay_amount', 60)
             ->set('pay_method', 'cash')
-            ->set('pay_date', now()->toDateString())
+            ->set('pay_date', $clinic->localNow()->toDateString())
             ->call('recordPayment');
 
         $invoice->refresh();
@@ -373,12 +373,66 @@ class InvoicesTest extends TestCase
             ->call('openPaymentModal')
             ->set('pay_amount', 50)
             ->set('pay_method', 'cash')
-            ->set('pay_date', now()->toDateString())
+            ->set('pay_date', $clinic->localNow()->toDateString())
             ->call('recordPayment');
 
         // Intentar acceder a la factura desde otra clínica → 404
         Livewire::actingAs($owner)
             ->test(InvoicesShow::class, ['clinic' => $otherClinic, 'invoice' => $invoice])
             ->assertStatus(404);
+    }
+
+    public function test_payment_on_a_cancelled_invoice_is_refused(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $invoice = $this->createInvoice($clinic, $patient, [
+            'status' => Invoice::STATUS_CANCELLED,
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesShow::class, ['clinic' => $clinic, 'invoice' => $invoice])
+            ->set('pay_amount', 40)
+            ->set('pay_method', 'cash')
+            ->set('pay_date', $clinic->localNow()->toDateString())
+            ->call('recordPayment')
+            ->assertForbidden();
+
+        $this->assertSame(0, $invoice->payments()->count());
+        $this->assertSame(Invoice::STATUS_CANCELLED, $invoice->fresh()->status);
+    }
+
+    public function test_payment_above_the_balance_is_rejected(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $invoice = $this->createInvoice($clinic, $patient);
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesShow::class, ['clinic' => $clinic, 'invoice' => $invoice])
+            ->set('pay_amount', 150)
+            ->set('pay_method', 'cash')
+            ->set('pay_date', $clinic->localNow()->toDateString())
+            ->call('recordPayment')
+            ->assertHasErrors(['pay_amount']);
+
+        $this->assertEquals(0.0, (float) $invoice->fresh()->paid_amount);
+    }
+
+    public function test_invoice_with_payments_cannot_be_cancelled(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $invoice = $this->createInvoice($clinic, $patient, [
+            'status' => Invoice::STATUS_PARTIAL,
+            'paid_amount' => 40,
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesShow::class, ['clinic' => $clinic, 'invoice' => $invoice])
+            ->call('cancel')
+            ->assertHasErrors(['invoice']);
+
+        $this->assertSame(Invoice::STATUS_PARTIAL, $invoice->fresh()->status);
     }
 }

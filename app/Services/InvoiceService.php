@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class InvoiceService
 {
@@ -76,20 +77,18 @@ class InvoiceService
      */
     public function recordPayment(Invoice $invoice, array $data): void
     {
+        if (! in_array($invoice->status, [Invoice::STATUS_PENDING, Invoice::STATUS_PARTIAL], true)) {
+            return;
+        }
+
         DB::transaction(function () use ($invoice, $data) {
             $invoice->payments()->create($data);
 
             $paid = (float) $invoice->payments()->sum('amount');
 
-            $status = match (true) {
-                $paid <= 0 => Invoice::STATUS_PENDING,
-                $paid < (float) $invoice->total => Invoice::STATUS_PARTIAL,
-                default => Invoice::STATUS_PAID,
-            };
-
             $invoice->update([
                 'paid_amount' => round($paid, 2),
-                'status' => $status,
+                'status' => $this->statusForPaidAmount($invoice, $paid),
             ]);
         });
     }
@@ -105,17 +104,24 @@ class InvoiceService
 
             $paid = (float) $invoice->payments()->sum('amount');
 
-            $status = match (true) {
-                $paid <= 0 => Invoice::STATUS_PENDING,
-                $paid < (float) $invoice->total => Invoice::STATUS_PARTIAL,
-                default => Invoice::STATUS_PAID,
-            };
-
             $invoice->update([
                 'paid_amount' => round($paid, 2),
-                'status' => $status,
+                'status' => $this->statusForPaidAmount($invoice, $paid),
             ]);
         });
+    }
+
+    private function statusForPaidAmount(Invoice $invoice, float $paid): string
+    {
+        if ($invoice->status === Invoice::STATUS_CANCELLED) {
+            return Invoice::STATUS_CANCELLED;
+        }
+
+        return match (true) {
+            $paid <= 0 => Invoice::STATUS_PENDING,
+            $paid < (float) $invoice->total => Invoice::STATUS_PARTIAL,
+            default => Invoice::STATUS_PAID,
+        };
     }
 
     /**
@@ -123,8 +129,14 @@ class InvoiceService
      */
     public function cancel(Invoice $invoice): void
     {
-        if ($invoice->status === Invoice::STATUS_PAID) {
+        if ($invoice->status === Invoice::STATUS_PAID || $invoice->status === Invoice::STATUS_CANCELLED) {
             return;
+        }
+
+        if ((float) $invoice->paid_amount > 0) {
+            throw ValidationException::withMessages([
+                'invoice' => __('invoices.cannot_cancel_with_payments'),
+            ]);
         }
 
         $invoice->update(['status' => Invoice::STATUS_CANCELLED]);

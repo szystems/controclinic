@@ -31,12 +31,14 @@ class Show extends Component
 
     protected function paymentRules(): array
     {
+        $balance = round((float) $this->invoice->balance, 2);
+
         return [
-            'pay_amount' => ['required', 'numeric', 'min:0.01'],
+            'pay_amount' => ['required', 'numeric', 'min:0.01', 'max:'.$balance],
             'pay_method' => ['required', 'in:cash,card,transfer,insurance,other'],
             'pay_reference' => ['nullable', 'string', 'max:255'],
             'pay_notes' => ['nullable', 'string', 'max:500'],
-            'pay_date' => ['required', 'date'],
+            'pay_date' => ['required', 'date', 'before_or_equal:'.$this->currentClinic->localNow()->toDateString()],
         ];
     }
 
@@ -47,14 +49,14 @@ class Show extends Component
 
         $this->currentClinic = $clinic;
         $this->invoice = $invoice;
-        $this->pay_date = now()->toDateString();
+        $this->pay_date = $clinic->localNow()->toDateString();
     }
 
     public function openPaymentModal(): void
     {
         $this->authorize('invoices.record_payment');
         $this->reset(['pay_amount', 'pay_method', 'pay_reference', 'pay_notes']);
-        $this->pay_date = now()->toDateString();
+        $this->pay_date = $this->currentClinic->localNow()->toDateString();
         $this->pay_method = 'cash';
         $balance = (float) $this->invoice->balance;
         $this->pay_amount = $balance > 0 ? (string) $balance : '';
@@ -69,6 +71,8 @@ class Show extends Component
     public function recordPayment(): void
     {
         $this->authorize('invoices.record_payment');
+        $this->invoice->refresh();
+        abort_unless(in_array($this->invoice->status, [Invoice::STATUS_PENDING, Invoice::STATUS_PARTIAL], true), 403);
 
         $validated = $this->validate($this->paymentRules());
 
