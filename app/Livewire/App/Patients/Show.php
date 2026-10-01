@@ -77,7 +77,7 @@ class Show extends Component
 
         $this->patient->loadCount([
             'appointments',
-            'medicalRecords',
+            'medicalRecords' => fn ($q) => $this->hideConfidentialRecords($q),
             'prescriptions',
             'files',
             'invoices',
@@ -251,7 +251,7 @@ class Show extends Component
 
     public function getRecentRecordsProperty()
     {
-        return $this->patient->medicalRecords()
+        return $this->visibleMedicalRecords()
             ->with('doctor')
             ->orderBy('created_at', 'desc')
             ->limit(5)
@@ -264,10 +264,25 @@ class Show extends Component
             return null;
         }
 
-        return $this->patient->medicalRecords()
+        return $this->visibleMedicalRecords()
             ->with('doctor')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+    }
+
+    private function visibleMedicalRecords()
+    {
+        $query = $this->patient->medicalRecords();
+        $this->hideConfidentialRecords($query);
+
+        return $query;
+    }
+
+    private function hideConfidentialRecords($query): void
+    {
+        if (! auth()->user()->can('records.view_confidential')) {
+            $query->where('is_confidential', false);
+        }
     }
 
     public function getInvoicesProperty()

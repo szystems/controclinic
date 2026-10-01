@@ -65,6 +65,7 @@ class Edit extends Component
         abort_if($record->clinic_id !== $patient->clinic_id, 404);
         abort_if($record->patient_id !== $patient->id, 404);
         abort_unless(auth()->user()->can('records.edit'), 403);
+        $this->authorize('view', $record);
 
         $this->clinicSlug = app('current_clinic')->slug;
         $this->clinic = app('current_clinic');
@@ -132,6 +133,7 @@ class Edit extends Component
         if (! auth()->user()->can('records.edit')) {
             abort(403);
         }
+        $this->authorize('view', $this->record);
 
         $fileRules = [];
         if (! empty($this->pendingUploads) && auth()->user()->can('files.upload')) {
@@ -173,7 +175,9 @@ class Edit extends Component
             'vital_signs' => $vitals ?: null,
             'diagnoses' => $diagnoses ?: null,
             'prescriptions' => $prescriptions ?: null,
-            'is_confidential' => (bool) ($data['isConfidential'] ?? false),
+            'is_confidential' => auth()->user()->can('records.view_confidential')
+                ? (bool) ($data['isConfidential'] ?? false)
+                : (bool) $this->record->is_confidential,
             'status' => $status,
             'finalized_at' => $status === MedicalRecord::STATUS_FINAL ? now() : null,
         ]);
