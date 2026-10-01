@@ -93,6 +93,7 @@ return [
     'empty_state_bullet_2' => 'Daily and weekly calendar view per doctor',
     'empty_state_bullet_3' => 'Automatic schedule conflict detection',
     'conflict_detected' => 'Schedule conflict detected',
+    'ends_next_day' => 'The appointment must end on the same day. Shorten the duration or choose an earlier time.',
 
     // Dashboard
     'todays_appointments' => "Today's Appointments",

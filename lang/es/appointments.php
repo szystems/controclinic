@@ -93,6 +93,7 @@ return [
     'empty_state_bullet_2' => 'Vista de calendario diaria y semanal por doctor',
     'empty_state_bullet_3' => 'Detección automática de conflictos de horario',
     'conflict_detected' => 'Se detectó un conflicto de horario',
+    'ends_next_day' => 'La cita debe terminar el mismo día. Reduce la duración o elige una hora más temprana.',
 
     // Dashboard
     'todays_appointments' => 'Citas de Hoy',

@@ -59,8 +59,18 @@ class Edit extends Component
             'patient_id' => ['required', Rule::exists('patients', 'id')->where('clinic_id', $this->currentClinic->id)],
             'doctor_id' => ['required', Rule::exists('users', 'id')->where('clinic_id', $this->currentClinic->id)],
             'appointment_type' => ['required', 'in:scheduled,walk_in,emergency,follow_up,telemedicine'],
-            'appointment_date' => ['required', 'date'],
-            'start_time' => ['required_unless:appointment_type,walk_in'],
+            'appointment_date' => ['required', 'date_format:Y-m-d', function (string $attribute, mixed $value, \Closure $fail): void {
+                $today = $this->currentClinic->localNow()->toDateString();
+                $existing = $this->appointment->appointment_date?->toDateString();
+
+                if (is_string($value) && $value < $today && $value !== $existing) {
+                    $fail(__('validation.after_or_equal', [
+                        'attribute' => __('appointments.date'),
+                        'date' => __('appointments.today'),
+                    ]));
+                }
+            }],
+            'start_time' => ['required_unless:appointment_type,walk_in', 'nullable', 'date_format:H:i', $this->sameDayEndRule()],
             'duration_minutes' => ['required', 'integer', 'min:5', 'max:480'],
             'reason' => ['nullable', 'string', 'max:500'],
             'symptoms' => ['nullable', 'string', 'max:1000'],
@@ -79,6 +89,26 @@ class Edit extends Component
             }],
             'is_billable' => ['boolean'],
         ];
+    }
+
+    private function sameDayEndRule(): \Closure
+    {
+        return function (string $attribute, mixed $value, \Closure $fail): void {
+            if (! is_string($value) || preg_match('/^\d{2}:\d{2}$/', $value) !== 1) {
+                return;
+            }
+
+            try {
+                $start = Carbon::createFromFormat('!H:i', $value);
+            } catch (\Throwable) {
+                return;
+            }
+
+            $end = $start->copy()->addMinutes((int) $this->duration_minutes);
+            if ($end->format('Y-m-d') !== $start->format('Y-m-d')) {
+                $fail(__('appointments.ends_next_day'));
+            }
+        };
     }
 
     public function mount(Clinic $clinic, Appointment $appointment): void

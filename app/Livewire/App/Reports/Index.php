@@ -44,6 +44,46 @@ class Index extends Component
         }
     }
 
+    public function updatedDateFrom(): void
+    {
+        $this->keepCalendarDate('dateFrom');
+    }
+
+    public function updatedDateTo(): void
+    {
+        $this->keepCalendarDate('dateTo');
+    }
+
+    protected function rules(): array
+    {
+        return [
+            'dateFrom' => ['required', 'date_format:Y-m-d'],
+            'dateTo' => ['required', 'date_format:Y-m-d'],
+        ];
+    }
+
+    private function keepCalendarDate(string $field): void
+    {
+        $value = $this->{$field};
+
+        if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
+            return;
+        }
+
+        $this->{$field} = $this->clinic->localNow()->toDateString();
+        $attribute = $field === 'dateFrom' ? __('reports.date_from') : __('reports.date_to');
+        $this->addError($field, __('validation.date_format', ['attribute' => $attribute, 'format' => 'Y-m-d']));
+    }
+
+    private function reportDate(string $value): string
+    {
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
+            return $value;
+        }
+
+        return $this->clinic->localNow()->toDateString();
+    }
+
     private function applyPeriodDates(): void
     {
         $now = $this->clinic->localNow();
@@ -68,7 +108,7 @@ class Index extends Component
      */
     private function baseQuery(bool $previousPeriod = false)
     {
-        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->dateFrom, $this->dateTo];
+        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->reportDate($this->dateFrom), $this->reportDate($this->dateTo)];
 
         $query = Appointment::query()
             ->withoutGlobalScope('clinic')
@@ -97,8 +137,8 @@ class Index extends Component
      */
     private function previousPeriodRange(): array
     {
-        $from = Carbon::parse($this->dateFrom);
-        $to = Carbon::parse($this->dateTo);
+        $from = Carbon::parse($this->reportDate($this->dateFrom));
+        $to = Carbon::parse($this->reportDate($this->dateTo));
         $days = $from->diffInDays($to) + 1;
 
         $prevTo = $from->copy()->subDay();
@@ -157,8 +197,8 @@ class Index extends Component
         return Patient::query()
             ->where('clinic_id', $this->clinic->id)
             ->whereBetween('created_at', [
-                $this->dateFrom.' 00:00:00',
-                $this->dateTo.' 23:59:59',
+                $this->reportDate($this->dateFrom).' 00:00:00',
+                $this->reportDate($this->dateTo).' 23:59:59',
             ])
             ->count();
     }
@@ -265,8 +305,8 @@ class Index extends Component
 
     public function appointmentsByDay(): string
     {
-        $from = Carbon::parse($this->dateFrom);
-        $to = Carbon::parse($this->dateTo);
+        $from = Carbon::parse($this->reportDate($this->dateFrom));
+        $to = Carbon::parse($this->reportDate($this->dateTo));
 
         // Limit to 90 days to keep chart readable
         if ($from->diffInDays($to) > 90) {
@@ -386,7 +426,7 @@ class Index extends Component
      */
     private function invoiceBaseQuery(bool $previousPeriod = false)
     {
-        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->dateFrom, $this->dateTo];
+        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->reportDate($this->dateFrom), $this->reportDate($this->dateTo)];
 
         $query = Invoice::query()
             ->withoutGlobalScope('clinic')
@@ -407,7 +447,7 @@ class Index extends Component
      */
     private function paymentBaseQuery(bool $previousPeriod = false)
     {
-        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->dateFrom, $this->dateTo];
+        [$from, $to] = $previousPeriod ? $this->previousPeriodRange() : [$this->reportDate($this->dateFrom), $this->reportDate($this->dateTo)];
 
         $query = InvoicePayment::query()
             ->whereHas('invoice', function ($q) {
@@ -521,8 +561,8 @@ class Index extends Component
      */
     public function revenueByDay(): string
     {
-        $from = Carbon::parse($this->dateFrom);
-        $to = Carbon::parse($this->dateTo);
+        $from = Carbon::parse($this->reportDate($this->dateFrom));
+        $to = Carbon::parse($this->reportDate($this->dateTo));
 
         if ($from->diffInDays($to) > 90) {
             $from = $to->copy()->subDays(89);
