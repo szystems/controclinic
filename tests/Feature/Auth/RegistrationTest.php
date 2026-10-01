@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Clinic;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
@@ -67,6 +68,63 @@ class RegistrationTest extends TestCase
             'country' => 'CA',
             'currency' => 'CAD',
             'locale' => 'en',
+        ]);
+    }
+
+    public function test_array_fields_are_rejected_without_crashing(): void
+    {
+        $component = Volt::test('pages.auth.register');
+
+        $component->set('email', ['not-an-email']);
+        $component->assertHasErrors('email');
+        $this->assertSame('', $component->get('email'));
+
+        $component->set('name', ['not-a-name']);
+        $component->assertHasErrors('name');
+        $this->assertSame('', $component->get('name'));
+
+        $component->set('terms_accepted', ['yes']);
+        $component->assertHasNoErrors('terms_accepted');
+        $this->assertFalse($component->get('terms_accepted'));
+    }
+
+    public function test_clinic_name_without_letters_gets_a_usable_slug(): void
+    {
+        Volt::test('pages.auth.register')
+            ->set('clinic_name', '!!!')
+            ->set('name', 'Owner')
+            ->set('email', 'symbols@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('terms_accepted', true)
+            ->call('register')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('verification.notice', absolute: false));
+
+        $clinic = Clinic::where('email', 'symbols@example.com')->first();
+
+        $this->assertNotNull($clinic);
+        $this->assertMatchesRegularExpression('/^clinica-[a-z0-9]{6}$/', $clinic->slug);
+    }
+
+    public function test_slug_skips_a_trashed_clinic_with_the_same_name(): void
+    {
+        $existing = Clinic::factory()->create(['slug' => 'acme']);
+        $existing->delete();
+
+        Volt::test('pages.auth.register')
+            ->set('clinic_name', 'Acme')
+            ->set('name', 'Owner')
+            ->set('email', 'acme@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('terms_accepted', true)
+            ->call('register')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('clinics', [
+            'email' => 'acme@example.com',
+            'slug' => 'acme-1',
         ]);
     }
 }

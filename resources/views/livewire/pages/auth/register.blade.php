@@ -1,25 +1,54 @@
 <?php
 
-use App\Models\User;
 use App\Models\Clinic;
 use App\Models\Plan;
+use App\Models\User;
+use App\Services\ClinicLocaleResolver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component
 {
-    public string $name = '';
-    public string $email = '';
-    public string $password = '';
-    public string $password_confirmation = '';
-    public string $clinic_name = '';
-    public bool $terms_accepted = false;
+    // Livewire assigns the request payload before this component can reject it.
+    // An array (email[]=) must not raise a type error; updated() clears it.
+    public string|array $name = '';
+
+    public string|array $email = '';
+
+    public string|array $password = '';
+
+    public string|array $password_confirmation = '';
+
+    public string|array $clinic_name = '';
+
+    public bool|array $terms_accepted = false;
+
+    public function updating(string $property, mixed $value): void
+    {
+        if ($property === 'terms_accepted' || is_scalar($value) || $value === null) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            $property => __('validation.string', ['attribute' => $property]),
+        ]);
+    }
+
+    public function updated(string $property, mixed $value): void
+    {
+        if (! is_array($value)) {
+            return;
+        }
+
+        $this->{$property} = $property === 'terms_accepted' ? false : '';
+    }
 
     /**
      * Handle an incoming registration request.
@@ -40,17 +69,19 @@ new #[Layout('layouts.guest')] class extends Component
         );
 
         $user = DB::transaction(function () use ($validated) {
-            // Generate unique slug from clinic name
             $baseSlug = Str::slug($validated['clinic_name']);
+            if ($baseSlug === '') {
+                $baseSlug = 'clinica-'.Str::lower(Str::random(6));
+            }
             $slug = $baseSlug;
             $counter = 1;
-            while (Clinic::where('slug', $slug)->exists()) {
-                $slug = $baseSlug . '-' . $counter;
+            while (Clinic::withTrashed()->where('slug', $slug)->exists()) {
+                $slug = $baseSlug.'-'.$counter;
                 $counter++;
             }
 
             // Create the clinic
-            $localeDefaults = app(\App\Services\ClinicLocaleResolver::class)->resolve(request());
+            $localeDefaults = app(ClinicLocaleResolver::class)->resolve(request());
 
             $clinic = Clinic::create(array_merge([
                 'name' => $validated['clinic_name'],
@@ -93,7 +124,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         try {
             event(new Registered($user));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             report($e);
         }
 
