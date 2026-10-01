@@ -254,6 +254,10 @@ class MedicalRecord extends Model
 
     public function finalize(): void
     {
+        if ($this->status !== self::STATUS_DRAFT) {
+            return;
+        }
+
         $this->update([
             'status' => self::STATUS_FINAL,
             'finalized_at' => now(),
@@ -262,6 +266,10 @@ class MedicalRecord extends Model
 
     public function amend(): void
     {
+        if ($this->status !== self::STATUS_FINAL) {
+            return;
+        }
+
         $this->update([
             'status' => self::STATUS_AMENDED,
         ]);

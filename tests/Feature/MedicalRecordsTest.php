@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\App\MedicalRecords\Create;
+use App\Livewire\App\MedicalRecords\Edit;
 use App\Livewire\App\MedicalRecords\Index;
 use App\Livewire\App\MedicalRecords\Show;
 use App\Models\Appointment;
@@ -248,5 +249,33 @@ class MedicalRecordsTest extends TestCase
             'id' => $final->id,
             'deleted_at' => null,
         ]);
+    }
+
+    public function test_a_finalized_record_cannot_be_overwritten_from_an_open_edit_form(): void
+    {
+        [$clinic, $user, $patient] = $this->makeContext();
+        $this->bindClinic($clinic);
+        $owner = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'owner']);
+        $owner->assignRole('owner');
+
+        $record = MedicalRecord::factory()->draft()->forPatient($patient)->create([
+            'doctor_id' => $user->id,
+            'title' => 'Borrador original',
+        ]);
+
+        $component = Livewire::actingAs($owner)
+            ->test(Edit::class, ['patient' => $patient, 'record' => $record]);
+
+        $record->update([
+            'status' => MedicalRecord::STATUS_FINAL,
+            'finalized_at' => now(),
+            'title' => 'Ya finalizada',
+        ]);
+
+        $component->set('title', 'Sobrescrito')->call('saveFinal')->assertForbidden();
+
+        $fresh = $record->fresh();
+        $this->assertSame(MedicalRecord::STATUS_FINAL, $fresh->status);
+        $this->assertSame('Ya finalizada', $fresh->title);
     }
 }

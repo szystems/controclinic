@@ -134,6 +134,7 @@ class Edit extends Component
             abort(403);
         }
         $this->authorize('view', $this->record);
+        abort_unless($this->record->fresh()->status === MedicalRecord::STATUS_DRAFT, 403);
 
         $fileRules = [];
         if (! empty($this->pendingUploads) && auth()->user()->can('files.upload')) {
