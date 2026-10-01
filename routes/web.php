@@ -111,7 +111,12 @@ Route::get('/lang/{locale}', function (string $locale) {
         }
     }
 
-    return redirect()->back();
+    $previous = url()->previous();
+    $host = parse_url($previous, PHP_URL_HOST);
+
+    return $host === request()->getHost()
+        ? redirect()->to($previous)
+        : redirect()->route('home');
 })->name('lang.switch');
 
 /*
