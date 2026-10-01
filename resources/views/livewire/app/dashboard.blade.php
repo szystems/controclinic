@@ -28,7 +28,7 @@
                 </span>
                 {{-- Upgrade: any tier with a higher plan available (owner only, full access) --}}
                 @if($clinic->canUpgradePlan() && $accessLevel === \App\Models\Clinic::ACCESS_FULL)
-                    @if(auth()->user()->hasRole('owner'))
+                    @if(auth()->user()->can('billing.manage'))
                         <a href="{{ route('app.billing.index', $clinic->slug) }}" wire:navigate
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition shadow-sm">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,10 +65,12 @@
                                     {{ __('general.limit_reached_description') }}
                                 </p>
                             </div>
+                            @can('billing.manage')
                             <a href="{{ route('app.billing.index', $clinic->slug) }}" wire:navigate
                                class="ml-4 flex-shrink-0 inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition">
                                 {{ __('general.upgrade_now') }}
                             </a>
+                            @endcan
                         </div>
                     </div>
                 @elseif($nearLimit)
@@ -85,10 +87,12 @@
                                     {{ __('general.near_limit_description') }}
                                 </p>
                             </div>
+                            @can('billing.manage')
                             <a href="{{ route('app.billing.index', $clinic->slug) }}" wire:navigate
                                class="ml-4 flex-shrink-0 inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg transition">
                                 {{ __('general.view_plans') }}
                             </a>
+                            @endcan
                         </div>
                     </div>
                 @endif

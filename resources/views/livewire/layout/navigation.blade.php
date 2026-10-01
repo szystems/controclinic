@@ -264,9 +264,11 @@ new class extends Component
                             {{ __('general.profile') }}
                         </x-dropdown-link>
 
+                        @can('billing.manage')
                         <x-dropdown-link :href="route('app.billing.index', $clinicSlug)" wire:navigate>
                             {{ __('general.billing') }}
                         </x-dropdown-link>
+                        @endcan
 
                         <x-dropdown-link :href="route('app.help.index', $clinicSlug)" wire:navigate>
                             {{ __('help.title') }}
@@ -506,13 +508,15 @@ new class extends Component
                                     'icon'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>',
                                     'external' => false,
                                 ],
-                                [
-                                    'href'   => route('app.billing.index', $clinicSlug),
-                                    'label'  => __('general.billing'),
-                                    'active' => request()->routeIs('app.billing.*'),
-                                    'icon'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h4M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>',
-                                    'external' => false,
-                                ],
+                                ...array_filter([
+                                    auth()->user()->can('billing.manage') ? [
+                                        'href'   => route('app.billing.index', $clinicSlug),
+                                        'label'  => __('general.billing'),
+                                        'active' => request()->routeIs('app.billing.*'),
+                                        'icon'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h4M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>',
+                                        'external' => false,
+                                    ] : null,
+                                ]),
                             ];
                         @endphp
                         @foreach ($accountLinks as $link)

@@ -4,6 +4,7 @@ namespace App\Livewire\App\Billing;
 
 use App\Models\Clinic;
 use App\Models\Plan;
+use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Exceptions\PaddleException;
 use Livewire\Component;
@@ -20,6 +21,7 @@ class Index extends Component
 
     public function mount(Clinic $clinic): void
     {
+        $this->authorizeBilling();
         $this->clinic = $clinic;
         $this->selectedPlan = $this->clinic->isOnFreePlan() ? '' : $this->clinic->planSlug();
     }
@@ -69,6 +71,20 @@ class Index extends Component
 
     public function redeemPromoCode(): void
     {
+        $this->authorizeBilling();
+
+        $key = 'billing-promo:'.$this->clinic->id;
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            $this->addError('promoCode', __('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => (int) ceil($seconds / 60),
+            ]));
+
+            return;
+        }
+        RateLimiter::hit($key, 600);
+
         $this->validate([
             'promoCode' => ['required', 'string', 'max:64'],
         ]);
@@ -90,6 +106,8 @@ class Index extends Component
 
     public function checkout(string $planSlug): void
     {
+        $this->authorizeBilling();
+
         if ($planSlug === 'enterprise') {
             $this->redirect(route('contact'));
 
@@ -172,6 +190,8 @@ class Index extends Component
 
     public function changePlan(string $planSlug): void
     {
+        $this->authorizeBilling();
+
         if (! $this->isSubscribed || $planSlug === 'enterprise') {
             return;
         }
@@ -237,6 +257,8 @@ class Index extends Component
 
     public function cancelSubscription(): void
     {
+        $this->authorizeBilling();
+
         $subscription = $this->clinic->subscription();
 
         if (! $subscription || $subscription->canceled()) {
@@ -255,6 +277,8 @@ class Index extends Component
 
     public function resumeSubscription(): void
     {
+        $this->authorizeBilling();
+
         $subscription = $this->clinic->subscription();
 
         // resume() applies to a subscription canceled on grace period or paused.
@@ -277,6 +301,8 @@ class Index extends Component
 
     public function redirectToCustomerPortal(): void
     {
+        $this->authorizeBilling();
+
         try {
             $url = $this->clinic->customerPortalUrl();
             $this->redirect($url, navigate: false);
@@ -284,6 +310,11 @@ class Index extends Component
             $this->dispatch('notify', type: 'error', message: __('billing.portal_unavailable'));
             logger()->error('Paddle customer portal error: '.$e->getMessage());
         }
+    }
+
+    private function authorizeBilling(): void
+    {
+        abort_unless(auth()->user()?->can('billing.manage'), 403);
     }
 
     protected function resolvePaddlePriceId(Plan $plan, string $planSlug): ?string

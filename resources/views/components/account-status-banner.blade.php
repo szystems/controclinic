@@ -29,10 +29,12 @@
                     @endif
                 </div>
             </div>
+            @can('billing.manage')
             <a href="{{ route('app.billing.index', $clinic->slug) }}"
                class="inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0">
                 {{ __('billing.banner_view_plans') }}
             </a>
+            @endcan
         </div>
     </div>
 </div>

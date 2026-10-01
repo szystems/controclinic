@@ -7,7 +7,7 @@
 @php
     $clinic = (app()->bound('current_clinic') ? app('current_clinic') : null) ?? auth()->user()->clinic;
     $slug = $clinicSlug ?? $clinic?->slug ?? 'demo';
-    $isOwner = auth()->user()->hasRole('owner');
+    $isOwner = auth()->user()->can('billing.manage');
     $billingRoute = route('app.billing.index', $slug);
     // ADR-008: distinguir si el bloqueo es por estado de cuenta (read-only/billing-only)
     // o por tope de uso del plan actual (cortesía/free al límite).
