@@ -64,7 +64,7 @@ class SendAppointmentNotification implements ShouldQueue
         try {
             switch ($this->type) {
                 case self::TYPE_BOOKED:
-                    if ($patient->email) {
+                    if ($patient->email && $this->sendsConfirmations($clinic)) {
                         Mail::to($patient->email)
                             ->locale($locale)
                             ->send(new AppointmentBookedToPatient($appointment));
@@ -77,7 +77,7 @@ class SendAppointmentNotification implements ShouldQueue
                     break;
 
                 case self::TYPE_CONFIRMED:
-                    if ($patient->email) {
+                    if ($patient->email && $this->sendsConfirmations($clinic)) {
                         Mail::to($patient->email)
                             ->locale($locale)
                             ->send(new AppointmentConfirmed($appointment));
@@ -93,6 +93,13 @@ class SendAppointmentNotification implements ShouldQueue
                     break;
 
                 case self::TYPE_REMINDER:
+                    if (in_array($appointment->status, [
+                        Appointment::STATUS_CANCELLED,
+                        Appointment::STATUS_COMPLETED,
+                    ], true)) {
+                        break;
+                    }
+
                     if ($patient->email) {
                         Mail::to($patient->email)
                             ->locale($locale)
@@ -114,6 +121,13 @@ class SendAppointmentNotification implements ShouldQueue
         } finally {
             App::setLocale($previousLocale);
         }
+    }
+
+    private function sendsConfirmations($clinic): bool
+    {
+        $value = data_get($clinic?->settings, 'send_confirmations');
+
+        return $value === null || (bool) $value;
     }
 
     public function failed(\Throwable $exception): void

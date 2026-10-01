@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Jobs\SendAppointmentNotification;
+use App\Livewire\App\Appointments\Edit as AppointmentEdit;
 use App\Mail\AppointmentBookedToClinic;
 use App\Mail\AppointmentBookedToPatient;
 use App\Mail\AppointmentCancelled;
@@ -12,9 +13,12 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
+use Livewire\Livewire;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class AppointmentNotificationsTest extends TestCase
@@ -225,7 +229,7 @@ class AppointmentNotificationsTest extends TestCase
     {
         Bus::fake();
 
-        $this->makeAppointment([
+        $appointment = $this->makeAppointment([
             'status' => Appointment::STATUS_CONFIRMED,
             'appointment_date' => now()->addHours(6)->toDateString(),
             'start_time' => now()->addHours(6)->format('H:i'),
@@ -235,6 +239,7 @@ class AppointmentNotificationsTest extends TestCase
             ->assertSuccessful();
 
         Bus::assertNotDispatched(SendAppointmentNotification::class);
+        $this->assertFalse($appointment->fresh()->reminder_sent);
     }
 
     public function test_reminder_command_respects_clinic_timezone(): void
@@ -305,5 +310,149 @@ class AppointmentNotificationsTest extends TestCase
         Bus::assertDispatched(SendAppointmentNotification::class, function ($job) use ($valid) {
             return $job->appointmentId === $valid->id;
         });
+    }
+
+    public function test_reminder_command_skips_a_clinic_that_turned_reminders_off(): void
+    {
+        Bus::fake();
+
+        $appointment = $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => now()->addHours(12)->toDateString(),
+            'start_time' => now()->addHours(12)->format('H:i'),
+        ], [
+            'settings' => ['send_reminders' => false],
+        ]);
+
+        $this->artisan('appointments:send-reminders --hours=24')->assertSuccessful();
+
+        Bus::assertNotDispatched(SendAppointmentNotification::class);
+        $this->assertFalse($appointment->fresh()->reminder_sent);
+    }
+
+    public function test_reminder_command_uses_the_clinic_reminder_window(): void
+    {
+        Bus::fake();
+
+        $tz = 'America/Mexico_City';
+        $inside = now($tz)->addHours(36);
+        $outside = now($tz)->addHours(60);
+
+        $due = $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => $inside->toDateString(),
+            'start_time' => $inside->format('H:i'),
+        ], [
+            'timezone' => $tz,
+            'settings' => ['send_reminders' => true, 'reminder_hours_before' => 48],
+        ]);
+
+        $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => $outside->toDateString(),
+            'start_time' => $outside->format('H:i'),
+        ], [
+            'timezone' => $tz,
+            'settings' => ['send_reminders' => true, 'reminder_hours_before' => 48],
+        ]);
+
+        $this->artisan('appointments:send-reminders --hours=24')->assertSuccessful();
+
+        Bus::assertDispatchedTimes(SendAppointmentNotification::class, 1);
+        Bus::assertDispatched(SendAppointmentNotification::class, function ($job) use ($due) {
+            return $job->appointmentId === $due->id;
+        });
+    }
+
+    public function test_reminder_command_marks_an_appointment_without_email_and_does_not_dispatch(): void
+    {
+        Bus::fake();
+
+        $appointment = $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => now()->addHours(6)->toDateString(),
+            'start_time' => now()->addHours(6)->format('H:i'),
+        ], [], null);
+
+        $this->artisan('appointments:send-reminders --hours=24')->assertSuccessful();
+
+        Bus::assertNotDispatched(SendAppointmentNotification::class);
+        $this->assertTrue($appointment->fresh()->reminder_sent);
+    }
+
+    public function test_reminder_command_claims_the_appointment_so_a_second_run_does_not_dispatch(): void
+    {
+        Bus::fake();
+
+        $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => now()->addHours(6)->toDateString(),
+            'start_time' => now()->addHours(6)->format('H:i'),
+        ]);
+
+        $this->artisan('appointments:send-reminders --hours=24')->assertSuccessful();
+        $this->artisan('appointments:send-reminders --hours=24')->assertSuccessful();
+
+        Bus::assertDispatchedTimes(SendAppointmentNotification::class, 1);
+    }
+
+    public function test_reminder_job_does_not_email_a_cancelled_or_completed_appointment(): void
+    {
+        Mail::fake();
+
+        $cancelled = $this->makeAppointment(['status' => Appointment::STATUS_CANCELLED]);
+        $completed = $this->makeAppointment(['status' => Appointment::STATUS_COMPLETED]);
+
+        (new SendAppointmentNotification($cancelled->id, SendAppointmentNotification::TYPE_REMINDER))->handle();
+        (new SendAppointmentNotification($completed->id, SendAppointmentNotification::TYPE_REMINDER))->handle();
+
+        Mail::assertNotSent(AppointmentReminder::class);
+    }
+
+    public function test_confirmation_emails_respect_the_clinic_setting(): void
+    {
+        Mail::fake();
+
+        $appointment = $this->makeAppointment(['status' => Appointment::STATUS_CONFIRMED], [
+            'settings' => ['send_confirmations' => false],
+        ]);
+
+        (new SendAppointmentNotification($appointment->id, SendAppointmentNotification::TYPE_CONFIRMED))->handle();
+        (new SendAppointmentNotification($appointment->id, SendAppointmentNotification::TYPE_BOOKED))->handle();
+
+        Mail::assertNotSent(AppointmentConfirmed::class);
+        Mail::assertNotSent(AppointmentBookedToPatient::class);
+        Mail::assertSent(AppointmentBookedToClinic::class);
+    }
+
+    public function test_editing_the_appointment_time_clears_the_reminder_flag(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $appointment = $this->makeAppointment([
+            'status' => Appointment::STATUS_SCHEDULED,
+            'appointment_date' => now()->addDays(3)->toDateString(),
+            'start_time' => '10:00',
+            'reminder_sent' => true,
+        ]);
+
+        $owner = User::factory()->owner()->create([
+            'clinic_id' => $appointment->clinic_id,
+        ]);
+
+        app()->instance('current_clinic', $appointment->clinic);
+        view()->share('currentClinic', $appointment->clinic);
+
+        Livewire::actingAs($owner)
+            ->test(AppointmentEdit::class, [
+                'clinic' => $appointment->clinic,
+                'appointment' => $appointment,
+            ])
+            ->set('start_time', '15:00')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertFalse((bool) $appointment->fresh()->reminder_sent);
     }
 }

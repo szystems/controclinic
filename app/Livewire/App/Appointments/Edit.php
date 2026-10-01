@@ -254,6 +254,13 @@ class Edit extends Component
                 return false;
             }
 
+            $previousDate = $this->appointment->appointment_date?->toDateString();
+            $previousTime = $this->appointment->start_time
+                ? Carbon::parse($this->appointment->start_time)->format('H:i')
+                : null;
+            $nextTime = $this->start_time ? Carbon::parse($this->start_time)->format('H:i') : null;
+            $scheduleChanged = $previousDate !== $this->appointment_date || $previousTime !== $nextTime;
+
             $this->appointment->update([
                 'patient_id' => $this->patient_id,
                 'doctor_id' => $this->doctor_id,
@@ -262,6 +269,7 @@ class Edit extends Component
                 'start_time' => $this->start_time ?: null,
                 'end_time' => $endTime,
                 'duration_minutes' => $this->duration_minutes,
+                'reminder_sent' => $scheduleChanged ? false : $this->appointment->reminder_sent,
                 'reason' => $this->reason ?: null,
                 'symptoms' => $this->symptoms ?: null,
                 'notes' => $this->notes ?: null,
