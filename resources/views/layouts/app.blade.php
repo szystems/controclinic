@@ -63,7 +63,7 @@
         </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
             <livewire:layout.navigation />
 
             <!-- Account status banner (read-only / billing-only per ADR-008) -->
@@ -79,7 +79,7 @@
             @endif
 
             <!-- Page Content -->
-            <main>
+            <main class="flex-1">
                 {{ $slot }}
             </main>
 

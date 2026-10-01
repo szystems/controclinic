@@ -9,7 +9,7 @@
 @endphp
 
 @if ($variant === 'app')
-    <footer class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+    <footer class="mt-auto border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <p class="text-center text-xs text-gray-500 dark:text-gray-400">
                 <x-brand-credit :app="$appName" link-class="underline hover:text-gray-700 dark:hover:text-gray-200" />
@@ -17,7 +17,7 @@
         </div>
     </footer>
 @else
-    <footer class="bg-gray-900 text-gray-400">
+    <footer class="mt-auto bg-gray-900 text-gray-400">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div class="col-span-2 md:col-span-1">

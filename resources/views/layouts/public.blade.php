@@ -81,7 +81,7 @@
     </script>
     @endif
 </head>
-<body class="font-sans antialiased bg-white text-gray-900 overflow-x-hidden">
+<body class="font-sans antialiased bg-white text-gray-900 overflow-x-hidden min-h-screen flex flex-col">
     @if($gtmId)
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -198,7 +198,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="min-w-0">
+    <main class="min-w-0 flex-1">
         {{ $slot }}
     </main>
 
