@@ -22,6 +22,8 @@ services:
       FILESYSTEM_DISK: local
       LOG_CHANNEL: stack
       LOG_LEVEL: error
+      LOG_STACK: ${LOG_STACK:-daily}
+      LOG_DAILY_DAYS: ${LOG_DAILY_DAYS:-30}
       DB_CONNECTION: mysql
       DB_HOST: controclinic-mysql
       DB_PORT: '3306'
@@ -134,6 +136,8 @@ services:
       APP_FALLBACK_LOCALE: en
       FILESYSTEM_DISK: local
       LOG_LEVEL: error
+      LOG_STACK: ${LOG_STACK:-daily}
+      LOG_DAILY_DAYS: ${LOG_DAILY_DAYS:-30}
       DB_CONNECTION: mysql
       DB_HOST: controclinic-mysql
       DB_PORT: '3306'
@@ -186,6 +190,8 @@ services:
       APP_FALLBACK_LOCALE: en
       FILESYSTEM_DISK: local
       LOG_LEVEL: error
+      LOG_STACK: ${LOG_STACK:-daily}
+      LOG_DAILY_DAYS: ${LOG_DAILY_DAYS:-30}
       DB_CONNECTION: mysql
       DB_HOST: controclinic-mysql
       DB_PORT: '3306'

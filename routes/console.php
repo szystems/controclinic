@@ -33,3 +33,11 @@ Schedule::command('backup:run --only-db')
     ->withoutOverlapping()
     ->onOneServer()
     ->sendOutputTo(storage_path('logs/backup.log'));
+
+Schedule::command('activitylog:clean --days=730')
+    ->weekly()
+    ->onOneServer();
+
+Schedule::command('queue:prune-failed --hours=168')
+    ->daily()
+    ->onOneServer();
