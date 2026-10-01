@@ -47,8 +47,8 @@ class InvoiceService
 
         foreach ($invoice->items as $item) {
             $base = (float) $item->unit_price * (float) $item->quantity;
-            $itemDisc = (float) $item->discount_amount;
-            $net = $base - $itemDisc;
+            $itemDisc = min((float) $item->discount_amount, max($base, 0));
+            $net = max(0, $base - $itemDisc);
             $itemTax = $net * ((float) $item->tax_rate / 100);
             $itemTotal = round($net + $itemTax, 2);
 

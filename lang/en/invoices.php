@@ -79,6 +79,7 @@ return [
     'invoice_updated' => 'Invoice updated',
     'invoice_cancelled' => 'Invoice cancelled',
     'cannot_cancel_with_payments' => 'An invoice that already has payments cannot be cancelled.',
+    'discount_exceeds_line' => 'The discount cannot be greater than the line amount.',
     'invoice_paid' => 'Invoice marked as paid',
     'cannot_edit_paid' => 'Cannot edit a paid or cancelled invoice',
     'no_invoices' => 'No invoices yet',

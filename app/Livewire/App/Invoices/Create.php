@@ -69,11 +69,30 @@ class Create extends Component
             'items' => ['required', 'array', 'min:1'],
             'items.*.type' => ['required', 'in:consultation,procedure,medication,lab,other'],
             'items.*.description' => ['required', 'string', 'max:500'],
-            'items.*.quantity' => ['required', 'numeric', 'min:0.01'],
-            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
-            'items.*.discount_amount' => ['nullable', 'numeric', 'min:0'],
+            'items.*.quantity' => ['required', 'numeric', 'min:0.01', 'max:99999'],
+            'items.*.unit_price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'items.*.discount_amount' => ['nullable', 'numeric', 'min:0', $this->discountWithinLineRule()],
             'items.*.tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
+    }
+
+    private function discountWithinLineRule(): \Closure
+    {
+        return function (string $attribute, mixed $value, \Closure $fail): void {
+            if (! preg_match('/^items\.(\d+)\.discount_amount$/', $attribute, $matches)) {
+                return;
+            }
+
+            $item = $this->items[(int) $matches[1]] ?? null;
+            if ($item === null) {
+                return;
+            }
+
+            $base = (float) ($item['quantity'] ?? 0) * (float) ($item['unit_price'] ?? 0);
+            if ((float) $value > $base) {
+                $fail(__('invoices.discount_exceeds_line'));
+            }
+        };
     }
 
     public function mount(Clinic $clinic, ?string $appointment = null): void

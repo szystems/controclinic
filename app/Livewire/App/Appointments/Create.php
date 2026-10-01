@@ -65,7 +65,15 @@ class Create extends Component
             'room' => ['nullable', 'string', 'max:50'],
             // Billing (optional, only when billing_enabled)
             'consultation_price' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
-            'consultation_discount' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'consultation_discount' => ['nullable', 'numeric', 'min:0', 'max:999999.99', function (string $attribute, mixed $value, \Closure $fail): void {
+                if ($value === null || $value === '') {
+                    return;
+                }
+
+                if ((float) $value > (float) ($this->consultation_price ?? 0)) {
+                    $fail(__('invoices.discount_exceeds_line'));
+                }
+            }],
             'is_billable' => ['boolean'],
         ];
     }

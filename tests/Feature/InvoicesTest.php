@@ -382,6 +382,39 @@ class InvoicesTest extends TestCase
             ->assertStatus(404);
     }
 
+    public function test_discount_larger_than_the_line_is_rejected(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesCreate::class, ['clinic' => $clinic])
+            ->call('selectPatient', $patient->id, $patient->full_name)
+            ->set('issued_at', now()->toDateString())
+            ->set('items.0.description', 'Consulta')
+            ->set('items.0.quantity', 1)
+            ->set('items.0.unit_price', 75)
+            ->set('items.0.discount_amount', 200)
+            ->call('save')
+            ->assertHasErrors(['items.0.discount_amount']);
+
+        $this->assertSame(0, Invoice::where('clinic_id', $clinic->id)->count());
+    }
+
+    public function test_recalculate_never_stores_a_negative_total(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $invoice = $this->createInvoice($clinic, $patient);
+        $invoice->items()->update(['discount_amount' => 250]);
+
+        app(InvoiceService::class)->recalculate($invoice);
+
+        $fresh = $invoice->fresh();
+        $this->assertEquals(0.0, (float) $fresh->total);
+        $this->assertGreaterThanOrEqual(0, (float) $fresh->tax_amount);
+    }
+
     public function test_payment_on_a_cancelled_invoice_is_refused(): void
     {
         [$clinic, $owner] = $this->createClinicWithOwner();

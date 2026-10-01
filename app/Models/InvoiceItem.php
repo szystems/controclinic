@@ -68,7 +68,7 @@ class InvoiceItem extends Model
     public function calculateTotal(): float
     {
         $base = (float) $this->unit_price * (float) $this->quantity;
-        $net = $base - (float) $this->discount_amount;
+        $net = max(0, $base - (float) $this->discount_amount);
         $tax = $net * ((float) $this->tax_rate / 100);
 
         return round($net + $tax, 2);
