@@ -7,10 +7,14 @@ while ! nc -z "${DB_HOST}" "${DB_PORT:-3306}" 2>/dev/null; do
 done
 echo "==> MySQL is ready."
 
+# The named public volume keeps the first deploy's files. Refresh them from the image.
+cp -a /opt/public-dist/. /var/www/html/public/
+
 php artisan storage:link --force || true
 php artisan migrate --force
 
 echo "==> Caching configuration..."
+php artisan package:discover --ansi
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache

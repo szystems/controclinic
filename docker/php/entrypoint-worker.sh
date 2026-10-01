@@ -11,5 +11,9 @@ while ! nc -z "${REDIS_HOST}" "${REDIS_PORT:-6379}" 2>/dev/null; do
     sleep 2
 done
 
+echo "==> Caching worker configuration..."
+php artisan package:discover --ansi
+php artisan config:cache
+
 echo "==> Worker ready. Executing: $*"
 exec "$@"

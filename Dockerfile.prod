@@ -81,6 +81,9 @@ COPY . .
 COPY --from=php-builder /var/www/html/vendor ./vendor
 COPY --from=node-builder /app/public/build ./public/build
 
+# Kept outside the public volume so each boot can refresh assets the volume froze.
+RUN cp -a /var/www/html/public /opt/public-dist
+
 RUN composer dump-autoload --optimize \
     && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \

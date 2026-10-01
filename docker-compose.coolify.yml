@@ -53,7 +53,6 @@ services:
     volumes:
       - public_root:/var/www/html/public
       - app_storage:/var/www/html/storage
-      - app_bootstrap:/var/www/html/bootstrap/cache
     depends_on:
       controclinic-mysql:
         condition: service_healthy
@@ -152,12 +151,12 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_ENCRYPTION: ${MAIL_ENCRYPTION}
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_MAILER: ${MAIL_MAILER:-log}
       MAIL_FROM_NAME: ControClinic
       SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN}
     volumes:
       - public_root:/var/www/html/public
       - app_storage:/var/www/html/storage
-      - app_bootstrap:/var/www/html/bootstrap/cache
     depends_on:
       controclinic-app:
         condition: service_started
@@ -203,12 +202,12 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_ENCRYPTION: ${MAIL_ENCRYPTION}
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_MAILER: ${MAIL_MAILER:-log}
       MAIL_FROM_NAME: ControClinic
       SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN}
     volumes:
       - public_root:/var/www/html/public
       - app_storage:/var/www/html/storage
-      - app_bootstrap:/var/www/html/bootstrap/cache
     depends_on:
       controclinic-app:
         condition: service_started
@@ -218,7 +217,6 @@ services:
 volumes:
   public_root:
   app_storage:
-  app_bootstrap:
   mysql_data:
   redis_data:
 
