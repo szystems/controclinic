@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Clinic;
+use App\Support\AttemptLimit;
 use App\Models\Plan;
 use App\Models\User;
 use App\Services\ClinicLocaleResolver;
@@ -67,6 +68,12 @@ new #[Layout('layouts.guest')] class extends Component
                 'terms_accepted.accepted' => __('auth.terms_required'),
             ]
         );
+
+        AttemptLimit::hit([[
+            'key' => 'register:'.request()->ip(),
+            'max' => 3,
+            'decay' => 3600,
+        ]], 'email');
 
         $user = DB::transaction(function () use ($validated) {
             $baseSlug = Str::slug($validated['clinic_name']);

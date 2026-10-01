@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\AttemptLimit;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -28,6 +29,12 @@ new #[Layout('layouts.guest')] class extends Component
     public function challenge(): void
     {
         $user = Auth::user();
+
+        AttemptLimit::hit([[
+            'key' => '2fa:'.$user->id.'|'.request()->ip(),
+            'max' => 5,
+            'decay' => 60,
+        ]], $this->usingRecoveryCode ? 'recoveryCode' : 'code');
 
         if ($this->usingRecoveryCode) {
             $codes = json_decode($user->two_factor_recovery_codes, true) ?? [];

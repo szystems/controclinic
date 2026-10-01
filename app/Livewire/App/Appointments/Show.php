@@ -6,6 +6,7 @@ use App\Jobs\SendAppointmentNotification;
 use App\Models\Appointment;
 use App\Models\AppointmentComment;
 use App\Models\Clinic;
+use App\Support\AttemptLimit;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 
@@ -157,6 +158,12 @@ class Show extends Component
 
         if (! $patient?->email) {
             session()->flash('error', __('appointments.reminder_no_email'));
+
+            return;
+        }
+
+        if ($message = AttemptLimit::appointmentReminder($this->appointment->id)) {
+            session()->flash('error', $message);
 
             return;
         }

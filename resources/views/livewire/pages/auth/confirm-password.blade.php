@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\AttemptLimit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
@@ -14,6 +15,12 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function confirmPassword(): void
     {
+        AttemptLimit::hit([[
+            'key' => 'confirm-password:'.Auth::id(),
+            'max' => 5,
+            'decay' => 60,
+        ]], 'password');
+
         $this->validate([
             'password' => ['required', 'string'],
         ]);

@@ -31,6 +31,7 @@ return [
     'terms_link' => 'Terms and Conditions',
     'privacy_link' => 'Privacy Policy',
     'terms_required' => 'You must accept the Terms and Conditions to continue.',
+    'throttle' => 'Too many attempts. Please try again in :seconds seconds.',
 
     // Two-Factor Authentication
     '2fa_title' => 'Two-Factor Authentication',

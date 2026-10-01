@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\DoctorUnavailability;
 use App\Models\User;
+use App\Support\AttemptLimit;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -330,6 +331,10 @@ class Calendar extends Component
 
         if (! $appointment->patient?->email) {
             return ['success' => false, 'message' => __('appointments.reminder_no_email')];
+        }
+
+        if ($message = AttemptLimit::appointmentReminder($appointment->id)) {
+            return ['success' => false, 'message' => $message];
         }
 
         SendAppointmentNotification::dispatch($appointment->id, SendAppointmentNotification::TYPE_REMINDER);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\AttemptLimit;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -33,6 +34,12 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function resetPassword(): void
     {
+        AttemptLimit::hit([[
+            'key' => 'password-reset:'.request()->ip(),
+            'max' => 5,
+            'decay' => 60,
+        ]], 'email');
+
         $this->validate([
             'token' => ['required'],
             'email' => ['required', 'string', 'email'],

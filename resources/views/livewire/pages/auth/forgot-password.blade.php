@@ -1,6 +1,8 @@
 <?php
 
+use App\Support\AttemptLimit;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -16,6 +18,11 @@ new #[Layout('layouts.guest')] class extends Component
         $this->validate([
             'email' => ['required', 'string', 'email'],
         ]);
+
+        AttemptLimit::hit([
+            ['key' => 'forgot:'.Str::lower($this->email), 'max' => 3, 'decay' => 600],
+            ['key' => 'forgot-ip:'.request()->ip(), 'max' => 10, 'decay' => 600],
+        ], 'email');
 
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
