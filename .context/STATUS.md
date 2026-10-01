@@ -2,7 +2,7 @@
 
 > **Última actualización:** 2026-10-01
 > **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
-> **Siguiente paso:** DATA-19 (cuota de almacenamiento). Paddle al final.
+> **Siguiente paso:** HARD-01 (cabeceras de seguridad). Paddle al final.
 > **Producción:** ✅ `https://controclinic.com`
 
 
@@ -37,12 +37,12 @@ Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` 
 | INF-01 paso 1, INF-02, INF-04 | Cliente MySQL para el respaldo, assets que se refrescan, php-fpm fuera de la red compartida |
 | AUTH-01 a AUTH-08 | Permisos de admin, ajustes, facturación, historial confidencial, horario, ids de otra clínica, solo-lectura y suspender |
 | AUTH-09 | Sin cambio de código: los médicos de una misma clínica ven los pacientes de esa clínica |
-| DATA-01 a DATA-18 | Lo anterior, más el folio de receta y la ordenación de listas solo por las columnas que la pantalla ofrece |
+| DATA-01 a DATA-19 | Lo anterior, más la ordenación de listas y la cuota de almacenamiento al subir archivos |
 | Página pública | Pie “Desarrollado por Szystems”, reserva arriba del equipo, puesto visible y foto opcional |
 
 | Pendiente | Quién |
 |-----------|--------|
-| DATA-19, luego G4 y TXT-01 | Agente, un ID por commit |
+| G4 (HARD-01 en adelante) y TXT-01 | Agente, un ID por commit |
 | INF-03, INF-05, G0-4 | Paddle, al final |
 | G0-1 panel Coolify, G0-3 firewall, INF-01 paso 2 | Otto |
 
