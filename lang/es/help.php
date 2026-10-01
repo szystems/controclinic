@@ -49,7 +49,7 @@ return [
             'summary' => 'Crea facturas, registra pagos y lleva el control de ingresos de tu clínica.',
             'tips' => [
                 'Puedes crear una factura directamente desde una cita completada.',
-                'Los estados son: Borrador, Enviada, Pagada, Vencida y Cancelada.',
+                'Los estados son: Borrador, Pendiente, Pago Parcial, Pagada, Reembolsada y Cancelada.',
                 'Exporta el listado en CSV para tu contador.',
             ],
         ],
@@ -72,18 +72,18 @@ return [
         ],
         'reports' => [
             'title' => 'Reportes',
-            'summary' => 'Analiza el rendimiento de tu clínica con reportes de ingresos, citas y ocupación.',
+            'summary' => 'Revisa citas y pacientes nuevos. Si la facturación está activa, también verás los ingresos del periodo.',
             'tips' => [
-                'Filtra los reportes por rango de fechas o por doctor.',
-                'Los gráficos de ingresos comparan mes a mes automáticamente.',
+                'Filtra por periodo, doctor, estado y tipo de cita.',
+                'Los ingresos, cobros y ticket promedio aparecen solo cuando la facturación está activa.',
             ],
         ],
         'schedule' => [
-            'title' => 'Horarios',
-            'summary' => 'Configura los días y horas de atención de tu clínica para el portal de reservas en línea.',
+            'title' => 'Mi horario',
+            'summary' => 'Bloquea días u horas en los que no atiendes. Esos bloqueos se descuentan de la disponibilidad del portal.',
             'tips' => [
-                'Puedes definir horarios distintos para cada día de la semana.',
-                'Los horarios afectan directamente la disponibilidad en el portal público.',
+                'Un bloqueo puede cubrir el día completo o solo unas horas.',
+                'El horario semanal del portal se configura en Ajustes, en la pestaña Citas.',
             ],
         ],
     ],

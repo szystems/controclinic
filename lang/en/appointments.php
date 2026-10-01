@@ -54,7 +54,7 @@ return [
     'cancel' => 'Cancel',
     'reschedule' => 'Reschedule',
     'confirm' => 'Confirm',
-    'mark_no_show' => 'Mark as No Show',
+    'mark_no_show' => 'Mark as no-show',
 
     // Cancellation
     'cancellation_reason' => 'Cancellation Reason',
@@ -118,7 +118,7 @@ return [
 
     // Confirmations
     'confirm_cancel' => 'Are you sure you want to cancel this appointment?',
-    'confirm_no_show' => 'Are you sure you want to mark this patient as no-show?',
+    'confirm_no_show' => 'Are you sure you want to mark this appointment as a no-show?',
 
     // Select
     'select_patient' => 'Select Patient',

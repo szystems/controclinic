@@ -54,7 +54,7 @@ return [
     'cancel' => 'Cancelar',
     'reschedule' => 'Reprogramar',
     'confirm' => 'Confirmar',
-    'mark_no_show' => 'Marcar como No Presentado',
+    'mark_no_show' => 'Marcar como no se presentó',
 
     // Cancelación
     'cancellation_reason' => 'Motivo de Cancelación',
@@ -118,7 +118,7 @@ return [
 
     // Confirmations
     'confirm_cancel' => '¿Está seguro que desea cancelar esta cita?',
-    'confirm_no_show' => '¿Está seguro que desea marcar a este paciente como no presentado?',
+    'confirm_no_show' => '¿Está seguro que desea marcar esta cita como no se presentó?',
 
     // Select
     'select_patient' => 'Seleccionar Paciente',

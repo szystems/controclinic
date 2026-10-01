@@ -47,7 +47,7 @@ return [
             'summary' => 'Create invoices, record payments, and track your clinic\'s income.',
             'tips' => [
                 'You can create an invoice directly from a completed appointment.',
-                'Statuses: Draft, Sent, Paid, Overdue, and Cancelled.',
+                'Statuses: Draft, Pending, Partially Paid, Paid, Refunded, and Cancelled.',
                 'Export the list as CSV for your accountant.',
             ],
         ],
@@ -70,18 +70,18 @@ return [
         ],
         'reports' => [
             'title' => 'Reports',
-            'summary' => 'Analyse your clinic\'s performance with income, appointment, and occupancy reports.',
+            'summary' => 'Review appointments and new patients. When billing is on, you also see income for the period.',
             'tips' => [
-                'Filter reports by date range or by doctor.',
-                'Income charts automatically compare month by month.',
+                'Filter by period, doctor, status, and appointment type.',
+                'Income, collections, and average ticket appear only when billing is on.',
             ],
         ],
         'schedule' => [
-            'title' => 'Schedule',
-            'summary' => 'Set up your clinic\'s opening days and hours for the online booking portal.',
+            'title' => 'My schedule',
+            'summary' => 'Block days or hours when you are unavailable. Those blocks are removed from public booking availability.',
             'tips' => [
-                'You can define different hours for each day of the week.',
-                'The schedule directly affects availability on the public portal.',
+                'A block can cover a full day or only a few hours.',
+                'The weekly hours for the public portal are set in Settings, on the Appointments tab.',
             ],
         ],
     ],
