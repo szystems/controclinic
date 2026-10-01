@@ -46,6 +46,12 @@ class Show extends Component
             return;
         }
 
+        if ($this->record->status === MedicalRecord::STATUS_FINAL) {
+            session()->flash('error', __('records.cannot_delete_finalized'));
+
+            return;
+        }
+
         $clinicSlug = $this->clinicSlug;
         $patientId = $this->patient->id;
 

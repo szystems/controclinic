@@ -19,12 +19,16 @@ class KeyboardShortcuts extends Component
             ['key' => 'g p', 'label' => __('shortcuts.go_patients'),     'url' => route('app.patients.index', ['clinic' => $slug]), 'permission' => 'patients.view'],
             ['key' => 'g a', 'label' => __('shortcuts.go_appointments'), 'url' => route('app.appointments.index', ['clinic' => $slug]), 'permission' => 'appointments.view'],
             ['key' => 'g c', 'label' => __('shortcuts.go_calendar'),     'url' => route('app.appointments.calendar', ['clinic' => $slug]), 'permission' => 'appointments.view'],
-            ['key' => 'g i', 'label' => __('shortcuts.go_invoices'),     'url' => route('app.invoices.index', ['clinic' => $slug]), 'permission' => 'invoices.view'],
+            ['key' => 'g i', 'label' => __('shortcuts.go_invoices'),     'url' => route('app.invoices.index', ['clinic' => $slug]), 'permission' => 'invoices.view', 'requires_billing' => true],
             ['key' => 'g r', 'label' => __('shortcuts.go_reports'),      'url' => route('app.reports', ['clinic' => $slug]), 'permission' => 'reports.view'],
         ];
 
         return [
-            'navigate' => array_values(array_filter($navigate, fn ($s) => $s['permission'] === null || $user->can($s['permission']))),
+            'navigate' => array_values(array_filter(
+                $navigate,
+                fn ($s) => ($s['permission'] === null || $user->can($s['permission']))
+                    && (empty($s['requires_billing']) || $this->clinic->billingEnabled())
+            )),
             'actions' => [
                 ['key' => '?', 'label' => __('shortcuts.show_shortcuts'), 'url' => null],
             ],

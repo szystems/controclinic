@@ -42,7 +42,9 @@ class MedicalRecordPolicy
 
     public function delete(User $user, MedicalRecord $record): bool
     {
-        return $this->sameTenant($user, $record) && $user->can('records.delete');
+        return $this->sameTenant($user, $record)
+            && $user->can('records.delete')
+            && $record->status !== MedicalRecord::STATUS_FINAL;
     }
 
     public function print(User $user, MedicalRecord $record): bool

@@ -104,6 +104,7 @@ return [
     'created' => 'Consulta creada exitosamente.',
     'updated' => 'Consulta actualizada.',
     'deleted' => 'Consulta eliminada.',
+    'cannot_delete_finalized' => 'Una consulta finalizada forma parte del historial y no se puede eliminar.',
     'finalized' => 'Consulta finalizada.',
 
     // Errors

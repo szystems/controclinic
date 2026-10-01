@@ -140,7 +140,7 @@
                 <p class="text-sm font-medium text-gray-900 leading-tight">{{ $doctor->name }}</p>
                 @php $role = $doctor->getRoleNames()->first(); @endphp
                 @if($role)
-                    <p class="text-xs text-gray-500 mt-0.5 capitalize">{{ __('roles.'.$role, ['default' => $role]) }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ \Illuminate\Support\Facades\Lang::has('staff.role_'.$role) ? __('staff.role_'.$role) : $role }}</p>
                 @endif
             </div>
             @endforeach

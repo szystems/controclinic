@@ -115,7 +115,7 @@
                 <td>{{ $a->start_time }}</td>
                 <td>{{ $a->doctor->name ?? '—' }}</td>
                 <td class="small">{{ $a->reason ?? '—' }}</td>
-                <td class="small muted">{{ __('reports.type_'.str_replace('_', '', $a->appointment_type)) }}</td>
+                <td class="small muted">{{ __('reports.type_'.$a->appointment_type) }}</td>
                 <td>
                     @php
                         $cls = match($a->status) {
@@ -125,7 +125,7 @@
                             default => 'badge',
                         };
                     @endphp
-                    <span class="badge {{ $cls }}">{{ __('reports.status_'.str_replace('_', '', $a->status)) }}</span>
+                    <span class="badge {{ $cls }}">{{ __('reports.status_'.$a->status) }}</span>
                 </td>
             </tr>
             @endforeach

@@ -106,8 +106,8 @@ class Index extends Component
     public function openCreate(): void
     {
         $this->resetForm();
-        $this->date_from = today()->toDateString();
-        $this->date_to = today()->toDateString();
+        $this->date_from = $this->clinic->localNow()->toDateString();
+        $this->date_to = $this->clinic->localNow()->toDateString();
         $this->showForm = true;
         $this->editingId = null;
     }

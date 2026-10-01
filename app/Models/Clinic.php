@@ -546,6 +546,11 @@ class Clinic extends Model
      * If $withTime is true, appends the time using the clinic's time format.
      * Returns '-' for null values.
      */
+    public function localNow(): Carbon
+    {
+        return now()->copy()->timezone($this->timezone ?: config('app.timezone'));
+    }
+
     public function formatDate(mixed $date, bool $withTime = false): string
     {
         if ($date === null) {

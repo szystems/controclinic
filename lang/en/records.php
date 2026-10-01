@@ -97,6 +97,7 @@ return [
     'created' => 'Record created successfully.',
     'updated' => 'Record updated.',
     'deleted' => 'Record deleted.',
+    'cannot_delete_finalized' => 'A finalized record is part of the history and cannot be deleted.',
     'finalized' => 'Record finalized.',
 
     'cannot_edit_finalized' => 'This record is finalized and cannot be edited. Create a new record to register changes.',

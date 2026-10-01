@@ -23,14 +23,14 @@ return [
             'tips' => [
                 'Usa la búsqueda para encontrar pacientes por nombre, teléfono o correo.',
                 'Accede al historial médico desde la ficha del paciente.',
-                'Puedes archivar pacientes inactivos sin eliminar sus datos.',
+                'Puedes desactivar un paciente inactivo sin borrar su expediente.',
             ],
         ],
         'appointments' => [
             'title' => 'Citas',
             'summary' => 'Agenda, confirma y gestiona todas las citas de tu clínica. Filtra por doctor, estado o rango de fechas.',
             'tips' => [
-                'Los estados de cita son: Pendiente, Confirmada, En progreso, Completada y Cancelada.',
+                'Los estados son: Programada, Confirmada, En espera, En consulta, Completada, Cancelada y No se presentó.',
                 'Usa "Nueva cita" para reservar directamente sin pasar por el portal.',
                 'Las citas confirmadas envían recordatorio automático si el correo está configurado.',
             ],
@@ -58,7 +58,7 @@ return [
             'summary' => 'Genera recetas médicas digitales vinculadas al paciente y al historial de la consulta.',
             'tips' => [
                 'Las recetas incluyen medicamento, dosis, frecuencia y duración.',
-                'Puedes imprimir o enviar la receta por correo al paciente.',
+                'Puedes imprimir la receta en PDF para entregarla al paciente.',
             ],
         ],
         'staff' => [

@@ -61,14 +61,14 @@ class Dashboard extends Component
     public function getTodayAppointmentsProperty(): int
     {
         return $this->appointmentsBaseQuery()
-            ->whereDate('appointment_date', now()->toDateString())
+            ->whereDate('appointment_date', $this->clinic->localNow()->toDateString())
             ->count();
     }
 
     public function getPendingTodayProperty(): int
     {
         return $this->appointmentsBaseQuery()
-            ->whereDate('appointment_date', now()->toDateString())
+            ->whereDate('appointment_date', $this->clinic->localNow()->toDateString())
             ->where('status', Appointment::STATUS_SCHEDULED)
             ->count();
     }
@@ -76,7 +76,7 @@ class Dashboard extends Component
     public function getCompletedTodayProperty(): int
     {
         return $this->appointmentsBaseQuery()
-            ->whereDate('appointment_date', now()->toDateString())
+            ->whereDate('appointment_date', $this->clinic->localNow()->toDateString())
             ->where('status', Appointment::STATUS_COMPLETED)
             ->count();
     }
@@ -85,7 +85,7 @@ class Dashboard extends Component
     {
         return $this->appointmentsBaseQuery()
             ->with('patient')
-            ->whereDate('appointment_date', now()->toDateString())
+            ->whereDate('appointment_date', $this->clinic->localNow()->toDateString())
             ->orderBy('start_time')
             ->get();
     }
@@ -95,8 +95,9 @@ class Dashboard extends Component
      */
     public function getUpcomingAppointmentsProperty()
     {
-        $tomorrow = now()->addDay()->toDateString();
-        $weekAhead = now()->addDays(7)->toDateString();
+        $local = $this->clinic->localNow();
+        $tomorrow = $local->copy()->addDay()->toDateString();
+        $weekAhead = $local->copy()->addDays(7)->toDateString();
 
         return $this->appointmentsBaseQuery()
             ->with(['patient', 'doctor'])

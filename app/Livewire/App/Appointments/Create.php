@@ -83,7 +83,7 @@ class Create extends Component
     public function mount(Clinic $clinic): void
     {
         $this->currentClinic = $clinic;
-        $this->appointment_date = now()->toDateString();
+        $this->appointment_date = $clinic->localNow()->toDateString();
         $this->duration_minutes = $clinic->settings['appointment_duration'] ?? 30;
 
         // Pre-fill billing defaults if enabled

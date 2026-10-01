@@ -79,7 +79,7 @@ class Booking extends Component
 
     public function getDoctorsProperty()
     {
-        return $this->clinic->doctors()
+        return $this->clinic->practitioners()
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
@@ -347,6 +347,7 @@ class Booking extends Component
         $doctor = User::where('id', $this->doctor_id)
             ->where('clinic_id', $this->clinic->id)
             ->where('is_active', true)
+            ->whereIn('role', ['doctor', 'owner'])
             ->first();
         if (! $doctor) {
             $this->addError('doctor_id', __('booking.validation.doctor_required'));

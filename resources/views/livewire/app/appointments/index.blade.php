@@ -450,6 +450,12 @@
                 {{ $appointments->links() }}
             </div>
             @else
+            @if(\App\Models\Appointment::query()->where('clinic_id', $currentClinic->id)->exists())
+            <div class="px-6 py-16 text-center">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ __('appointments.no_appointments') }}</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('appointments.no_appointments_for_filters') }}</p>
+            </div>
+            @else
             {{-- Empty State --}}
             <x-empty-state
                 icon="calendar"
@@ -460,6 +466,7 @@
                 :cta-route="route('app.appointments.create', ['clinic' => $currentClinic->slug])"
                 cta-permission="appointments.create"
             />
+            @endif
             @endif
         </div>
     </div>

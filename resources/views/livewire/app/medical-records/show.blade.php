@@ -55,6 +55,7 @@
                     @endif
                 @endcan
                 @can('records.delete')
+                    @if($record->status !== \App\Models\MedicalRecord::STATUS_FINAL)
                     <button type="button"
                             wire:click="delete"
                             wire:confirm="{{ __('records.confirm_delete') }}"
@@ -64,6 +65,7 @@
                         </svg>
                         {{ __('general.delete') }}
                     </button>
+                    @endif
                 @endcan
             </div>
 

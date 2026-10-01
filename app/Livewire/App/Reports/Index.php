@@ -46,7 +46,7 @@ class Index extends Component
 
     private function applyPeriodDates(): void
     {
-        $now = Carbon::now();
+        $now = $this->clinic->localNow();
 
         match ($this->period) {
             'today' => [$this->dateFrom, $this->dateTo] = [$now->toDateString(), $now->toDateString()],
@@ -322,7 +322,7 @@ class Index extends Component
         $bgColors = [];
         foreach ($statuses as $status) {
             if (isset($data[$status]) && $data[$status] > 0) {
-                $labels[] = __('reports.status_'.str_replace('_', '', $status));
+                $labels[] = __('reports.status_'.$status);
                 $values[] = $data[$status];
                 $bgColors[] = $colors[$status] ?? '#9ca3af';
             }
@@ -367,7 +367,7 @@ class Index extends Component
             ->toArray();
 
         $labels = array_map(
-            fn ($t) => __('reports.type_'.str_replace('_', '', $t)),
+            fn ($t) => __('reports.type_'.$t),
             array_keys($data)
         );
 
@@ -606,11 +606,11 @@ class Index extends Component
             : __('reports.all_doctors');
 
         $statusLabel = $this->statusFilter
-            ? __('reports.status_'.str_replace('_', '', $this->statusFilter))
+            ? __('reports.status_'.$this->statusFilter)
             : __('reports.all_statuses');
 
         $typeLabel = $this->typeFilter
-            ? __('reports.type_'.str_replace('_', '', $this->typeFilter))
+            ? __('reports.type_'.$this->typeFilter)
             : __('reports.all_types');
 
         $filename = 'citas-'.$this->dateFrom.'-'.$this->dateTo.'.csv';
@@ -652,8 +652,8 @@ class Index extends Component
                     $appointment->start_time,
                     $appointment->patient?->full_name ?? '—',
                     $appointment->doctor?->name ?? '—',
-                    __('reports.type_'.str_replace('_', '', $appointment->appointment_type)),
-                    __('reports.status_'.str_replace('_', '', $appointment->status)),
+                    __('reports.type_'.$appointment->appointment_type),
+                    __('reports.status_'.$appointment->status),
                     $appointment->duration_minutes,
                     $appointment->reason ?? '',
                 ]);

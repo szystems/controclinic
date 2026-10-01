@@ -87,6 +87,7 @@ return [
     'no_appointments' => 'No hay citas para mostrar',
     'no_appointments_today' => 'No hay citas para hoy',
     'no_appointments_description' => 'Agenda tu primera cita para empezar a organizar la consulta.',
+    'no_appointments_for_filters' => 'No hay citas para la fecha o los filtros seleccionados.',
     'empty_state_bullet_1' => 'Confirmación automática por email con link de cancelación',
     'empty_state_bullet_2' => 'Vista de calendario diaria y semanal por doctor',
     'empty_state_bullet_3' => 'Detección automática de conflictos de horario',

@@ -195,6 +195,27 @@ class Index extends Component
         $this->loadClinicData();
     }
 
+    public function getCountryOptionsProperty(): array
+    {
+        $codes = array_keys(config('clinic_locale.countries', []));
+        if ($this->country !== '' && ! in_array($this->country, $codes, true)) {
+            $codes[] = $this->country;
+        }
+
+        $locale = app()->getLocale();
+        $options = [];
+        foreach ($codes as $code) {
+            $label = class_exists(\Locale::class)
+                ? \Locale::getDisplayRegion('-'.$code, $locale)
+                : '';
+            $options[$code] = (is_string($label) && $label !== '') ? $label : $code;
+        }
+
+        asort($options, SORT_FLAG_CASE | SORT_NATURAL);
+
+        return $options;
+    }
+
     protected function loadClinicData(): void
     {
         // General

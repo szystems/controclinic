@@ -538,7 +538,7 @@
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $record->title ?? __('records.'.$record->record_type) }}</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $record->title ?: __('records.type_'.$record->record_type) }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $record->doctor->name ?? 'N/A' }} &middot; {{ $currentClinic->formatDate($record->created_at) }}</p>
                             @if($record->chief_complaint)
                             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 truncate">{{ $record->chief_complaint }}</p>
@@ -788,11 +788,9 @@
 
     {{-- Delete Confirmation Modal --}}
     @if($showDeleteModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 transition-opacity" wire:click="cancelDelete"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-gray-500/75 dark:bg-gray-900/80" wire:click="cancelDelete"></div>
+        <div class="relative z-10 w-full max-w-lg rounded-xl bg-white dark:bg-gray-800 px-4 pt-5 pb-4 text-left shadow-xl sm:p-6">
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
                         <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -816,7 +814,6 @@
                         {{ __('general.cancel') }}
                     </button>
                 </div>
-            </div>
         </div>
     </div>
     @endif

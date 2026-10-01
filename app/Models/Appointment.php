@@ -256,15 +256,23 @@ class Appointment extends Model
         return $query->whereBetween('appointment_date', [$startDate, $endDate]);
     }
 
+    public static function clinicToday(): string
+    {
+        $clinic = app()->bound('current_clinic') ? app('current_clinic') : null;
+        $timezone = $clinic?->timezone ?: config('app.timezone');
+
+        return now()->copy()->timezone($timezone)->toDateString();
+    }
+
     public function scopeUpcoming($query)
     {
-        return $query->where('appointment_date', '>=', now()->toDateString())
+        return $query->where('appointment_date', '>=', static::clinicToday())
             ->whereIn('status', [self::STATUS_SCHEDULED, self::STATUS_CONFIRMED]);
     }
 
     public function scopeToday($query)
     {
-        return $query->whereDate('appointment_date', now()->toDateString());
+        return $query->whereDate('appointment_date', static::clinicToday());
     }
 
     public function scopePending($query)

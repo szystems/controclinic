@@ -21,14 +21,14 @@ return [
             'tips' => [
                 'Use the search bar to find patients by name, phone, or email.',
                 'Access the medical history from the patient\'s profile.',
-                'You can archive inactive patients without deleting their data.',
+                'You can deactivate an inactive patient without deleting their record.',
             ],
         ],
         'appointments' => [
             'title' => 'Appointments',
             'summary' => 'Schedule, confirm, and manage all your clinic\'s appointments. Filter by doctor, status, or date range.',
             'tips' => [
-                'Appointment statuses: Pending, Confirmed, In Progress, Completed, and Cancelled.',
+                'Statuses: Scheduled, Confirmed, Waiting, In consultation, Completed, Cancelled, and No-show.',
                 'Use "New appointment" to book directly without going through the patient portal.',
                 'Confirmed appointments trigger an automatic reminder if email is configured.',
             ],
@@ -56,7 +56,7 @@ return [
             'summary' => 'Generate digital prescriptions linked to the patient and consultation record.',
             'tips' => [
                 'Prescriptions include medication, dose, frequency, and duration.',
-                'You can print or email the prescription to the patient.',
+                'You can print the prescription as a PDF to give to the patient.',
             ],
         ],
         'staff' => [

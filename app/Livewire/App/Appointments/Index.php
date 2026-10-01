@@ -54,7 +54,7 @@ class Index extends Component
     public function mount(Clinic $clinic): void
     {
         $this->currentClinic = $clinic;
-        $this->dateFilter = now()->toDateString();
+        $this->dateFilter = $this->currentClinic->localNow()->toDateString();
     }
 
     public function updatingSearch(): void
@@ -105,13 +105,13 @@ class Index extends Component
     public function clearFilters(): void
     {
         $this->reset(['search', 'status', 'doctorId', 'dateFrom', 'dateTo', 'createdViaFilter']);
-        $this->dateFilter = now()->toDateString();
+        $this->dateFilter = $this->currentClinic->localNow()->toDateString();
         $this->resetPage();
     }
 
     public function showToday(): void
     {
-        $this->dateFilter = now()->toDateString();
+        $this->dateFilter = $this->currentClinic->localNow()->toDateString();
         $this->resetPage();
     }
 

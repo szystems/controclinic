@@ -87,7 +87,7 @@
                         class="w-full text-sm rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary focus:border-primary">
                         <option value="">{{ __('reports.all_statuses') }}</option>
                         @foreach($this->statuses() as $s)
-                        <option value="{{ $s }}">{{ __('reports.status_' . str_replace('_', '', str_replace('-', '', $s))) ?? $s }}</option>
+                        <option value="{{ $s }}">{{ __('reports.status_'.$s) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -99,7 +99,7 @@
                         class="w-full text-sm rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary focus:border-primary">
                         <option value="">{{ __('reports.all_types') }}</option>
                         @foreach($this->types() as $t)
-                        <option value="{{ $t }}">{{ __('reports.type_' . str_replace('_', '', $t)) ?? $t }}</option>
+                        <option value="{{ $t }}">{{ __('reports.type_'.$t) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -456,7 +456,7 @@
                 $activeFilters[] = __('general.doctor').': '.($doc->name ?? $doctorFilter);
             }
             if ($statusFilter) { $activeFilters[] = __('general.status').': '.__('reports.status_'.$statusFilter); }
-            if ($typeFilter) { $activeFilters[] = __('appointments.type').': '.__('reports.type_'.str_replace('_', '', $typeFilter)); }
+            if ($typeFilter) { $activeFilters[] = __('appointments.type').': '.__('reports.type_'.$typeFilter); }
         @endphp
         <div id="print-report-header" class="hidden">
             <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #4f46e5;padding-bottom:10px;margin-bottom:14px;gap:12px;">

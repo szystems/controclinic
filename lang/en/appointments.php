@@ -87,6 +87,7 @@ return [
     'no_appointments' => 'No appointments to show',
     'no_appointments_today' => 'No appointments for today',
     'no_appointments_description' => 'Schedule your first appointment to start organizing consultations.',
+    'no_appointments_for_filters' => 'No appointments match this date or these filters.',
     'empty_state_bullet_1' => 'Automatic email confirmation with cancellation link',
     'empty_state_bullet_2' => 'Daily and weekly calendar view per doctor',
     'empty_state_bullet_3' => 'Automatic schedule conflict detection',

@@ -204,7 +204,9 @@ class MedicalRecordsTest extends TestCase
     {
         [$clinic, $user, $patient] = $this->makeContext();
         $this->bindClinic($clinic);
-        $record = MedicalRecord::factory()->forPatient($patient)->create();
+        $record = MedicalRecord::factory()->forPatient($patient)->create([
+            'status' => MedicalRecord::STATUS_DRAFT,
+        ]);
 
         // doctor role does NOT have records.delete by default
         Livewire::actingAs($user)
@@ -229,5 +231,22 @@ class MedicalRecordsTest extends TestCase
             ->assertRedirect();
 
         $this->assertSoftDeleted('medical_records', ['id' => $record->id]);
+
+        $final = MedicalRecord::factory()->forPatient($patient)->create([
+            'status' => MedicalRecord::STATUS_FINAL,
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test(Show::class, [
+                'patient' => $patient,
+                'record' => $final,
+            ])
+            ->call('delete')
+            ->assertNoRedirect();
+
+        $this->assertDatabaseHas('medical_records', [
+            'id' => $final->id,
+            'deleted_at' => null,
+        ]);
     }
 }
