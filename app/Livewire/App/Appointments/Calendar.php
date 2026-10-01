@@ -10,6 +10,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Calendar extends Component
@@ -208,30 +209,33 @@ class Calendar extends Component
             $newEndTime = $startCarbon->copy()->addMinutes(30)->format('H:i:s');
         }
 
-        // Check for scheduling conflicts
-        $hasConflict = Appointment::query()
-            ->forClinic($this->clinic->id)
-            ->forDoctor((int) $appointment->doctor_id)
-            ->forDate($newDate)
-            ->active()
-            ->where('id', '!=', $appointment->id)
-            ->where(function ($q) use ($newStartTime, $newEndTime) {
-                $q->where('start_time', '<', $newEndTime)
-                    ->where('end_time', '>', $newStartTime);
-            })
-            ->exists();
+        return DB::transaction(function () use ($appointment, $newDate, $newStartTime, $newEndTime, $endCarbon) {
+            User::whereKey($appointment->doctor_id)->lockForUpdate()->first();
 
-        if ($hasConflict) {
-            return ['success' => false, 'message' => __('appointments.conflict_detected')];
-        }
+            $hasConflict = Appointment::query()
+                ->forClinic($this->clinic->id)
+                ->forDoctor((int) $appointment->doctor_id)
+                ->forDate($newDate)
+                ->active()
+                ->where('id', '!=', $appointment->id)
+                ->where(function ($q) use ($newStartTime, $newEndTime) {
+                    $q->where('start_time', '<', $newEndTime)
+                        ->where('end_time', '>', $newStartTime);
+                })
+                ->exists();
 
-        $appointment->update([
-            'appointment_date' => $newDate,
-            'start_time' => $newStartTime,
-            'end_time' => $endCarbon ? $endCarbon->format('H:i:s') : $appointment->end_time,
-        ]);
+            if ($hasConflict) {
+                return ['success' => false, 'message' => __('appointments.conflict_detected')];
+            }
 
-        return ['success' => true, 'message' => __('appointments.rescheduled')];
+            $appointment->update([
+                'appointment_date' => $newDate,
+                'start_time' => $newStartTime,
+                'end_time' => $endCarbon ? $endCarbon->format('H:i:s') : $appointment->end_time,
+            ]);
+
+            return ['success' => true, 'message' => __('appointments.rescheduled')];
+        });
     }
 
     public function toggleDoctor(int $doctorId): void

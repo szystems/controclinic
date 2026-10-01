@@ -8,6 +8,7 @@ use App\Models\DoctorUnavailability;
 use App\Models\Patient;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -263,26 +264,44 @@ class Create extends Component
             $endTime = Carbon::parse($this->start_time)->addMinutes($this->duration_minutes)->format('H:i:s');
         }
 
-        $appointment = Appointment::create([
-            'clinic_id' => $this->currentClinic->id,
-            'patient_id' => $this->patient_id,
-            'doctor_id' => $this->doctor_id,
-            'created_by' => auth()->id(),
-            'appointment_type' => $this->appointment_type,
-            'appointment_date' => $this->appointment_date,
-            'start_time' => $this->start_time ?: null,
-            'end_time' => $endTime,
-            'duration_minutes' => $this->duration_minutes,
-            'status' => Appointment::STATUS_CONFIRMED,
-            'created_via' => 'staff',
-            'reason' => $this->reason ?: null,
-            'symptoms' => $this->symptoms ?: null,
-            'notes' => $this->notes ?: null,
-            'room' => $this->room ?: null,
-            'consultation_price' => $this->currentClinic->billingEnabled() ? ($this->consultation_price !== '' ? $this->consultation_price : null) : null,
-            'consultation_discount' => $this->currentClinic->billingEnabled() ? ($this->consultation_discount !== '' ? $this->consultation_discount : null) : null,
-            'is_billable' => $this->currentClinic->billingEnabled() ? $this->is_billable : true,
-        ]);
+        $appointment = DB::transaction(function () use ($endTime) {
+            User::whereKey($this->doctor_id)->lockForUpdate()->first();
+
+            $this->doctorUnavailableConflict = false;
+            if ($this->checkConflicts()) {
+                return null;
+            }
+
+            return Appointment::create([
+                'clinic_id' => $this->currentClinic->id,
+                'patient_id' => $this->patient_id,
+                'doctor_id' => $this->doctor_id,
+                'created_by' => auth()->id(),
+                'appointment_type' => $this->appointment_type,
+                'appointment_date' => $this->appointment_date,
+                'start_time' => $this->start_time ?: null,
+                'end_time' => $endTime,
+                'duration_minutes' => $this->duration_minutes,
+                'status' => Appointment::STATUS_CONFIRMED,
+                'created_via' => 'staff',
+                'reason' => $this->reason ?: null,
+                'symptoms' => $this->symptoms ?: null,
+                'notes' => $this->notes ?: null,
+                'room' => $this->room ?: null,
+                'consultation_price' => $this->currentClinic->billingEnabled() ? ($this->consultation_price !== '' ? $this->consultation_price : null) : null,
+                'consultation_discount' => $this->currentClinic->billingEnabled() ? ($this->consultation_discount !== '' ? $this->consultation_discount : null) : null,
+                'is_billable' => $this->currentClinic->billingEnabled() ? $this->is_billable : true,
+            ]);
+        });
+
+        if (! $appointment) {
+            $msg = $this->doctorUnavailableConflict
+                ? __('schedule.doctor_unavailable')
+                : __('appointments.conflict_detected');
+            session()->flash('error', $msg);
+
+            return;
+        }
 
         session()->flash('success', __('appointments.appointment_created'));
 

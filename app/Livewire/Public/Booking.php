@@ -381,6 +381,17 @@ class Booking extends Component
 
         try {
             $appointment = DB::transaction(function () use ($doctor) {
+                User::whereKey($doctor->id)->lockForUpdate()->first();
+
+                if (! in_array($this->selectedTime, $this->availableSlots, true)) {
+                    $this->selectedTime = null;
+                    $this->step = 2;
+
+                    throw ValidationException::withMessages([
+                        'submit' => __('booking.error_slot_taken'),
+                    ]);
+                }
+
                 // Find or create patient by email or phone within this clinic
                 $patient = null;
                 if ($this->email) {
