@@ -3,7 +3,7 @@
 > **Última actualización:** 2026-10-01
 > **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
 > **Siguiente paso:** DATA-17 (folio de receta). Paddle al final.
-> **Producción:** ✅ `https://controclinic.com` · HEAD `150e48e` · deploy Coolify 245
+> **Producción:** ✅ `https://controclinic.com` · HEAD `6a76168`
 
 
 ---
