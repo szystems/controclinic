@@ -4,11 +4,11 @@ Allow: /pricing
 Allow: /contact
 Allow: /terms
 Allow: /privacy
+Allow: /c/
 Disallow: /app/
 Disallow: /admin/
-Disallow: /booking/
-Disallow: /confirm/
-Disallow: /portal/
-Disallow: /rx/
+Disallow: /appointment/
+Disallow: /invitation/
+Disallow: /lang/
 
-Sitemap: https://app.controclinic.com/sitemap.xml
+Sitemap: https://controclinic.com/sitemap.xml
