@@ -7,7 +7,6 @@ use App\Http\Middleware\EnsureCanWrite;
 use App\Http\Middleware\EnsureTwoFactorAuthenticated;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TenantMiddleware;
-use App\Listeners\PaddleEventListener;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Policies\SuperAdminPolicy;
@@ -44,9 +43,6 @@ class AppServiceProvider extends ServiceProvider
                 ->orWhere('public_portal_slug', $value)
                 ->firstOrFail();
         });
-
-        // Paddle webhook event listeners
-        Event::subscribe(PaddleEventListener::class);
 
         // Registrar último acceso al autenticarse
         Event::listen(Login::class, function (Login $event) {
