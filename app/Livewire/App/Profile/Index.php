@@ -9,11 +9,14 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
 
 class Index extends Component
 {
+    use WithFileUploads;
     use WithPagination;
 
     public User $user;
@@ -29,6 +32,8 @@ class Index extends Component
     public string $timezone = '';
 
     public string $avatar = '';
+
+    public ?TemporaryUploadedFile $photo = null;
 
     public string $specialties = '';
 
@@ -93,6 +98,27 @@ class Index extends Component
         $payload = json_encode(['name' => $this->user->name], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
         $this->js("window.dispatchEvent(new CustomEvent('profile-updated', {detail: {$payload}}));");
         $this->dispatch('notify', type: 'success', message: __('profile.updated_successfully'));
+    }
+
+    public function updatedPhoto(): void
+    {
+        $this->validate([
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $path = $this->photo->store('clinics/'.$this->user->clinic_id.'/avatars', 'public');
+        $this->user->replaceAvatar($path);
+        $this->photo = null;
+        $this->avatar = $this->user->avatar ?? '';
+        $this->dispatch('notify', type: 'success', message: __('profile.photo_updated'));
+    }
+
+    public function removePhoto(): void
+    {
+        $this->user->replaceAvatar(null);
+        $this->avatar = '';
+        $this->photo = null;
+        $this->dispatch('notify', type: 'success', message: __('profile.photo_removed'));
     }
 
     public function updatePassword()

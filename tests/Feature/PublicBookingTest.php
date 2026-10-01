@@ -411,6 +411,56 @@ class PublicBookingTest extends TestCase
         $this->assertGreaterThan($bookingPos, $teamPos);
     }
 
+    public function test_public_team_presents_the_owner_as_a_doctor(): void
+    {
+        $clinic = Clinic::factory()->onboarded()->create([
+            'public_portal_enabled' => true,
+            'public_show_doctors' => true,
+            'settings' => array_merge(Clinic::getDefaultSettings(), [
+                'allow_online_booking' => true,
+            ]),
+        ]);
+
+        User::factory()->create([
+            'clinic_id' => $clinic->id,
+            'role' => User::ROLE_OWNER,
+            'name' => 'Otto Publico',
+            'is_active' => true,
+        ]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee('Otto Publico', false)
+            ->assertSee(__('staff.role_doctor'), false)
+            ->assertDontSee(__('staff.role_owner'), false);
+    }
+
+    public function test_public_team_prefers_a_specialty_and_shows_a_photo_when_present(): void
+    {
+        $clinic = Clinic::factory()->onboarded()->create([
+            'public_portal_enabled' => true,
+            'public_show_doctors' => true,
+            'settings' => array_merge(Clinic::getDefaultSettings(), [
+                'allow_online_booking' => true,
+            ]),
+        ]);
+
+        User::factory()->create([
+            'clinic_id' => $clinic->id,
+            'role' => User::ROLE_OWNER,
+            'name' => 'Ana Foto',
+            'is_active' => true,
+            'specialties' => ['Pediatría'],
+            'avatar' => 'clinics/demo/avatars/ana.jpg',
+        ]);
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee('Pediatría', false)
+            ->assertSee('/storage/clinics/demo/avatars/ana.jpg', false)
+            ->assertDontSee(__('staff.role_owner'), false);
+    }
+
     public function test_public_page_hides_doctor_team_when_disabled(): void
     {
         [$clinic] = $this->makeClinicWithDoctor(['public_show_doctors' => false]);

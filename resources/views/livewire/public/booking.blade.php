@@ -469,15 +469,16 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($doctors as $doctor)
             <div class="text-center p-4 rounded-lg bg-gray-50 border border-gray-100">
-                <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-lg font-bold"
-                     style="background: linear-gradient(135deg, var(--clinic-primary) 0%, var(--clinic-secondary,#6366f1) 100%)">
-                    {{ mb_strtoupper(mb_substr($doctor->name, 0, 1)) }}
-                </div>
-                <p class="text-sm font-medium text-gray-900 leading-tight">{{ $doctor->name }}</p>
-                @php $role = $doctor->getRoleNames()->first(); @endphp
-                @if($role)
-                    <p class="text-xs text-gray-500 mt-0.5">{{ \Illuminate\Support\Facades\Lang::has('staff.role_'.$role) ? __('staff.role_'.$role) : $role }}</p>
+                @if($doctor->avatar)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($doctor->avatar) }}" alt="" class="w-14 h-14 rounded-full mx-auto mb-3 object-cover">
+                @else
+                    <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-lg font-bold"
+                         style="background: linear-gradient(135deg, var(--clinic-primary) 0%, var(--clinic-secondary,#6366f1) 100%)">
+                        {{ mb_strtoupper(mb_substr($doctor->name, 0, 1)) }}
+                    </div>
                 @endif
+                <p class="text-sm font-medium text-gray-900 leading-tight">{{ $doctor->name }}</p>
+                <p class="text-xs text-gray-500 mt-0.5">{{ $doctor->publicPositionLabel() }}</p>
             </div>
             @endforeach
         </div>

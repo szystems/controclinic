@@ -8,12 +8,16 @@ use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 use Spatie\Permission\Models\Role;
 
 // ...el resto del código de la clase...
 
 class Edit extends Component
 {
+    use WithFileUploads;
+
     public User $member;
 
     public string $name = '';
@@ -35,6 +39,8 @@ class Edit extends Component
     public string $bio = '';
 
     public bool $is_active = true;
+
+    public ?TemporaryUploadedFile $photo = null;
 
     public bool $resetLinkSent = false;
 
@@ -108,6 +114,35 @@ class Edit extends Component
         $this->is_active = $user->is_active;
         // Cargar permisos directos (extra), excluyendo los heredados del rol.
         $this->extraPermissions = $user->getDirectPermissions()->pluck('name')->toArray();
+    }
+
+    public function updatedPhoto(): void
+    {
+        if (! auth()->user()->can('users.manage')) {
+            abort(403);
+        }
+
+        $this->validate([
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $path = $this->photo->store('clinics/'.$this->member->clinic_id.'/avatars', 'public');
+        $this->member->replaceAvatar($path);
+        $this->photo = null;
+        $this->member->refresh();
+        $this->dispatch('notify', type: 'success', message: __('profile.photo_updated'));
+    }
+
+    public function removePhoto(): void
+    {
+        if (! auth()->user()->can('users.manage')) {
+            abort(403);
+        }
+
+        $this->member->replaceAvatar(null);
+        $this->photo = null;
+        $this->member->refresh();
+        $this->dispatch('notify', type: 'success', message: __('profile.photo_removed'));
     }
 
     public function save(): void

@@ -30,6 +30,28 @@
         </div>
         @endif
 
+        <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ __('profile.photo') }}</h2>
+            <div class="flex items-center gap-4">
+                @if($member->avatar)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($member->avatar) }}" alt="" class="h-16 w-16 rounded-full object-cover">
+                @else
+                    <div class="h-16 w-16 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xl font-semibold">
+                        {{ mb_strtoupper(mb_substr($member->name, 0, 1)) }}
+                    </div>
+                @endif
+                <div>
+                    <input wire:model="photo" type="file" id="staff-photo" accept="image/jpeg,image/png,image/webp" class="block w-full text-sm text-gray-600 dark:text-gray-300">
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('profile.photo_hint') }}</p>
+                    @error('photo') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                    <p wire:loading wire:target="photo" class="mt-1 text-xs text-gray-500">{{ __('general.saving') }}...</p>
+                    @if($member->avatar)
+                        <button type="button" wire:click="removePhoto" class="mt-2 text-sm text-red-600 hover:text-red-700">{{ __('profile.photo_remove') }}</button>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <form wire:submit="save" class="space-y-6">
             {{-- Personal Info --}}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">

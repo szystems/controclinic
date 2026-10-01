@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
@@ -165,6 +167,40 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=0D8ABC&color=fff';
+    }
+
+    /**
+     * Texto que ve un visitante. La especialidad, si existe, describe el puesto.
+     * El dueño atiende pacientes, así que en público se presenta como doctor.
+     */
+    public function publicPositionLabel(): string
+    {
+        $specialties = array_values(array_filter((array) $this->specialties, fn ($item) => is_string($item) && $item !== ''));
+
+        if ($specialties !== []) {
+            return implode(' · ', $specialties);
+        }
+
+        $role = $this->role === self::ROLE_OWNER ? self::ROLE_DOCTOR : $this->role;
+        $key = 'staff.role_'.$role;
+
+        return Lang::has($key) ? __($key) : (string) $role;
+    }
+
+    public function replaceAvatar(?string $path): void
+    {
+        $previous = $this->avatar;
+
+        $this->update(['avatar' => $path]);
+
+        if (
+            is_string($previous)
+            && $previous !== ''
+            && $previous !== $path
+            && ! str_contains($previous, '://')
+        ) {
+            Storage::disk('public')->delete($previous);
+        }
     }
 
     // ==================== ROLE CHECKS ====================
