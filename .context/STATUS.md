@@ -2,7 +2,7 @@
 
 > **Última actualización:** 2026-10-01
 > **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
-> **Siguiente paso:** Paddle (INF-03, INF-05, G0-4), al final. El dominio HTTPS del panel de Coolify espera un nombre elegido por Otto.
+> **Siguiente paso:** Paddle (INF-03, INF-05, G0-4), al final.
 > **Producción:** ✅ `https://controclinic.com`
 
 
@@ -43,7 +43,6 @@ Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` 
 
 | Pendiente | Quién |
 |-----------|--------|
-| G0-1 dominio HTTPS del panel | Otto: solo si quiere una dirección con candado; el puerto 8000 ya no está abierto al público |
 | INF-03, INF-05, G0-4 | Paddle, al final |
 | G0-3 firewall, INF-01 paso 2 | Otto |
 
