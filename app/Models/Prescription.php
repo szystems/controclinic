@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -148,10 +149,23 @@ class Prescription extends Model
      */
     public static function generateFolio(string $clinicId): string
     {
+        return DB::transaction(function () use ($clinicId) {
+            Clinic::whereKey($clinicId)->lockForUpdate()->first();
+
+            return static::nextFolio($clinicId);
+        });
+    }
+
+    private static function nextFolio(string $clinicId): string
+    {
+        $order = DB::connection()->getDriverName() === 'sqlite'
+            ? 'CAST(SUBSTR(folio, ?) AS INTEGER) DESC'
+            : 'CAST(SUBSTRING(folio, ?) AS UNSIGNED) DESC';
+
         $last = static::withTrashed()
             ->where('clinic_id', $clinicId)
             ->whereNotNull('folio')
-            ->orderByDesc('folio')
+            ->orderByRaw($order, [4])
             ->value('folio');
 
         if (! $last) {
@@ -160,7 +174,7 @@ class Prescription extends Model
 
         $number = (int) preg_replace('/\D/', '', $last);
 
-        return 'RX-'.str_pad($number + 1, 4, '0', STR_PAD_LEFT);
+        return 'RX-'.str_pad((string) ($number + 1), 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -173,21 +187,33 @@ class Prescription extends Model
 
     public function issue(): void
     {
-        $this->update([
-            'status' => self::STATUS_ISSUED,
-            'issued_at' => $this->issued_at ?? $this->clinic->localNow()->toDateString(),
-            'folio' => $this->folio ?? static::generateFolio($this->clinic_id),
-            'qr_payload' => $this->qr_payload ?? static::generateQrPayload($this->id),
-        ]);
+        DB::transaction(function () {
+            Clinic::whereKey($this->clinic_id)->lockForUpdate()->first();
+
+            $this->update([
+                'status' => self::STATUS_ISSUED,
+                'issued_at' => $this->issued_at ?? $this->clinic->localNow()->toDateString(),
+                'folio' => $this->folio ?? static::nextFolio($this->clinic_id),
+                'qr_payload' => $this->qr_payload ?? static::generateQrPayload($this->id),
+            ]);
+        });
     }
 
     public function cancel(): void
     {
+        if (! in_array($this->status, [self::STATUS_DRAFT, self::STATUS_ISSUED], true)) {
+            return;
+        }
+
         $this->update(['status' => self::STATUS_CANCELLED]);
     }
 
     public function markDispensed(): void
     {
+        if ($this->status !== self::STATUS_ISSUED) {
+            return;
+        }
+
         $this->update(['status' => self::STATUS_DISPENSED]);
     }
 }

@@ -256,6 +256,52 @@ class PrescriptionsTest extends TestCase
         $this->assertEquals('RX-0001', $rx2->fresh()->folio);
     }
 
+    public function test_folio_continues_numerically_after_9999(): void
+    {
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
+        $patient = $this->makePatient($clinic);
+
+        $this->makeDraft($clinic, $patient, $doctor, [
+            'status' => Prescription::STATUS_ISSUED,
+            'folio' => 'RX-9999',
+        ]);
+        $this->makeDraft($clinic, $patient, $doctor, [
+            'status' => Prescription::STATUS_ISSUED,
+            'folio' => 'RX-10000',
+        ]);
+
+        $next = $this->makeDraft($clinic, $patient, $doctor);
+        $next->issue();
+
+        $this->assertSame('RX-10001', $next->fresh()->folio);
+    }
+
+    public function test_cancel_and_dispense_only_follow_allowed_statuses(): void
+    {
+        $clinic = $this->makeClinic();
+        $doctor = $this->makeDoctor($clinic);
+        $patient = $this->makePatient($clinic);
+
+        $issued = $this->makeDraft($clinic, $patient, $doctor);
+        $issued->issue();
+        $issued->markDispensed();
+        $this->assertSame(Prescription::STATUS_DISPENSED, $issued->fresh()->status);
+
+        $issued->cancel();
+        $this->assertSame(Prescription::STATUS_DISPENSED, $issued->fresh()->status);
+
+        $draft = $this->makeDraft($clinic, $patient, $doctor);
+        $draft->markDispensed();
+        $this->assertSame(Prescription::STATUS_DRAFT, $draft->fresh()->status);
+
+        $draft->cancel();
+        $this->assertSame(Prescription::STATUS_CANCELLED, $draft->fresh()->status);
+
+        $draft->markDispensed();
+        $this->assertSame(Prescription::STATUS_CANCELLED, $draft->fresh()->status);
+    }
+
     // ─── SHOW / ACCIONES ─────────────────────────────────────────────
 
     public function test_doctor_can_issue_from_show(): void
