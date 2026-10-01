@@ -219,23 +219,20 @@
 
     {{-- Cancel Modal --}}
     @if($showCancelModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75" wire:click="$set('showCancelModal', false)"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-xl px-4 pt-5 pb-4 text-left shadow-xl sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
-                <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2">{{ __('prescriptions.cancel_prescription') }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ __('prescriptions.confirm_cancel_message') }}</p>
-                <div class="flex gap-3 justify-end">
-                    <button wire:click="$set('showCancelModal', false)" type="button"
-                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        {{ __('general.cancel') }}
-                    </button>
-                    <button wire:click="cancel" type="button"
-                            class="px-4 py-2 bg-red-600 border border-transparent rounded-lg text-sm font-semibold text-white hover:bg-red-700">
-                        {{ __('prescriptions.yes_cancel') }}
-                    </button>
-                </div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-gray-500/75 dark:bg-gray-900/80" wire:click="$set('showCancelModal', false)"></div>
+        <div class="relative z-10 w-full max-w-sm rounded-xl bg-white px-4 pb-4 pt-5 text-left shadow-xl dark:bg-gray-800 sm:p-6">
+            <h3 class="mb-2 text-base font-semibold text-gray-900 dark:text-white">{{ __('prescriptions.cancel_prescription') }}</h3>
+            <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">{{ __('prescriptions.confirm_cancel_message') }}</p>
+            <div class="flex justify-end gap-3">
+                <button wire:click="$set('showCancelModal', false)" type="button"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    {{ __('general.cancel') }}
+                </button>
+                <button wire:click="cancel" type="button"
+                        class="rounded-lg border border-transparent bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                    {{ __('prescriptions.yes_cancel') }}
+                </button>
             </div>
         </div>
     </div>

@@ -84,13 +84,8 @@ return [
     'issued_successfully' => 'Receta emitida.',
     'cancelled_successfully' => 'Receta cancelada.',
     'no_prescriptions' => 'No hay recetas registradas.',
-    'no_prescriptions_description' => 'Emite tu primera receta y entrégala al paciente con código QR de verificación.',
+    'no_prescriptions_description' => 'Emite tu primera receta y entrégala al paciente en PDF.',
     'empty_state_bullet_1' => 'Ítems de medicamento con dosis, frecuencia y duración',
-    'empty_state_bullet_2' => 'PDF imprimible con código QR de verificación pública',
+    'empty_state_bullet_2' => 'PDF imprimible con folio, diagnóstico y medicamentos',
     'empty_state_bullet_3' => 'Vinculada automáticamente al historial del paciente',
-
-    // QR (Fase 2)
-    'verify_prescription' => 'Verificar receta',
-    'qr_valid' => 'Receta válida',
-    'qr_invalid' => 'Receta no encontrada o inválida',
 ];

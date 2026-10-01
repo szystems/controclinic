@@ -84,13 +84,8 @@ return [
     'issued_successfully' => 'Prescription issued.',
     'cancelled_successfully' => 'Prescription cancelled.',
     'no_prescriptions' => 'No prescriptions found.',
-    'no_prescriptions_description' => 'Issue your first prescription and deliver it with a QR verification code.',
+    'no_prescriptions_description' => 'Issue your first prescription and give the patient a printable PDF.',
     'empty_state_bullet_1' => 'Medication items with dose, frequency and duration',
-    'empty_state_bullet_2' => 'Printable PDF with public QR verification code',
+    'empty_state_bullet_2' => 'Printable PDF with folio, diagnosis and medications',
     'empty_state_bullet_3' => 'Automatically linked to the patient\'s medical record',
-
-    // QR (Phase 2)
-    'verify_prescription' => 'Verify prescription',
-    'qr_valid' => 'Valid prescription',
-    'qr_invalid' => 'Prescription not found or invalid',
 ];
