@@ -1,9 +1,10 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-07-05
-> **Fase actual:** **Fase D** (Paddle sandbox) en curso — checkout E2E funcionando, auditoría + optimización en progreso
-> **Siguiente paso:** cerrar hallazgos ADR-016 (changePlan, price IDs Clínica, portal cliente)
-> **Producción:** ✅ `https://controclinic.com` · último deploy `a03ff0c`
+> **Última actualización:** 2026-10-01
+> **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
+> **Siguiente paso:** DATA-17 (folio de receta). Paddle al final.
+> **Producción:** ✅ `https://controclinic.com` · HEAD `150e48e` · deploy Coolify 245
+
 
 ---
 
@@ -27,25 +28,70 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 
 ---
 
-## 🌐 Producción — 2026-07-04
+## Auditoría 2026-10-01 — en producción
+
+Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` están en `150e48e`.
+
+| Hecho | Qué quedó |
+|-------|-----------|
+| INF-01 paso 1, INF-02, INF-04 | Cliente MySQL para el respaldo, assets que se refrescan, php-fpm fuera de la red compartida |
+| AUTH-01 a AUTH-08 | Permisos de admin, ajustes, facturación, historial confidencial, horario, ids de otra clínica, solo-lectura y suspender |
+| AUTH-09 | Sin cambio de código: los médicos de una misma clínica ven los pacientes de esa clínica |
+| DATA-01 a DATA-16 | Expediente, reserva pública, historial finalizado, facturas, zona horaria, paciente borrado, doble reserva, estados de cita, enlaces de correo, recordatorios, validación de hora, registro, CSV y “hoy” en la zona de la clínica |
+| Página pública | Pie “Desarrollado por Szystems”, reserva arriba del equipo, puesto visible y foto opcional |
+
+| Pendiente | Quién |
+|-----------|--------|
+| DATA-17 a DATA-19, luego G4 y TXT-01 | Agente, un ID por commit |
+| INF-03, INF-05, G0-4 | Paddle, al final |
+| G0-1 panel Coolify, G0-3 firewall, INF-01 paso 2 | Otto |
+
+## 🌐 Producción — 2026-09-07
 
 | Item | Estado |
 |------|--------|
 | Dominio + SSL | ✅ controclinic.com + www |
-| Coolify app | ✅ `controclinic:main-ybwfwifzqp47cu1et7pi0vz6` |
-| Contenedores | ✅ app, webserver, mysql, redis, queue, scheduler |
-| Health check | ✅ `/up` → 200 |
-| Smoke test A8 | ✅ Pruebas manuales completadas con éxito |
-| Uploads `/storage/` | ✅ Volumen nginx + location |
-| MAIL saliente | ✅ Resend SMTP · `php artisan mail:test` |
-| Post-deploy auto | ✅ `scripts/post-deploy-health.sh` + systemd watcher (A12) |
-| Ops health | ✅ `php artisan ops:health --queue` |
+| Coolify app | ✅ `controclinic:main-ybwfwifzqp47cu1et7pi0vz6` · app id **4** |
+| portal.szystems.com | ✅ app id **2** · FQDN restaurado `https://portal.szystems.com` |
+| Contenedores | ✅ ambos stacks Up (rebuild watchdog 16:51 UTC) |
+| Health check | ✅ `/up` 200 · portal `/` 200 · REPRO `/login` 200 |
+| Multi-site watchdog | ✅ start contenedores primero · **nunca** rebuild paralelo · `force_rebuild=false` |
+| Coolify cleanup | ✅ `force_docker_cleanup=false` (solo si disco ≥ 80%) · `concurrent_builds=1` |
+| Coolify restart-limit | ✅ `max_restart_count=0` en apps 2, 4 y 5 (ya no StopApplication a los 10 restarts) |
+| Coolify auto-update | ✅ **off** — no pulsar Upgrade en el dashboard |
+| Swap VPS | ✅ `/swapfile` 2G (antes 0) |
 | Password admin prod | ⚠️ Cambiar vía `/admin/profile` |
 | Snapshot Hetzner | ⚠️ A11 — pendiente manual en consola |
 
-**Post-deploy:** tras deploy Coolify, Traefik puede dar 503 ~1–6 min; el script A12 reinicia proxy/webserver y recupera solo.
+### Outage 2026-09-07 (resuelto ~11 min)
 
-**Últimos deploys:** `7a5f564` archivos UX · `4a70f13` contadores pestañas paciente · `c75f287` staff invite UX · `82107eb` límites plan BD · `dffe0de` infra Fase A.
+- **Síntoma:** ControClinic + portal.szystems.com → 503 `no available server`. REPRO siguió en 200.
+- **Cadena:** `GetContainersStatus` 16:46:28 UTC → **dos** `StopApplication` → `CleanupDocker` borra los contenedores detenidos → watchdog 16:51:42 hace **force rebuild de ambos a la vez** → sitios 200 ~16:57.
+- **Causa raíz (misma de ago-13):** Coolify 4.1.2 con `max_restart_count=10` llama `StopApplication` cuando Docker `RestartCount` llega a 10. En CPX31 8 GB **sin swap**, los compose de ControClinic/portal acumulan restarts. `force_docker_cleanup=true` (cron 00:00 UTC) empeora: prune de contenedores stopped. El watchdog antiguo no hacía `docker start` y reconstruía los dos en paralelo.
+- **Fix 2026-09-07 (sin tocar Asonata / Clínicas del Valle / REPRO compose):**
+  - BD Coolify: `force_docker_cleanup=false`, `concurrent_builds=1`, `max_restart_count=0` (apps 2/4/5), FQDN portal restaurado, `is_auto_update_enabled=false`.
+  - Swap 2G en el VPS.
+  - Watchdog: si hay contenedores exited → `docker start`; si hay deploy en curso → no hacer nada; **un** redeploy por corrida y sin `force_rebuild`.
+- **No hacer:** Coolify Upgrade · reactivar cleanup forzado · `max_restart_count>0` · `migrate:fresh` REPRO.
+
+### Outage 2026-08-18 (resuelto — ~5 días caído)
+
+- **Síntoma:** `https://controclinic.com` → **503** `no available server` (Traefik sin backend). Sitio caído desde **~2026-08-13 00:04 UTC** hasta redeploy manual **2026-08-18 04:50 UTC**.
+- **Causa directa:** Coolify eliminó **todos** los contenedores ControClinic durante mantenimiento nocturno (**2026-08-13 00:00–00:01 UTC**): `DockerCleanupJob` → `ServerCheckJob` → `StopApplication` → `Server\CleanupDocker`. Volúmenes MySQL/storage **intactos**.
+- **Por qué no se auto-recuperó:** el timer `szystems-sites-watchdog` detectaba la caída cada 5 min e intentaba redeploy, pero fallaba con **PHP Parse error** (`unexpected T_NS_SEPARATOR`) por escape incorrecto de `App\Models\Application` en el comando `tinker` embebido en el script del VPS.
+- **Fix aplicado (2026-08-18):**
+  - Redeploy Coolify deployment **#108** (force rebuild) → contenedores arriba, `/up` 200.
+  - Scripts en repo: `scripts/coolify-queue-redeploy.sh`, `scripts/szystems-sites-watchdog.sh`, `scripts/install-szystems-watchdog.sh`.
+  - BD Coolify: FQDN `https://controclinic.com,https://www.controclinic.com`, status `running:healthy`, `health_check_path=/up`, `health_check_enabled=true`.
+- **Prevención adicional pendiente:** snapshot Hetzner (A11) · monitoreo externo (UptimeRobot/etc.) · revisar cleanup nocturno Coolify · considerar redeploy portal (app id **2**).
+
+### Outage 2026-07-18 (resuelto)
+- **Síntoma:** ControClinic + portal.szystems.com → 503. Asonata, Clínicas El Valle, szystems.com OK.
+- **Causa:** contenedores Coolify de ControClinic y portal estaban **eliminados** (`exited:unhealthy`). ControClinic se detuvo deliberadamente el **2026-07-06 ~08:31 UTC** (compose stop); portal desde ~2026-06-27. Imágenes app/webserver podadas después. El watcher A12 solo actúa en *start* de webserver, no detectaba stacks ausentes.
+- **Fix:** force-rebuild Coolify (apps 4 y 2) + post-deploy Traefik. Datos MySQL en volúmenes intactos.
+- **Prevención:** timer `szystems-sites-watchdog` (redeploy si faltan contenedores; proxy restart si hay 504; cooldown 1h). **Actualizado 2026-08-18:** helper `coolify-queue-redeploy.sh` evita bug de escape en tinker.
+
+**Últimos deploys:** redeploy infra **#108** (2026-08-18, HEAD) · `7a5f564` archivos UX · `4a70f13` contadores pestañas paciente · `c75f287` staff invite UX · `82107eb` límites plan BD · `dffe0de` infra Fase A.
 
 ---
 
@@ -284,6 +330,7 @@ ADRs: **011** (marca) · **012** (freemium) · **013** (deploy) · **014** (domi
 | Item | Estado | Razón |
 |------|--------|-------|
 | Post-deploy Traefik restart | ✅ A12 automatizado | Script + systemd watcher en VPS |
+| Multi-site watchdog auto-redeploy | ✅ corregido 2026-08-18 | `coolify-queue-redeploy.sh` + `install-szystems-watchdog.sh` |
 | Paddle checkout | ▶️ Fase D | Business number obtenido · cuenta SZ Systems |
 | CI/CD + Deploy | ✅ Fase A (prod live) | Hetzner + Coolify |
 | Admin password prod | 🟡 Verificar | G2 implementado — cambiar en `/admin/profile` |
