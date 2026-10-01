@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\CheckPlanLimits;
+use App\Http\Middleware\EnsureCanWrite;
+use App\Http\Middleware\EnsureTwoFactorAuthenticated;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TenantMiddleware;
 use App\Listeners\PaddleEventListener;
@@ -56,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
         Livewire::addPersistentMiddleware([
             TenantMiddleware::class,
             SetLocale::class,
+            EnsureCanWrite::class,
+            CheckPlanLimits::class,
+            EnsureTwoFactorAuthenticated::class,
         ]);
 
         // ==================== RATE LIMITERS ====================
