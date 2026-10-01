@@ -314,6 +314,7 @@ class InvoicesTest extends TestCase
 
         $this->assertEquals('TEST-000001', $n1);
         $this->assertEquals('TEST-000002', $n2);
+        $this->assertSame(3, (int) $clinic->fresh()->settings['next_invoice_number']);
     }
 
     public function test_invoice_service_recalculate_updates_totals(): void

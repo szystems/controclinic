@@ -18,16 +18,16 @@ class InvoiceService
     public function nextInvoiceNumber(Clinic $clinic): string
     {
         return DB::transaction(function () use ($clinic) {
-            $settings = $clinic->settings ?? [];
+            $locked = Clinic::whereKey($clinic->id)->lockForUpdate()->first();
+            $settings = $locked->settings ?? [];
             $prefix = $settings['invoice_prefix'] ?? 'INV-';
             $next = (int) ($settings['next_invoice_number'] ?? 1);
 
-            $number = $prefix.str_pad($next, 6, '0', STR_PAD_LEFT);
+            $number = $prefix.str_pad((string) $next, 6, '0', STR_PAD_LEFT);
 
-            // Incrementar el contador en la clínica
-            $updated = $settings;
-            $updated['next_invoice_number'] = $next + 1;
-            $clinic->update(['settings' => $updated]);
+            $settings['next_invoice_number'] = $next + 1;
+            $locked->update(['settings' => $settings]);
+            $clinic->refresh();
 
             return $number;
         });
