@@ -62,6 +62,11 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            // Internal Docker network has no TLS. The image ships MariaDB's client,
+            // which refuses the dump unless SSL is explicitly skipped.
+            'dump' => [
+                'add_extra_option' => '--skip-ssl',
+            ],
         ],
 
         'mariadb' => [
