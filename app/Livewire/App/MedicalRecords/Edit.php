@@ -9,6 +9,7 @@ use App\Models\PatientFile;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 #[Layout('layouts.app')]
@@ -155,6 +156,13 @@ class Edit extends Component
             'isConfidential' => ['boolean'],
         ], $fileRules));
 
+        if (! empty($this->pendingUploads) && auth()->user()->can('files.upload')
+            && ! $this->clinic->canStoreBytes($this->uploadBytes($this->pendingUploads))) {
+            $this->addError('storage', __('files.storage_limit_reached'));
+
+            return null;
+        }
+
         $vitals = array_filter($this->vitalSigns, fn ($v) => $v !== '' && $v !== null);
         $diagnoses = array_values(array_filter(
             $this->diagnoses,
@@ -234,5 +242,19 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.app.medical-records.edit');
+    }
+
+    /**
+     * @param  iterable<int, TemporaryUploadedFile>  $uploads
+     */
+    private function uploadBytes(iterable $uploads): int
+    {
+        $bytes = 0;
+
+        foreach ($uploads as $upload) {
+            $bytes += (int) $upload->getSize();
+        }
+
+        return $bytes;
     }
 }

@@ -19,6 +19,7 @@ return [
     'save' => 'Upload',
     'cancel' => 'Cancel',
     'uploaded_success' => 'Files uploaded successfully.',
+    'storage_limit_reached' => 'You have reached your plan\'s storage limit.',
     'deleted_success' => 'File deleted.',
     'uploaded_by' => 'Uploaded by',
     'uploaded_at' => 'Date',

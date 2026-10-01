@@ -10,9 +10,12 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
+use App\Models\PatientFile;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -45,6 +48,15 @@ class MedicalRecordsTest extends TestCase
     {
         app()->instance('current_clinic', $clinic);
         view()->share('currentClinic', $clinic);
+    }
+
+    private function setStorageLimit(Clinic $clinic, ?int $bytes): Clinic
+    {
+        $clinic->resolvePlan()?->update(['max_storage_bytes' => $bytes]);
+        $clinic->unsetRelation('plan');
+        $clinic->update(['max_storage_bytes' => $bytes]);
+
+        return $clinic->fresh();
     }
 
     public function test_index_renders_with_records_for_authorized_user(): void
@@ -199,6 +211,50 @@ class MedicalRecordsTest extends TestCase
             ->withQueryParams(['appointment_id' => $appointment->id])
             ->test(Create::class, ['patient' => $patient])
             ->assertSet('appointmentId', $appointment->id);
+    }
+
+    public function test_record_is_not_saved_when_attached_files_exceed_storage(): void
+    {
+        Storage::fake('local');
+
+        [$clinic, $user, $patient] = $this->makeContext();
+        $clinic = $this->setStorageLimit($clinic, 100);
+        $this->bindClinic($clinic);
+
+        Livewire::actingAs($user)
+            ->test(Create::class, ['patient' => $patient])
+            ->set('pendingUploads', [UploadedFile::fake()->create('lab.pdf', 1, 'application/pdf')])
+            ->set('pendingCategory', 'lab')
+            ->call('saveFinal')
+            ->assertHasErrors(['storage'])
+            ->assertDontSee(__('general.view_plans'));
+
+        $this->assertSame(0, MedicalRecord::count());
+        $this->assertSame(0, PatientFile::count());
+        $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
+    public function test_draft_is_not_changed_when_attached_files_exceed_storage(): void
+    {
+        Storage::fake('local');
+
+        [$clinic, $user, $patient] = $this->makeContext();
+        $clinic = $this->setStorageLimit($clinic, 100);
+        $this->bindClinic($clinic);
+        $draft = MedicalRecord::factory()->draft()->forPatient($patient)->create([
+            'title' => 'Original',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Edit::class, ['patient' => $patient, 'record' => $draft])
+            ->set('title', 'Cambiado')
+            ->set('pendingUploads', [UploadedFile::fake()->create('lab.pdf', 1, 'application/pdf')])
+            ->set('pendingCategory', 'lab')
+            ->call('saveDraft')
+            ->assertHasErrors(['storage']);
+
+        $this->assertSame('Original', $draft->fresh()->title);
+        $this->assertSame(0, PatientFile::count());
     }
 
     public function test_delete_requires_permission(): void

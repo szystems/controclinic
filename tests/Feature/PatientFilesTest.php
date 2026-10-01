@@ -307,4 +307,85 @@ class PatientFilesTest extends TestCase
         $component->assertSee('Hemograma')
             ->assertDontSee('Informe consulta');
     }
+
+    public function test_upload_stops_when_the_plan_storage_is_full(): void
+    {
+        Storage::fake('local');
+
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $clinic = $this->setStorageLimit($clinic, 500);
+        $patient = $this->createPatient($clinic);
+        $this->createFile($clinic, $patient, $owner);
+
+        Livewire::actingAs($owner)
+            ->test(PatientFiles::class, ['clinic' => $clinic, 'patient' => $patient])
+            ->set('showUploader', true)
+            ->set('uploads', [UploadedFile::fake()->create('extra.pdf', 1, 'application/pdf')])
+            ->set('uploadCategory', 'lab')
+            ->call('uploadFiles')
+            ->assertHasErrors(['storage'])
+            ->assertSee(__('files.storage_limit_reached'))
+            ->assertDontSee(__('general.view_plans'));
+
+        $this->assertSame(1, PatientFile::count());
+        $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
+    public function test_storage_limit_links_to_billing_only_when_billing_is_enabled(): void
+    {
+        Storage::fake('local');
+
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $settings = $clinic->settings ?? [];
+        $settings['billing_enabled'] = true;
+        $clinic->update(['settings' => $settings]);
+        $clinic = $this->setStorageLimit($clinic, 500);
+        $patient = $this->createPatient($clinic);
+        $this->createFile($clinic, $patient, $owner);
+
+        Livewire::actingAs($owner)
+            ->test(PatientFiles::class, ['clinic' => $clinic->fresh(), 'patient' => $patient])
+            ->set('showUploader', true)
+            ->set('uploads', [UploadedFile::fake()->create('extra.pdf', 1, 'application/pdf')])
+            ->set('uploadCategory', 'lab')
+            ->call('uploadFiles')
+            ->assertHasErrors(['storage'])
+            ->assertSee(__('general.view_plans'));
+    }
+
+    public function test_upload_fits_when_storage_is_unlimited_or_exactly_at_the_limit(): void
+    {
+        Storage::fake('local');
+
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $clinic = $this->setStorageLimit($clinic, null);
+        $patient = $this->createPatient($clinic);
+
+        Livewire::actingAs($owner)
+            ->test(PatientFiles::class, ['clinic' => $clinic->fresh(), 'patient' => $patient])
+            ->set('uploads', [UploadedFile::fake()->create('libre.pdf', 1, 'application/pdf')])
+            ->set('uploadCategory', 'other')
+            ->call('uploadFiles')
+            ->assertHasNoErrors();
+
+        $clinic = $this->setStorageLimit($clinic, 1024 + (int) PatientFile::sum('size_bytes'));
+
+        Livewire::actingAs($owner)
+            ->test(PatientFiles::class, ['clinic' => $clinic->fresh(), 'patient' => $patient])
+            ->set('uploads', [UploadedFile::fake()->create('justo.pdf', 1, 'application/pdf')])
+            ->set('uploadCategory', 'other')
+            ->call('uploadFiles')
+            ->assertHasNoErrors();
+
+        $this->assertSame(2, PatientFile::count());
+    }
+
+    private function setStorageLimit(Clinic $clinic, ?int $bytes): Clinic
+    {
+        $clinic->resolvePlan()?->update(['max_storage_bytes' => $bytes]);
+        $clinic->unsetRelation('plan');
+        $clinic->update(['max_storage_bytes' => $bytes]);
+
+        return $clinic->fresh();
+    }
 }

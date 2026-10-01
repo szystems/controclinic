@@ -8,6 +8,7 @@ use App\Models\PatientFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 class Files extends Component
@@ -63,6 +64,12 @@ class Files extends Component
             'uploadNotes' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        if (! $this->currentClinic->canStoreBytes($this->uploadBytes($this->uploads))) {
+            $this->addError('storage', __('files.storage_limit_reached'));
+
+            return;
+        }
+
         foreach ($this->uploads as $upload) {
             $originalName = $upload->getClientOriginalName();
             $mime = $upload->getMimeType();
@@ -97,6 +104,20 @@ class Files extends Component
         $this->uploadCategory = 'other';
         $this->dispatch('files-uploaded');
         session()->flash('success', __('files.uploaded_success'));
+    }
+
+    /**
+     * @param  iterable<int, TemporaryUploadedFile>  $uploads
+     */
+    private function uploadBytes(iterable $uploads): int
+    {
+        $bytes = 0;
+
+        foreach ($uploads as $upload) {
+            $bytes += (int) $upload->getSize();
+        }
+
+        return $bytes;
     }
 
     public function confirmDelete(string $fileId): void

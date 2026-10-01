@@ -19,6 +19,7 @@ return [
     'save' => 'Subir',
     'cancel' => 'Cancelar',
     'uploaded_success' => 'Archivos subidos correctamente.',
+    'storage_limit_reached' => 'Has alcanzado el espacio de almacenamiento de tu plan.',
     'deleted_success' => 'Archivo eliminado.',
     'uploaded_by' => 'Subido por',
     'uploaded_at' => 'Fecha',

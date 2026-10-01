@@ -151,6 +151,14 @@
             @error('uploads.*')
                 <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
             @enderror
+            @error('storage')
+                <p class="text-xs text-red-600 dark:text-red-400">
+                    {{ $message }}
+                    @if($currentClinic->billingEnabled())
+                        <a href="{{ route('app.billing.index', $currentClinic->slug) }}" wire:navigate class="underline">{{ __('general.view_plans') }}</a>
+                    @endif
+                </p>
+            @enderror
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {{-- Nombre descriptivo --}}

@@ -336,6 +336,14 @@
                         @error('pendingUploads.*')
                             <p class="text-xs text-rose-500 mt-1">{{ $message }}</p>
                         @enderror
+                        @error('storage')
+                            <p class="text-xs text-rose-500 mt-1">
+                                {{ $message }}
+                                @if($clinic->billingEnabled())
+                                    <a href="{{ route('app.billing.index', $clinic->slug) }}" wire:navigate class="underline">{{ __('general.view_plans') }}</a>
+                                @endif
+                            </p>
+                        @enderror
                     </div>
                 </section>
                 @endcan

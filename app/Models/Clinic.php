@@ -390,6 +390,22 @@ class Clinic extends Model
         return $used < $limits['max_doctors'];
     }
 
+    public function canStoreBytes(int $additionalBytes): bool
+    {
+        $limit = $this->getPlanLimits()['max_storage_bytes'] ?? null;
+
+        if ($limit === null) {
+            return true;
+        }
+
+        $used = (int) PatientFile::query()
+            ->withoutGlobalScope('clinic')
+            ->where('clinic_id', $this->id)
+            ->sum('size_bytes');
+
+        return $used + max(0, $additionalBytes) <= (int) $limit;
+    }
+
     public function canAddStaff(): bool
     {
         if (! $this->canWrite()) {
