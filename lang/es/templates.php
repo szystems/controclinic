@@ -43,11 +43,11 @@ return [
     // Plantilla inicial sugerida
     'suggested_name' => 'Consulta general',
     'suggested_created' => '¡Plantilla inicial creada! Puedes editarla cuando quieras.',
-    'suggested_chief_complaint' => 'Motivo de consulta (personaliza según tu especialidad)',
-    'suggested_present_illness' => 'Inicio, duración, síntomas asociados, factores que alivian o empeoran.',
-    'suggested_physical_examination' => 'Aspecto general, signos vitales, sistemas revisados según indicación.',
-    'suggested_assessment' => 'Impresión clínica / diagnóstico presuntivo.',
-    'suggested_plan' => 'Tratamiento, seguimiento, indicaciones al paciente e interconsultas si aplica.',
+    'suggested_chief_complaint' => '',
+    'suggested_present_illness' => '',
+    'suggested_physical_examination' => '',
+    'suggested_assessment' => '',
+    'suggested_plan' => '',
 
     // Recordatorio en formulario de nueva consulta
     'create_reminder_title' => 'Agiliza tus notas con plantillas',

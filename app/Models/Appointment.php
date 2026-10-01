@@ -206,13 +206,13 @@ class Appointment extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            self::STATUS_SCHEDULED => __('Programada'),
-            self::STATUS_CONFIRMED => __('Confirmada'),
-            self::STATUS_WAITING => __('En espera'),
-            self::STATUS_IN_PROGRESS => __('En consulta'),
-            self::STATUS_COMPLETED => __('Completada'),
-            self::STATUS_CANCELLED => __('Cancelada'),
-            self::STATUS_NO_SHOW => __('No se presentó'),
+            self::STATUS_SCHEDULED => __('appointments.status_scheduled'),
+            self::STATUS_CONFIRMED => __('appointments.status_confirmed'),
+            self::STATUS_WAITING => __('appointments.status_waiting'),
+            self::STATUS_IN_PROGRESS => __('appointments.status_in_progress'),
+            self::STATUS_COMPLETED => __('appointments.status_completed'),
+            self::STATUS_CANCELLED => __('appointments.status_cancelled'),
+            self::STATUS_NO_SHOW => __('appointments.status_no_show'),
             default => $this->status,
         };
     }
@@ -220,11 +220,11 @@ class Appointment extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->appointment_type) {
-            self::TYPE_SCHEDULED => __('Programada'),
-            self::TYPE_WALK_IN => __('Orden de llegada'),
-            self::TYPE_EMERGENCY => __('Emergencia'),
-            self::TYPE_FOLLOW_UP => __('Seguimiento'),
-            self::TYPE_TELEMEDICINE => __('Telemedicina'),
+            self::TYPE_SCHEDULED => __('appointments.scheduled'),
+            self::TYPE_WALK_IN => __('appointments.walk_in'),
+            self::TYPE_EMERGENCY => __('appointments.emergency'),
+            self::TYPE_FOLLOW_UP => __('appointments.follow_up'),
+            self::TYPE_TELEMEDICINE => __('appointments.telemedicine'),
             default => $this->appointment_type,
         };
     }

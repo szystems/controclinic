@@ -26,7 +26,7 @@ return [
     'total_appointments' => 'Total Appointments',
     'completed' => 'Completed',
     'cancelled' => 'Cancelled',
-    'no_show' => 'No Show',
+    'no_show' => 'No-show',
     'completion_rate' => 'Completion rate',
     'avg_duration' => 'Average duration',
     'avg_duration_help' => 'Average minutes for completed appointments.',
@@ -46,10 +46,10 @@ return [
     'status_scheduled' => 'Scheduled',
     'status_confirmed' => 'Confirmed',
     'status_waiting' => 'Waiting',
-    'status_in_progress' => 'In progress',
+    'status_in_progress' => 'In consultation',
     'status_completed' => 'Completed',
     'status_cancelled' => 'Cancelled',
-    'status_no_show' => 'No show',
+    'status_no_show' => 'No-show',
 
     // Type labels
     'type_scheduled' => 'Scheduled',

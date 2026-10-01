@@ -43,11 +43,11 @@ return [
     // Suggested starter template
     'suggested_name' => 'General consultation',
     'suggested_created' => 'Starter template created! You can edit it anytime.',
-    'suggested_chief_complaint' => 'Reason for visit (customize for your specialty)',
-    'suggested_present_illness' => 'Onset, duration, associated symptoms, relieving/aggravating factors.',
-    'suggested_physical_examination' => 'General appearance, vital signs, systems reviewed as indicated.',
-    'suggested_assessment' => 'Clinical impression / working diagnosis.',
-    'suggested_plan' => 'Treatment, follow-up, patient instructions, and referrals if needed.',
+    'suggested_chief_complaint' => '',
+    'suggested_present_illness' => '',
+    'suggested_physical_examination' => '',
+    'suggested_assessment' => '',
+    'suggested_plan' => '',
 
     // Reminder on new record form
     'create_reminder_title' => 'Speed up your notes with templates',
