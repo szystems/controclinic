@@ -31,6 +31,8 @@ class Index extends Component
 
     public string $createdViaFilter = '';
 
+    public const SORTABLE = ['appointment_date'];
+
     public string $sortField = 'appointment_date';
 
     public string $sortDirection = 'asc';
@@ -94,12 +96,26 @@ class Index extends Component
 
     public function sortBy(string $field): void
     {
+        if (! in_array($field, self::SORTABLE, true)) {
+            return;
+        }
+
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+    }
+
+    private function sortColumn(): string
+    {
+        return in_array($this->sortField, self::SORTABLE, true) ? $this->sortField : 'appointment_date';
+    }
+
+    private function sortOrder(): string
+    {
+        return $this->sortDirection === 'desc' ? 'desc' : 'asc';
     }
 
     public function clearFilters(): void
@@ -154,7 +170,7 @@ class Index extends Component
             ->when($this->createdViaFilter, function ($query) {
                 $query->where('created_via', $this->createdViaFilter);
             })
-            ->orderBy($this->sortField, $this->sortDirection)
+            ->orderBy($this->sortColumn(), $this->sortOrder())
             ->orderBy('start_time', 'asc')
             ->paginate(15);
     }

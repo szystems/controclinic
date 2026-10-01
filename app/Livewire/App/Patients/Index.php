@@ -32,6 +32,8 @@ class Index extends Component
 
     public string $ageMax = '';
 
+    public const SORTABLE = ['last_name', 'last_visit_at'];
+
     public string $sortField = 'created_at';
 
     public string $sortDirection = 'desc';
@@ -100,12 +102,26 @@ class Index extends Component
 
     public function sortBy(string $field): void
     {
+        if (! in_array($field, self::SORTABLE, true)) {
+            return;
+        }
+
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+    }
+
+    private function sortColumn(): string
+    {
+        return in_array($this->sortField, self::SORTABLE, true) ? $this->sortField : 'created_at';
+    }
+
+    private function sortOrder(): string
+    {
+        return $this->sortDirection === 'asc' ? 'asc' : 'desc';
     }
 
     public function getPatientsProperty()
@@ -222,7 +238,7 @@ class Index extends Component
                 $query->whereNotNull('birth_date')
                     ->whereDate('birth_date', '>=', $this->currentClinic->localNow()->subYears((int) $this->ageMax + 1)->addDay()->toDateString());
             })
-            ->orderBy($this->sortField, $this->sortDirection);
+            ->orderBy($this->sortColumn(), $this->sortOrder());
     }
 
     private function buildExportQuery()

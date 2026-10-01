@@ -23,6 +23,8 @@ class Index extends Component
 
     public string $statusFilter = '';
 
+    public const SORTABLE = ['name', 'last_login_at'];
+
     public string $sortField = 'name';
 
     public string $sortDirection = 'asc';
@@ -69,12 +71,26 @@ class Index extends Component
 
     public function sortBy(string $field): void
     {
+        if (! in_array($field, self::SORTABLE, true)) {
+            return;
+        }
+
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+    }
+
+    private function sortColumn(): string
+    {
+        return in_array($this->sortField, self::SORTABLE, true) ? $this->sortField : 'name';
+    }
+
+    private function sortOrder(): string
+    {
+        return $this->sortDirection === 'desc' ? 'desc' : 'asc';
     }
 
     public function getMembersProperty()
@@ -98,7 +114,7 @@ class Index extends Component
                 $query->where('is_active', $this->statusFilter === 'active');
             })
             ->orderByRaw("CASE WHEN role = 'owner' THEN 0 ELSE 1 END") // owner siempre primero
-            ->orderBy($this->sortField, $this->sortDirection)
+            ->orderBy($this->sortColumn(), $this->sortOrder())
             ->paginate(15);
     }
 
@@ -347,7 +363,7 @@ class Index extends Component
             ->when($this->roleFilter, fn ($q) => $q->where('role', $this->roleFilter))
             ->when($this->statusFilter !== '', fn ($q) => $q->where('is_active', $this->statusFilter === 'active'))
             ->orderByRaw("CASE WHEN role = 'owner' THEN 0 ELSE 1 END")
-            ->orderBy($this->sortField, $this->sortDirection)
+            ->orderBy($this->sortColumn(), $this->sortOrder())
             ->limit(500)
             ->get();
 
