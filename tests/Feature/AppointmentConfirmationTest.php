@@ -63,11 +63,28 @@ class AppointmentConfirmationTest extends TestCase
         $this->assertNotEquals($a1->confirmation_token, $a2->confirmation_token);
     }
 
-    public function test_patient_can_confirm_appointment_via_link(): void
+    public function test_opening_the_confirm_link_does_not_change_the_appointment(): void
     {
         $appointment = $this->makeAppointment();
 
         $response = $this->get(route('appointment.confirm', $appointment->confirmation_token));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('appointment.confirm');
+        $response->assertSee(route('appointment.confirm.store', $appointment->confirmation_token), false);
+
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'status' => Appointment::STATUS_SCHEDULED,
+            'confirmed_via' => null,
+        ]);
+    }
+
+    public function test_patient_can_confirm_appointment_via_link(): void
+    {
+        $appointment = $this->makeAppointment();
+
+        $response = $this->post(route('appointment.confirm.store', $appointment->confirmation_token));
 
         $response->assertStatus(200);
         $response->assertViewIs('appointment.confirmed');
@@ -79,11 +96,24 @@ class AppointmentConfirmationTest extends TestCase
         ]);
     }
 
-    public function test_patient_can_cancel_appointment_via_link(): void
+    public function test_opening_the_cancel_link_does_not_change_the_appointment(): void
     {
         $appointment = $this->makeAppointment();
 
         $response = $this->get(route('appointment.cancel', $appointment->confirmation_token));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('appointment.cancel');
+        $response->assertSee(route('appointment.cancel.store', $appointment->confirmation_token), false);
+
+        $this->assertSame(Appointment::STATUS_SCHEDULED, $appointment->fresh()->status);
+    }
+
+    public function test_patient_can_cancel_appointment_via_link(): void
+    {
+        $appointment = $this->makeAppointment();
+
+        $response = $this->post(route('appointment.cancel.store', $appointment->confirmation_token));
 
         $response->assertStatus(200);
         $response->assertViewIs('appointment.cancelled');
@@ -148,5 +178,83 @@ class AppointmentConfirmationTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('appointment.already-cancelled');
+    }
+
+    public function test_confirm_link_does_not_reopen_a_completed_appointment(): void
+    {
+        $appointment = $this->makeAppointment([
+            'status' => Appointment::STATUS_COMPLETED,
+        ]);
+
+        $this->post(route('appointment.confirm.store', $appointment->confirmation_token))
+            ->assertOk()
+            ->assertViewIs('appointment.unavailable');
+
+        $this->assertSame(Appointment::STATUS_COMPLETED, $appointment->fresh()->status);
+    }
+
+    public function test_confirm_link_rejects_a_past_appointment(): void
+    {
+        $appointment = $this->makeAppointment([
+            'appointment_date' => now()->subDay()->toDateString(),
+        ]);
+
+        $this->post(route('appointment.confirm.store', $appointment->confirmation_token))
+            ->assertOk()
+            ->assertViewIs('appointment.unavailable');
+
+        $this->assertSame(Appointment::STATUS_SCHEDULED, $appointment->fresh()->status);
+    }
+
+    public function test_cancel_link_rejects_a_past_appointment(): void
+    {
+        $appointment = $this->makeAppointment([
+            'appointment_date' => now()->subDay()->toDateString(),
+            'status' => Appointment::STATUS_CONFIRMED,
+        ]);
+
+        $this->post(route('appointment.cancel.store', $appointment->confirmation_token))
+            ->assertOk()
+            ->assertViewIs('appointment.unavailable');
+
+        $this->assertSame(Appointment::STATUS_CONFIRMED, $appointment->fresh()->status);
+    }
+
+    public function test_cancel_link_honors_the_clinic_cancellation_notice(): void
+    {
+        $appointment = $this->makeAppointment([
+            'appointment_date' => now()->addDay()->toDateString(),
+        ]);
+        $clinic = $appointment->clinic;
+        $clinic->update([
+            'settings' => array_merge($clinic->settings ?? [], [
+                'cancellation_notice' => 48,
+            ]),
+        ]);
+
+        $this->post(route('appointment.cancel.store', $appointment->confirmation_token))
+            ->assertOk()
+            ->assertViewIs('appointment.unavailable');
+
+        $this->assertSame(Appointment::STATUS_SCHEDULED, $appointment->fresh()->status);
+    }
+
+    public function test_cancel_link_allows_a_future_appointment_outside_the_notice(): void
+    {
+        $appointment = $this->makeAppointment([
+            'appointment_date' => now()->addDays(5)->toDateString(),
+        ]);
+        $clinic = $appointment->clinic;
+        $clinic->update([
+            'settings' => array_merge($clinic->settings ?? [], [
+                'cancellation_notice' => 24,
+            ]),
+        ]);
+
+        $this->post(route('appointment.cancel.store', $appointment->confirmation_token))
+            ->assertOk()
+            ->assertViewIs('appointment.cancelled');
+
+        $this->assertSame(Appointment::STATUS_CANCELLED, $appointment->fresh()->status);
     }
 }

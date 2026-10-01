@@ -196,4 +196,15 @@ return [
     'origin_walkin' => 'Walk-in',
     'price' => 'Price',
     'invoiced' => 'Invoiced',
+
+    'link_confirm_title' => 'Confirm your appointment',
+    'link_confirm_message' => 'Review the details and press the button to confirm your attendance. Opening this link does not change the appointment.',
+    'link_confirm_button' => 'Confirm appointment',
+    'link_cancel_title' => 'Cancel your appointment',
+    'link_cancel_message' => 'Review the details and press the button to cancel. Opening this link does not change the appointment.',
+    'link_cancel_button' => 'Cancel appointment',
+    'link_unavailable_title' => 'This appointment cannot be changed',
+    'link_unavailable_message' => 'This appointment can no longer be confirmed or cancelled from the link. Please contact the clinic.',
+    'link_past_message' => 'This appointment has already passed. Contact the clinic if you need another one.',
+    'link_notice_message' => 'The clinic asks for at least :hours hours notice. Contact the clinic to cancel.',
 ];

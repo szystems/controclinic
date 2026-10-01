@@ -184,9 +184,17 @@ Route::get('/appointment/confirm/{token}', [AppointmentConfirmationController::c
     ->middleware('throttle:10,1')
     ->name('appointment.confirm');
 
+Route::post('/appointment/confirm/{token}', [AppointmentConfirmationController::class, 'confirmStore'])
+    ->middleware('throttle:10,1')
+    ->name('appointment.confirm.store');
+
 Route::get('/appointment/cancel/{token}', [AppointmentConfirmationController::class, 'cancel'])
     ->middleware('throttle:10,1')
     ->name('appointment.cancel');
+
+Route::post('/appointment/cancel/{token}', [AppointmentConfirmationController::class, 'cancelStore'])
+    ->middleware('throttle:10,1')
+    ->name('appointment.cancel.store');
 
 Route::post('logout', function () {
     (new Logout)();

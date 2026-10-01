@@ -198,4 +198,15 @@ return [
     'origin_walkin' => 'Presencial',
     'price' => 'Precio',
     'invoiced' => 'Facturado',
+
+    'link_confirm_title' => 'Confirma tu cita',
+    'link_confirm_message' => 'Revisa los datos y pulsa el botón para confirmar tu asistencia. Abrir este enlace no cambia la cita.',
+    'link_confirm_button' => 'Confirmar cita',
+    'link_cancel_title' => 'Cancelar tu cita',
+    'link_cancel_message' => 'Revisa los datos y pulsa el botón para cancelar. Abrir este enlace no cambia la cita.',
+    'link_cancel_button' => 'Cancelar cita',
+    'link_unavailable_title' => 'No se puede cambiar esta cita',
+    'link_unavailable_message' => 'Esta cita ya no se puede confirmar ni cancelar desde el enlace. Contacta a la clínica.',
+    'link_past_message' => 'Esta cita ya pasó. Contacta a la clínica si necesitas otra.',
+    'link_notice_message' => 'La clínica pide avisar con al menos :hours horas de antelación. Contacta a la clínica para cancelar.',
 ];
