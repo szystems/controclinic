@@ -91,12 +91,10 @@ Route::get('/health', function () {
         $status = 503;
     }
 
-    $checks['app'] = config('app.name');
-    $checks['env'] = config('app.env');
     $checks['status'] = $status === 200 ? 'healthy' : 'degraded';
 
     return response()->json($checks, $status);
-})->name('health');
+})->middleware('throttle:30,1')->name('health');
 
 /*
 |--------------------------------------------------------------------------
