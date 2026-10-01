@@ -120,14 +120,16 @@ class Booking extends Component
             return [];
         }
 
+        $tz = $this->clinicTimezone();
+
         try {
-            $date = Carbon::parse($this->selectedDate);
+            $date = Carbon::parse($this->selectedDate, $tz)->startOfDay();
         } catch (\Throwable $e) {
             return [];
         }
 
         $hours = $this->workingHours;
-        $now = now($this->clinic->timezone ?? config('app.timezone'));
+        $now = now($tz);
 
         // Day-of-week check
         if (! in_array($date->dayOfWeek, $hours['days'], true)) {
@@ -143,8 +145,8 @@ class Booking extends Component
         }
 
         // Generate raw slots
-        $start = Carbon::parse($date->toDateString().' '.$hours['start']);
-        $end = Carbon::parse($date->toDateString().' '.$hours['end']);
+        $start = Carbon::parse($date->toDateString().' '.$hours['start'], $tz);
+        $end = Carbon::parse($date->toDateString().' '.$hours['end'], $tz);
         $duration = $hours['duration'];
 
         $slots = [];
@@ -157,7 +159,7 @@ class Booking extends Component
         // Drop slots earlier than min notice
         $minTime = $minDate;
         $slots = array_values(array_filter($slots, function ($time) use ($date, $minTime) {
-            return Carbon::parse($date->toDateString().' '.$time)->gte($minTime);
+            return Carbon::parse($date->toDateString().' '.$time, $tz)->gte($minTime);
         }));
 
         if (empty($slots)) {
@@ -177,13 +179,13 @@ class Booking extends Component
 
         $available = [];
         foreach ($slots as $time) {
-            $slotStart = Carbon::parse($date->toDateString().' '.$time);
+            $slotStart = Carbon::parse($date->toDateString().' '.$time, $tz);
             $slotEnd = $slotStart->copy()->addMinutes($duration);
 
-            $conflict = $existing->contains(function ($appt) use ($slotStart, $slotEnd, $date) {
-                $apptStart = Carbon::parse($date->toDateString().' '.$appt->start_time->format('H:i'));
+            $conflict = $existing->contains(function ($appt) use ($slotStart, $slotEnd, $date, $tz) {
+                $apptStart = Carbon::parse($date->toDateString().' '.$appt->start_time->format('H:i'), $tz);
                 $apptEnd = $appt->end_time
-                    ? Carbon::parse($date->toDateString().' '.$appt->end_time->format('H:i'))
+                    ? Carbon::parse($date->toDateString().' '.$appt->end_time->format('H:i'), $tz)
                     : $apptStart->copy()->addMinutes(30);
 
                 return $slotStart->lt($apptEnd) && $slotEnd->gt($apptStart);
@@ -202,8 +204,8 @@ class Booking extends Component
             ->get();
 
         if ($unavailabilities->isNotEmpty()) {
-            $available = array_values(array_filter($available, function (string $time) use ($unavailabilities, $date, $duration) {
-                $slotStart = Carbon::parse($date->toDateString().' '.$time);
+            $available = array_values(array_filter($available, function (string $time) use ($unavailabilities, $date, $duration, $tz) {
+                $slotStart = Carbon::parse($date->toDateString().' '.$time, $tz);
                 $slotEnd = $slotStart->copy()->addMinutes($duration);
                 foreach ($unavailabilities as $block) {
                     if ($block->blocksSlot($date->toDateString(), $time, $slotEnd->format('H:i'))) {
@@ -218,14 +220,19 @@ class Booking extends Component
         return $available;
     }
 
+    private function clinicTimezone(): string
+    {
+        return $this->clinic->timezone ?: config('app.timezone');
+    }
+
     public function getMinBookableDateProperty(): string
     {
-        return now($this->clinic->timezone ?? config('app.timezone'))->toDateString();
+        return now($this->clinicTimezone())->toDateString();
     }
 
     public function getMaxBookableDateProperty(): string
     {
-        return now($this->clinic->timezone ?? config('app.timezone'))
+        return now($this->clinicTimezone())
             ->addDays($this->workingHours['max_advance_days'])
             ->toDateString();
     }

@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
@@ -133,6 +134,34 @@ class PublicBookingTest extends TestCase
         $slots = $component->get('availableSlots');
         $this->assertNotContains('10:00', $slots);
         $this->assertContains('10:30', $slots);
+    }
+
+    public function test_same_day_slots_follow_the_clinic_timezone(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-01 20:00:00', 'America/Vancouver'));
+
+        [$clinic, $doctor] = $this->makeClinicWithDoctor([
+            'timezone' => 'America/Vancouver',
+            'settings' => array_merge(Clinic::getDefaultSettings(), [
+                'allow_online_booking' => true,
+                'min_booking_notice' => 0,
+                'max_booking_advance' => 30,
+                'working_days' => [0, 1, 2, 3, 4, 5, 6],
+                'working_hours_start' => '08:00',
+                'working_hours_end' => '21:00',
+                'appointment_duration' => 30,
+            ]),
+        ]);
+
+        $slots = Livewire::test(Booking::class, ['clinic' => $clinic])
+            ->call('selectDoctor', $doctor->id)
+            ->set('selectedDate', '2026-10-01')
+            ->get('availableSlots');
+
+        $this->assertContains('20:30', $slots);
+        $this->assertNotContains('19:00', $slots);
+
+        Carbon::setTestNow();
     }
 
     public function test_submit_creates_patient_and_appointment(): void
