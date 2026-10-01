@@ -7,6 +7,7 @@ use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\Tag;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -130,7 +131,10 @@ class Index extends Component
             return;
         }
 
-        $patient->delete();
+        DB::transaction(function () use ($patient): void {
+            $patient->cancelUpcomingAppointments();
+            $patient->delete();
+        });
 
         session()->flash('success', __('patients.deleted_successfully'));
         $this->dispatch('patientDeleted');

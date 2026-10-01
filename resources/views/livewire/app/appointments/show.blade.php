@@ -468,8 +468,8 @@
                                 <span class="text-indigo-600 dark:text-indigo-400 font-medium text-lg">{{ $appointment->patient->initials }}</span>
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $appointment->patient->full_name }}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $appointment->patient->phone }}</div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $appointment->patient?->full_name }}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $appointment->patient?->phone }}</div>
                             </div>
                         </div>
                         <a href="{{ route('app.patients.show', ['clinic' => $currentClinic->slug, 'patient' => $appointment->patient->id]) }}"
@@ -585,7 +585,7 @@
                                     ? \Carbon\Carbon::parse($appointment->start_time)->format('H:i')
                                     : '';
                                 $waMsg = __('appointments.whatsapp_reminder_message', [
-                                    'patient' => $appointment->patient->first_name,
+                                    'patient' => $appointment->patient?->first_name,
                                     'doctor'  => $appointment->doctor?->name ?? '',
                                     'date'    => $waDate,
                                     'time'    => $waTime,

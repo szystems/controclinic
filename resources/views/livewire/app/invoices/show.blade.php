@@ -82,9 +82,9 @@
                     <div class="grid grid-cols-2 gap-6">
                         <div>
                             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{ __('invoices.patient') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $invoice->patient->full_name ?? '—' }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $invoice->patient?->full_name ?? '—' }}</p>
                             @if($invoice->patient?->email)
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $invoice->patient->email }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $invoice->patient?->email }}</p>
                             @endif
                         </div>
                         @if($invoice->doctor)

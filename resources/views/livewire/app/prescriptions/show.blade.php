@@ -27,7 +27,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
-                {{ $prescription->patient->full_name }}
+                {{ $prescription->patient?->full_name }}
             </a>
         </div>
 
@@ -54,7 +54,7 @@
                             <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('prescriptions.patient') }}</dt>
                             <dd class="font-medium text-gray-900 dark:text-white">
                                 <a href="{{ route('app.patients.show', ['clinic' => $currentClinic->slug, 'patient' => $prescription->patient_id]) }}"
-                                   class="hover:text-indigo-600 dark:hover:text-indigo-400">{{ $prescription->patient->full_name }}</a>
+                                   class="hover:text-indigo-600 dark:hover:text-indigo-400">{{ $prescription->patient?->full_name }}</a>
                             </dd>
                         </div>
                         <div>

@@ -67,12 +67,12 @@
     <div class="info-grid">
         <div class="info-col">
             <div class="section-label">{{ __('invoices.pdf_patient') }}</div>
-            <div style="font-weight:600;">{{ $invoice->patient->full_name ?? '—' }}</div>
+            <div style="font-weight:600;">{{ $invoice->patient?->full_name ?? '—' }}</div>
             @if($invoice->patient?->document_number)
-            <div style="font-size:9px; color:#6b7280;">{{ $invoice->patient->document_number }}</div>
+            <div style="font-size:9px; color:#6b7280;">{{ $invoice->patient?->document_number }}</div>
             @endif
             @if($invoice->patient?->email)
-            <div style="font-size:9px; color:#6b7280;">{{ $invoice->patient->email }}</div>
+            <div style="font-size:9px; color:#6b7280;">{{ $invoice->patient?->email }}</div>
             @endif
         </div>
         @if($invoice->doctor)

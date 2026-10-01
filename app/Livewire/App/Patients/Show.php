@@ -4,6 +4,7 @@ namespace App\Livewire\App\Patients;
 
 use App\Models\Invoice;
 use App\Models\Patient;
+use Illuminate\Support\Facades\DB;
 use App\Models\PatientFile;
 use App\Models\Prescription;
 use App\Models\Tag;
@@ -130,7 +131,10 @@ class Show extends Component
             return;
         }
 
-        $this->patient->delete();
+        DB::transaction(function (): void {
+            $this->patient->cancelUpcomingAppointments();
+            $this->patient->delete();
+        });
 
         session()->flash('success', __('patients.deleted_successfully'));
 

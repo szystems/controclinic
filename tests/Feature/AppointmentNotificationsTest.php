@@ -265,6 +265,23 @@ class AppointmentNotificationsTest extends TestCase
         Bus::assertDispatchedTimes(SendAppointmentNotification::class, 1);
     }
 
+    public function test_notification_job_stops_when_the_patient_was_deleted(): void
+    {
+        Mail::fake();
+
+        $appointment = $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => now()->addHours(12)->toDateString(),
+            'start_time' => now()->addHours(12)->format('H:i'),
+        ]);
+        $appointment->patient->delete();
+
+        (new SendAppointmentNotification($appointment->id, SendAppointmentNotification::TYPE_REMINDER))
+            ->handle();
+
+        Mail::assertNothingSent();
+    }
+
     public function test_reminder_command_continues_when_a_clinic_timezone_is_invalid(): void
     {
         Bus::fake();

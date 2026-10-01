@@ -52,8 +52,8 @@
     <div class="info-grid">
         <div class="info-col">
             <div class="section-label">{{ __('prescriptions.patient') }}</div>
-            <div style="font-size:11px; font-weight:600;">{{ $prescription->patient->full_name }}</div>
-            @if($prescription->patient->birth_date)
+            <div style="font-size:11px; font-weight:600;">{{ $prescription->patient?->full_name }}</div>
+            @if($prescription->patient?->birth_date)
             <div style="font-size:9px; color:#6b7280;">
                 {{ __('patients.birth_date') }}: {{ $prescription->patient->birth_date->format('d/m/Y') }}
             </div>
@@ -128,7 +128,7 @@
         <div class="sig-line">{{ $prescription->doctor?->name ?? __('prescriptions.doctor') }}</div>
     </div>
     <div class="sig-cell">
-        <div class="sig-line">{{ __('prescriptions.patient') }}: {{ $prescription->patient->full_name }}</div>
+        <div class="sig-line">{{ __('prescriptions.patient') }}: {{ $prescription->patient?->full_name }}</div>
     </div>
 </div>
 

@@ -60,6 +60,7 @@ return [
     'cancellation_reason' => 'Motivo de Cancelación',
     'cancelled_by_patient' => 'Cancelado por el paciente',
     'cancelled_by_clinic' => 'Cancelado por la clínica',
+    'cancelled_patient_deleted' => 'Paciente eliminado',
 
     // Recordatorios
     'reminder' => 'Recordatorio',

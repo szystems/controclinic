@@ -49,6 +49,11 @@ class SendAppointmentNotification implements ShouldQueue
 
         $clinic = $appointment->clinic;
         $patient = $appointment->patient;
+
+        if (! $patient || $patient->trashed()) {
+            return;
+        }
+
         $locale = $clinic->locale ?: config('app.locale');
 
         // Switch locale for translations & date formatting

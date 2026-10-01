@@ -39,7 +39,7 @@
                         <td>
                             {{ $a->patient?->first_name }} {{ $a->patient?->last_name }}
                             @if($a->patient?->phone)
-                                <div class="small muted">{{ $a->patient->phone }}</div>
+                                <div class="small muted">{{ $a->patient?->phone }}</div>
                             @endif
                         </td>
                         <td>{{ $a->doctor?->name ?? '—' }}</td>

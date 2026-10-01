@@ -60,6 +60,7 @@ return [
     'cancellation_reason' => 'Cancellation Reason',
     'cancelled_by_patient' => 'Cancelled by patient',
     'cancelled_by_clinic' => 'Cancelled by clinic',
+    'cancelled_patient_deleted' => 'Patient deleted',
 
     // Reminders
     'reminder' => 'Reminder',

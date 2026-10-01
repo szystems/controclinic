@@ -223,6 +223,35 @@ class Patient extends Model
         });
     }
 
+    public function cancelUpcomingAppointments(): void
+    {
+        $now = $this->clinic->localNow();
+        $today = $now->toDateString();
+        $time = $now->format('H:i:s');
+        $reason = __('appointments.cancelled_patient_deleted');
+
+        $this->appointments()
+            ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_CONFIRMED])
+            ->where(function ($query) use ($today, $time) {
+                $query->where('appointment_date', '>', $today)
+                    ->orWhere(function ($query) use ($today, $time) {
+                        $query->whereDate('appointment_date', $today)
+                            ->where(function ($query) use ($time) {
+                                $query->whereNull('start_time')
+                                    ->orWhere('start_time', '>=', $time);
+                            });
+                    });
+            })
+            ->get()
+            ->each(function (Appointment $appointment) use ($reason): void {
+                $appointment->update([
+                    'status' => Appointment::STATUS_CANCELLED,
+                    'cancelled_at' => now(),
+                    'cancellation_reason' => $reason,
+                ]);
+            });
+    }
+
     public function updateLastVisit(): void
     {
         $this->update(['last_visit_at' => now()]);

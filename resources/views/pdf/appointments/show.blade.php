@@ -43,17 +43,17 @@
             </div>
             @if($appointment->patient?->medical_record_number)
                 <div class="info-row"><span class="label">{{ __('patients.medical_record') }}:</span>
-                    <span class="value">{{ $appointment->patient->medical_record_number }}</span>
+                    <span class="value">{{ $appointment->patient?->medical_record_number }}</span>
                 </div>
             @endif
             @if($appointment->patient?->phone)
                 <div class="info-row"><span class="label">{{ __('patients.phone') }}:</span>
-                    <span class="value">{{ $appointment->patient->phone }}</span>
+                    <span class="value">{{ $appointment->patient?->phone }}</span>
                 </div>
             @endif
             @if($appointment->patient?->email)
                 <div class="info-row"><span class="label">{{ __('patients.email') }}:</span>
-                    <span class="value">{{ $appointment->patient->email }}</span>
+                    <span class="value">{{ $appointment->patient?->email }}</span>
                 </div>
             @endif
         </div>

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\SendAppointmentNotification;
+use App\Livewire\App\Patients\Index as PatientsIndex;
 use App\Livewire\App\Patients\Show as PatientsShow;
 use App\Models\Appointment;
 use App\Models\Clinic;
@@ -10,6 +12,7 @@ use App\Models\Patient;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Livewire\Livewire;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -270,5 +273,66 @@ class PatientShowTabsTest extends TestCase
             ->test(PatientsShow::class, ['patient' => $patient])
             ->assertSeeHtml('aria-label="2 records"')
             ->assertSeeHtml('aria-label="1 records"');
+    }
+
+    public function test_deleting_a_patient_cancels_upcoming_appointments_without_email(): void
+    {
+        Bus::fake();
+        [$clinic, $user] = $this->makeClinicWithUser('owner');
+        $patient = $this->makePatient($clinic);
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
+        $local = $clinic->localNow();
+
+        $upcoming = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => $local->copy()->addDay()->toDateString(),
+            'start_time' => '10:00',
+        ]);
+        $past = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+            'status' => Appointment::STATUS_SCHEDULED,
+            'appointment_date' => $local->copy()->subDay()->toDateString(),
+            'start_time' => '10:00',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(PatientsShow::class, ['patient' => $patient])
+            ->call('deletePatient');
+
+        $this->assertSoftDeleted('patients', ['id' => $patient->id]);
+        $this->assertSame(Appointment::STATUS_CANCELLED, $upcoming->fresh()->status);
+        $this->assertSame(__('appointments.cancelled_patient_deleted'), $upcoming->fresh()->cancellation_reason);
+        $this->assertSame(Appointment::STATUS_SCHEDULED, $past->fresh()->status);
+        Bus::assertNotDispatched(SendAppointmentNotification::class);
+    }
+
+    public function test_deleting_from_the_list_also_cancels_upcoming_appointments(): void
+    {
+        Bus::fake();
+        [$clinic, $user] = $this->makeClinicWithUser('owner');
+        $patient = $this->makePatient($clinic);
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
+
+        $upcoming = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+            'status' => Appointment::STATUS_SCHEDULED,
+            'appointment_date' => $clinic->localNow()->addDay()->toDateString(),
+            'start_time' => '11:00',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(PatientsIndex::class, ['clinic' => $clinic])
+            ->call('deletePatient', $patient->id);
+
+        $this->assertSoftDeleted('patients', ['id' => $patient->id]);
+        $this->assertSame(Appointment::STATUS_CANCELLED, $upcoming->fresh()->status);
+        Bus::assertNotDispatched(SendAppointmentNotification::class);
     }
 }
