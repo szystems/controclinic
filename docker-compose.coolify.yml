@@ -60,7 +60,6 @@ services:
         condition: service_healthy
     networks:
       - controclinic_network
-      - coolify
 
   controclinic-webserver:
     build:
