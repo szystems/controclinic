@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Services\ClinicLocaleResolver;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -130,15 +131,15 @@ class Index extends Component
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['nullable', 'string', 'max:100'],
-            'country' => ['nullable', 'string', 'max:2'],
+            'country' => ['nullable', 'string', 'size:2', Rule::in($this->allowedCountries())],
             'website' => ['nullable', 'url', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
 
             // Localization
             'locale' => ['required', 'in:es,en'],
-            'timezone' => ['required', 'string'],
-            'currency' => ['required', 'string', 'size:3'],
-            'date_format' => ['required', 'string'],
+            'timezone' => ['required', 'timezone:all'],
+            'currency' => ['required', 'string', 'size:3', Rule::in($this->allowedCurrencies())],
+            'date_format' => ['required', 'string', Rule::in($this->allowedDateFormats())],
             'time_format' => ['required', 'in:12h,24h'],
             'phone_country_code' => ['nullable', 'string', 'max:5', 'regex:/^[0-9]{1,5}$/'],
 
@@ -195,6 +196,52 @@ class Index extends Component
 
         $this->clinic = $clinic;
         $this->loadClinicData();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowedCountries(): array
+    {
+        $allowed = array_keys(config('clinic_locale.countries', []));
+        $current = $this->clinic->country ?? null;
+        if (is_string($current) && $current !== '' && ! in_array($current, $allowed, true)) {
+            $allowed[] = $current;
+        }
+
+        return $allowed;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowedCurrencies(): array
+    {
+        $allowed = [
+            'USD', 'CAD', 'MXN', 'GTQ', 'HNL', 'NIO', 'CRC', 'PAB',
+            'DOP', 'CUP', 'COP', 'PEN', 'CLP', 'ARS', 'VES', 'BOB',
+            'PYG', 'UYU', 'BRL', 'EUR', 'GBP',
+        ];
+        $current = $this->clinic->currency ?? null;
+        if (is_string($current) && $current !== '' && ! in_array($current, $allowed, true)) {
+            $allowed[] = $current;
+        }
+
+        return $allowed;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowedDateFormats(): array
+    {
+        $allowed = ['d/m/Y', 'm/d/Y', 'Y-m-d', 'd-m-Y'];
+        $current = $this->clinic->settings['date_format'] ?? null;
+        if (is_string($current) && $current !== '' && ! in_array($current, $allowed, true)) {
+            $allowed[] = $current;
+        }
+
+        return $allowed;
     }
 
     public function getCountryOptionsProperty(): array

@@ -264,4 +264,29 @@ class AppointmentNotificationsTest extends TestCase
 
         Bus::assertDispatchedTimes(SendAppointmentNotification::class, 1);
     }
+
+    public function test_reminder_command_continues_when_a_clinic_timezone_is_invalid(): void
+    {
+        Bus::fake();
+
+        $valid = $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => now()->addHours(12)->toDateString(),
+            'start_time' => now()->addHours(12)->format('H:i'),
+        ]);
+
+        $this->makeAppointment([
+            'status' => Appointment::STATUS_CONFIRMED,
+            'appointment_date' => now()->addHours(12)->toDateString(),
+            'start_time' => now()->addHours(12)->format('H:i'),
+        ], ['timezone' => 'Not/AZone']);
+
+        $this->artisan('appointments:send-reminders --hours=24')
+            ->assertSuccessful();
+
+        Bus::assertDispatchedTimes(SendAppointmentNotification::class, 1);
+        Bus::assertDispatched(SendAppointmentNotification::class, function ($job) use ($valid) {
+            return $job->appointmentId === $valid->id;
+        });
+    }
 }

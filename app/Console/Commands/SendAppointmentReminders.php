@@ -41,19 +41,25 @@ class SendAppointmentReminders extends Command
 
         // Filtro fino: cada cita se compara en la zona horaria de SU clínica
         $appointments = $query->get()->filter(function (Appointment $a) use ($hours) {
-            $tz = $a->clinic?->timezone ?? config('app.timezone');
+            try {
+                $tz = $a->clinic?->timezone ?? config('app.timezone');
 
-            $localNow = now($tz);
-            $localTo = $localNow->copy()->addHours($hours);
+                $localNow = now($tz);
+                $localTo = $localNow->copy()->addHours($hours);
 
-            // appointment_date + start_time se interpretan en hora LOCAL de la clínica
-            $apptLocal = Carbon::parse(
-                $a->appointment_date->format('Y-m-d').' '.
-                Carbon::parse($a->start_time)->format('H:i:s'),
-                $tz
-            );
+                // appointment_date + start_time se interpretan en hora LOCAL de la clínica
+                $apptLocal = Carbon::parse(
+                    $a->appointment_date->format('Y-m-d').' '.
+                    Carbon::parse($a->start_time)->format('H:i:s'),
+                    $tz
+                );
 
-            return $apptLocal->betweenIncluded($localNow, $localTo);
+                return $apptLocal->betweenIncluded($localNow, $localTo);
+            } catch (\Throwable $e) {
+                report($e);
+
+                return false;
+            }
         });
 
         $count = $appointments->count();
