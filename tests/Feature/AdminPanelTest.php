@@ -424,4 +424,16 @@ class AdminPanelTest extends TestCase
         // Since we can't easily mock SubscriptionCreated, verify the guard logic directly
         $this->assertEquals($groupPlan->id, $clinic->plan_id);
     }
+
+    public function test_regular_user_cannot_suspend_a_clinic_from_the_admin_component(): void
+    {
+        $user = $this->createRegularUser();
+        $clinic = Clinic::factory()->onboarded()->create(['status' => 'active']);
+
+        Livewire::actingAs($user)
+            ->test(ClinicsShow::class, ['clinic' => $clinic])
+            ->assertForbidden();
+
+        $this->assertSame('active', $clinic->fresh()->status);
+    }
 }

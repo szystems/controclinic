@@ -14,23 +14,27 @@ class Show extends Component
 
     public function mount(Clinic $clinic): void
     {
+        $this->ensureSuperAdmin();
         $this->clinic = $clinic->load(['owner', 'plan', 'users']);
     }
 
     public function suspend(): void
     {
+        $this->ensureSuperAdmin();
         $this->clinic->update(['status' => 'suspended']);
         session()->flash('success', __('admin.clinic_suspended'));
     }
 
     public function activate(): void
     {
+        $this->ensureSuperAdmin();
         $this->clinic->update(['status' => 'active']);
         session()->flash('success', __('admin.clinic_activated'));
     }
 
     public function extendTrial(int $days = 14): void
     {
+        $this->ensureSuperAdmin();
         $this->clinic->update([
             'status' => 'trial',
             'trial_ends_at' => now()->addDays($days),
@@ -40,6 +44,7 @@ class Show extends Component
 
     public function changePlan(int $planId): void
     {
+        $this->ensureSuperAdmin();
         // Kept for backward compatibility but no longer exposed in UI.
         // Use assignManualPlan() instead.
         $plan = Plan::findOrFail($planId);
@@ -93,6 +98,7 @@ class Show extends Component
 
     public function assignManualPlan(int $planId): void
     {
+        $this->ensureSuperAdmin();
         $this->validate([
             'manualPlanReason' => 'required|string|max:500',
         ]);
@@ -118,6 +124,7 @@ class Show extends Component
 
     public function removeManualPlan(): void
     {
+        $this->ensureSuperAdmin();
         $this->clinic->update([
             'is_manual_plan' => false,
             'manual_plan_reason' => null,
@@ -125,6 +132,11 @@ class Show extends Component
 
         $this->clinic->refresh();
         session()->flash('success', __('admin.manual_plan_removed'));
+    }
+
+    private function ensureSuperAdmin(): void
+    {
+        abort_unless(auth()->user()?->is_super_admin, 403);
     }
 
     public function getPatientsCountProperty(): int
