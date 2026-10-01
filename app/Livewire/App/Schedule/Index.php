@@ -55,16 +55,17 @@ class Index extends Component
 
     public function getTargetDoctorProperty(): ?User
     {
-        if (! $this->selectedDoctorId) {
+        $doctorId = $this->resolveDoctorId();
+        if (! $doctorId) {
             return null;
         }
 
-        return User::find($this->selectedDoctorId);
+        return $this->clinic->practitioners()->find($doctorId);
     }
 
     public function getUnavailabilitiesProperty()
     {
-        if (! $this->selectedDoctorId) {
+        if (! $this->resolveDoctorId()) {
             return collect();
         }
 
@@ -78,7 +79,7 @@ class Index extends Component
 
     public function getPastUnavailabilitiesProperty()
     {
-        if (! $this->selectedDoctorId) {
+        if (! $this->resolveDoctorId()) {
             return collect();
         }
 
@@ -114,6 +115,7 @@ class Index extends Component
 
     public function openEdit(string $id): void
     {
+        $this->resolveDoctorId();
         $block = $this->findBlockForCurrentDoctor($id);
         if (! $block) {
             return;
@@ -137,6 +139,7 @@ class Index extends Component
 
     public function save(): void
     {
+        $this->resolveDoctorId();
         $this->validate($this->rules());
 
         $data = [
@@ -169,6 +172,7 @@ class Index extends Component
 
     public function delete(string $id): void
     {
+        $this->resolveDoctorId();
         $block = $this->findBlockForCurrentDoctor($id);
         if (! $block) {
             return;
@@ -180,12 +184,38 @@ class Index extends Component
 
     public function updatedSelectedDoctorId(): void
     {
+        $this->resolveDoctorId();
         $this->showForm = false;
         $this->editingId = null;
         $this->resetForm();
     }
 
     // ==================== HELPERS ====================
+
+    private function resolveDoctorId(): ?int
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return null;
+        }
+
+        if (! $this->canManageOthers) {
+            $this->selectedDoctorId = $user->id;
+
+            return $user->id;
+        }
+
+        $allowed = $this->selectedDoctorId
+            && $this->clinic->practitioners()->whereKey($this->selectedDoctorId)->exists();
+
+        if (! $allowed) {
+            $this->selectedDoctorId = $this->clinic->practitioners()->whereKey($user->id)->exists()
+                ? $user->id
+                : $this->clinic->practitioners()->value('id');
+        }
+
+        return $this->selectedDoctorId;
+    }
 
     private function findBlockForCurrentDoctor(string $id): ?DoctorUnavailability
     {

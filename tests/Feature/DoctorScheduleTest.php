@@ -242,4 +242,24 @@ class DoctorScheduleTest extends TestCase
 
         $this->assertEquals(1, Appointment::count());
     }
+
+    public function test_staff_cannot_block_another_doctors_calendar(): void
+    {
+        $clinic = Clinic::factory()->onboarded()->create();
+        $assistant = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'assistant']);
+        $assistant->assignRole('assistant');
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
+        $doctor->assignRole('doctor');
+
+        Livewire::actingAs($assistant)
+            ->test(ScheduleIndex::class, ['clinic' => $clinic])
+            ->set('selectedDoctorId', $doctor->id)
+            ->set('date_from', '2026-10-10')
+            ->set('date_to', '2026-10-10')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertTrue(DoctorUnavailability::where('doctor_id', $assistant->id)->exists());
+        $this->assertFalse(DoctorUnavailability::where('doctor_id', $doctor->id)->exists());
+    }
 }
