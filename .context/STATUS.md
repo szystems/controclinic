@@ -2,7 +2,7 @@
 
 > **Última actualización:** 2026-10-01
 > **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
-> **Siguiente paso:** HARD-02 (IP real tras Cloudflare, apagado hasta el firewall). Paddle al final.
+> **Siguiente paso:** HARD-03 (límites de 2FA, registro y restablecer). Paddle al final.
 > **Producción:** ✅ `https://controclinic.com`
 
 
@@ -37,12 +37,12 @@ Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` 
 | INF-01 paso 1, INF-02, INF-04 | Cliente MySQL para el respaldo, assets que se refrescan, php-fpm fuera de la red compartida |
 | AUTH-01 a AUTH-08 | Permisos de admin, ajustes, facturación, historial confidencial, horario, ids de otra clínica, solo-lectura y suspender |
 | AUTH-09 | Sin cambio de código: los médicos de una misma clínica ven los pacientes de esa clínica |
-| DATA-01 a DATA-19 y HARD-01 | Lo anterior, más la cuota de almacenamiento y las cabeceras de seguridad |
+| DATA-01 a DATA-19, HARD-01 y HARD-02 | Lo anterior, más cabeceras de seguridad. La IP de Cloudflare está lista y apagada hasta el firewall |
 | Página pública | Pie “Desarrollado por Szystems”, reserva arriba del equipo, puesto visible y foto opcional |
 
 | Pendiente | Quién |
 |-----------|--------|
-| G4 desde HARD-02 y TXT-01 | Agente, un ID por commit |
+| G4 desde HARD-03 y TXT-01 | Agente, un ID por commit |
 | INF-03, INF-05, G0-4 | Paddle, al final |
 | G0-1 panel Coolify, G0-3 firewall, INF-01 paso 2 | Otto |
 
