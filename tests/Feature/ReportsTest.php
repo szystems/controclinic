@@ -224,6 +224,39 @@ class ReportsTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_csv_export_neutralizes_formula_cells(): void
+    {
+        [$clinic, $owner] = $this->makeClinicWithUser('owner');
+        app()->instance('current_clinic', $clinic);
+        view()->share('currentClinic', $clinic);
+
+        $component = Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic]);
+
+        $patient = Patient::factory()->create([
+            'clinic_id' => $clinic->id,
+            'first_name' => '=Ana',
+            'last_name' => 'Lopez',
+        ]);
+
+        Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $owner->id,
+            'appointment_date' => $component->get('dateFrom'),
+            'reason' => '@SUM(1)',
+        ]);
+
+        $component->call('exportCsv')->assertOk();
+
+        $download = data_get($component->effects, 'download');
+        $this->assertNotNull($download);
+        $content = base64_decode($download['content']);
+
+        $this->assertStringContainsString("'=Ana", $content);
+        $this->assertStringContainsString("'@SUM(1)", $content);
+    }
+
     public function test_doctor_without_export_permission_cannot_export(): void
     {
         [$clinic, $doctor] = $this->makeClinicWithUser('doctor');

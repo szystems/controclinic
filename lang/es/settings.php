@@ -151,6 +151,12 @@ return [
         'export_hint' => 'Solo el propietario de la clínica puede descargar los datos. La generación puede tardar unos segundos.',
     ],
 
+    'export' => [
+        'id' => 'ID',
+        'confidential' => 'Confidencial',
+        'deleted' => 'Eliminado',
+    ],
+
     'custom_domain' => [
         'title' => 'Dominio personalizado',
         'subtitle' => 'Conecta tu propio dominio para que tus pacientes accedan al portal de reservas con tu marca.',

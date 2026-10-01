@@ -151,6 +151,12 @@ return [
         'export_hint' => 'Only the clinic owner can download clinic data. Generation may take a few seconds.',
     ],
 
+    'export' => [
+        'id' => 'ID',
+        'confidential' => 'Confidential',
+        'deleted' => 'Deleted',
+    ],
+
     'custom_domain' => [
         'title' => 'Custom domain',
         'subtitle' => 'Connect your own domain so patients access the booking portal under your brand.',

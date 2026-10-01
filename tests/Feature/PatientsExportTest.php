@@ -114,6 +114,27 @@ class PatientsExportTest extends TestCase
         $this->assertStringNotContainsString('TenantB', $content);
     }
 
+    public function test_csv_export_includes_birth_date_and_neutralizes_formulas(): void
+    {
+        [$clinic, $owner] = $this->makeClinicWithUser('owner');
+        Patient::factory()->create([
+            'clinic_id' => $clinic->id,
+            'first_name' => 'Lia',
+            'last_name' => 'Noriega',
+            'phone' => '+52551234',
+            'birth_date' => '1988-03-02',
+        ]);
+
+        $component = Livewire::actingAs($owner)
+            ->test(PatientsIndex::class, ['clinic' => $clinic])
+            ->call('exportCsv')
+            ->assertFileDownloaded();
+
+        $content = $this->downloadContent($component);
+        $this->assertStringContainsString('1988-03-02', $content);
+        $this->assertStringContainsString("'+52551234", $content);
+    }
+
     // ==================== PDF EXPORT (Index list) ====================
 
     public function test_owner_can_export_patients_pdf(): void

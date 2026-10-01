@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\Tag;
+use App\Support\Csv;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -262,15 +263,15 @@ class Index extends Component
             // BOM for Excel UTF-8
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
-            fputcsv($handle, [__('patients.list_title').' — '.$clinic->name]);
-            fputcsv($handle, [__('reports.generated_at'), now()->format('d/m/Y H:i')]);
+            fputcsv($handle, Csv::row([__('patients.list_title').' — '.$clinic->name]));
+            fputcsv($handle, Csv::row([__('reports.generated_at'), now()->format('d/m/Y H:i')]));
             if ($filtersText) {
-                fputcsv($handle, [__('reports.filters'), $filtersText]);
+                fputcsv($handle, Csv::row([__('reports.filters'), $filtersText]));
             }
-            fputcsv($handle, [__('general.total'), $patients->count()]);
+            fputcsv($handle, Csv::row([__('general.total'), $patients->count()]));
             fputcsv($handle, []);
 
-            fputcsv($handle, [
+            fputcsv($handle, Csv::row([
                 __('patients.medical_record_number'),
                 __('patients.first_name'),
                 __('patients.last_name'),
@@ -282,10 +283,10 @@ class Index extends Component
                 __('patients.blood_type'),
                 __('general.status'),
                 __('reports.generated_at'),
-            ]);
+            ]));
 
             foreach ($patients as $p) {
-                fputcsv($handle, [
+                fputcsv($handle, Csv::row([
                     $p->medical_record_number,
                     $p->first_name,
                     $p->last_name,
@@ -297,7 +298,7 @@ class Index extends Component
                     $p->blood_type,
                     $p->is_active ? __('general.active') : __('general.inactive'),
                     optional($p->created_at)->format('Y-m-d H:i'),
-                ]);
+                ]));
             }
 
             fclose($handle);

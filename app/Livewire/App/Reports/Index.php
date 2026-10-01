@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Patient;
 use App\Models\User;
+use App\Support\Csv;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -666,16 +667,16 @@ class Index extends Component
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
             // ── Filter header block ──
-            fputcsv($handle, [__('reports.title').' — '.$this->clinic->name]);
-            fputcsv($handle, [__('reports.generated_at'), now()->format('d/m/Y H:i')]);
-            fputcsv($handle, [__('reports.period'), $this->dateFrom.' → '.$this->dateTo]);
-            fputcsv($handle, [__('general.doctor'), $doctorName]);
-            fputcsv($handle, [__('general.status'), $statusLabel]);
-            fputcsv($handle, [__('appointments.type'), $typeLabel]);
+            fputcsv($handle, Csv::row([__('reports.title').' — '.$this->clinic->name]));
+            fputcsv($handle, Csv::row([__('reports.generated_at'), now()->format('d/m/Y H:i')]));
+            fputcsv($handle, Csv::row([__('reports.period'), $this->dateFrom.' → '.$this->dateTo]));
+            fputcsv($handle, Csv::row([__('general.doctor'), $doctorName]));
+            fputcsv($handle, Csv::row([__('general.status'), $statusLabel]));
+            fputcsv($handle, Csv::row([__('appointments.type'), $typeLabel]));
             fputcsv($handle, []);
 
             // ── Column headers ──
-            fputcsv($handle, [
+            fputcsv($handle, Csv::row([
                 __('reports.col_date'),
                 __('reports.col_time'),
                 __('reports.col_patient'),
@@ -684,10 +685,10 @@ class Index extends Component
                 __('reports.col_status'),
                 __('reports.col_duration'),
                 __('reports.col_reason'),
-            ]);
+            ]));
 
             foreach ($appointments as $appointment) {
-                fputcsv($handle, [
+                fputcsv($handle, Csv::row([
                     $appointment->appointment_date,
                     $appointment->start_time,
                     $appointment->patient?->full_name ?? '—',
@@ -696,15 +697,15 @@ class Index extends Component
                     __('reports.status_'.$appointment->status),
                     $appointment->duration_minutes,
                     $appointment->reason ?? '',
-                ]);
+                ]));
             }
 
             // ── Summary footer ──
             fputcsv($handle, []);
-            fputcsv($handle, [__('reports.total_appointments'), $totals['total']]);
-            fputcsv($handle, [__('reports.completed'), $totals['completed']]);
-            fputcsv($handle, [__('reports.cancelled'), $totals['cancelled']]);
-            fputcsv($handle, [__('reports.no_show'), $totals['no_show']]);
+            fputcsv($handle, Csv::row([__('reports.total_appointments'), $totals['total']]));
+            fputcsv($handle, Csv::row([__('reports.completed'), $totals['completed']]));
+            fputcsv($handle, Csv::row([__('reports.cancelled'), $totals['cancelled']]));
+            fputcsv($handle, Csv::row([__('reports.no_show'), $totals['no_show']]));
 
             fclose($handle);
         };

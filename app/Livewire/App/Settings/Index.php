@@ -4,8 +4,10 @@ namespace App\Livewire\App\Settings;
 
 use App\Models\Clinic;
 use App\Services\ClinicLocaleResolver;
+use App\Support\Csv;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -684,7 +686,7 @@ class Index extends Component
 
         $clinic = $this->clinic;
         $filename = 'datos-clinica-'.$clinic->slug.'-'.now()->format('Y-m-d').'.zip';
-        $tmpPath = storage_path('app/tmp/'.$filename);
+        $tmpPath = storage_path('app/tmp/'.Str::uuid().'-'.$filename);
 
         if (! is_dir(storage_path('app/tmp'))) {
             mkdir(storage_path('app/tmp'), 0755, true);
@@ -694,7 +696,15 @@ class Index extends Component
         $zip->open($tmpPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         // --- Pacientes ---
-        $patientsRows = [['ID', 'Nombre', 'Apellido', 'Correo', 'Teléfono', 'Fecha de nacimiento', 'Registrado']];
+        $patientsRows = [[
+            __('settings.export.id'),
+            __('patients.first_name'),
+            __('patients.last_name'),
+            __('patients.email'),
+            __('patients.phone'),
+            __('patients.birth_date'),
+            __('patients.registered'),
+        ]];
         $clinic->patients()->withTrashed()->get()
             ->each(function ($p) use (&$patientsRows) {
                 $patientsRows[] = [
@@ -703,14 +713,24 @@ class Index extends Component
                     $p->last_name,
                     $p->email ?? '',
                     $p->phone ?? '',
-                    $p->date_of_birth?->format('d/m/Y') ?? '',
+                    $p->birth_date?->format('d/m/Y') ?? '',
                     $p->created_at->format('d/m/Y H:i'),
                 ];
             });
         $zip->addFromString('pacientes.csv', $this->arrayToCsv($patientsRows));
 
         // --- Citas ---
-        $apptRows = [['ID', 'Paciente', 'Doctor', 'Fecha', 'Hora inicio', 'Hora fin', 'Estado', 'Tipo', 'Notas']];
+        $apptRows = [[
+            __('settings.export.id'),
+            __('appointments.patient'),
+            __('appointments.doctor'),
+            __('appointments.date'),
+            __('appointments.start_time'),
+            __('appointments.end_time'),
+            __('general.status'),
+            __('appointments.type'),
+            __('appointments.notes'),
+        ]];
         $clinic->appointments()->withTrashed()->with(['patient', 'doctor'])->get()
             ->each(function ($a) use (&$apptRows) {
                 $apptRows[] = [
@@ -728,7 +748,15 @@ class Index extends Component
         $zip->addFromString('citas.csv', $this->arrayToCsv($apptRows));
 
         // --- Historiales médicos ---
-        $recordRows = [['ID', 'Paciente', 'Doctor', 'Tipo', 'Estado', 'Fecha', 'Confidencial']];
+        $recordRows = [[
+            __('settings.export.id'),
+            __('appointments.patient'),
+            __('appointments.doctor'),
+            __('records.filter_type'),
+            __('general.status'),
+            __('appointments.date'),
+            __('settings.export.confidential'),
+        ]];
         $clinic->medicalRecords()->withTrashed()->with(['patient', 'doctor'])->get()
             ->each(function ($r) use (&$recordRows) {
                 $recordRows[] = [
@@ -738,21 +766,28 @@ class Index extends Component
                     $r->record_type,
                     $r->status,
                     $r->created_at->format('d/m/Y H:i'),
-                    $r->is_confidential ? 'Sí' : 'No',
+                    $r->is_confidential ? __('general.yes') : __('general.no'),
                 ];
             });
         $zip->addFromString('historiales.csv', $this->arrayToCsv($recordRows));
 
         // --- Staff ---
-        $staffRows = [['ID', 'Nombre', 'Correo', 'Rol', 'Estado', 'Registrado']];
-        $clinic->users()->withTrashed()->get()
+        $staffRows = [[
+            __('settings.export.id'),
+            __('general.name'),
+            __('patients.email'),
+            __('staff.role'),
+            __('general.status'),
+            __('patients.registered'),
+        ]];
+        $clinic->users()->withTrashed()->with('roles')->get()
             ->each(function ($u) use (&$staffRows) {
                 $staffRows[] = [
                     $u->id,
                     $u->name,
                     $u->email,
                     $u->getRoleNames()->first() ?? '',
-                    $u->trashed() ? 'eliminado' : 'activo',
+                    $u->trashed() ? __('settings.export.deleted') : __('general.active'),
                     $u->created_at->format('d/m/Y H:i'),
                 ];
             });
@@ -786,7 +821,7 @@ class Index extends Component
         $output = "\xEF\xBB\xBF"; // UTF-8 BOM for Excel
         $f = fopen('php://temp', 'r+');
         foreach ($rows as $row) {
-            fputcsv($f, $row);
+            fputcsv($f, Csv::row($row));
         }
         rewind($f);
         $output .= stream_get_contents($f);
