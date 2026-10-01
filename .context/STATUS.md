@@ -2,7 +2,7 @@
 
 > **Última actualización:** 2026-10-01
 > **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
-> **Siguiente paso:** Paddle (INF-03, INF-05, G0-4), al final. Antes, Otto: enlaces del pie público y, si quiere, el nombre visible de la clínica.
+> **Siguiente paso:** Paddle (INF-03, INF-05, G0-4), al final. El dominio HTTPS del panel de Coolify espera un nombre elegido por Otto.
 > **Producción:** ✅ `https://controclinic.com`
 
 
@@ -38,15 +38,13 @@ Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` 
 | AUTH-01 a AUTH-08 | Permisos de admin, ajustes, facturación, historial confidencial, horario, ids de otra clínica, solo-lectura y suspender |
 | AUTH-09 | Sin cambio de código: los médicos de una misma clínica ven los pacientes de esa clínica |
 | DATA-01 a DATA-19 y HARD-01 a HARD-12 | Lo anterior, más cabeceras, límites de acceso, salud, idioma, SVG, nginx, logs, workers y robots. La IP de Cloudflare sigue apagada hasta el firewall. Las migraciones del arranque no se tocaron |
-| TXT-01 | Textos de pestañas, historial, roles, bienvenida y exportación. Faltan los enlaces vacíos del pie y el nombre guardado de la clínica |
+| TXT-01 | Textos de pestañas, historial, roles, bienvenida y exportación. El pie ya no tiene enlaces vacíos |
 | Página pública | Pie “Desarrollado por Szystems”, reserva arriba del equipo, puesto visible y foto opcional |
 
 | Pendiente | Quién |
 |-----------|--------|
-| Enlaces `href="#"` del pie público | Otto: decir a dónde deben ir |
-| Nombre visible «clinica szarata» | Otto: es el dato guardado, se cambia en Ajustes si quiere mayúsculas |
+| G0-1 dominio HTTPS del panel | Otto: solo si quiere una dirección con candado; el puerto 8000 ya no está abierto al público |
 | INF-03, INF-05, G0-4 | Paddle, al final |
-| G0-1 dominio HTTPS del panel | Otto: elegir el nombre; el puerto 8000 ya no está abierto al público |
 | G0-3 firewall, INF-01 paso 2 | Otto |
 
 ## 🌐 Producción — 2026-09-07
