@@ -170,6 +170,12 @@ class Index extends Component
             return;
         }
 
+        if (! $appointment->canConfirm()) {
+            session()->flash('error', __('general.action_not_allowed'));
+
+            return;
+        }
+
         $appointment->confirm();
         session()->flash('success', __('appointments.appointment_confirmed'));
     }
@@ -184,15 +190,10 @@ class Index extends Component
             return;
         }
 
-        if (! $appointment->canCheckIn() && $appointment->status !== Appointment::STATUS_SCHEDULED) {
+        if (! $appointment->canCheckIn()) {
             session()->flash('error', __('general.action_not_allowed'));
 
             return;
-        }
-
-        // Si está scheduled, primero confirmar
-        if ($appointment->status === Appointment::STATUS_SCHEDULED) {
-            $appointment->confirm();
         }
 
         $appointment->checkIn();
@@ -265,6 +266,12 @@ class Index extends Component
 
         if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        if (! $appointment->canMarkNoShow()) {
+            session()->flash('error', __('general.action_not_allowed'));
 
             return;
         }

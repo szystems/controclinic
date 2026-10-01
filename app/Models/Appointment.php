@@ -321,10 +321,29 @@ class Appointment extends Model
         ]);
     }
 
+    public function canConfirm(): bool
+    {
+        return $this->status === self::STATUS_SCHEDULED;
+    }
+
     public function canCheckIn(): bool
     {
-        return $this->status === self::STATUS_CONFIRMED
-            && $this->appointment_date->isToday();
+        if (! in_array($this->status, [self::STATUS_SCHEDULED, self::STATUS_CONFIRMED], true)) {
+            return false;
+        }
+
+        $today = $this->clinic?->localNow()->toDateString() ?? static::clinicToday();
+
+        return $this->appointment_date?->toDateString() === $today;
+    }
+
+    public function canMarkNoShow(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_SCHEDULED,
+            self::STATUS_CONFIRMED,
+            self::STATUS_WAITING,
+        ], true);
     }
 
     public function canStart(): bool

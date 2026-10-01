@@ -348,7 +348,7 @@
                                                 {{ __('appointments.confirm') }}
                                             </button>
                                             @endif
-                                            @if(in_array($appointment->status, ['scheduled', 'confirmed']))
+                                            @if($appointment->canCheckIn())
                                             <button type="button" wire:click="checkIn('{{ $appointment->id }}')" @click="open=false"
                                                     class="w-full flex items-center gap-2 px-4 py-2 text-sm text-yellow-700 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

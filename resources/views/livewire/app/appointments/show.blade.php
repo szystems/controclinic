@@ -499,7 +499,7 @@
                             </button>
                         @endif
 
-                        @if(in_array($appointment->status, ['scheduled', 'confirmed']))
+                        @if($appointment->canCheckIn())
                             <button wire:click="checkIn"
                                     class="w-full inline-flex justify-center items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-lg font-medium text-xs text-white uppercase tracking-widest hover:bg-yellow-600 transition">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -684,7 +684,7 @@
                         @endif
 
                         {{-- No Show --}}
-                        @if(in_array($appointment->status, ['scheduled', 'confirmed', 'waiting']))
+                        @if($appointment->canMarkNoShow())
                             @can('appointments.edit')
                             <button wire:click="markNoShow"
                                     wire:confirm="{{ __('appointments.confirm_no_show') }}"

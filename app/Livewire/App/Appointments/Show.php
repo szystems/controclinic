@@ -41,6 +41,12 @@ class Show extends Component
             return;
         }
 
+        if (! $this->appointment->canConfirm()) {
+            session()->flash('error', __('general.action_not_allowed'));
+
+            return;
+        }
+
         $this->appointment->confirm();
         $this->appointment->refresh();
         session()->flash('success', __('appointments.appointment_confirmed'));
@@ -50,6 +56,12 @@ class Show extends Component
     {
         if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        if (! $this->appointment->canCheckIn()) {
+            session()->flash('error', __('general.action_not_allowed'));
 
             return;
         }
@@ -158,6 +170,12 @@ class Show extends Component
     {
         if (! auth()->user()->can('appointments.edit')) {
             session()->flash('error', __('general.unauthorized'));
+
+            return;
+        }
+
+        if (! $this->appointment->canMarkNoShow()) {
+            session()->flash('error', __('general.action_not_allowed'));
 
             return;
         }

@@ -191,6 +191,10 @@ class Calendar extends Component
             return ['success' => false, 'message' => __('appointments.not_found')];
         }
 
+        if (! $appointment->isEditable()) {
+            return ['success' => false, 'message' => __('general.action_not_allowed')];
+        }
+
         $startCarbon = Carbon::parse($start);
         $endCarbon = $end ? Carbon::parse($end) : null;
 
@@ -209,7 +213,7 @@ class Calendar extends Component
             $newEndTime = $startCarbon->copy()->addMinutes(30)->format('H:i:s');
         }
 
-        return DB::transaction(function () use ($appointment, $newDate, $newStartTime, $newEndTime, $endCarbon) {
+        return DB::transaction(function () use ($appointment, $newDate, $newStartTime, $newEndTime) {
             User::whereKey($appointment->doctor_id)->lockForUpdate()->first();
 
             $hasConflict = Appointment::query()
@@ -228,10 +232,33 @@ class Calendar extends Component
                 return ['success' => false, 'message' => __('appointments.conflict_detected')];
             }
 
+            $blocks = DoctorUnavailability::query()
+                ->forClinic($this->clinic->id)
+                ->forDoctor((int) $appointment->doctor_id)
+                ->forDate($newDate)
+                ->get();
+
+            foreach ($blocks as $block) {
+                if ($block->blocksSlot($newDate, Carbon::parse($newStartTime)->format('H:i'), Carbon::parse($newEndTime)->format('H:i'))) {
+                    return ['success' => false, 'message' => __('schedule.doctor_unavailable')];
+                }
+            }
+
+            $durationMinutes = (int) Carbon::parse($newDate.' '.$newStartTime)->diffInMinutes(Carbon::parse($newDate.' '.$newEndTime));
+            if ($durationMinutes < 1) {
+                $durationMinutes = (int) ($appointment->duration_minutes ?: 30);
+            }
+
+            $previousDate = $appointment->appointment_date?->toDateString();
+            $previousTime = $appointment->start_time ? Carbon::parse($appointment->start_time)->format('H:i:s') : null;
+            $scheduleChanged = $previousDate !== $newDate || $previousTime !== $newStartTime;
+
             $appointment->update([
                 'appointment_date' => $newDate,
                 'start_time' => $newStartTime,
-                'end_time' => $endCarbon ? $endCarbon->format('H:i:s') : $appointment->end_time,
+                'end_time' => $newEndTime,
+                'duration_minutes' => $durationMinutes,
+                'reminder_sent' => $scheduleChanged ? false : $appointment->reminder_sent,
             ]);
 
             return ['success' => true, 'message' => __('appointments.rescheduled')];

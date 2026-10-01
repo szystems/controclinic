@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Livewire\App\Appointments\Calendar;
 use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\DoctorUnavailability;
 use App\Models\Patient;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -299,5 +300,86 @@ class AppointmentsCalendarTest extends TestCase
         $toMove->refresh();
         // Should not have moved
         $this->assertSame('2026-05-10', $toMove->appointment_date->toDateString());
+    }
+
+    public function test_reschedule_refuses_a_completed_appointment(): void
+    {
+        [$clinic, $user] = $this->makeContext();
+        $this->bindClinic($clinic);
+
+        $patient = Patient::factory()->create(['clinic_id' => $clinic->id]);
+        $appointment = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $user->id,
+            'appointment_date' => '2026-05-10',
+            'start_time' => '09:00:00',
+            'end_time' => '09:30:00',
+            'status' => Appointment::STATUS_COMPLETED,
+        ]);
+
+        $result = Livewire::actingAs($user)
+            ->test(Calendar::class, ['clinic' => $clinic])
+            ->instance()
+            ->rescheduleEvent((string) $appointment->id, '2026-05-12T14:00:00', '2026-05-12T14:30:00');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('2026-05-10', $appointment->fresh()->appointment_date->toDateString());
+    }
+
+    public function test_reschedule_refuses_a_blocked_hour_and_clears_the_reminder(): void
+    {
+        [$clinic, $user] = $this->makeContext();
+        $this->bindClinic($clinic);
+
+        $patient = Patient::factory()->create(['clinic_id' => $clinic->id]);
+        DoctorUnavailability::create([
+            'clinic_id' => $clinic->id,
+            'doctor_id' => $user->id,
+            'date_from' => '2026-05-20',
+            'date_to' => '2026-05-20',
+            'all_day' => true,
+            'created_by' => $user->id,
+        ]);
+
+        $blocked = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $user->id,
+            'appointment_date' => '2026-05-10',
+            'start_time' => '09:00:00',
+            'end_time' => '09:30:00',
+            'status' => Appointment::STATUS_SCHEDULED,
+        ]);
+
+        $result = Livewire::actingAs($user)
+            ->test(Calendar::class, ['clinic' => $clinic])
+            ->instance()
+            ->rescheduleEvent((string) $blocked->id, '2026-05-20T11:00:00', '2026-05-20T11:30:00');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('2026-05-10', $blocked->fresh()->appointment_date->toDateString());
+
+        $movable = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $user->id,
+            'appointment_date' => '2026-05-11',
+            'start_time' => '09:00:00',
+            'end_time' => '09:30:00',
+            'status' => Appointment::STATUS_CONFIRMED,
+            'reminder_sent' => true,
+        ]);
+
+        $moved = Livewire::actingAs($user)
+            ->test(Calendar::class, ['clinic' => $clinic])
+            ->instance()
+            ->rescheduleEvent((string) $movable->id, '2026-05-21T15:00:00', '2026-05-21T16:00:00');
+
+        $this->assertTrue($moved['success']);
+        $fresh = $movable->fresh();
+        $this->assertSame('2026-05-21', $fresh->appointment_date->toDateString());
+        $this->assertSame(60, (int) $fresh->duration_minutes);
+        $this->assertFalse((bool) $fresh->reminder_sent);
     }
 }
