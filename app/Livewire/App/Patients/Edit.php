@@ -4,6 +4,7 @@ namespace App\Livewire\App\Patients;
 
 use App\Models\Patient;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Edit extends Component
@@ -145,7 +146,7 @@ class Edit extends Component
             'emergency_relationship' => ['nullable', 'string', 'max:100'],
             'insurance_provider' => ['nullable', 'string', 'max:255'],
             'insurance_policy_number' => ['nullable', 'string', 'max:100'],
-            'primary_doctor_id' => ['nullable', 'exists:users,id'],
+            'primary_doctor_id' => ['nullable', Rule::exists('users', 'id')->where('clinic_id', $this->patient->clinic_id)],
             'notes' => ['nullable', 'string', 'max:2000'],
             'internal_notes' => ['nullable', 'string', 'max:5000'],
         ];

@@ -4,6 +4,7 @@ namespace App\Livewire\App\Prescriptions;
 
 use App\Models\Patient;
 use App\Models\Prescription;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Create extends Component
@@ -33,7 +34,7 @@ class Create extends Component
     protected function rules(): array
     {
         return [
-            'patientId' => ['required', 'uuid', 'exists:patients,id'],
+            'patientId' => ['required', 'uuid', Rule::exists('patients', 'id')->where(fn ($q) => $q->where('clinic_id', app('current_clinic')->id))],
             'diagnosis' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'internalNotes' => ['nullable', 'string', 'max:1000'],

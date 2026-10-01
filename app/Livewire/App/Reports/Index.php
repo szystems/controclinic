@@ -602,7 +602,7 @@ class Index extends Component
         ];
 
         $doctorName = $this->doctorFilter
-            ? optional(User::find($this->doctorFilter))->name ?? '—'
+            ? optional(User::where('clinic_id', $this->clinic->id)->find($this->doctorFilter))->name ?? '—'
             : __('reports.all_doctors');
 
         $statusLabel = $this->statusFilter

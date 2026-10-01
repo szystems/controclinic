@@ -11,6 +11,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
@@ -323,7 +324,7 @@ class Booking extends Component
         }
 
         $this->validate([
-            'doctor_id' => ['required', 'exists:users,id'],
+            'doctor_id' => ['required', Rule::exists('users', 'id')->where('clinic_id', $this->clinic->id)],
             'selectedDate' => ['required', 'date'],
             'selectedTime' => ['required', 'string'],
             'first_name' => ['required', 'string', 'min:2', 'max:80'],

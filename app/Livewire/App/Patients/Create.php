@@ -5,6 +5,7 @@ namespace App\Livewire\App\Patients;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Create extends Component
@@ -98,7 +99,7 @@ class Create extends Component
             'emergency_relationship' => ['nullable', 'string', 'max:100'],
             'insurance_provider' => ['nullable', 'string', 'max:255'],
             'insurance_policy_number' => ['nullable', 'string', 'max:100'],
-            'primary_doctor_id' => ['nullable', 'exists:users,id'],
+            'primary_doctor_id' => ['nullable', Rule::exists('users', 'id')->where('clinic_id', $this->currentClinic->id)],
             'notes' => ['nullable', 'string', 'max:2000'],
         ];
     }

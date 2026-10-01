@@ -11,6 +11,7 @@ use App\Models\ServiceCatalog;
 use App\Models\User;
 use App\Services\InvoiceService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -60,8 +61,8 @@ class Create extends Component
     protected function rules(): array
     {
         return [
-            'patient_id' => ['required', 'exists:patients,id'],
-            'doctor_id' => ['nullable', 'exists:users,id'],
+            'patient_id' => ['required', Rule::exists('patients', 'id')->where('clinic_id', $this->currentClinic->id)],
+            'doctor_id' => ['nullable', Rule::exists('users', 'id')->where('clinic_id', $this->currentClinic->id)],
             'issued_at' => ['required', 'date'],
             'due_at' => ['nullable', 'date', 'after_or_equal:issued_at'],
             'notes' => ['nullable', 'string', 'max:2000'],

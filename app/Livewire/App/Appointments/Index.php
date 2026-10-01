@@ -343,7 +343,7 @@ class Index extends Component
             $parts[] = __('appointments.status').': '.__('appointments.status_'.$this->status);
         }
         if ($this->doctorId) {
-            $doctor = User::find($this->doctorId);
+            $doctor = User::where('clinic_id', $this->currentClinic->id)->find($this->doctorId);
             if ($doctor) {
                 $parts[] = __('appointments.doctor').': '.$doctor->name;
             }

@@ -8,6 +8,7 @@ use App\Models\DoctorUnavailability;
 use App\Models\Patient;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Edit extends Component
@@ -54,8 +55,8 @@ class Edit extends Component
     protected function rules(): array
     {
         return [
-            'patient_id' => ['required', 'exists:patients,id'],
-            'doctor_id' => ['required', 'exists:users,id'],
+            'patient_id' => ['required', Rule::exists('patients', 'id')->where('clinic_id', $this->currentClinic->id)],
+            'doctor_id' => ['required', Rule::exists('users', 'id')->where('clinic_id', $this->currentClinic->id)],
             'appointment_type' => ['required', 'in:scheduled,walk_in,emergency,follow_up,telemedicine'],
             'appointment_date' => ['required', 'date'],
             'start_time' => ['required_unless:appointment_type,walk_in'],

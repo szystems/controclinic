@@ -9,6 +9,7 @@ use App\Models\ServiceCatalog;
 use App\Models\User;
 use App\Services\InvoiceService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -43,7 +44,7 @@ class Edit extends Component
     protected function rules(): array
     {
         return [
-            'doctor_id' => ['nullable', 'exists:users,id'],
+            'doctor_id' => ['nullable', Rule::exists('users', 'id')->where('clinic_id', $this->currentClinic->id)],
             'issued_at' => ['required', 'date'],
             'due_at' => ['nullable', 'date', 'after_or_equal:issued_at'],
             'notes' => ['nullable', 'string', 'max:2000'],
