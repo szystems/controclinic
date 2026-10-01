@@ -127,7 +127,16 @@ class Appointment extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['status', 'appointment_date', 'start_time', 'doctor_id'])
+            ->logOnly([
+                'status',
+                'appointment_date',
+                'start_time',
+                'end_time',
+                'doctor_id',
+                'patient_id',
+                'appointment_type',
+                'cancellation_reason',
+            ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
