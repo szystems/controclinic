@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Plan;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +30,7 @@ class CheckPlanLimits
             $valid = $subscription && ($subscription->active() || $subscription->onTrial() || $subscription->pastDue());
 
             if (! $valid) {
-                $freePlan = \App\Models\Plan::getFreePlan();
+                $freePlan = Plan::getFreePlan();
                 if ($freePlan) {
                     $clinic->applyPlan($freePlan);
                 } else {

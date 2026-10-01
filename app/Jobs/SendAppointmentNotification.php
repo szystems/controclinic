@@ -8,6 +8,7 @@ use App\Mail\AppointmentCancelled;
 use App\Mail\AppointmentConfirmed;
 use App\Mail\AppointmentReminder;
 use App\Models\Appointment;
+use App\Models\Patient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -50,7 +51,7 @@ class SendAppointmentNotification implements ShouldQueue
         $clinic = $appointment->clinic;
         $patient = $appointment->patient;
 
-        if (! $patient || $patient->trashed()) {
+        if (! $patient instanceof Patient || $patient->trashed()) {
             return;
         }
 

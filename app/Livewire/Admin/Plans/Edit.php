@@ -4,7 +4,6 @@ namespace App\Livewire\Admin\Plans;
 
 use App\Models\Clinic;
 use App\Models\Plan;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Edit extends Component

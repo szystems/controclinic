@@ -4,11 +4,11 @@ namespace App\Livewire\App\Patients;
 
 use App\Models\Invoice;
 use App\Models\Patient;
-use Illuminate\Support\Facades\DB;
 use App\Models\PatientFile;
 use App\Models\Prescription;
 use App\Models\Tag;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Spatie\Activitylog\Models\Activity;
 

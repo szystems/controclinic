@@ -214,6 +214,7 @@ class StaffCustomPermissionsTest extends TestCase
     public function test_owner_can_assign_admin_role(): void
     {
         [$clinic, $owner] = $this->bootstrapClinic();
+        $clinic->update(['max_staff' => 5]);
         $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
         $doctor->assignRole('doctor');
 

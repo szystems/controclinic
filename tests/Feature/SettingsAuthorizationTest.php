@@ -27,6 +27,9 @@ class SettingsAuthorizationTest extends TestCase
         $user->assignRole($role);
         $clinic->update(['owner_id' => $role === 'owner' ? $user->id : User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'owner'])->id]);
 
+        app()->instance('current_clinic', $clinic);
+        view()->share('currentClinic', $clinic);
+
         return [$clinic, $user];
     }
 
@@ -55,6 +58,8 @@ class SettingsAuthorizationTest extends TestCase
         $owner = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'owner']);
         $owner->assignRole('owner');
         $clinic->update(['owner_id' => $owner->id]);
+        app()->instance('current_clinic', $clinic);
+        view()->share('currentClinic', $clinic);
 
         Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic])
@@ -71,6 +76,8 @@ class SettingsAuthorizationTest extends TestCase
         $owner = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'owner']);
         $owner->assignRole('owner');
         $clinic->update(['owner_id' => $owner->id]);
+        app()->instance('current_clinic', $clinic);
+        view()->share('currentClinic', $clinic);
 
         Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic])
@@ -96,6 +103,8 @@ class SettingsAuthorizationTest extends TestCase
         $owner = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'owner']);
         $owner->assignRole('owner');
         $clinic->update(['owner_id' => $owner->id]);
+        app()->instance('current_clinic', $clinic);
+        view()->share('currentClinic', $clinic);
 
         Livewire::actingAs($owner)
             ->test(Index::class, ['clinic' => $clinic])

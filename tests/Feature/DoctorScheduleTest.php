@@ -251,6 +251,9 @@ class DoctorScheduleTest extends TestCase
         $doctor = User::factory()->create(['clinic_id' => $clinic->id, 'role' => 'doctor']);
         $doctor->assignRole('doctor');
 
+        app()->instance('current_clinic', $clinic);
+        view()->share('currentClinic', $clinic);
+
         Livewire::actingAs($assistant)
             ->test(ScheduleIndex::class, ['clinic' => $clinic])
             ->set('selectedDoctorId', $doctor->id)
