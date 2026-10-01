@@ -398,9 +398,17 @@ class PublicBookingTest extends TestCase
             'public_show_doctors' => true,
         ]);
 
-        $this->get('/c/'.$clinic->slug)
+        $content = $this->get('/c/'.$clinic->slug)
             ->assertOk()
-            ->assertSee(__('booking.our_team'), false);
+            ->assertSee(__('booking.our_team'), false)
+            ->getContent();
+
+        $bookingPos = strpos($content, 'id="booking"');
+        $teamPos = strpos($content, __('booking.our_team'));
+
+        $this->assertNotFalse($bookingPos);
+        $this->assertNotFalse($teamPos);
+        $this->assertGreaterThan($bookingPos, $teamPos);
     }
 
     public function test_public_page_hides_doctor_team_when_disabled(): void

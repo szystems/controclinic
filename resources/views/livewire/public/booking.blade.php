@@ -112,45 +112,7 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════ --}}
-    {{-- EQUIPO MÉDICO                                          --}}
-    {{-- ══════════════════════════════════════════════════════ --}}
-    @if($showDoctors)
-    @php
-        $doctors = $clinic->users()
-            ->where(function ($q) {
-                $q->whereHas('roles', fn ($r) => $r->whereIn('name', ['owner', 'doctor']))
-                  ->orWhereIn('role', ['owner', 'doctor']);
-            })
-            ->where('is_active', true)
-            ->get();
-    @endphp
-    @if($doctors->count() > 0)
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-clinic-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            {{ __('booking.our_team') }}
-        </h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            @foreach($doctors as $doctor)
-            <div class="text-center p-4 rounded-lg bg-gray-50 border border-gray-100">
-                <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-lg font-bold"
-                     style="background: linear-gradient(135deg, var(--clinic-primary) 0%, var(--clinic-secondary,#6366f1) 100%)">
-                    {{ mb_strtoupper(mb_substr($doctor->name, 0, 1)) }}
-                </div>
-                <p class="text-sm font-medium text-gray-900 leading-tight">{{ $doctor->name }}</p>
-                @php $role = $doctor->getRoleNames()->first(); @endphp
-                @if($role)
-                    <p class="text-xs text-gray-500 mt-0.5">{{ \Illuminate\Support\Facades\Lang::has('staff.role_'.$role) ? __('staff.role_'.$role) : $role }}</p>
-                @endif
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-    @endif
-
-    {{-- ══════════════════════════════════════════════════════ --}}
-    {{-- BOOKING WIZARD (existente — sin cambios)               --}}
+    {{-- BOOKING WIZARD                                         --}}
     {{-- ══════════════════════════════════════════════════════ --}}
     <div id="booking">
         @if(! $portalDisabled && $this->onlineBookingEnabled && $step < 4)
@@ -484,5 +446,43 @@
     @endif
 
     </div>{{-- end #booking --}}
+
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- EQUIPO MÉDICO (debajo de la reserva)                   --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    @if($showDoctors)
+    @php
+        $doctors = $clinic->users()
+            ->where(function ($q) {
+                $q->whereHas('roles', fn ($r) => $r->whereIn('name', ['owner', 'doctor']))
+                  ->orWhereIn('role', ['owner', 'doctor']);
+            })
+            ->where('is_active', true)
+            ->get();
+    @endphp
+    @if($doctors->count() > 0)
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 mt-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-clinic-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            {{ __('booking.our_team') }}
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach($doctors as $doctor)
+            <div class="text-center p-4 rounded-lg bg-gray-50 border border-gray-100">
+                <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-lg font-bold"
+                     style="background: linear-gradient(135deg, var(--clinic-primary) 0%, var(--clinic-secondary,#6366f1) 100%)">
+                    {{ mb_strtoupper(mb_substr($doctor->name, 0, 1)) }}
+                </div>
+                <p class="text-sm font-medium text-gray-900 leading-tight">{{ $doctor->name }}</p>
+                @php $role = $doctor->getRoleNames()->first(); @endphp
+                @if($role)
+                    <p class="text-xs text-gray-500 mt-0.5">{{ \Illuminate\Support\Facades\Lang::has('staff.role_'.$role) ? __('staff.role_'.$role) : $role }}</p>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+    @endif
 
 </div>
