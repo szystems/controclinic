@@ -31,6 +31,7 @@ return [
     'form_section_diagnoses' => 'Diagnósticos',
     'form_section_prescriptions' => 'Prescripciones',
     'form_section_confidentiality' => 'Confidencialidad',
+    'appointment_not_for_patient' => 'La cita no corresponde a este paciente.',
 
     'field_record_type' => 'Tipo de registro',
     'field_title' => 'Título',

@@ -21,6 +21,7 @@ return [
     'patient' => 'Paciente',
     'doctor' => 'Doctor',
     'appointment' => 'Cita Relacionada',
+    'appointment_not_for_patient' => 'La cita no corresponde a este paciente.',
     'currency' => 'Moneda',
     'notes' => 'Notas',
     'subtotal' => 'Subtotal',

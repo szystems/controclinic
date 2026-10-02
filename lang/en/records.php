@@ -28,6 +28,7 @@ return [
     'form_section_diagnoses' => 'Diagnoses',
     'form_section_prescriptions' => 'Prescriptions',
     'form_section_confidentiality' => 'Confidentiality',
+    'appointment_not_for_patient' => 'That appointment does not belong to this patient.',
 
     'field_record_type' => 'Record type',
     'field_title' => 'Title',

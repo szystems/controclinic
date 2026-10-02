@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Livewire\App\Invoices\Create as InvoicesCreate;
 use App\Livewire\App\Invoices\Index as InvoicesIndex;
 use App\Livewire\App\Invoices\Show as InvoicesShow;
+use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -153,6 +154,64 @@ class InvoicesTest extends TestCase
             'patient_id' => $patient->id,
         ]);
         $this->assertDatabaseHas('invoice_items', ['description' => 'Consulta general']);
+    }
+
+    public function test_create_rejects_an_appointment_from_another_patient(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $other = $this->createPatient($clinic);
+        $appointment = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $other->id,
+            'doctor_id' => $owner->id,
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesCreate::class, ['clinic' => $clinic])
+            ->call('selectPatient', $patient->id, $patient->full_name)
+            ->set('issued_at', now()->toDateString())
+            ->set('appointmentId', $appointment->id)
+            ->set('items.0.description', 'Consulta')
+            ->set('items.0.quantity', 1)
+            ->set('items.0.unit_price', 75)
+            ->set('items.0.tax_rate', 0)
+            ->call('save')
+            ->assertHasErrors(['appointmentId']);
+
+        $this->assertDatabaseMissing('invoices', [
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+        ]);
+    }
+
+    public function test_create_keeps_an_appointment_of_the_same_patient(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner();
+        $patient = $this->createPatient($clinic);
+        $appointment = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $owner->id,
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test(InvoicesCreate::class, ['clinic' => $clinic])
+            ->call('selectPatient', $patient->id, $patient->full_name)
+            ->set('issued_at', now()->toDateString())
+            ->set('appointmentId', $appointment->id)
+            ->set('items.0.description', 'Consulta')
+            ->set('items.0.quantity', 1)
+            ->set('items.0.unit_price', 75)
+            ->set('items.0.tax_rate', 0)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('invoices', [
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'appointment_id' => $appointment->id,
+        ]);
     }
 
     public function test_create_calculates_totals_correctly(): void

@@ -232,11 +232,18 @@ class Create extends Component
             fn ($p) => ! empty($p['drug'])
         ));
 
+        $appointmentId = $this->appointmentBelongingToPatient();
+        if ($this->appointmentId && ! $appointmentId) {
+            $this->addError('appointmentId', __('records.appointment_not_for_patient'));
+
+            return null;
+        }
+
         $record = MedicalRecord::create([
             'clinic_id' => $this->patient->clinic_id,
             'patient_id' => $this->patient->id,
             'doctor_id' => auth()->id(),
-            'appointment_id' => $this->appointmentId,
+            'appointment_id' => $appointmentId,
             'record_type' => $data['recordType'],
             'title' => $data['title'] ?: null,
             'chief_complaint' => $data['chiefComplaint'] ?: null,
@@ -357,5 +364,18 @@ class Create extends Component
         $this->physicalExamination = $template->physical_examination ?? '';
         $this->assessment = $template->assessment ?? '';
         $this->plan = $template->plan ?? '';
+    }
+
+    private function appointmentBelongingToPatient(): ?string
+    {
+        if (! $this->appointmentId) {
+            return null;
+        }
+
+        return Appointment::query()
+            ->where('clinic_id', $this->patient->clinic_id)
+            ->where('patient_id', $this->patient->id)
+            ->whereKey($this->appointmentId)
+            ->value('id');
     }
 }

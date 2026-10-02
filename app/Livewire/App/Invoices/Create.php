@@ -303,9 +303,24 @@ class Create extends Component
         $this->authorize('invoices.create');
         $validated = $this->validate();
 
+        $appointmentId = null;
+        if ($this->appointmentId) {
+            $appointmentId = Appointment::query()
+                ->where('clinic_id', $this->currentClinic->id)
+                ->where('patient_id', $validated['patient_id'])
+                ->whereKey($this->appointmentId)
+                ->value('id');
+
+            if (! $appointmentId) {
+                $this->addError('appointmentId', __('invoices.appointment_not_for_patient'));
+
+                return;
+            }
+        }
+
         $invoiceId = null;
 
-        DB::transaction(function () use ($validated, &$invoiceId) {
+        DB::transaction(function () use ($validated, &$invoiceId, $appointmentId) {
             $service = app(InvoiceService::class);
             $number = $service->nextInvoiceNumber($this->currentClinic);
 
@@ -313,7 +328,7 @@ class Create extends Component
                 'clinic_id' => $this->currentClinic->id,
                 'patient_id' => $validated['patient_id'],
                 'doctor_id' => $validated['doctor_id'] ?: null,
-                'appointment_id' => $this->appointmentId,
+                'appointment_id' => $appointmentId,
                 'created_by' => auth()->id(),
                 'invoice_number' => $number,
                 'issued_at' => $validated['issued_at'],

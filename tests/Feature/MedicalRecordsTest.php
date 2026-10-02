@@ -213,6 +213,50 @@ class MedicalRecordsTest extends TestCase
             ->assertSet('appointmentId', $appointment->id);
     }
 
+    public function test_create_rejects_an_appointment_from_another_patient(): void
+    {
+        [$clinic, $user, $patient] = $this->makeContext();
+        $this->bindClinic($clinic);
+        $other = Patient::factory()->create(['clinic_id' => $clinic->id]);
+        $appointment = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $other->id,
+            'doctor_id' => $user->id,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Create::class, ['patient' => $patient])
+            ->set('recordType', MedicalRecord::TYPE_CONSULTATION)
+            ->set('title', 'Consulta')
+            ->set('appointmentId', $appointment->id)
+            ->call('saveFinal')
+            ->assertHasErrors(['appointmentId']);
+
+        $this->assertSame(0, MedicalRecord::query()->where('clinic_id', $clinic->id)->count());
+    }
+
+    public function test_create_keeps_an_appointment_of_the_same_patient(): void
+    {
+        [$clinic, $user, $patient] = $this->makeContext();
+        $this->bindClinic($clinic);
+        $appointment = Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $user->id,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Create::class, ['patient' => $patient])
+            ->set('recordType', MedicalRecord::TYPE_CONSULTATION)
+            ->set('title', 'Consulta')
+            ->set('appointmentId', $appointment->id)
+            ->call('saveFinal')
+            ->assertHasNoErrors();
+
+        $record = MedicalRecord::query()->where('clinic_id', $clinic->id)->first();
+        $this->assertSame($appointment->id, $record->appointment_id);
+    }
+
     public function test_record_is_not_saved_when_attached_files_exceed_storage(): void
     {
         Storage::fake('local');

@@ -21,6 +21,7 @@ return [
     'patient' => 'Patient',
     'doctor' => 'Doctor',
     'appointment' => 'Related Appointment',
+    'appointment_not_for_patient' => 'That appointment does not belong to this patient.',
     'currency' => 'Currency',
     'notes' => 'Notes',
     'subtotal' => 'Subtotal',
