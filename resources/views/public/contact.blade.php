@@ -1,7 +1,7 @@
 <x-public-layout>
     @php
-        $title = 'Contacto';
-        $description = 'Ponte en contacto con nosotros. Estamos aquí para ayudarte.';
+        $title = __('public.contact_title');
+        $description = __('public.contact_description');
     @endphp
 
     <section class="pt-32 pb-20 lg:pt-40">
@@ -10,10 +10,10 @@
                 {{-- Contact Info --}}
                 <div class="min-w-0">
                     <h1 class="text-4xl font-bold text-gray-900 mb-6">
-                        ¿Cómo podemos ayudarte?
+                        {{ __('public.contact_heading') }}
                     </h1>
                     <p class="text-xl text-gray-600 mb-10">
-                        Ya sea que tengas preguntas sobre nuestros planes, necesites soporte técnico o quieras agendar una demo, estamos aquí para ti.
+                        {{ __('public.contact_intro') }}
                     </p>
 
                     <div class="space-y-6">
@@ -24,9 +24,9 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900">Email</h3>
-                                <p class="text-gray-600">soporte@controclinic.com</p>
-                                <p class="text-sm text-gray-500 mt-1">Respondemos en menos de 24 horas</p>
+                                <h3 class="font-semibold text-gray-900">{{ __('public.contact_email_title') }}</h3>
+                                <p class="text-gray-600">{{ __('public.contact_email_address') }}</p>
+                                <p class="text-sm text-gray-500 mt-1">{{ __('public.contact_email_note') }}</p>
                             </div>
                         </div>
 
@@ -37,9 +37,9 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900">Chat en vivo</h3>
-                                <p class="text-gray-600">Lunes a Viernes, 9am - 6pm</p>
-                                <p class="text-sm text-gray-500 mt-1">Horario de Ciudad de México (GMT-6)</p>
+                                <h3 class="font-semibold text-gray-900">{{ __('public.contact_chat_title') }}</h3>
+                                <p class="text-gray-600">{{ __('public.contact_chat_hours') }}</p>
+                                <p class="text-sm text-gray-500 mt-1">{{ __('public.contact_chat_note') }}</p>
                             </div>
                         </div>
 
@@ -50,19 +50,19 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900">Demo personalizada</h3>
-                                <p class="text-gray-600">Agenda una videollamada</p>
-                                <p class="text-sm text-gray-500 mt-1">Te mostramos cómo funciona en 15 minutos</p>
+                                <h3 class="font-semibold text-gray-900">{{ __('public.contact_demo_title') }}</h3>
+                                <p class="text-gray-600">{{ __('public.contact_demo_body') }}</p>
+                                <p class="text-sm text-gray-500 mt-1">{{ __('public.contact_demo_note') }}</p>
                             </div>
                         </div>
                     </div>
 
                     {{-- FAQ Link --}}
                     <div class="mt-10 p-6 bg-gray-50 rounded-2xl">
-                        <h3 class="font-semibold text-gray-900 mb-2">¿Buscas respuestas rápidas?</h3>
-                        <p class="text-gray-600 mb-4">Revisa nuestra sección de preguntas frecuentes.</p>
+                        <h3 class="font-semibold text-gray-900 mb-2">{{ __('public.contact_faq_title') }}</h3>
+                        <p class="text-gray-600 mb-4">{{ __('public.contact_faq_body') }}</p>
                         <a href="{{ route('pricing') }}#faq" class="text-indigo-600 font-medium hover:text-indigo-700">
-                            Ver FAQ →
+                            {{ __('public.contact_faq_link') }}
                         </a>
                     </div>
                 </div>
@@ -70,70 +70,70 @@
                 {{-- Contact Form --}}
                 <div>
                     <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Envíanos un mensaje</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('public.contact_form_title') }}</h2>
 
                         <form action="#" method="POST" class="space-y-6">
                             @csrf
                             <div class="grid sm:grid-cols-2 gap-6">
                                 <div>
                                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Nombre
+                                        {{ __('public.contact_name') }}
                                     </label>
                                     <input type="text" id="name" name="name" required
                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                                           placeholder="Tu nombre">
+                                           placeholder="{{ __('public.contact_name_placeholder') }}">
                                 </div>
                                 <div>
                                     <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Email
+                                        {{ __('public.contact_email') }}
                                     </label>
                                     <input type="email" id="email" name="email" required
                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                                           placeholder="tu@email.com">
+                                           placeholder="{{ __('public.contact_email_placeholder') }}">
                                 </div>
                             </div>
 
                             <div>
                                 <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Asunto
+                                    {{ __('public.contact_subject') }}
                                 </label>
                                 <select id="subject" name="subject"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                                    <option value="">Selecciona un asunto</option>
-                                    <option value="sales" {{ request('subject') == 'enterprise' ? 'selected' : '' }}>Ventas / Precios</option>
-                                    <option value="support">Soporte técnico</option>
-                                    <option value="demo">Solicitar demo</option>
-                                    <option value="partnership">Alianzas / Partnership</option>
-                                    <option value="other">Otro</option>
+                                    <option value="">{{ __('public.contact_subject_placeholder') }}</option>
+                                    <option value="sales" {{ request('subject') == 'enterprise' ? 'selected' : '' }}>{{ __('public.contact_subject_sales') }}</option>
+                                    <option value="support">{{ __('public.contact_subject_support') }}</option>
+                                    <option value="demo">{{ __('public.contact_subject_demo') }}</option>
+                                    <option value="partnership">{{ __('public.contact_subject_partnership') }}</option>
+                                    <option value="other">{{ __('public.contact_subject_other') }}</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label for="clinic_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Nombre de la clínica <span class="text-gray-400">(opcional)</span>
+                                    {{ __('public.contact_clinic') }} <span class="text-gray-400">{{ __('public.contact_clinic_optional') }}</span>
                                 </label>
                                 <input type="text" id="clinic_name" name="clinic_name"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                                       placeholder="Mi Clínica">
+                                       placeholder="{{ __('public.contact_clinic_placeholder') }}">
                             </div>
 
                             <div>
                                 <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Mensaje
+                                    {{ __('public.contact_message') }}
                                 </label>
                                 <textarea id="message" name="message" rows="5" required
                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
-                                          placeholder="¿En qué podemos ayudarte?"></textarea>
+                                          placeholder="{{ __('public.contact_message_placeholder') }}"></textarea>
                             </div>
 
                             <button type="submit"
                                     class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors">
-                                Enviar mensaje
+                                {{ __('public.contact_submit') }}
                             </button>
 
                             <p class="text-sm text-gray-500 text-center">
-                                Al enviar, aceptas nuestra
-                                <a href="#" class="text-indigo-600 hover:underline">política de privacidad</a>.
+                                {{ __('public.contact_privacy_notice') }}
+                                <a href="{{ route('privacy') }}" class="text-indigo-600 hover:underline">{{ __('public.contact_privacy_link') }}</a>.
                             </p>
                         </form>
                     </div>

@@ -164,7 +164,22 @@ class PublicLandingTest extends TestCase
     public function test_contact_page_renders_ok(): void
     {
         $this->get(route('contact'))
-            ->assertOk();
+            ->assertOk()
+            ->assertSee(__('public.contact_submit'), false)
+            ->assertSee(route('privacy'), false)
+            ->assertDontSee('href="#"', false);
+    }
+
+    public function test_contact_page_follows_the_english_locale(): void
+    {
+        $this->get('/lang/en');
+
+        $this->get(route('contact'))
+            ->assertOk()
+            ->assertSee('Send us a message', false)
+            ->assertSee('privacy policy', false)
+            ->assertSee(route('privacy'), false)
+            ->assertDontSee('Envíanos un mensaje', false);
     }
 
     // ==================== SITEMAP / ROBOTS ====================
