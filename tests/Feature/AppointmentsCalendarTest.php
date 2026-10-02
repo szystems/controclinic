@@ -198,8 +198,8 @@ class AppointmentsCalendarTest extends TestCase
     public function test_reschedule_event_blocked_when_user_lacks_permission(): void
     {
         [$clinic, $user] = $this->makeContext('receptionist');
-        // receptionist has appointments.view but check whether edit is granted; if granted skip — use bare user
-        $bare = User::factory()->create(['clinic_id' => $clinic->id]);
+        $viewer = User::factory()->create(['clinic_id' => $clinic->id]);
+        $viewer->givePermissionTo('appointments.view');
         $this->bindClinic($clinic);
 
         $patient = Patient::factory()->create(['clinic_id' => $clinic->id]);
@@ -211,7 +211,7 @@ class AppointmentsCalendarTest extends TestCase
             'start_time' => '09:00:00',
         ]);
 
-        $component = Livewire::actingAs($bare)->test(Calendar::class, ['clinic' => $clinic]);
+        $component = Livewire::actingAs($viewer)->test(Calendar::class, ['clinic' => $clinic]);
         $result = $component->instance()->rescheduleEvent(
             (string) $appointment->id,
             '2026-05-12T14:00:00'
@@ -381,5 +381,45 @@ class AppointmentsCalendarTest extends TestCase
         $this->assertSame('2026-05-21', $fresh->appointment_date->toDateString());
         $this->assertSame(60, (int) $fresh->duration_minutes);
         $this->assertFalse((bool) $fresh->reminder_sent);
+    }
+
+    public function test_user_without_appointment_permission_cannot_open_the_calendar(): void
+    {
+        [$clinic] = $this->makeContext();
+        $member = User::factory()->create(['clinic_id' => $clinic->id]);
+
+        $this->actingAs($member)
+            ->get("/app/{$clinic->slug}/appointments/calendar")
+            ->assertForbidden();
+
+        Livewire::actingAs($member)
+            ->test(Calendar::class, ['clinic' => $clinic])
+            ->assertForbidden();
+    }
+
+    public function test_fetch_events_includes_contact_details_for_viewers(): void
+    {
+        [$clinic, $user] = $this->makeContext();
+        $this->bindClinic($clinic);
+        $patient = Patient::factory()->create([
+            'clinic_id' => $clinic->id,
+            'email' => 'paciente@example.com',
+            'phone' => '5551234567',
+        ]);
+        Appointment::factory()->create([
+            'clinic_id' => $clinic->id,
+            'patient_id' => $patient->id,
+            'doctor_id' => $user->id,
+            'appointment_date' => '2026-05-10',
+            'start_time' => '10:00:00',
+        ]);
+
+        $events = Livewire::actingAs($user)
+            ->test(Calendar::class, ['clinic' => $clinic])
+            ->instance()
+            ->fetchEvents('2026-05-01', '2026-05-31');
+
+        $this->assertSame('paciente@example.com', $events[0]['extendedProps']['email']);
+        $this->assertSame('5551234567', $events[0]['extendedProps']['phone']);
     }
 }

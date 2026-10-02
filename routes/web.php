@@ -295,7 +295,7 @@ Route::prefix('app/{clinic}')
                 // Appointments
                 Route::prefix('appointments')->name('appointments.')->group(function () {
                     Route::get('/', AppointmentsIndex::class)->name('index');
-                    Route::get('/calendar', AppointmentsCalendar::class)->name('calendar');
+                    Route::get('/calendar', AppointmentsCalendar::class)->middleware('can:appointments.view')->name('calendar');
                     Route::get('/schedule', AppointmentsSchedule::class)->name('schedule');
 
                     // Write routes (require canWrite) — must come BEFORE /{appointment} catch-all

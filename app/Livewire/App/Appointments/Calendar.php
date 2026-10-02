@@ -27,6 +27,8 @@ class Calendar extends Component
 
     public function mount(Clinic $clinic): void
     {
+        abort_unless(auth()->user()?->can('appointments.view'), 403);
+
         $this->clinic = $clinic;
         $this->clinicSlug = $clinic->slug;
     }
@@ -59,6 +61,8 @@ class Calendar extends Component
      */
     public function fetchEvents(string $start, string $end): array
     {
+        abort_unless(auth()->user()?->can('appointments.view'), 403);
+
         $startDate = Carbon::parse($start)->startOfDay();
         $endDate = Carbon::parse($end)->endOfDay();
 
