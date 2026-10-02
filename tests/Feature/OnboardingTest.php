@@ -178,4 +178,38 @@ class OnboardingTest extends TestCase
         $this->assertSame('CA', $clinic->country);
         $this->assertSame('+1 6045551234', $clinic->phone);
     }
+
+    #[Test]
+    public function doctor_cannot_open_or_change_onboarding(): void
+    {
+        [$clinic] = $this->makeClinicWithOwner(['city' => 'Langford']);
+        $doctor = User::factory()->create(['clinic_id' => $clinic->id]);
+        $doctor->assignRole('doctor');
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($doctor)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->assertForbidden();
+
+        $clinic->refresh();
+        $this->assertSame('Langford', $clinic->city);
+        $this->assertNull($clinic->onboarding_completed_at);
+    }
+
+    #[Test]
+    public function finished_onboarding_redirects_the_owner_to_the_dashboard(): void
+    {
+        [$clinic, $owner] = $this->makeClinicWithOwner([
+            'onboarding_completed_at' => now(),
+            'city' => 'Langford',
+        ]);
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->assertRedirect(route('app.dashboard', $clinic->slug));
+
+        $clinic->refresh();
+        $this->assertSame('Langford', $clinic->city);
+    }
 }

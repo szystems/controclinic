@@ -250,7 +250,7 @@ Route::prefix('app/{clinic}')
     ->name('app.')
     ->group(function () {
         // Onboarding (accessible before onboarding is completed)
-        Route::prefix('onboarding')->name('onboarding.')->group(function () {
+        Route::prefix('onboarding')->name('onboarding.')->middleware('can:settings.edit')->group(function () {
             Route::get('/', Index::class)->name('index');
         });
 

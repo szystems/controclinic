@@ -110,6 +110,13 @@ class Index extends Component
     public function mount(Clinic $clinic): void
     {
         $this->clinic = $clinic;
+        $this->ensureCanManageOnboarding();
+
+        if ($clinic->onboarding_completed_at) {
+            $this->redirect(route('app.dashboard', $clinic->slug), navigate: true);
+
+            return;
+        }
 
         // Parse phone
         $this->parsePhone($clinic->phone);
@@ -154,6 +161,17 @@ class Index extends Component
         $this->weekend_shift2_end = $settings['weekend_shift2_end'] ?? '17:00';
 
         $this->selectedPlan = $clinic->plan_type ?? 'free';
+    }
+
+    private function ensureCanManageOnboarding(): void
+    {
+        abort_unless(auth()->user()?->can('settings.edit'), 403);
+    }
+
+    private function ensureOnboardingWritable(): void
+    {
+        $this->ensureCanManageOnboarding();
+        abort_if($this->clinic->fresh()->onboarding_completed_at, 403);
     }
 
     private function parsePhone(?string $phone): void
@@ -210,6 +228,7 @@ class Index extends Component
 
     public function nextStep(): void
     {
+        $this->ensureOnboardingWritable();
         $this->validateCurrentStep();
         $this->saveCurrentStep();
 
@@ -229,6 +248,7 @@ class Index extends Component
 
     public function completeOnboarding(): void
     {
+        $this->ensureOnboardingWritable();
         $updateData = ['onboarding_completed_at' => now()];
 
         // Save desired plan preference for when billing is available
@@ -245,6 +265,7 @@ class Index extends Component
 
     public function skipOnboarding(): void
     {
+        $this->ensureOnboardingWritable();
         $this->clinic->update([
             'onboarding_completed_at' => now(),
         ]);
@@ -261,6 +282,8 @@ class Index extends Component
 
     public function removeLogo(): void
     {
+        $this->ensureOnboardingWritable();
+
         if ($this->currentLogo && Storage::disk('public')->exists($this->currentLogo)) {
             Storage::disk('public')->delete($this->currentLogo);
         }
@@ -404,6 +427,8 @@ class Index extends Component
 
     public function refineTimezoneFromBrowser(string $timezone): void
     {
+        $this->ensureCanManageOnboarding();
+
         if ($this->browserTimezoneRefined || $this->clinic->onboarding_completed_at) {
             return;
         }
