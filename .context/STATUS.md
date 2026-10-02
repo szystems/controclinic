@@ -1,6 +1,6 @@
 # 📊 Estado Actual del Proyecto
 
-> **Última actualización:** 2026-10-01
+> **Última actualización:** 2026-10-02
 > **Fase actual:** **Fase D** (Paddle sandbox) · auditoría 2026-10-01 en curso
 > **Siguiente paso:** Paddle (INF-03, INF-05, G0-4), al final.
 > **Producción:** ✅ `https://controclinic.com`
@@ -37,14 +37,15 @@ Detalle y orden: [AUDIT-2026-10-01.md](AUDIT-2026-10-01.md). `develop` y `main` 
 | INF-01 paso 1, INF-02, INF-04 | Cliente MySQL para el respaldo, assets que se refrescan, php-fpm fuera de la red compartida |
 | AUTH-01 a AUTH-08 | Permisos de admin, ajustes, facturación, historial confidencial, horario, ids de otra clínica, solo-lectura y suspender |
 | AUTH-09 | Sin cambio de código: los médicos de una misma clínica ven los pacientes de esa clínica |
-| DATA-01 a DATA-19 y HARD-01 a HARD-12 | Lo anterior, más cabeceras, límites de acceso, salud, idioma, SVG, nginx, logs, workers y robots. La IP de Cloudflare sigue apagada hasta el firewall. Las migraciones del arranque no se tocaron |
+| DATA-01 a DATA-19 y HARD-01 a HARD-12 | Lo anterior, más cabeceras, límites de acceso, salud, idioma, SVG, nginx, logs, workers y robots. La IP de Cloudflare queda apagada en los contenedores actuales y en `true` en Coolify para el próximo deploy. Las migraciones del arranque no se tocaron |
+| G0-3 | Puertos 80/443 del VPS solo aceptan conexiones nuevas desde Cloudflare. El panel y los sitios que apuntaban directo al servidor quedaron detrás del proxy |
 | TXT-01 | Textos de pestañas, historial, roles, bienvenida y exportación. El pie ya no tiene enlaces vacíos |
 | Página pública | Pie “Desarrollado por Szystems”, reserva arriba del equipo, puesto visible y foto opcional |
 
 | Pendiente | Quién |
 |-----------|--------|
 | INF-03, INF-05, G0-4 | Paddle, al final |
-| G0-3 firewall, INF-01 paso 2 | Otto |
+| INF-01 paso 2 | Otto |
 
 ## 🌐 Producción — 2026-09-07
 
