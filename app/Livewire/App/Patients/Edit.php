@@ -76,6 +76,8 @@ class Edit extends Component
 
     public function mount(Patient $patient): void
     {
+        abort_unless(auth()->user()?->can('patients.edit'), 403);
+
         // Tenant isolation
         abort_if($patient->clinic_id !== app('current_clinic')->id, 404);
 
