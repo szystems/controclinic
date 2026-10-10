@@ -63,6 +63,29 @@ class PublicLandingTest extends TestCase
             ->assertSee(__('public.custom_plan_title'), false);
     }
 
+    public function test_pricing_cards_list_the_same_clinical_tools_on_every_plan(): void
+    {
+        $this->get(route('pricing'))
+            ->assertOk()
+            ->assertSee(__('features.booking'), false)
+            ->assertSee(__('features.prescriptions'), false)
+            ->assertSee(__('features.row_invoices'), false)
+            ->assertSee(__('features.row_email_reminders'), false)
+            ->assertSee(__('features.row_audit_log'), false)
+            ->assertSee(__('features.storage_mb', ['count' => 500]), false)
+            ->assertSee(__('features.storage_unlimited'), false)
+            ->assertDontSee('Booking avanzado', false)
+            ->assertDontSee('Advanced booking', false)
+            ->assertDontSee('Portal multi-doctor', false);
+
+        $free = Plan::where('slug', 'free')->firstOrFail();
+        $practica = Plan::where('slug', 'practica')->firstOrFail();
+
+        $this->assertTrue($free->getComparisonValue('row_booking'));
+        $this->assertTrue($free->getComparisonValue('row_prescriptions'));
+        $this->assertSame($free->features, $practica->features);
+    }
+
     public function test_pricing_cards_show_doctor_limits_from_database(): void
     {
         $this->get(route('pricing'))

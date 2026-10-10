@@ -66,8 +66,8 @@ class PlanLimitsTest extends TestCase
         [$clinic, $user] = $this->createClinicWithOwner('free');
         $patient = Patient::factory()->create(['clinic_id' => $clinic->id]);
 
-        // Free plan allows 5 appointments/month
-        Appointment::factory()->count(5)->create([
+        // Free plan allows 20 appointments/month
+        Appointment::factory()->count(20)->create([
             'clinic_id' => $clinic->id,
             'patient_id' => $patient->id,
             'doctor_id' => $user->id,
@@ -192,7 +192,7 @@ class PlanLimitsTest extends TestCase
         $limits = $clinic->getPlanLimits();
 
         $this->assertEquals(25, $limits['max_patients']);
-        $this->assertEquals(5, $limits['max_appointments_per_month']);
+        $this->assertEquals(20, $limits['max_appointments_per_month']);
         $this->assertEquals(1, $limits['max_doctors']);
         $this->assertEquals(1, $limits['max_staff']);
     }
@@ -303,18 +303,18 @@ class PlanLimitsTest extends TestCase
     {
         [$clinic, $user] = $this->createClinicWithOwner('free');
 
-        $this->assertTrue($clinic->hasFeature('basic_forms'));
-        $this->assertTrue($clinic->hasFeature('basic_portal'));
-        $this->assertFalse($clinic->hasFeature('ai'));
+        $this->assertTrue($clinic->hasFeature('booking'));
+        $this->assertTrue($clinic->hasFeature('prescriptions'));
+        $this->assertFalse($clinic->hasFeature('custom_domain'));
     }
 
-    public function test_solo_plan_has_ai_feature(): void
+    public function test_solo_plan_has_the_same_clinical_tools_as_free(): void
     {
         [$clinic, $user] = $this->createClinicWithOwner('solo');
 
-        $this->assertTrue($clinic->hasFeature('ai'));
         $this->assertTrue($clinic->hasFeature('booking'));
-        $this->assertFalse($clinic->hasFeature('api'));
+        $this->assertTrue($clinic->hasFeature('medical_records'));
+        $this->assertFalse($clinic->hasFeature('custom_domain'));
     }
 
     // ===== Dashboard: shows usage stats =====

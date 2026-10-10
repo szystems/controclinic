@@ -323,11 +323,11 @@ class Clinic extends Model
     {
         return [
             'max_patients' => 25,
-            'max_appointments_per_month' => 5,
+            'max_appointments_per_month' => 20,
             'max_doctors' => 1,
             'max_staff' => 1,
             'max_storage_bytes' => 524288000,
-            'features' => ['basic_forms', 'basic_portal'],
+            'features' => Plan::CLINICAL_FEATURE_KEYS,
         ];
     }
 

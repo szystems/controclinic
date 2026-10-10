@@ -19,7 +19,7 @@ class ClinicTest extends TestCase
         $limits = $clinic->getPlanLimits();
 
         $this->assertEquals(25, $limits['max_patients']);
-        $this->assertEquals(5, $limits['max_appointments_per_month']);
+        $this->assertEquals(20, $limits['max_appointments_per_month']);
         $this->assertEquals(1, $limits['max_doctors']);
         $this->assertEquals(0, $limits['max_staff']);
     }
@@ -94,17 +94,18 @@ class ClinicTest extends TestCase
     {
         $freeClinic = Clinic::factory()->withPlan('free')->create();
         $soloClinic = Clinic::factory()->withPlan('solo')->create();
-        $groupClinic = Clinic::factory()->withPlan('group')->create();
+        $groupClinic = Clinic::factory()->withPlan('practica')->create();
 
-        $this->assertTrue($freeClinic->hasFeature('basic_forms'));
-        $this->assertFalse($freeClinic->hasFeature('ai'));
+        $this->assertTrue($freeClinic->hasFeature('booking'));
+        $this->assertTrue($freeClinic->hasFeature('prescriptions'));
+        $this->assertFalse($freeClinic->hasFeature('custom_domain'));
 
-        $this->assertTrue($soloClinic->hasFeature('ai'));
-        $this->assertTrue($soloClinic->hasFeature('custom_portal'));
-        $this->assertFalse($soloClinic->hasFeature('api'));
+        $this->assertTrue($soloClinic->hasFeature('booking'));
+        $this->assertTrue($soloClinic->hasFeature('medical_records'));
+        $this->assertFalse($soloClinic->hasFeature('custom_domain'));
 
         $this->assertTrue($groupClinic->hasFeature('audit_logs'));
-        $this->assertTrue($groupClinic->hasFeature('multi_doctor_portal'));
+        $this->assertTrue($groupClinic->hasFeature('booking'));
     }
 
     public function test_is_on_trial_returns_correct_value(): void

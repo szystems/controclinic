@@ -11,20 +11,37 @@ class Plan extends Model
     use HasFactory;
 
     /**
-     * Features shown on public pricing (v1 — exclude roadmap items like AI, SMS, API).
+     * Clinical tools every plan includes. Seat, patient, appointment and storage
+     * limits are the only differences between Free, Solo, Práctica and Clínica.
+     *
+     * @var list<string>
+     */
+    public const CLINICAL_FEATURE_KEYS = [
+        'booking',
+        'medical_records',
+        'prescriptions',
+        'invoices',
+        'reports',
+        'email_reminders',
+        '2fa',
+        'audit_logs',
+    ];
+
+    /**
+     * Features shown on public pricing. Excludes unimplemented items (AI, SMS, API).
      *
      * @var list<string>
      */
     public const V1_FEATURE_KEYS = [
-        'basic_forms',
-        'basic_portal',
-        'custom_portal',
-        'multi_doctor_portal',
         'booking',
-        'booking_advanced',
-        'audit_logs',
+        'medical_records',
+        'prescriptions',
+        'invoices',
+        'reports',
+        'email_reminders',
         '2fa',
-        'compliance',
+        'audit_logs',
+        'custom_domain',
     ];
 
     /**
@@ -39,9 +56,17 @@ class Plan extends Model
             'row_staff',
             'row_patients',
             'row_appointments',
+            'row_storage',
+            'row_booking',
             'row_medical_records',
             'row_prescriptions',
+            'row_invoices',
+            'row_patient_files',
             'row_reports',
+            'row_email_reminders',
+            'row_2fa',
+            'row_audit_log',
+            'row_custom_branding',
             'row_email_support',
         ];
     }
@@ -388,6 +413,12 @@ class Plan extends Model
             $items[] = __('features.appointments_count', ['count' => $this->max_appointments_per_month]);
         }
 
+        if ($this->max_storage_bytes === null) {
+            $items[] = __('features.storage_unlimited');
+        } elseif ($this->max_storage_bytes > 0) {
+            $items[] = __('features.storage_mb', ['count' => (int) round($this->max_storage_bytes / 1048576)]);
+        }
+
         foreach ($this->v1FeatureKeys() as $featureKey) {
             $translated = $this->translateFeatureKey($featureKey);
             if ($translated) {
@@ -436,21 +467,28 @@ class Plan extends Model
             'row_appointments' => $this->max_appointments_per_month === null
                 ? __('features.appointments_unlimited')
                 : (string) $this->max_appointments_per_month,
+            'row_storage' => $this->max_storage_bytes === null
+                ? __('features.storage_unlimited')
+                : __('features.storage_mb', ['count' => (int) round(((int) $this->max_storage_bytes) / 1048576)]),
             'row_medical_records' => true,
-            'row_prescriptions' => ! $this->is_free,
+            'row_prescriptions' => true,
+            'row_invoices' => true,
+            'row_patient_files' => true,
             'row_reports' => true,
+            'row_email_reminders' => true,
+            'row_2fa' => true,
+            'row_audit_log' => true,
+            'row_custom_branding' => true,
             'row_email_support' => true,
-            // Legacy rows (kept for backwards compatibility if referenced elsewhere)
+            // These modules exist on every plan. The plan only changes the limits above.
             'row_users' => $this->total_users === null
                 ? __('features.users_unlimited')
                 : (string) $this->total_users,
-            'row_email_reminders' => $this->hasFeature('booking') || $this->hasFeature('booking_advanced'),
             'row_sms_reminders' => false,
             'row_whatsapp_reminders' => false,
-            'row_booking' => $this->hasFeature('booking') || $this->hasFeature('booking_advanced'),
+            'row_booking' => true,
             'row_basic_reports' => true,
-            'row_advanced_reports' => $this->hasFeature('audit_logs'),
-            'row_custom_branding' => $this->hasFeature('custom_portal') || $this->hasFeature('multi_doctor_portal'),
+            'row_advanced_reports' => true,
             'row_api' => false,
             'row_white_label' => false,
             'row_priority_support' => false,
