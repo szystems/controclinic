@@ -336,6 +336,7 @@ class Index extends Component
     {
         return view('livewire.app.appointments.index', [
             'appointments' => $this->appointments,
+            'todayCount' => $this->todayCount,
             'doctors' => $this->doctors,
             'statuses' => [
                 Appointment::STATUS_SCHEDULED => __('appointments.status_scheduled'),
