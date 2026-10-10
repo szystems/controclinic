@@ -73,6 +73,14 @@ class ClinicLocalDateTest extends TestCase
         $this->assertNotNull($patient->nextUpcomingAppointment);
         $this->assertCount(1, $patient->getUpcomingAppointments());
 
+        $listed = Patient::query()
+            ->where('clinic_id', $clinic->id)
+            ->with('nextUpcomingAppointment')
+            ->get()
+            ->firstWhere('first_name', 'Octubre');
+
+        $this->assertNotNull($listed->nextUpcomingAppointment);
+
         $birthdays = Livewire::actingAs($owner)
             ->test(Dashboard::class, ['clinic' => $clinic])
             ->instance()

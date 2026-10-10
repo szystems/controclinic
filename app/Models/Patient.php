@@ -105,9 +105,24 @@ class Patient extends Model
     {
         return $this->hasOne(Appointment::class)
             ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_CONFIRMED])
-            ->where('appointment_date', '>=', $this->clinic->localNow()->toDateString())
+            ->where('appointment_date', '>=', $this->clinicLocalDate())
             ->orderBy('appointment_date')
             ->orderBy('start_time');
+    }
+
+    /**
+     * Clinic-local date used inside relationship constraints.
+     * Eager loading calls the relationship on a blank model, which has no clinic.
+     */
+    protected function clinicLocalDate(): string
+    {
+        $clinic = $this->clinic_id ? $this->clinic : null;
+
+        if ($clinic === null && app()->bound('current_clinic')) {
+            $clinic = app('current_clinic');
+        }
+
+        return ($clinic?->localNow() ?? now())->toDateString();
     }
 
     public function medicalRecords(): HasMany
