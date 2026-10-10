@@ -141,6 +141,14 @@ class Index extends Component
             ->get();
     }
 
+    public function getTodayCountProperty(): int
+    {
+        return Appointment::query()
+            ->forClinic($this->currentClinic->id)
+            ->forDate($this->currentClinic->localNow()->toDateString())
+            ->count();
+    }
+
     public function getAppointmentsProperty()
     {
         return Appointment::query()

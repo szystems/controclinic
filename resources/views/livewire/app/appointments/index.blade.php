@@ -8,7 +8,7 @@
                     {{ __('appointments.title') }}
                 </h1>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {{ __('appointments.todays_appointments') }}: {{ $appointments->where('appointment_date', today())->count() }}
+                    {{ __('appointments.todays_appointments') }}: {{ $todayCount }}
                 </p>
             </div>
             @canany(['appointments.create', 'appointments.export', 'appointments.print'])

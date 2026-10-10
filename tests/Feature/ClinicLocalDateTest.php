@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\App\Appointments\Index as AppointmentIndex;
 use App\Livewire\App\Dashboard;
 use App\Livewire\App\Invoices\Create as InvoiceCreate;
 use App\Livewire\App\Invoices\Index as InvoiceIndex;
@@ -80,6 +81,10 @@ class ClinicLocalDateTest extends TestCase
             ->firstWhere('first_name', 'Octubre');
 
         $this->assertNotNull($listed->nextUpcomingAppointment);
+
+        Livewire::actingAs($owner)
+            ->test(AppointmentIndex::class, ['clinic' => $clinic])
+            ->assertSee("Today's Appointments: 1", false);
 
         $birthdays = Livewire::actingAs($owner)
             ->test(Dashboard::class, ['clinic' => $clinic])
