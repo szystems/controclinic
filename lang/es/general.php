@@ -153,6 +153,7 @@ return [
     'currency_label' => 'Moneda',
     'public_portal' => 'Portal público',
     'configure_clinic' => 'Configurar clínica',
+    'summary' => 'Resumen',
 
     // Límites de plan
     'limit_reached_title' => 'Has alcanzado el límite de tu plan',

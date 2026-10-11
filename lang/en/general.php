@@ -154,6 +154,7 @@ return [
     'currency_label' => 'Currency',
     'public_portal' => 'Public portal',
     'configure_clinic' => 'Configure clinic',
+    'summary' => 'Summary',
 
     // Plan limits
     'limit_reached_title' => 'You have reached your plan limit',
