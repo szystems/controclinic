@@ -55,6 +55,17 @@ class PublicBookingTest extends TestCase
             ->assertDontSee(__('booking.powered_by'), false);
     }
 
+    public function test_public_page_weekdays_follow_the_page_language(): void
+    {
+        app()->setLocale('en');
+        [$clinic] = $this->makeClinicWithDoctor();
+
+        $this->get('/c/'.$clinic->slug)
+            ->assertOk()
+            ->assertSee('Monday')
+            ->assertDontSee('Lun');
+    }
+
     public function test_dashboard_footer_credits_szystems(): void
     {
         $html = view('components.site-footer', ['variant' => 'app'])->render();

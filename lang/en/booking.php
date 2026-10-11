@@ -45,6 +45,8 @@ return [
     // Date / time selection
     'select_date' => 'Select a date',
     'select_time' => 'Select a time slot',
+    'date' => 'Date',
+    'time' => 'Time',
     'no_slots_available' => 'No available slots on this date. Please select another day.',
     'date_not_available' => 'The clinic is closed on this day.',
     'date_too_soon' => 'Bookings must be made at least :hours hours in advance.',

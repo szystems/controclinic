@@ -46,6 +46,8 @@ return [
     // Date / time selection
     'select_date' => 'Selecciona una fecha',
     'select_time' => 'Selecciona un horario',
+    'date' => 'Fecha',
+    'time' => 'Hora',
     'no_slots_available' => 'No hay horarios disponibles para esta fecha. Por favor selecciona otro día.',
     'date_not_available' => 'La clínica no atiende este día.',
     'date_too_soon' => 'Las reservas deben hacerse con al menos :hours horas de anticipación.',

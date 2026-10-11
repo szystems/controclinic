@@ -15,8 +15,7 @@
     $branding       = $clinic->branding ?? [];
     $logoPath       = $branding['logo'] ?? null;
     $logoUrl        = $logoPath ? \Illuminate\Support\Facades\Storage::disk('public')->url($logoPath) : null;
-    $dayNames       = [0 => 'Dom', 1 => 'Lun', 2 => 'Mar', 3 => 'Mié', 4 => 'Jue', 5 => 'Vie', 6 => 'Sáb'];
-    $workingDayList = collect($hours['days'])->map(fn($d) => $dayNames[$d] ?? '')->implode(', ');
+    $workingDayList = collect($hours['days'])->map(fn ($d) => __('booking.days.'.$d))->implode(', ');
 @endphp
 
 <div>
@@ -178,11 +177,11 @@
                     </div>
                 @endif
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">{{ __('booking.select_date') }}</span>
+                    <span class="text-gray-500">{{ __('booking.date') }}</span>
                     <span class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d M Y') }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">{{ __('booking.select_time') }}</span>
+                    <span class="text-gray-500">{{ __('booking.time') }}</span>
                     <span class="font-medium text-gray-900">{{ $selectedTime }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
@@ -424,8 +423,8 @@
                                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 text-sm">
                                     @php $selectedDoctor = $this->doctors->firstWhere('id', $doctor_id); @endphp
                                     <div class="flex justify-between mb-1"><span class="text-gray-500">{{ __('booking.appointment_with') }}</span><span class="font-medium">{{ $selectedDoctor?->name }}</span></div>
-                                    <div class="flex justify-between mb-1"><span class="text-gray-500">{{ __('booking.select_date') }}</span><span class="font-medium">{{ $selectedDate ? \Carbon\Carbon::parse($selectedDate)->translatedFormat('d M Y') : '' }}</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-500">{{ __('booking.select_time') }}</span><span class="font-medium">{{ $selectedTime }}</span></div>
+                                    <div class="flex justify-between mb-1"><span class="text-gray-500">{{ __('booking.date') }}</span><span class="font-medium">{{ $selectedDate ? \Carbon\Carbon::parse($selectedDate)->translatedFormat('d M Y') : '' }}</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-500">{{ __('booking.time') }}</span><span class="font-medium">{{ $selectedTime }}</span></div>
                                 </div>
 
                                 <div class="flex justify-between pt-2">
