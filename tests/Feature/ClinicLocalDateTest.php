@@ -71,6 +71,12 @@ class ClinicLocalDateTest extends TestCase
             'status' => Appointment::STATUS_SCHEDULED,
         ]);
 
+        Carbon::setLocale('en');
+        $this->assertSame(
+            'October 31, 2026 11:00 PM',
+            $clinic->formatInstant(Carbon::parse('2026-11-01 06:00:00', 'UTC'))
+        );
+
         $this->assertNotNull($patient->nextUpcomingAppointment);
         $this->assertCount(1, $patient->getUpcomingAppointments());
 

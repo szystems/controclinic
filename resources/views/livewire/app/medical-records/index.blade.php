@@ -114,7 +114,7 @@
                                 @endif
                             </div>
                             <div class="text-right flex-shrink-0 text-xs text-gray-500 dark:text-gray-400">
-                                <div>{{ $record->created_at->isoFormat('LL') }}</div>
+                                <div>{{ $clinic->formatInstant($record->created_at, false) }}</div>
                                 <div class="mt-0.5">{{ $record->doctor?->name }}</div>
                                 @php $attachmentsCount = count($record->attachments ?? []); @endphp
                                 @if($attachmentsCount > 0)

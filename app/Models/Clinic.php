@@ -567,6 +567,22 @@ class Clinic extends Model
         return now()->copy()->timezone($this->timezone ?: config('app.timezone'));
     }
 
+    /**
+     * A stored instant shown in the clinic timezone.
+     * Date-only values must not use this: shifting them can move the calendar day.
+     */
+    public function formatInstant(mixed $date, bool $withTime = true): string
+    {
+        if ($date === null) {
+            return '-';
+        }
+
+        $carbon = ($date instanceof Carbon ? $date->copy() : Carbon::parse($date))
+            ->timezone($this->timezone ?: config('app.timezone'));
+
+        return $carbon->isoFormat($withTime ? 'LLL' : 'LL');
+    }
+
     public function formatDate(mixed $date, bool $withTime = false): string
     {
         if ($date === null) {

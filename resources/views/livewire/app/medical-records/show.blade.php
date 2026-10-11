@@ -115,12 +115,12 @@
                     </div>
                     <div>
                         <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('records.created_at') }}</dt>
-                        <dd class="font-medium text-gray-900 dark:text-white">{{ $record->created_at->isoFormat('LLL') }}</dd>
+                        <dd class="font-medium text-gray-900 dark:text-white">{{ $clinic->formatInstant($record->created_at) }}</dd>
                     </div>
                     @if($record->finalized_at)
                         <div>
                             <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('records.finalized_at') }}</dt>
-                            <dd class="font-medium text-gray-900 dark:text-white">{{ $record->finalized_at->isoFormat('LLL') }}</dd>
+                            <dd class="font-medium text-gray-900 dark:text-white">{{ $clinic->formatInstant($record->finalized_at) }}</dd>
                         </div>
                     @endif
                 </dl>
