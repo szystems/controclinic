@@ -99,7 +99,12 @@ class Edit extends Component
         $this->city = $patient->city ?? '';
         $this->state = $patient->state ?? '';
         $this->postal_code = $patient->postal_code ?? '';
-        $this->country = $patient->country ?? 'GT';
+        $countries = array_keys(__('patients.countries'));
+        $storedCountry = strtoupper((string) ($patient->country ?? ''));
+        $clinicCountry = strtoupper((string) $patient->clinic?->country);
+        $this->country = in_array($storedCountry, $countries, true)
+            ? $storedCountry
+            : (in_array($clinicCountry, $countries, true) ? $clinicCountry : ($countries[0] ?? 'CA'));
         $this->blood_type = $patient->blood_type ?? '';
         $this->allergies = $patient->allergies ?? '';
         $this->chronic_conditions = $patient->chronic_conditions ?? '';

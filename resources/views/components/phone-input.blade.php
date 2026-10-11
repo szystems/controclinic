@@ -11,30 +11,30 @@
 
 @php
     $countryCodes = [
-        ['code' => '502',  'flag' => '🇬🇹', 'label' => '+502 Guatemala'],
-        ['code' => '503',  'flag' => '🇸🇻', 'label' => '+503 El Salvador'],
-        ['code' => '504',  'flag' => '🇭🇳', 'label' => '+504 Honduras'],
-        ['code' => '505',  'flag' => '🇳🇮', 'label' => '+505 Nicaragua'],
-        ['code' => '506',  'flag' => '🇨🇷', 'label' => '+506 Costa Rica'],
-        ['code' => '507',  'flag' => '🇵🇦', 'label' => '+507 Panamá'],
-        ['code' => '52',   'flag' => '🇲🇽', 'label' => '+52 México'],
-        ['code' => '1',    'flag' => '🇺🇸', 'label' => '+1 EE.UU./Canadá'],
-        ['code' => '57',   'flag' => '🇨🇴', 'label' => '+57 Colombia'],
-        ['code' => '51',   'flag' => '🇵🇪', 'label' => '+51 Perú'],
-        ['code' => '56',   'flag' => '🇨🇱', 'label' => '+56 Chile'],
-        ['code' => '54',   'flag' => '🇦🇷', 'label' => '+54 Argentina'],
-        ['code' => '55',   'flag' => '🇧🇷', 'label' => '+55 Brasil'],
-        ['code' => '58',   'flag' => '🇻🇪', 'label' => '+58 Venezuela'],
-        ['code' => '591',  'flag' => '🇧🇴', 'label' => '+591 Bolivia'],
-        ['code' => '595',  'flag' => '🇵🇾', 'label' => '+595 Paraguay'],
-        ['code' => '598',  'flag' => '🇺🇾', 'label' => '+598 Uruguay'],
-        ['code' => '593',  'flag' => '🇪🇨', 'label' => '+593 Ecuador'],
-        ['code' => '1809', 'flag' => '🇩🇴', 'label' => '+1809 Rep. Dominicana'],
-        ['code' => '53',   'flag' => '🇨🇺', 'label' => '+53 Cuba'],
-        ['code' => '34',   'flag' => '🇪🇸', 'label' => '+34 España'],
-        ['code' => '44',   'flag' => '🇬🇧', 'label' => '+44 Reino Unido'],
-        ['code' => '33',   'flag' => '🇫🇷', 'label' => '+33 Francia'],
-        ['code' => '49',   'flag' => '🇩🇪', 'label' => '+49 Alemania'],
+        ['code' => '502',  'flag' => '🇬🇹'],
+        ['code' => '503',  'flag' => '🇸🇻'],
+        ['code' => '504',  'flag' => '🇭🇳'],
+        ['code' => '505',  'flag' => '🇳🇮'],
+        ['code' => '506',  'flag' => '🇨🇷'],
+        ['code' => '507',  'flag' => '🇵🇦'],
+        ['code' => '52',   'flag' => '🇲🇽'],
+        ['code' => '1',    'flag' => '🇺🇸'],
+        ['code' => '57',   'flag' => '🇨🇴'],
+        ['code' => '51',   'flag' => '🇵🇪'],
+        ['code' => '56',   'flag' => '🇨🇱'],
+        ['code' => '54',   'flag' => '🇦🇷'],
+        ['code' => '55',   'flag' => '🇧🇷'],
+        ['code' => '58',   'flag' => '🇻🇪'],
+        ['code' => '591',  'flag' => '🇧🇴'],
+        ['code' => '595',  'flag' => '🇵🇾'],
+        ['code' => '598',  'flag' => '🇺🇾'],
+        ['code' => '593',  'flag' => '🇪🇨'],
+        ['code' => '1809', 'flag' => '🇩🇴'],
+        ['code' => '53',   'flag' => '🇨🇺'],
+        ['code' => '34',   'flag' => '🇪🇸'],
+        ['code' => '44',   'flag' => '🇬🇧'],
+        ['code' => '33',   'flag' => '🇫🇷'],
+        ['code' => '49',   'flag' => '🇩🇪'],
     ];
     $resolvedCode = $codeValue ?: $defaultCode;
 @endphp
@@ -53,7 +53,7 @@
                 class="w-40 shrink-0 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm @error($codeName) border-red-500 @enderror">
             @foreach($countryCodes as $country)
                 <option value="{{ $country['code'] }}" @selected($resolvedCode === $country['code'])>
-                    {{ $country['flag'] }} {{ $country['label'] }}
+                    {{ $country['flag'] }} {{ __('patients.phone_countries.'.$country['code']) }}
                 </option>
             @endforeach
         </select>

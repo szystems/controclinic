@@ -213,16 +213,9 @@
                         </label>
                         <select wire:model="country" id="country"
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="GT">Guatemala</option>
-                            <option value="MX">México</option>
-                            <option value="SV">El Salvador</option>
-                            <option value="HN">Honduras</option>
-                            <option value="NI">Nicaragua</option>
-                            <option value="CR">Costa Rica</option>
-                            <option value="PA">Panamá</option>
-                            <option value="CO">Colombia</option>
-                            <option value="ES">España</option>
-                            <option value="US">Estados Unidos</option>
+                            @foreach (__('patients.countries') as $code => $label)
+                                <option value="{{ $code }}">{{ $label }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>

@@ -46,7 +46,7 @@ class Create extends Component
 
     public string $postal_code = '';
 
-    public string $country = 'GT';
+    public string $country = '';
 
     // Medical Info
     public string $blood_type = '';
@@ -123,6 +123,10 @@ class Create extends Component
         $settings = $this->currentClinic->settings ?? [];
         $this->phone_country_code = $settings['phone_country_code'] ?? config('clinic_locale.fallback.phone_country_code', '1');
         $this->phone_country_code_secondary = $this->phone_country_code;
+
+        $countries = array_keys(__('patients.countries'));
+        $clinicCountry = strtoupper((string) $clinic->country);
+        $this->country = in_array($clinicCountry, $countries, true) ? $clinicCountry : ($countries[0] ?? 'CA');
     }
 
     public function getDoctorsProperty()
