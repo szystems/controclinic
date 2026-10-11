@@ -5,7 +5,10 @@ namespace App\Livewire\App\Onboarding;
 use App\Models\Clinic;
 use App\Models\Plan;
 use App\Services\ClinicLocaleResolver;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Exceptions\PaddleException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -76,6 +79,10 @@ class Index extends Component
     // Step 5: Plan selection
     public string $selectedPlan = 'free';
 
+    public string $billingCycle = 'monthly';
+
+    public string $promoCode = '';
+
     public bool $browserTimezoneRefined = false;
 
     public const PHONE_CODES = [
@@ -104,7 +111,26 @@ class Index extends Component
 
     public function getPlansProperty()
     {
-        return Plan::active()->ordered()->get();
+        $unlocked = $this->clinic->unlockedPlanSlugs();
+
+        return Plan::query()
+            ->active()
+            ->ordered()
+            ->where('is_enterprise', false)
+            ->where(function ($query) use ($unlocked) {
+                $query->where('is_private', false);
+
+                if ($unlocked !== []) {
+                    $query->orWhereIn('slug', $unlocked);
+                }
+            })
+            ->get();
+    }
+
+    public function getIsPaddleReadyProperty(): bool
+    {
+        return (bool) config('cashier.api_key')
+            && (config('cashier.client_side_token') || config('cashier.seller_id'));
     }
 
     public function mount(Clinic $clinic): void
@@ -219,10 +245,131 @@ class Index extends Component
         }
     }
 
-    public function selectPlan(string $plan): void
+    public function selectPlan(string $planSlug): void
     {
-        if (in_array($plan, ['free', 'solo', 'group', 'enterprise'])) {
-            $this->selectedPlan = $plan;
+        $this->ensureOnboardingWritable();
+
+        $plan = $this->plans->firstWhere('slug', $planSlug);
+
+        if (! $plan) {
+            return;
+        }
+
+        if ($plan->is_free) {
+            $this->selectedPlan = $plan->slug;
+
+            return;
+        }
+
+        $this->checkout($planSlug);
+    }
+
+    public function redeemPromoCode(): void
+    {
+        $this->ensureOnboardingWritable();
+
+        $key = 'billing-promo:'.$this->clinic->id;
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            $this->addError('promoCode', __('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => (int) ceil($seconds / 60),
+            ]));
+
+            return;
+        }
+        RateLimiter::hit($key, 600);
+
+        $this->validate([
+            'promoCode' => ['required', 'string', 'max:64'],
+        ]);
+
+        $plan = Plan::findByAccessCode($this->promoCode);
+
+        if (! $plan) {
+            $this->addError('promoCode', __('billing.promo_code_invalid'));
+
+            return;
+        }
+
+        $this->clinic->unlockPlan($plan);
+        $this->clinic->refresh();
+        $this->promoCode = '';
+
+        $this->dispatch('notify', type: 'success', message: __('billing.promo_code_applied', ['plan' => $plan->name]));
+    }
+
+    public function checkout(string $planSlug): void
+    {
+        $this->ensureOnboardingWritable();
+
+        if ($planSlug === 'enterprise') {
+            $this->redirect(route('contact', ['subject' => 'enterprise']));
+
+            return;
+        }
+
+        if (! $this->isPaddleReady) {
+            $this->dispatch('notify', type: 'error', message: __('billing.paddle_not_configured'));
+
+            return;
+        }
+
+        $plan = Plan::where('slug', $planSlug)->where('is_active', true)->first();
+
+        if (! $plan || $plan->is_free) {
+            $this->dispatch('notify', type: 'error', message: __('billing.plan_not_available'));
+
+            return;
+        }
+
+        if ($plan->is_private && ! $this->clinic->hasUnlockedPlan($plan)) {
+            $this->dispatch('notify', type: 'error', message: __('billing.plan_requires_code'));
+
+            return;
+        }
+
+        $priceId = $plan->paddlePriceIdForCycle($this->billingCycle)
+            ?: config("cashier.prices.{$planSlug}.{$this->billingCycle}");
+
+        if (! $priceId) {
+            $this->dispatch('notify', type: 'error', message: __('billing.plan_price_not_configured', ['plan' => $plan->name]));
+
+            return;
+        }
+
+        $email = $this->clinic->owner->email ?? auth()->user()->email;
+
+        try {
+            $customer = $this->clinic->customer ?? $this->clinic->createAsCustomer([
+                'email' => $email,
+                'name' => $this->clinic->owner->name ?? $this->clinic->name,
+            ]);
+
+            $response = Cashier::api('POST', 'transactions', [
+                'items' => [['price_id' => $priceId, 'quantity' => 1]],
+                'customer_id' => $customer->paddle_id,
+                'custom_data' => [
+                    'clinic_id' => $this->clinic->id,
+                    'plan_type' => $planSlug,
+                    'billing_cycle' => $this->billingCycle,
+                ],
+            ]);
+
+            $transactionId = $response['data']['id'] ?? null;
+
+            if ($transactionId) {
+                $this->dispatch('open-paddle-checkout', transactionId: $transactionId);
+            } else {
+                $this->dispatch('notify', type: 'error', message: __('billing.checkout_failed'));
+            }
+        } catch (\Exception $e) {
+            $message = $e instanceof PaddleException && ($e->getError()['code'] ?? null) === 'transaction_default_checkout_url_not_set'
+                ? __('billing.paddle_default_payment_link_missing')
+                : __('billing.checkout_failed');
+
+            $this->dispatch('notify', type: 'error', message: $message);
+            logger()->error('Paddle checkout error: '.$e->getMessage());
         }
     }
 
@@ -249,16 +396,10 @@ class Index extends Component
     public function completeOnboarding(): void
     {
         $this->ensureOnboardingWritable();
-        $updateData = ['onboarding_completed_at' => now()];
 
-        // Save desired plan preference for when billing is available
-        if ($this->selectedPlan !== 'free') {
-            $updateData['settings'] = array_merge($this->clinic->settings ?? [], [
-                'desired_plan' => $this->selectedPlan,
-            ]);
-        }
-
-        $this->clinic->update($updateData);
+        $this->clinic->update([
+            'onboarding_completed_at' => now(),
+        ]);
 
         $this->redirect(route('app.dashboard', $this->clinic->slug), navigate: true);
     }

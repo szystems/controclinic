@@ -33,7 +33,7 @@
             @if ($selected)
                 <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">{{ __('onboarding.selected') }}</span>
             @elseif (!$isFree && !$isEnterprise)
-                <span class="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full font-medium">{{ __('onboarding.coming_soon') }}</span>
+                <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">{{ __('onboarding.pay_this_plan') }}</span>
             @endif
         </div>
         <div class="mb-4">

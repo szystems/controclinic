@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Livewire\App\Onboarding\Index;
 use App\Models\Clinic;
+use App\Models\Plan;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -211,5 +212,106 @@ class OnboardingTest extends TestCase
 
         $clinic->refresh();
         $this->assertSame('Langford', $clinic->city);
+    }
+
+    #[Test]
+    public function plan_step_shows_public_plans_and_hides_a_private_plan_until_the_code_is_redeemed(): void
+    {
+        Plan::create(['name' => 'Free', 'slug' => 'free', 'sort_order' => 1, 'is_active' => true, 'is_free' => true]);
+        Plan::create(['name' => 'Solo', 'slug' => 'solo', 'monthly_price' => '29.00', 'sort_order' => 2, 'is_active' => true]);
+        Plan::create([
+            'name' => 'Friendly',
+            'slug' => 'friendly',
+            'monthly_price' => '9.00',
+            'sort_order' => 5,
+            'is_active' => true,
+            'is_private' => true,
+            'requires_code' => true,
+            'access_code' => 'CC-TEST',
+        ]);
+
+        [$clinic, $owner] = $this->makeClinicWithOwner(['plan_type' => 'free']);
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->set('currentStep', 5)
+            ->assertSee('Free')
+            ->assertSee('Solo')
+            ->assertSee(__('onboarding.continue_free'))
+            ->assertDontSee('Friendly')
+            ->set('promoCode', 'cc-test')
+            ->call('redeemPromoCode')
+            ->assertHasNoErrors()
+            ->assertSee('Friendly');
+
+        $this->assertTrue($clinic->fresh()->hasUnlockedPlan(Plan::where('slug', 'friendly')->first()));
+    }
+
+    #[Test]
+    public function invalid_plan_code_does_not_unlock_a_private_plan(): void
+    {
+        Plan::create([
+            'name' => 'Friendly',
+            'slug' => 'friendly',
+            'sort_order' => 5,
+            'is_active' => true,
+            'is_private' => true,
+            'requires_code' => true,
+            'access_code' => 'CC-TEST',
+        ]);
+
+        [$clinic, $owner] = $this->makeClinicWithOwner(['plan_type' => 'free']);
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->set('promoCode', 'WRONG')
+            ->call('redeemPromoCode')
+            ->assertHasErrors(['promoCode']);
+
+        $this->assertFalse($clinic->fresh()->hasUnlockedPlan(Plan::where('slug', 'friendly')->first()));
+    }
+
+    #[Test]
+    public function finishing_onboarding_keeps_the_free_plan(): void
+    {
+        [$clinic, $owner] = $this->makeClinicWithOwner(['plan_type' => 'free']);
+        app()->instance('current_clinic', $clinic);
+
+        Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->set('selectedPlan', 'solo')
+            ->call('completeOnboarding');
+
+        $clinic->refresh();
+        $this->assertNotNull($clinic->onboarding_completed_at);
+        $this->assertSame('free', $clinic->plan_type);
+        $this->assertArrayNotHasKey('desired_plan', $clinic->settings ?? []);
+    }
+
+    #[Test]
+    public function choosing_a_paid_plan_without_a_price_does_not_change_the_free_plan(): void
+    {
+        Plan::create(['name' => 'Solo', 'slug' => 'solo', 'monthly_price' => '29.00', 'sort_order' => 2, 'is_active' => true]);
+
+        [$clinic, $owner] = $this->makeClinicWithOwner(['plan_type' => 'free']);
+        app()->instance('current_clinic', $clinic);
+
+        config([
+            'cashier.api_key' => 'test-key',
+            'cashier.client_side_token' => 'test-token',
+            'cashier.prices.solo.monthly' => null,
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->call('selectPlan', 'solo')
+            ->assertNotDispatched('open-paddle-checkout')
+            ->assertSet('selectedPlan', 'free');
+
+        $clinic->refresh();
+        $this->assertSame('free', $clinic->plan_type);
+        $this->assertNull($clinic->onboarding_completed_at);
     }
 }

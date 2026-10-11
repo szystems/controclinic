@@ -456,6 +456,21 @@
                         {{ __('onboarding.choose_plan_description') }}
                     </p>
 
+                    <div class="mb-6">
+                        <label for="promoCode" class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">{{ __('billing.promo_code_title') }}</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ __('billing.promo_code_hint') }}</p>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input id="promoCode" type="text" wire:model="promoCode"
+                                   placeholder="{{ __('billing.promo_code_placeholder') }}"
+                                   class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 uppercase">
+                            <button type="button" wire:click="redeemPromoCode" wire:loading.attr="disabled"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition disabled:opacity-50">
+                                {{ __('billing.promo_code_apply') }}
+                            </button>
+                        </div>
+                        @error('promoCode') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @foreach ($this->plans as $plan)
                             <x-plan-card
@@ -467,15 +482,37 @@
                         @endforeach
                     </div>
 
-                    @if ($selectedPlan !== 'free')
-                        <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                            <p class="text-sm text-amber-700 dark:text-amber-300">
-                                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                {{ __('onboarding.paid_plan_notice') }}
-                            </p>
-                        </div>
+                    <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            {{ __('onboarding.paid_plan_notice') }}
+                        </p>
+                    </div>
+
+                    @if ($this->isPaddleReady)
+                        @paddleJS
+                        <div x-data x-on:open-paddle-checkout.window="
+                            const transactionId = $event.detail?.transactionId ?? $event.detail?.[0]?.transactionId;
+                            if (! transactionId) {
+                                return;
+                            }
+                            const settings = {
+                                allowLogout: false,
+                                displayMode: 'overlay',
+                                theme: 'light',
+                                locale: '{{ app()->getLocale() }}'
+                            };
+                            const openCheckout = () => {
+                                if (typeof Paddle === 'undefined') {
+                                    return;
+                                }
+                                Paddle.Checkout.open({ transactionId, settings });
+                            };
+                            if (typeof Paddle !== 'undefined') {
+                                openCheckout();
+                            } else {
+                                window.addEventListener('paddle:ready', openCheckout, { once: true });
+                            }
+                        "></div>
                     @endif
                 </div>
             @endif
@@ -513,7 +550,7 @@
                         </button>
                     @else
                         <button wire:click="completeOnboarding" type="button" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition">
-                            {{ __('onboarding.start_using') }}
+                            {{ $clinic->isOnFreePlan() ? __('onboarding.continue_free') : __('onboarding.start_using') }}
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>

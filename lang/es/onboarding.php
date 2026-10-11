@@ -62,18 +62,20 @@ return [
 
     // Step 5: Plan Selection
     'choose_plan_title' => 'Elige tu Plan',
-    'choose_plan_description' => 'Selecciona el plan que mejor se adapte a tu clínica. Podrás cambiarlo cuando quieras.',
+    'choose_plan_description' => 'El plan gratis ya está elegido. Si quieres otro, puedes pagarlo ahora o seguir gratis y cambiarlo después desde Facturación.',
     'plan_free' => 'Gratuito',
     'forever_free' => '— gratis para siempre',
     'per_month' => '/mes',
     'coming_soon' => 'Próximamente',
     'selected' => 'Seleccionado',
     'contact_us' => 'Contáctanos',
-    'paid_plan_notice' => 'Los planes de pago estarán disponibles próximamente. Tu clínica comenzará con el plan gratuito y podrás actualizar desde configuración.',
+    'pay_this_plan' => 'Pagar este plan',
+    'continue_free' => 'Continuar con el plan gratis',
+    'paid_plan_notice' => 'Si cierras el pago, sigues en el plan gratis. Si lo completas, pulsa continuar: el plan cambia cuando el cobro se confirma. Un código válido muestra aquí el plan privado.',
 
     // Plan features
     'plan_free_f1' => 'Hasta 25 pacientes',
-    'plan_free_f2' => '5 citas al mes',
+    'plan_free_f2' => '20 citas al mes',
     'plan_free_f3' => '1 doctor',
     'plan_free_f4' => 'Portal básico',
     'plan_solo_f1' => 'Pacientes ilimitados',

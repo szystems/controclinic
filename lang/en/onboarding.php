@@ -62,18 +62,20 @@ return [
 
     // Step 5: Plan Selection
     'choose_plan_title' => 'Choose Your Plan',
-    'choose_plan_description' => 'Select the plan that best fits your clinic. You can change it anytime.',
+    'choose_plan_description' => 'The free plan is already selected. You can pay for another plan now, or continue free and change it later from Billing.',
     'plan_free' => 'Free',
     'forever_free' => '— free forever',
     'per_month' => '/month',
     'coming_soon' => 'Coming soon',
     'selected' => 'Selected',
     'contact_us' => 'Contact us',
-    'paid_plan_notice' => 'Paid plans will be available soon. Your clinic will start with the free plan and you can upgrade from settings.',
+    'pay_this_plan' => 'Pay for this plan',
+    'continue_free' => 'Continue on the free plan',
+    'paid_plan_notice' => 'If you close the payment, you stay on the free plan. If you finish it, press continue: the plan changes once the charge is confirmed. A valid code shows the private plan here.',
 
     // Plan features
     'plan_free_f1' => 'Up to 25 patients',
-    'plan_free_f2' => '5 appointments/month',
+    'plan_free_f2' => '20 appointments/month',
     'plan_free_f3' => '1 doctor',
     'plan_free_f4' => 'Basic portal',
     'plan_solo_f1' => 'Unlimited patients',
