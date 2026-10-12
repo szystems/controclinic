@@ -16,6 +16,7 @@ return [
     'settings' => 'Settings',
     'view_public_page' => 'View public page',
     'billing' => 'Billing',
+    'subscription' => 'Subscription',
     'reports' => 'Reports',
     'audit_log' => 'Audit Log',
     'users' => 'Users',

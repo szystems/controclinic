@@ -16,6 +16,7 @@ return [
     'settings' => 'Configuración',
     'view_public_page' => 'Ver página pública',
     'billing' => 'Facturación',
+    'subscription' => 'Suscripción',
     'reports' => 'Reportes',
     'audit_log' => 'Auditoría',
     'users' => 'Usuarios',

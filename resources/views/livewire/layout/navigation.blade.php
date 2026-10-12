@@ -125,6 +125,17 @@ new class extends Component
         ];
     }
 
+    if (auth()->user()->can('billing.manage')) {
+        $primaryNav[] = [
+            'route' => 'app.billing.index',
+            'active' => fn () => request()->routeIs('app.billing.*'),
+            'label' => __('general.subscription'),
+            'group' => 'account',
+            'tour'  => 'nav-subscription',
+            'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h4M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>',
+        ];
+    }
+
     if (auth()->user()->can('schedule.manage')) {
         $primaryNav[] = [
             'route' => 'app.schedule',
@@ -266,7 +277,7 @@ new class extends Component
 
                         @can('billing.manage')
                         <x-dropdown-link :href="route('app.billing.index', $clinicSlug)" wire:navigate>
-                            {{ __('general.billing') }}
+                            {{ __('general.subscription') }}
                         </x-dropdown-link>
                         @endcan
 
@@ -511,7 +522,7 @@ new class extends Component
                                 ...array_filter([
                                     auth()->user()->can('billing.manage') ? [
                                         'href'   => route('app.billing.index', $clinicSlug),
-                                        'label'  => __('general.billing'),
+                                        'label'  => __('general.subscription'),
                                         'active' => request()->routeIs('app.billing.*'),
                                         'icon'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h4M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>',
                                         'external' => false,

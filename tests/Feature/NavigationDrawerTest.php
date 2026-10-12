@@ -74,5 +74,19 @@ class NavigationDrawerTest extends TestCase
         // Items de equipo no deben aparecer como enlace de navegaci\u00f3n
         $response->assertDontSee(route('app.staff.index', $clinic->slug));
         $response->assertDontSee(route('app.reports', $clinic->slug));
+        $response->assertDontSee(route('app.settings.index', $clinic->slug), false);
+        $response->assertDontSee(route('app.billing.index', $clinic->slug), false);
+    }
+
+    public function test_owner_sees_the_subscription_link(): void
+    {
+        [$clinic, $owner] = $this->bootstrapOwner();
+
+        $this->actingAs($owner)
+            ->get("/app/{$clinic->slug}")
+            ->assertOk()
+            ->assertSee(__('general.subscription'))
+            ->assertSee(route('app.billing.index', $clinic->slug), false)
+            ->assertSee(route('app.settings.index', $clinic->slug), false);
     }
 }
