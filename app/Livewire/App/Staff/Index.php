@@ -7,6 +7,7 @@ use App\Models\Clinic;
 use App\Models\ClinicInvitation;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -187,7 +188,20 @@ class Index extends Component
             return;
         }
 
-        $member->delete();
+        $originalEmail = $member->email;
+
+        DB::transaction(function () use ($member, $originalEmail) {
+            DB::table('password_reset_tokens')->where('email', $originalEmail)->delete();
+
+            // The email is unique for the whole app. Free it so this person can
+            // open their own clinic or be invited somewhere else.
+            $member->forceFill([
+                'email' => 'deleted+'.$member->id.'@users.invalid',
+                'is_active' => false,
+            ])->save();
+
+            $member->delete();
+        });
 
         session()->flash('success', __('staff.deleted_successfully'));
     }

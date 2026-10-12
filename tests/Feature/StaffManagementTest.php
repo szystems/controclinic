@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\App\Invitations\Accept;
 use App\Livewire\App\Staff\Create;
 use App\Livewire\App\Staff\Edit;
 use App\Livewire\App\Staff\Index;
 use App\Mail\ClinicInvitationMail;
 use App\Models\Clinic;
+use App\Models\ClinicInvitation;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -389,6 +391,43 @@ class StaffManagementTest extends TestCase
             ->call('deleteMember', $doctor->id);
 
         $this->assertSoftDeleted('users', ['id' => $doctor->id]);
+        $this->assertNull(User::withTrashed()->where('email', $doctor->email)->first());
+    }
+
+    public function test_a_removed_member_can_join_another_clinic_with_the_same_email(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner('solo');
+        [$otherClinic, $otherOwner] = $this->createClinicWithOwner('solo');
+        $assistant = User::factory()->assistant()->create([
+            'clinic_id' => $clinic->id,
+            'email' => 'freed@test.com',
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test(Index::class, ['clinic' => $clinic])
+            ->call('deleteMember', $assistant->id);
+
+        $invitation = ClinicInvitation::create([
+            'clinic_id' => $otherClinic->id,
+            'email' => 'freed@test.com',
+            'name' => 'Freed Person',
+            'role' => 'assistant',
+            'token' => ClinicInvitation::generateToken(),
+            'invited_by' => $otherOwner->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        Livewire::test(Accept::class, ['token' => $invitation->token])
+            ->set('password', 'password123')
+            ->set('password_confirmation', 'password123')
+            ->call('accept')
+            ->assertRedirect(route('login'));
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'freed@test.com',
+            'clinic_id' => $otherClinic->id,
+            'deleted_at' => null,
+        ]);
     }
 
     public function test_cannot_delete_self(): void
