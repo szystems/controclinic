@@ -295,10 +295,22 @@ class BillingTest extends TestCase
             ->assertDispatched('notify', type: 'info', message: __('billing.subscription_restart_checkout', [
                 'plan' => $clinica->name,
             ]))
-            ->assertDispatched('open-paddle-checkout', transactionId: 'txn_restart')
+            ->assertDispatched('open-paddle-checkout', transactionId: 'txn_restart', planSlug: 'clinica')
             ->assertNotDispatched('notify', type: 'error', message: __('billing.change_plan_failed'));
 
         $this->assertSame('ctm_current', $clinic->customer()->first()->paddle_id);
         $this->assertSame('practica', $clinic->fresh()->plan_type);
+    }
+
+    public function test_subscription_reflects_matches_only_the_saved_plan(): void
+    {
+        [$clinic, $user] = $this->createClinicWithOwner('practica');
+
+        Livewire::actingAs($user)
+            ->test(BillingIndex::class, ['clinic' => $clinic])
+            ->call('subscriptionReflects', 'clinica')
+            ->assertReturned(false)
+            ->call('subscriptionReflects', 'practica')
+            ->assertReturned(true);
     }
 }

@@ -184,12 +184,38 @@
             {{-- Paddle Checkout via JS --}}
             @if ($this->isPaddleReady)
             @paddleJS
-            <div x-data x-on:open-paddle-checkout.window="
+            <div
+                x-data="{
+                    syncing: false,
+                    async startSync() {
+                        if (this.syncing) {
+                            return;
+                        }
+                        this.syncing = true;
+                        const slug = window.__paddleExpectedPlan || '';
+                        try {
+                            for (let attempt = 0; attempt < 12; attempt++) {
+                                if (slug && await $wire.subscriptionReflects(slug)) {
+                                    break;
+                                }
+                                if (! slug) {
+                                    break;
+                                }
+                                await new Promise((resolve) => setTimeout(resolve, 750));
+                            }
+                        } catch (e) {}
+                        window.location.reload();
+                    }
+                }"
+                x-on:paddle-checkout-finished.window="startSync()"
+                x-on:open-paddle-checkout.window="
                 const transactionId = $event.detail?.transactionId ?? $event.detail?.[0]?.transactionId;
+                const planSlug = $event.detail?.planSlug ?? $event.detail?.[0]?.planSlug ?? '';
                 if (! transactionId) {
                     console.error('Missing Paddle transaction ID');
                     return;
                 }
+                window.__paddleExpectedPlan = planSlug;
                 const settings = {
                     allowLogout: false,
                     displayMode: 'overlay',
@@ -203,6 +229,21 @@
                         }));
                         return;
                     }
+                    if (! window.__paddlePlanWatcher) {
+                        window.__paddlePlanWatcher = true;
+                        Paddle.Update({
+                            eventCallback(event) {
+                                const name = event && event.name;
+                                if (name === 'checkout.completed') {
+                                    window.__paddleCheckoutCompleted = true;
+                                }
+                                if (name === 'checkout.closed' && window.__paddleCheckoutCompleted) {
+                                    window.__paddleCheckoutCompleted = false;
+                                    window.dispatchEvent(new CustomEvent('paddle-checkout-finished'));
+                                }
+                            }
+                        });
+                    }
                     Paddle.Checkout.open({ transactionId, settings });
                 };
                 if (typeof Paddle !== 'undefined') {
@@ -210,7 +251,11 @@
                 } else {
                     window.addEventListener('paddle:ready', openCheckout, { once: true });
                 }
-            "></div>
+            ">
+                <div x-show="syncing" x-cloak class="fixed inset-0 z-[80] flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('billing.plan_syncing') }}</p>
+                </div>
+            </div>
             @endif
         @endif
 

@@ -74,6 +74,7 @@ return [
     'checkout_loading' => 'Preparando pago…',
     'checkout_failed' => 'No se pudo iniciar el pago. Inténtalo de nuevo en unos minutos.',
     'paddle_js_not_loaded' => 'No se pudo cargar Paddle.js. Recarga la página e inténtalo de nuevo.',
+    'plan_syncing' => 'Actualizando tu plan…',
     'paddle_default_payment_link_missing' => 'Falta configurar el Default payment link en Paddle (Checkout → Checkout settings). Usa https://controclinic.com y guarda.',
 
     // Transaction history

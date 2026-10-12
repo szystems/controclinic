@@ -161,7 +161,7 @@ class Index extends Component
             $transactionId = $response['data']['id'] ?? null;
 
             if ($transactionId) {
-                $this->dispatch('open-paddle-checkout', transactionId: $transactionId);
+                $this->dispatch('open-paddle-checkout', transactionId: $transactionId, planSlug: $planSlug);
             } else {
                 $this->dispatch('notify', type: 'error', message: __('billing.checkout_failed'));
             }
@@ -249,6 +249,25 @@ class Index extends Component
 
         return $code === 'url_called_is_invalid'
             || str_contains($e->getMessage(), 'URL called is invalid.');
+    }
+
+    /**
+     * True once the webhook has stored the plan the checkout was opened for.
+     * The page polls this after Paddle closes and only then reloads.
+     */
+    public function subscriptionReflects(string $planSlug): bool
+    {
+        $this->authorizeBilling();
+
+        if ($planSlug === '') {
+            return false;
+        }
+
+        $this->clinic->refresh();
+        $this->clinic->unsetRelation('plan');
+        $this->clinic->unsetRelation('subscriptions');
+
+        return $this->clinic->planSlug() === $planSlug;
     }
 
     public function changePlan(string $planSlug): void
