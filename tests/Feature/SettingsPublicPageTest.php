@@ -48,7 +48,10 @@ class SettingsPublicPageTest extends TestCase
         Livewire::actingAs($owner)
             ->test(SettingsIndex::class, ['clinic' => $clinic])
             ->assertHasNoErrors()
-            ->assertSet('activeTab', 'general');
+            ->assertSet('activeTab', 'general')
+            ->assertSee(__('settings.tab_general'))
+            ->assertSee(__('settings.tab_localization'))
+            ->assertDontSee("__('settings.tab_general')", false);
     }
 
     // ─── Save public page ─────────────────────────────────────────────────────
