@@ -98,10 +98,8 @@ class Create extends Component
 
         $this->validate();
 
-        // Check if email already exists in this clinic
-        $exists = User::where('clinic_id', $this->currentClinic->id)
-            ->where('email', $this->email)
-            ->exists();
+        // users.email is unique across the app, not only inside this clinic.
+        $exists = User::where('email', $this->email)->exists();
 
         if ($exists) {
             $this->addError('email', __('staff.email_already_exists'));

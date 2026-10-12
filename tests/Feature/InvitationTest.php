@@ -432,4 +432,43 @@ class InvitationTest extends TestCase
         $this->assertNotEquals($token1, $token2);
         $this->assertEquals(64, strlen($token1));
     }
+
+    public function test_accepting_an_email_that_already_has_an_account_does_not_fail(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner('solo');
+        [$otherClinic] = $this->createClinicWithOwner('solo');
+
+        User::factory()->create([
+            'clinic_id' => $otherClinic->id,
+            'email' => 'taken@test.com',
+        ]);
+
+        $invitation = $this->createPendingInvitation($clinic, $owner, [
+            'email' => 'taken@test.com',
+            'role' => 'assistant',
+        ]);
+
+        Livewire::test(Accept::class, ['token' => $invitation->token])
+            ->set('password', 'password123')
+            ->set('password_confirmation', 'password123')
+            ->call('accept')
+            ->assertSessionHas('error', __('invitations.email_already_registered'));
+
+        $this->assertNull($invitation->fresh()->accepted_at);
+        $this->assertSame(1, User::where('email', 'taken@test.com')->count());
+    }
+
+    public function test_invitation_email_renders_the_clinic_header_as_html(): void
+    {
+        [$clinic, $owner] = $this->createClinicWithOwner('solo');
+        $invitation = $this->createPendingInvitation($clinic, $owner, [
+            'role' => 'assistant',
+        ]);
+
+        $html = (new ClinicInvitationMail($invitation))->render();
+
+        $this->assertStringContainsString('border-radius:50%', $html);
+        $this->assertStringNotContainsString('&lt;span', $html);
+        $this->assertStringContainsString($clinic->name, $html);
+    }
 }

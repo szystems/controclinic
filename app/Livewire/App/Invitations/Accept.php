@@ -4,6 +4,7 @@ namespace App\Livewire\App\Invitations;
 
 use App\Models\ClinicInvitation;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
@@ -55,10 +56,8 @@ class Accept extends Component
 
         $this->validate();
 
-        // Check if user already exists in this clinic
-        $exists = User::where('clinic_id', $this->invitation->clinic_id)
-            ->where('email', $this->invitation->email)
-            ->exists();
+        // One email can belong to one account. A duplicate insert is a 500.
+        $exists = User::where('email', $this->invitation->email)->exists();
 
         if ($exists) {
             session()->flash('error', __('invitations.email_already_registered'));
@@ -66,21 +65,31 @@ class Accept extends Component
             return;
         }
 
-        DB::transaction(function () {
-            $user = User::create([
-                'name' => $this->invitation->name,
-                'email' => $this->invitation->email,
-                'password' => $this->password,
-                'clinic_id' => $this->invitation->clinic_id,
-                'role' => $this->invitation->role,
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]);
+        try {
+            DB::transaction(function () {
+                $user = User::create([
+                    'name' => $this->invitation->name,
+                    'email' => $this->invitation->email,
+                    'password' => $this->password,
+                    'clinic_id' => $this->invitation->clinic_id,
+                    'role' => $this->invitation->role,
+                    'is_active' => true,
+                    'email_verified_at' => now(),
+                ]);
 
-            $user->assignRole($this->invitation->role);
+                $user->assignRole($this->invitation->role);
 
-            $this->invitation->update(['accepted_at' => now()]);
-        });
+                $this->invitation->update(['accepted_at' => now()]);
+            });
+        } catch (QueryException $e) {
+            if ((string) $e->getCode() === '23000') {
+                session()->flash('error', __('invitations.email_already_registered'));
+
+                return;
+            }
+
+            throw $e;
+        }
 
         session()->flash('success', __('invitations.accept_success'));
 

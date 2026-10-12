@@ -294,9 +294,7 @@ class Index extends Component
 
         // If email changed, ensure it's not already used or duplicated
         if ($emailChanged) {
-            $alreadyUser = User::where('clinic_id', $this->currentClinic->id)
-                ->where('email', $this->editInvitationEmail)
-                ->exists();
+            $alreadyUser = User::where('email', $this->editInvitationEmail)->exists();
 
             if ($alreadyUser) {
                 $this->addError('editInvitationEmail', __('invitations.email_already_registered'));

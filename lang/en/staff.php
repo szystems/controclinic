@@ -60,7 +60,7 @@ return [
     'cannot_deactivate_owner' => 'You cannot deactivate the owner',
     'cannot_delete_owner' => 'You cannot delete the owner',
     'cannot_delete_self' => 'You cannot delete yourself',
-    'email_already_exists' => 'This email is already registered in this clinic',
+    'email_already_exists' => 'This email already has an account. Use a different email.',
 
     // Limits
     'doctors_usage' => 'Doctors: :current/:max',

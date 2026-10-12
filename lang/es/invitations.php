@@ -47,7 +47,7 @@ return [
     'invalid_token' => 'Esta invitación no es válida o ha expirado.',
     'already_accepted' => 'Esta invitación ya fue aceptada.',
     'already_cancelled' => 'Esta invitación fue cancelada.',
-    'email_already_registered' => 'Este correo ya está registrado en esta clínica.',
+    'email_already_registered' => 'Este correo ya tiene una cuenta. Usa otro correo para unirte a la clínica.',
     'duplicate_pending' => 'Ya existe una invitación pendiente para este correo.',
 
     // Pending invitations section

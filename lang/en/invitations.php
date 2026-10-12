@@ -47,7 +47,7 @@ return [
     'invalid_token' => 'This invitation is not valid or has expired.',
     'already_accepted' => 'This invitation has already been accepted.',
     'already_cancelled' => 'This invitation has been cancelled.',
-    'email_already_registered' => 'This email is already registered in this clinic.',
+    'email_already_registered' => 'This email already has an account. Use a different email to join the clinic.',
     'duplicate_pending' => 'There is already a pending invitation for this email.',
 
     // Pending invitations section
