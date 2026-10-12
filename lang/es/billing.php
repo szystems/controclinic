@@ -55,6 +55,7 @@ return [
     'plan_downgrade_scheduled' => 'Cambio a :plan programado. Se aplicará al final de tu período de facturación actual.',
     'already_on_plan' => 'Ya estás en este plan.',
     'change_plan_failed' => 'No se pudo cambiar el plan. Revisa tu método de pago o inténtalo más tarde.',
+    'subscription_restart_checkout' => 'La suscripción anterior ya no está en el proveedor de pago. Completa el pago para pasar a :plan.',
     'portal_unavailable' => 'No se pudo abrir el portal de pago. Inténtalo de nuevo en unos minutos.',
     'plan_not_available' => 'Este plan no está disponible en este momento.',
     'subscription_cancelled' => 'Suscripción cancelada. Tu plan seguirá activo hasta el final del período de facturación.',

@@ -7,6 +7,7 @@ use App\Models\Clinic;
 use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -218,5 +219,86 @@ class BillingTest extends TestCase
             ->call('checkout', 'friendly')
             ->assertNotDispatched('open-paddle-checkout')
             ->assertSessionHas('error', __('billing.plan_requires_code'));
+    }
+
+    public function test_change_plan_starts_a_new_checkout_when_paddle_does_not_know_the_subscription(): void
+    {
+        config([
+            'cashier.api_key' => 'test_key',
+            'cashier.client_side_token' => 'test_token',
+            'cashier.sandbox' => true,
+        ]);
+
+        [$clinic, $user] = $this->createClinicWithOwner('practica');
+        $clinic->update(['owner_id' => $user->id]);
+        $clinic->customer()->create([
+            'paddle_id' => 'ctm_oldsandbox',
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
+        $clinic->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_oldsandbox',
+            'status' => 'active',
+        ]);
+
+        $clinica = Plan::findBySlug('clinica');
+
+        Http::fake(function ($request) use ($user) {
+            $method = $request->method();
+            $url = $request->url();
+
+            if ($method === 'PATCH' && str_contains($url, 'subscriptions/sub_oldsandbox')) {
+                return Http::response([
+                    'error' => [
+                        'type' => 'request_error',
+                        'code' => 'url_called_is_invalid',
+                        'detail' => 'URL called is invalid.',
+                    ],
+                ], 404);
+            }
+
+            if ($method === 'GET' && str_contains($url, 'customers/ctm_oldsandbox')) {
+                return Http::response([
+                    'error' => [
+                        'type' => 'request_error',
+                        'code' => 'url_called_is_invalid',
+                        'detail' => 'URL called is invalid.',
+                    ],
+                ], 404);
+            }
+
+            if ($method === 'GET' && str_contains($url, '/customers')) {
+                return Http::response(['data' => []], 200);
+            }
+
+            if ($method === 'POST' && str_contains($url, '/customers')) {
+                return Http::response([
+                    'data' => [
+                        'id' => 'ctm_current',
+                        'name' => $user->name,
+                        'email' => $user->email,
+                    ],
+                ], 200);
+            }
+
+            if ($method === 'POST' && str_contains($url, '/transactions')) {
+                return Http::response(['data' => ['id' => 'txn_restart']], 200);
+            }
+
+            return Http::response(['error' => ['detail' => 'unexpected']], 500);
+        });
+
+        Livewire::actingAs($user)
+            ->test(BillingIndex::class, ['clinic' => $clinic])
+            ->call('changePlan', 'clinica')
+            ->assertDispatched('notify', type: 'info', message: __('billing.subscription_restart_checkout', [
+                'plan' => $clinica->name,
+            ]))
+            ->assertDispatched('open-paddle-checkout', transactionId: 'txn_restart')
+            ->assertNotDispatched('notify', type: 'error', message: __('billing.change_plan_failed'));
+
+        $this->assertSame('ctm_current', $clinic->customer()->first()->paddle_id);
+        $this->assertSame('practica', $clinic->fresh()->plan_type);
     }
 }

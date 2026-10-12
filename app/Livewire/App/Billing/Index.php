@@ -145,13 +145,8 @@ class Index extends Component
         $this->selectedPlan = $planSlug;
 
         // ADR-012: no trial period — checkout uses price ID only (no trial_days).
-        $email = $this->clinic->owner->email ?? auth()->user()->email;
-
         try {
-            $customer = $this->clinic->customer ?? $this->clinic->createAsCustomer([
-                'email' => $email,
-                'name' => $this->clinic->owner->name ?? $this->clinic->name,
-            ]);
+            $customer = $this->resolveBillableCustomer();
 
             $response = Cashier::api('POST', 'transactions', [
                 'items' => [['price_id' => $priceId, 'quantity' => 1]],
@@ -186,6 +181,74 @@ class Index extends Component
         }
 
         return __('billing.checkout_failed');
+    }
+
+    /**
+     * Customer row for the current Paddle account. A stored id from an older
+     * account is replaced; clinics with no customer are created as usual.
+     */
+    protected function resolveBillableCustomer(): \Laravel\Paddle\Customer
+    {
+        $email = $this->clinic->owner->email ?? auth()->user()->email;
+        $name = $this->clinic->owner->name ?? $this->clinic->name;
+        $customer = $this->clinic->customer;
+
+        if (! $customer) {
+            return $this->clinic->createAsCustomer([
+                'email' => $email,
+                'name' => $name,
+            ]);
+        }
+
+        if ($this->paddleCustomerExists($customer->paddle_id)) {
+            return $customer;
+        }
+
+        $response = Cashier::api('GET', 'customers', [
+            'status' => 'active,archived',
+            'email' => $email,
+        ])['data'][0] ?? null;
+
+        if ($response === null) {
+            $response = Cashier::api('POST', 'customers', [
+                'email' => $email,
+                'name' => $name,
+            ])['data'];
+        }
+
+        $customer->paddle_id = $response['id'];
+        $customer->name = $response['name'] ?? $name;
+        $customer->email = $response['email'] ?? $email;
+        $customer->save();
+
+        return $customer;
+    }
+
+    protected function paddleCustomerExists(string $paddleId): bool
+    {
+        try {
+            Cashier::api('GET', 'customers/'.$paddleId);
+
+            return true;
+        } catch (PaddleException $e) {
+            if ($this->isMissingPaddleResource($e)) {
+                return false;
+            }
+
+            throw $e;
+        }
+    }
+
+    protected function isMissingPaddleResource(\Throwable $e): bool
+    {
+        if (! $e instanceof PaddleException) {
+            return false;
+        }
+
+        $code = $e->getError()['code'] ?? null;
+
+        return $code === 'url_called_is_invalid'
+            || str_contains($e->getMessage(), 'URL called is invalid.');
     }
 
     public function changePlan(string $planSlug): void
@@ -250,8 +313,21 @@ class Index extends Component
             session()->flash('success', $message);
             $this->dispatch('notify', type: 'success', message: $message);
         } catch (\Exception $e) {
-            $this->dispatch('notify', type: 'error', message: __('billing.change_plan_failed'));
             logger()->error('Paddle change plan error: '.$e->getMessage());
+
+            // The local Cashier row can point at a subscription from a previous Paddle
+            // account. That account answers "URL called is invalid" and there is nothing
+            // to prorate, so the selected plan has to start as a new checkout.
+            if ($this->isMissingPaddleResource($e)) {
+                $this->dispatch('notify', type: 'info', message: __('billing.subscription_restart_checkout', [
+                    'plan' => $plan->name,
+                ]));
+                $this->checkout($planSlug);
+
+                return;
+            }
+
+            $this->dispatch('notify', type: 'error', message: __('billing.change_plan_failed'));
         }
     }
 
