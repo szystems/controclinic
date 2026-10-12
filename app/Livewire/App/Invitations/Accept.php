@@ -74,8 +74,11 @@ class Accept extends Component
                     'clinic_id' => $this->invitation->clinic_id,
                     'role' => $this->invitation->role,
                     'is_active' => true,
-                    'email_verified_at' => now(),
                 ]);
+
+                // The invitation link already proved this inbox. The column is not
+                // mass-assignable, so create() would leave the account unverified.
+                $user->markEmailAsVerified();
 
                 $user->assignRole($this->invitation->role);
 

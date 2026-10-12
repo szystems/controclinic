@@ -242,6 +242,7 @@ class InvitationTest extends TestCase
         // Verify role was assigned
         $user = User::where('email', 'newdoc@test.com')->first();
         $this->assertTrue($user->hasRole('doctor'));
+        $this->assertNotNull($user->email_verified_at);
     }
 
     public function test_cannot_accept_expired_invitation(): void
