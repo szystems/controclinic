@@ -16,9 +16,11 @@
 </x-mail::header>
 </x-slot:header>
 
-{{-- Clinic sub-header (inyectado por emails dirigidos a pacientes) --}}
+{{-- Clinic sub-header stays outside the markdown body so its HTML is not escaped. --}}
 @isset($clinicHeader)
+<x-slot:clinicHeader>
 {!! $clinicHeader !!}
+</x-slot:clinicHeader>
 @endisset
 
 {{-- Body --}}
