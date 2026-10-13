@@ -66,7 +66,19 @@ class Invoice extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logFillable()
+            ->logOnly([
+                'invoice_number',
+                'issued_at',
+                'due_at',
+                'status',
+                'subtotal',
+                'discount_amount',
+                'tax_amount',
+                'total',
+                'paid_amount',
+                'currency',
+                'notes',
+            ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }

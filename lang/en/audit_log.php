@@ -46,5 +46,8 @@ return [
         'MedicalRecord' => 'Medical record',
         'User' => 'User',
         'Clinic' => 'Clinic',
+        'Invoice' => 'Invoice',
+        'Prescription' => 'Prescription',
+        'RecordTemplate' => 'Template',
     ],
 ];

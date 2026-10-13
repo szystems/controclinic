@@ -46,5 +46,8 @@ return [
         'MedicalRecord' => 'Historial médico',
         'User' => 'Usuario',
         'Clinic' => 'Clínica',
+        'Invoice' => 'Factura',
+        'Prescription' => 'Receta',
+        'RecordTemplate' => 'Plantilla',
     ],
 ];
