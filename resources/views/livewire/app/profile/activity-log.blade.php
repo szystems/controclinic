@@ -34,6 +34,7 @@
                                         <span class="font-medium">{{ $change['label'] }}:</span>
                                         @if (isset($change['from']))
                                             <span class="text-gray-400 line-through">{{ $change['from'] }}</span>
+                                            <span aria-hidden="true">→</span>
                                             <span>{{ $change['to'] }}</span>
                                         @else
                                             {{ $change['value'] }}

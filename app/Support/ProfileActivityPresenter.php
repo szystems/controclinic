@@ -137,6 +137,10 @@ class ProfileActivityPresenter
             return $this->translated(['staff.role_'], $string);
         }
 
+        if (in_array($key, ['appointment_type', 'record_type'], true)) {
+            return $this->translated(['appointments.', 'medical_records.'], $string);
+        }
+
         if ($key === 'is_active') {
             return in_array($string, ['1', 'true'], true) ? __('general.yes') : __('general.no');
         }
