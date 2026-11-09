@@ -52,7 +52,7 @@ return [
     // Messages
     'plan_changed' => 'Plan updated successfully.',
     'plan_upgraded' => 'Plan upgraded to :plan. The prorated difference was charged to your payment method.',
-    'plan_downgrade_scheduled' => 'Change to :plan scheduled. It will take effect at the end of your current billing period.',
+    'plan_downgrade_scheduled' => 'Plan changed to :plan. We do not refund the unused part of the period already paid.',
     'already_on_plan' => 'You are already on this plan.',
     'change_plan_failed' => 'Could not change the plan. Check your payment method or try again later.',
     'subscription_restart_checkout' => 'The previous subscription is no longer in the payment provider. Complete checkout to move to :plan.',

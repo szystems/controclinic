@@ -310,8 +310,8 @@ class Index extends Component
                 // Upgrade: cobra la diferencia prorrateada de inmediato al método de pago en archivo.
                 $subscription->swapAndInvoice($priceId);
             } else {
-                // Downgrade: se aplica al final del período actual (prorrateo al próximo ciclo).
-                $subscription->swap($priceId);
+                // Downgrade: el plan nuevo empieza ahora y no se acredita el tiempo ya pagado.
+                $subscription->doNotBill()->swap($priceId);
             }
 
             // Quien llega aquí es suscriptor real de Paddle: ya no es un plan manual del admin.

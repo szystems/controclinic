@@ -52,7 +52,7 @@ return [
     // Messages
     'plan_changed' => 'Plan actualizado exitosamente.',
     'plan_upgraded' => 'Plan actualizado a :plan. Se cobró la diferencia prorrateada a tu método de pago.',
-    'plan_downgrade_scheduled' => 'Cambio a :plan programado. Se aplicará al final de tu período de facturación actual.',
+    'plan_downgrade_scheduled' => 'Plan cambiado a :plan. No reembolsamos la parte no usada del período ya pagado.',
     'already_on_plan' => 'Ya estás en este plan.',
     'change_plan_failed' => 'No se pudo cambiar el plan. Revisa tu método de pago o inténtalo más tarde.',
     'subscription_restart_checkout' => 'La suscripción anterior ya no está en el proveedor de pago. Completa el pago para pasar a :plan.',

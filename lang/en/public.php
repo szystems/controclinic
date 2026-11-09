@@ -63,7 +63,7 @@ return [
 
     // FAQ
     'faq_change_plan_q' => 'Can I change plans at any time?',
-    'faq_change_plan_a' => 'Yes, you can upgrade or downgrade whenever you want. Changes apply immediately and billing is prorated for the remaining days in the period.',
+    'faq_change_plan_a' => 'Yes. You can move to a higher or lower plan at any time from Billing. Moving up charges the difference for the remaining days immediately. Moving down starts the new plan right away, and we do not refund the difference for the period already paid. If you cancel, you keep access until the end of that period, and we do not refund the unused days.',
     'faq_free_plan_q' => 'How does the Free plan work?',
     'faq_free_plan_a' => 'The Free plan is permanent: it never expires and does not require a card. It includes generous limits to try ControClinic with your real clinic. When you need more capacity, upgrade to a paid plan from Billing.',
     'faq_taxes_q' => 'Do prices include taxes?',

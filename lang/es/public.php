@@ -63,7 +63,7 @@ return [
 
     // FAQ
     'faq_change_plan_q' => '¿Puedo cambiar de plan en cualquier momento?',
-    'faq_change_plan_a' => 'Sí, puedes actualizar o degradar tu plan cuando quieras. Los cambios se aplican inmediatamente y el cobro se prorratea según los días restantes del período.',
+    'faq_change_plan_a' => 'Sí. Puedes subir o bajar de plan cuando quieras desde Facturación. Si subes, se cobra en ese momento la diferencia por los días que quedan. Si bajas, el plan nuevo queda activo enseguida y no devolvemos la diferencia del período ya pagado. Si cancelas, conservas el acceso hasta el final de ese período y tampoco reembolsamos los días que no uses.',
     'faq_free_plan_q' => '¿Cómo funciona el plan Free?',
     'faq_free_plan_a' => 'El plan Free es permanente: no caduca ni requiere tarjeta. Incluye límites generosos para probar ControClinic con tu clínica real. Cuando necesites más capacidad, mejoras a un plan de pago desde Facturación.',
     'faq_taxes_q' => '¿Los precios incluyen impuestos?',
