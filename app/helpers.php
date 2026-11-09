@@ -20,3 +20,10 @@ if (! function_exists('app_setting')) {
         return AppSetting::get($key, $default);
     }
 }
+
+if (! function_exists('registration_is_open')) {
+    function registration_is_open(): bool
+    {
+        return (bool) app_setting('features.registration_open', true);
+    }
+}

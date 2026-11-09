@@ -106,6 +106,7 @@ class AdminSettingsTest extends TestCase
             ->assertSet('branding_app_name', 'ControClinic')
             ->assertSet('branding_primary_color', '#2563eb')
             ->assertSet('defaults_locale', 'es')
+            ->assertSet('defaults_timezone', 'America/Guatemala')
             ->assertSet('features_registration_open', true)
             ->assertSet('features_maintenance_mode', false);
     }
@@ -226,7 +227,7 @@ class AdminSettingsTest extends TestCase
             ->assertHasNoErrors();
 
         $this->assertTrue((bool) AppSetting::get('features.maintenance_mode'));
-        $this->assertTrue((bool) AppSetting::get('features.ai_enabled'));
+        $this->assertFalse((bool) AppSetting::get('features.ai_enabled'));
         $this->assertFalse((bool) AppSetting::get('features.registration_open'));
     }
 

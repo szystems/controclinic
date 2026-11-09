@@ -76,7 +76,7 @@ class AppSettingsSeeder extends Seeder
             [
                 'group' => 'defaults',
                 'key' => 'defaults.locale',
-                'value' => 'en',
+                'value' => 'es',
                 'type' => 'string',
                 'is_public' => true,
                 'description' => 'Idioma por defecto para nuevas clínicas (es|en)',
@@ -84,7 +84,7 @@ class AppSettingsSeeder extends Seeder
             [
                 'group' => 'defaults',
                 'key' => 'defaults.timezone',
-                'value' => 'America/New_York',
+                'value' => 'America/Guatemala',
                 'type' => 'string',
                 'is_public' => false,
                 'description' => 'Zona horaria por defecto para nuevas clínicas',
@@ -150,7 +150,7 @@ class AppSettingsSeeder extends Seeder
             [
                 'group' => 'seo',
                 'key' => 'seo.meta_description',
-                'value' => 'ControClinic es el software de gestión para clínicas médicas más fácil de usar. Agenda citas, gestiona pacientes y haz crecer tu práctica médica.',
+                'value' => 'ControClinic ayuda a tu clínica a agendar citas, llevar pacientes, historiales y recetas en un solo lugar. Empieza gratis y sin tarjeta.',
                 'type' => 'string',
                 'is_public' => true,
                 'description' => 'Descripción por defecto en meta tags (recomendado 150-160 caracteres)',

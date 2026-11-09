@@ -32,6 +32,7 @@ return [
     'terms_link' => 'Términos y Condiciones',
     'privacy_link' => 'Política de Privacidad',
     'terms_required' => 'Debes aceptar los Términos y Condiciones para continuar.',
+    'registration_closed' => 'El registro de clínicas nuevas está cerrado por ahora. Si ya tienes cuenta, entra desde el inicio de sesión.',
     'throttle' => 'Demasiados intentos. Inténtalo de nuevo en :seconds segundos.',
 
     // Two-Factor Authentication

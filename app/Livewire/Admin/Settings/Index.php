@@ -38,7 +38,7 @@ class Index extends Component
     // --- Defaults ---
     public string $defaults_locale = 'es';
 
-    public string $defaults_timezone = 'America/Bogota';
+    public string $defaults_timezone = 'America/Guatemala';
 
     public string $defaults_currency = 'USD';
 
@@ -81,7 +81,7 @@ class Index extends Component
         $this->legal_support_email = $settings['legal.support_email'] ?? '';
 
         $this->defaults_locale = $settings['defaults.locale'] ?? 'es';
-        $this->defaults_timezone = $settings['defaults.timezone'] ?? 'America/Bogota';
+        $this->defaults_timezone = $settings['defaults.timezone'] ?? 'America/Guatemala';
         $this->defaults_currency = $settings['defaults.currency'] ?? 'USD';
 
         $this->features_portal_enabled = (bool) ($settings['features.portal_enabled'] ?? false);
@@ -91,7 +91,7 @@ class Index extends Component
         $this->features_maintenance_mode = (bool) ($settings['features.maintenance_mode'] ?? false);
 
         $this->seo_meta_title = $settings['seo.meta_title'] ?? 'ControClinic — Software para Clínicas Médicas';
-        $this->seo_meta_description = $settings['seo.meta_description'] ?? '';
+        $this->seo_meta_description = $settings['seo.meta_description'] ?? 'ControClinic ayuda a tu clínica a agendar citas, llevar pacientes, historiales y recetas en un solo lugar. Empieza gratis y sin tarjeta.';
         $this->seo_og_image_url = $settings['seo.og_image_url'] ?? '';
         $this->seo_google_analytics_id = $settings['seo.google_analytics_id'] ?? '';
         $this->seo_gtm_id = $settings['seo.gtm_id'] ?? '';
@@ -201,7 +201,7 @@ class Index extends Component
     {
         $this->validate([
             'defaults_locale' => 'required|in:es,en',
-            'defaults_timezone' => 'required|string|max:60',
+            'defaults_timezone' => 'required|timezone:all',
             'defaults_currency' => 'required|string|size:3',
         ]);
 
@@ -218,11 +218,15 @@ class Index extends Component
     {
         $userId = Auth::id();
 
-        AppSetting::set('features.portal_enabled', $this->features_portal_enabled, $userId);
-        AppSetting::set('features.telemedicine_enabled', $this->features_telemedicine_enabled, $userId);
-        AppSetting::set('features.ai_enabled', $this->features_ai_enabled, $userId);
+        AppSetting::set('features.portal_enabled', false, $userId);
+        AppSetting::set('features.telemedicine_enabled', false, $userId);
+        AppSetting::set('features.ai_enabled', false, $userId);
         AppSetting::set('features.registration_open', $this->features_registration_open, $userId);
         AppSetting::set('features.maintenance_mode', $this->features_maintenance_mode, $userId);
+
+        $this->features_portal_enabled = false;
+        $this->features_telemedicine_enabled = false;
+        $this->features_ai_enabled = false;
 
         $this->dispatch('notify', type: 'success', message: __('settings.features_saved'));
     }

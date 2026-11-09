@@ -10,7 +10,7 @@
         $logoUrl = app_setting('branding.logo_url');
         $primaryColor = app_setting('branding.primary_color', '#4f46e5');
         $defaultMetaTitle = app_setting('seo.meta_title', $appName.' — Software para Clínicas Médicas');
-        $defaultMetaDesc = app_setting('seo.meta_description', 'Software de gestión para clínicas médicas. Agenda citas, gestiona pacientes y haz crecer tu práctica.');
+        $defaultMetaDesc = app_setting('seo.meta_description', 'ControClinic ayuda a tu clínica a agendar citas, llevar pacientes, historiales y recetas en un solo lugar. Empieza gratis y sin tarjeta.');
         $ogImageUrl = app_setting('seo.og_image_url') ?: asset('images/og-image.png');
         $gaId = app_setting('seo.google_analytics_id');
         $gtmId = app_setting('seo.gtm_id');
@@ -132,9 +132,11 @@
                         <a href="{{ route('login') }}" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">
                             {{ __('public.nav_login') }}
                         </a>
+                        @if(registration_is_open())
                         <a href="{{ route('register') }}" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-all">
                             {{ __('public.nav_start_free') }}
                         </a>
+                        @endif
                     @endauth
                 </div>
 
@@ -175,9 +177,11 @@
                         </a>
                     @else
                         <a href="{{ route('login') }}" class="text-gray-700 font-medium">{{ __('public.nav_login') }}</a>
+                        @if(registration_is_open())
                         <a href="{{ route('register') }}" class="inline-flex justify-center items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors">
                             {{ __('public.nav_start_free') }}
                         </a>
+                        @endif
                     @endauth
                     <hr class="border-gray-100">
                     <!-- Language toggle mobile -->

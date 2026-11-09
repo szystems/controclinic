@@ -56,6 +56,12 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function register(): void
     {
+        if (! registration_is_open()) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.registration_closed'),
+            ]);
+        }
+
         $validated = $this->validate(
             [
                 'name' => ['required', 'string', 'max:255'],
@@ -141,6 +147,14 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    @if(! registration_is_open())
+        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            {{ __('auth.registration_closed') }}
+        </div>
+        <a href="{{ route('login') }}" wire:navigate class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900">
+            {{ __('public.nav_login') }}
+        </a>
+    @else
     <form wire:submit="register">
         <!-- Clinic Name -->
         <div>
@@ -221,4 +235,5 @@ new #[Layout('layouts.guest')] class extends Component
             </x-primary-button>
         </div>
     </form>
+    @endif
 </div>

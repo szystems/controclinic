@@ -32,6 +32,7 @@ return [
     'terms_link' => 'Terms and Conditions',
     'privacy_link' => 'Privacy Policy',
     'terms_required' => 'You must accept the Terms and Conditions to continue.',
+    'registration_closed' => 'Registration for new clinics is closed for now. If you already have an account, sign in.',
     'throttle' => 'Too many attempts. Please try again in :seconds seconds.',
 
     // Two-Factor Authentication

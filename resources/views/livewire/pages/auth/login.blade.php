@@ -28,7 +28,7 @@ new #[Layout('layouts.guest')] class extends Component
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    @if (Route::has('register'))
+    @if (Route::has('register') && registration_is_open())
         <div class="mb-6">
             <a href="{{ route('register') }}" wire:navigate
                class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3.5 text-sm font-semibold text-white shadow-md hover:from-indigo-700 hover:to-purple-700 transition">

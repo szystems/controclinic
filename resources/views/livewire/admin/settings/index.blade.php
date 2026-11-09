@@ -357,13 +357,8 @@
                     {{-- Timezone --}}
                     <div>
                         <x-input-label for="defaults_timezone" :value="__('admin.default_timezone')" />
-                        <x-text-input
-                            id="defaults_timezone"
-                            wire:model="defaults_timezone"
-                            type="text"
-                            class="mt-1 block w-full"
-                            placeholder="America/Bogota"
-                        />
+                        <x-timezone-select id="defaults_timezone" wireModel="defaults_timezone" class="mt-1" />
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.default_timezone_help') }}</p>
                         <x-input-error :messages="$errors->get('defaults_timezone')" class="mt-2" />
                     </div>
 
@@ -410,11 +405,11 @@
 
                 <form wire:submit="saveFeatures" class="p-6 space-y-4">
                     @foreach([
-                        ['field' => 'features_registration_open',     'label' => 'registration_open',     'desc' => 'registration_open_description'],
-                        ['field' => 'features_portal_enabled',        'label' => 'portal_enabled',        'desc' => 'portal_enabled_description'],
-                        ['field' => 'features_telemedicine_enabled',  'label' => 'telemedicine_enabled',  'desc' => 'telemedicine_enabled_description'],
-                        ['field' => 'features_ai_enabled',            'label' => 'ai_enabled',            'desc' => 'ai_enabled_description'],
-                        ['field' => 'features_maintenance_mode',      'label' => 'maintenance_mode',      'desc' => 'maintenance_mode_description'],
+                        ['field' => 'features_registration_open', 'label' => 'registration_open', 'desc' => 'registration_open_description', 'disabled' => false],
+                        ['field' => 'features_maintenance_mode', 'label' => 'maintenance_mode', 'desc' => 'maintenance_mode_description', 'disabled' => false],
+                        ['field' => 'features_portal_enabled', 'label' => 'portal_enabled', 'desc' => 'portal_enabled_description', 'disabled' => true],
+                        ['field' => 'features_telemedicine_enabled', 'label' => 'telemedicine_enabled', 'desc' => 'telemedicine_enabled_description', 'disabled' => true],
+                        ['field' => 'features_ai_enabled', 'label' => 'ai_enabled', 'desc' => 'ai_enabled_description', 'disabled' => true],
                     ] as $toggle)
                         <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
                             <div>
@@ -427,12 +422,13 @@
                             </div>
                             <label
                                 x-data="{ on: @entangle($toggle['field']) }"
-                                class="relative inline-flex items-center cursor-pointer ml-4 flex-shrink-0"
+                                class="relative inline-flex items-center ml-4 flex-shrink-0 {{ $toggle['disabled'] ? 'opacity-50 pointer-events-none' : 'cursor-pointer' }}"
                             >
                                 <input
                                     type="checkbox"
                                     wire:model="{{ $toggle['field'] }}"
                                     class="sr-only peer"
+                                    @disabled($toggle['disabled'])
                                 />
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 dark:peer-focus:ring-indigo-600 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
                             </label>
@@ -562,6 +558,7 @@
                             <x-input-error :messages="$errors->get('seo_gtm_id')" class="mt-2" />
                         </div>
                     </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('admin.seo_analytics_help') }}</p>
 
                     <div class="flex justify-end pt-2">
                         <x-primary-button wire:loading.attr="disabled">

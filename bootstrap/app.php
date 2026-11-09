@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureCanWrite;
+use App\Http\Middleware\EnsurePlatformAvailable;
 use App\Http\Middleware\EnsureTwoFactorAuthenticated;
 use App\Http\Middleware\ResolveCustomDomain;
 use App\Http\Middleware\SecurityHeaders;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             SetLocale::class,
+            EnsurePlatformAvailable::class,
             SecurityHeaders::class,
         ]);
 
