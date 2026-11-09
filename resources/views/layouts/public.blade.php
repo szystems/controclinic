@@ -14,7 +14,7 @@
         $ogImageUrl = app_setting('seo.og_image_url') ?: asset('images/og-image.png');
         $gaId = app_setting('seo.google_analytics_id');
         $gtmId = app_setting('seo.gtm_id');
-        $supportEmail = app_setting('legal.support_email', 'soporte@controclinic.com');
+        $supportEmail = app_setting('legal.support_email', 'support@controclinic.com');
         $termsUrl = app_setting('legal.terms_url', '/terms');
         $privacyUrl = app_setting('legal.privacy_url', '/privacy');
 

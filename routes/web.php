@@ -146,6 +146,10 @@ Route::get('/privacy', function () {
     return view('public.privacy');
 })->name('privacy');
 
+Route::get('/refund', function () {
+    return view('public.refund');
+})->name('refund');
+
 Route::get('/sitemap.xml', function () {
     $urls = [
         ['loc' => route('home'),    'changefreq' => 'weekly',  'priority' => '1.0'],
@@ -153,6 +157,7 @@ Route::get('/sitemap.xml', function () {
         ['loc' => route('contact'), 'changefreq' => 'monthly', 'priority' => '0.7'],
         ['loc' => route('terms'),   'changefreq' => 'yearly',  'priority' => '0.3'],
         ['loc' => route('privacy'), 'changefreq' => 'yearly',  'priority' => '0.3'],
+        ['loc' => route('refund'),  'changefreq' => 'yearly',  'priority' => '0.3'],
     ];
 
     $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";

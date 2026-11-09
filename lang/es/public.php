@@ -67,7 +67,7 @@ return [
     'faq_free_plan_q' => '¿Cómo funciona el plan Free?',
     'faq_free_plan_a' => 'El plan Free es permanente: no caduca ni requiere tarjeta. Incluye límites generosos para probar ControClinic con tu clínica real. Cuando necesites más capacidad, mejoras a un plan de pago desde Facturación.',
     'faq_taxes_q' => '¿Los precios incluyen impuestos?',
-    'faq_taxes_a' => 'Los precios mostrados no incluyen impuestos locales. El impuesto aplicable se calculará según tu ubicación al momento del pago.',
+    'faq_taxes_a' => 'Los precios de los planes están en dólares estadounidenses (USD) y no incluyen impuestos locales. Paddle calcula el impuesto según tu ubicación al momento del pago.',
     'faq_students_q' => '¿Ofrecen descuentos para estudiantes?',
     'faq_students_a' => 'Sí, tenemos un plan privado con descuento para estudiantes. Solicita tu código de acceso desde Facturación o contáctanos.',
     'faq_cancel_q' => '¿Cómo funciona la cancelación?',
@@ -84,6 +84,7 @@ return [
     'footer_contact' => 'Contacto',
     'footer_privacy' => 'Privacidad',
     'footer_terms' => 'Términos de Uso',
+    'footer_refund' => 'Reembolsos',
     'footer_copyright' => '© :year :app. Todos los derechos reservados.',
 
     // Contact
@@ -92,7 +93,7 @@ return [
     'contact_heading' => '¿Cómo podemos ayudarte?',
     'contact_intro' => 'Ya sea que tengas preguntas sobre nuestros planes, necesites soporte técnico o quieras agendar una demo, estamos aquí para ti.',
     'contact_email_title' => 'Email',
-    'contact_email_address' => 'soporte@controclinic.com',
+    'contact_email_address' => 'support@controclinic.com',
     'contact_email_note' => 'Respondemos en menos de 24 horas',
     'contact_chat_title' => 'Chat en vivo',
     'contact_chat_hours' => 'Lunes a Viernes, 9am - 6pm',

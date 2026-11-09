@@ -54,6 +54,8 @@ return [
     'free_label' => 'Gratis para siempre',
     'per_month' => '/mes',
     'per_year' => '/año',
+    'usd_per_month' => '/mes USD',
+    'usd_per_year' => '/año USD',
     'custom_pricing' => 'Personalizado',
     'contact_for_pricing' => 'Contáctanos para un plan a medida',
     'save_percent' => 'Ahorras :percent%',

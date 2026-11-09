@@ -67,7 +67,7 @@ return [
     'faq_free_plan_q' => 'How does the Free plan work?',
     'faq_free_plan_a' => 'The Free plan is permanent: it never expires and does not require a card. It includes generous limits to try ControClinic with your real clinic. When you need more capacity, upgrade to a paid plan from Billing.',
     'faq_taxes_q' => 'Do prices include taxes?',
-    'faq_taxes_a' => 'Prices shown do not include local taxes. Applicable tax will be calculated based on your location at checkout.',
+    'faq_taxes_a' => 'Plan prices are in US dollars (USD) and do not include local taxes. Paddle calculates the tax for your location at checkout.',
     'faq_students_q' => 'Do you offer student discounts?',
     'faq_students_a' => 'Yes, we have a private discounted plan for students. Request your access code from Billing or contact us.',
     'faq_cancel_q' => 'How does cancellation work?',
@@ -84,6 +84,7 @@ return [
     'footer_contact' => 'Contact',
     'footer_privacy' => 'Privacy',
     'footer_terms' => 'Terms of Use',
+    'footer_refund' => 'Refunds',
     'footer_copyright' => '© :year :app. All rights reserved.',
 
     // Contact
@@ -92,7 +93,7 @@ return [
     'contact_heading' => 'How can we help?',
     'contact_intro' => 'Whether you have questions about our plans, need technical support, or want to book a demo, we are here for you.',
     'contact_email_title' => 'Email',
-    'contact_email_address' => 'soporte@controclinic.com',
+    'contact_email_address' => 'support@controclinic.com',
     'contact_email_note' => 'We reply within 24 hours',
     'contact_chat_title' => 'Live chat',
     'contact_chat_hours' => 'Monday to Friday, 9am - 6pm',

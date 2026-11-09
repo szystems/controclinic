@@ -54,6 +54,8 @@ return [
     'free_label' => 'Free forever',
     'per_month' => '/month',
     'per_year' => '/year',
+    'usd_per_month' => '/month USD',
+    'usd_per_year' => '/year USD',
     'custom_pricing' => 'Custom',
     'contact_for_pricing' => 'Contact us for a custom plan',
     'save_percent' => 'Save :percent%',

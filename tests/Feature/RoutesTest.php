@@ -38,6 +38,20 @@ class RoutesTest extends TestCase
         $this->get('/privacy')->assertOk()->assertSee('Privacidad');
     }
 
+    public function test_refund_page_loads(): void
+    {
+        $this->get('/refund')->assertOk()->assertSee('reembolsos')->assertSee('SZ Systems');
+    }
+
+    public function test_terms_name_the_operator_and_drop_the_draft_notice(): void
+    {
+        $this->get('/terms')
+            ->assertOk()
+            ->assertSee('SZ Systems')
+            ->assertSee('Langford')
+            ->assertDontSee('preliminar');
+    }
+
     // ==================== AUTH ROUTES ====================
 
     public function test_login_page_loads(): void

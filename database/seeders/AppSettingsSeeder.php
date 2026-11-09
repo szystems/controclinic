@@ -67,7 +67,7 @@ class AppSettingsSeeder extends Seeder
             [
                 'group' => 'legal',
                 'key' => 'legal.support_email',
-                'value' => 'soporte@controclinic.com',
+                'value' => 'support@controclinic.com',
                 'type' => 'string',
                 'is_public' => true,
                 'description' => 'Email de soporte visible a los usuarios',

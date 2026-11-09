@@ -15,6 +15,6 @@
         <span class="{{ $linkClass }}">Szystems</span>
     </a>
     @if ($variant !== 'developed')
-        · Victoria, BC
+        · Langford, BC
     @endif
 </span>

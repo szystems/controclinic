@@ -44,7 +44,7 @@
                 <span class="text-gray-500 dark:text-gray-400">{{ __('onboarding.forever_free') }}</span>
             @else
                 <span class="text-3xl font-bold text-gray-900 dark:text-white">${{ number_format($plan->monthly_price, 0) }}</span>
-                <span class="text-gray-500 dark:text-gray-400">{{ __('onboarding.per_month') }}</span>
+                <span class="text-gray-500 dark:text-gray-400">{{ __('features.usd_per_month') }}</span>
             @endif
         </div>
         <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
@@ -78,10 +78,10 @@
                 <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('billing.contact_us') }}</span>
             @elseif ($price)
                 <span class="text-4xl font-bold text-gray-900 dark:text-white">${{ number_format($price, 0) }}</span>
-                <span class="text-gray-500 dark:text-gray-400">{{ __('features.per_month') }}</span>
+                <span class="text-gray-500 dark:text-gray-400">{{ __('features.usd_per_month') }}</span>
                 @if ($billingCycle === 'yearly' && $yearlyTotal)
                     <p class="text-sm text-green-600 dark:text-green-400 mt-1">
-                        ${{ number_format($yearlyTotal, 0) }}{{ __('features.per_year') }}
+                        ${{ number_format($yearlyTotal, 0) }}{{ __('features.usd_per_year') }}
                     </p>
                 @endif
             @endif
@@ -152,10 +152,10 @@
                 <span class="text-4xl font-bold {{ $isPopular ? 'text-white' : 'text-gray-900' }}" x-text="annual ? '${{ number_format($plan->yearly_monthly_price, 0) }}' : '${{ number_format($plan->monthly_price, 0) }}'">
                     ${{ number_format($plan->yearly_monthly_price ?? $plan->monthly_price, 0) }}
                 </span>
-                <span class="{{ $isPopular ? 'text-indigo-200' : 'text-gray-500' }}">{{ __('features.per_month') }}</span>
+                <span class="{{ $isPopular ? 'text-indigo-200' : 'text-gray-500' }}">{{ __('features.usd_per_month') }}</span>
                 @if ($plan->yearly_price && $savings)
                     <span x-show="annual" class="block text-sm {{ $isPopular ? 'text-indigo-200' : 'text-green-600' }} mt-1">
-                        ${{ number_format($plan->yearly_price, 0) }}/{{ __('billing.year') }} ({{ __('features.save_percent', ['percent' => round($savings / ($plan->monthly_price * 12) * 100)]) }})
+                        ${{ number_format($plan->yearly_price, 0) }}{{ __('features.usd_per_year') }} ({{ __('features.save_percent', ['percent' => round($savings / ($plan->monthly_price * 12) * 100)]) }})
                     </span>
                 @endif
             @endif

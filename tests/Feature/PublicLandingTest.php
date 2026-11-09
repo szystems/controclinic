@@ -219,6 +219,7 @@ class PublicLandingTest extends TestCase
         $this->assertStringContainsString(route('home'), $xml);
         $this->assertStringContainsString(route('pricing'), $xml);
         $this->assertStringContainsString(route('contact'), $xml);
+        $this->assertStringContainsString(route('refund'), $xml);
     }
 
     public function test_robots_txt_disallows_private_areas(): void

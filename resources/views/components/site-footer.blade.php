@@ -3,7 +3,7 @@
 @php
     $appName = app_setting('branding.app_name', 'ControClinic');
     $logoUrl = app_setting('branding.logo_url');
-    $supportEmail = app_setting('legal.support_email', 'soporte@controclinic.com');
+    $supportEmail = app_setting('legal.support_email', 'support@controclinic.com');
     $termsUrl = app_setting('legal.terms_url', '/terms');
     $privacyUrl = app_setting('legal.privacy_url', '/privacy');
 @endphp
@@ -52,6 +52,7 @@
                     <ul class="space-y-2 text-sm">
                         <li><a href="{{ $privacyUrl }}" class="hover:text-white transition-colors">{{ __('public.footer_privacy') }}</a></li>
                         <li><a href="{{ $termsUrl }}" class="hover:text-white transition-colors">{{ __('public.footer_terms') }}</a></li>
+                        <li><a href="{{ route('refund') }}" class="hover:text-white transition-colors">{{ __('public.footer_refund') }}</a></li>
                         <li><a href="mailto:{{ $supportEmail }}" class="hover:text-white transition-colors">{{ $supportEmail }}</a></li>
                     </ul>
                 </div>
