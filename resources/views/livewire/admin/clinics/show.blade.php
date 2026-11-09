@@ -207,6 +207,11 @@
 
                         @if($subscriptionInfo)
                             <div class="space-y-3">
+                                @unless($subscriptionInfo['is_live'])
+                                    <div class="p-2 bg-amber-50 dark:bg-amber-900/20 rounded text-xs text-amber-700 dark:text-amber-300">
+                                        {{ __('admin.previous_account_notice') }}
+                                    </div>
+                                @endunless
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs text-gray-500 dark:text-gray-400">{{ __('general.status') }}</span>
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
@@ -238,9 +243,21 @@
                                     </div>
                                 @endif
 
-                                @if($clinic->is_manual_plan && $subscriptionInfo['plan_name'])
+                                @if($subscriptionInfo['is_live'] && $clinic->is_manual_plan && $subscriptionInfo['plan_name'])
                                     <div class="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded text-xs text-amber-700 dark:text-amber-300">
                                         {{ __('admin.pays_but_has', ['pays' => $subscriptionInfo['plan_name'], 'has' => $clinic->plan->name]) }}
+                                    </div>
+                                @endif
+
+                                @if($subscriptionInfo['can_cancel'])
+                                    <div class="pt-2">
+                                        <button type="button"
+                                                wire:click="cancelSubscription"
+                                                wire:confirm="{{ __('admin.confirm_cancel_subscription') }}"
+                                                class="w-full inline-flex justify-center items-center px-3 py-2 border border-red-300 dark:border-red-700 text-sm font-medium rounded-md text-red-700 dark:text-red-300 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                            {{ __('admin.cancel_subscription') }}
+                                        </button>
+                                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.cancel_keeps_access') }}</p>
                                     </div>
                                 @endif
 

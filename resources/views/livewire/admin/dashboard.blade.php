@@ -8,6 +8,15 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            @if($subscriptionBreakdown['past_due'] > 0)
+                <a href="{{ route('admin.subscriptions.index', ['status' => 'past_due']) }}"
+                   class="mb-6 block rounded-md bg-red-50 dark:bg-red-900/30 p-4 hover:bg-red-100 dark:hover:bg-red-900/40">
+                    <p class="text-sm font-medium text-red-800 dark:text-red-200">
+                        {{ __('admin.past_due_banner', ['count' => $subscriptionBreakdown['past_due']]) }}
+                    </p>
+                </a>
+            @endif
+
             {{-- Stat Cards Row 1 - Core Metrics --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">

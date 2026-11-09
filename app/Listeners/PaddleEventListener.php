@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Billing\LiveSubscriptions;
 use App\Models\Clinic;
 use App\Models\Plan;
 use Illuminate\Events\Dispatcher;
@@ -13,6 +14,8 @@ class PaddleEventListener
 {
     public function handleSubscriptionCreated(SubscriptionCreated $event): void
     {
+        LiveSubscriptions::remember($event->subscription);
+
         $clinic = $event->billable;
 
         if (! $clinic instanceof Clinic) {
@@ -32,6 +35,8 @@ class PaddleEventListener
 
     public function handleSubscriptionUpdated(SubscriptionUpdated $event): void
     {
+        LiveSubscriptions::remember($event->subscription);
+
         // SubscriptionUpdated only exposes the subscription + payload (no billable).
         $clinic = $event->subscription->billable;
 

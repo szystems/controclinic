@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Clinics;
 
+use App\Billing\LiveSubscriptions;
 use App\Models\Clinic;
 use App\Models\Plan;
 use Livewire\Component;
@@ -16,6 +17,8 @@ class Index extends Component
     public string $filterPlan = '';
 
     public string $filterStatus = '';
+
+    public string $filterBilling = '';
 
     public function updatingSearch(): void
     {
@@ -32,9 +35,14 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterBilling(): void
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
-        $clinics = Clinic::with(['owner', 'plan'])
+        $clinics = Clinic::with(['owner', 'plan', 'subscriptions'])
             ->withCount(['patients', 'users'])
             ->when($this->search, function ($q) {
                 $q->where(function ($q) {
@@ -45,6 +53,7 @@ class Index extends Component
             })
             ->when($this->filterPlan, fn ($q) => $q->where('plan_type', $this->filterPlan))
             ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
+            ->when($this->filterBilling !== '', fn ($q) => LiveSubscriptions::applyClinicFilter($q, $this->filterBilling))
             ->latest()
             ->paginate(20);
 

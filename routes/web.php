@@ -402,6 +402,7 @@ Route::prefix('admin')
         Route::get('/plans/create', PlansCreate::class)->name('plans.create');
         Route::get('/plans/{plan}/edit', Edit::class)->name('plans.edit');
         Route::get('/clinics', App\Livewire\Admin\Clinics\Index::class)->name('clinics.index');
+        Route::get('/subscriptions', App\Livewire\Admin\Subscriptions\Index::class)->name('subscriptions.index');
         Route::get('/clinics/{clinic}', Show::class)->name('clinics.show');
         Route::get('/users', App\Livewire\Admin\Users\Index::class)->name('users.index');
         Route::get('/users/create', App\Livewire\Admin\Users\Create::class)->name('users.create');

@@ -51,6 +51,10 @@
                                    class="{{ request()->routeIs('admin.clinics.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
                                     {{ __('admin.clinics') }}
                                 </a>
+                                <a href="{{ route('admin.subscriptions.index') }}" wire:navigate
+                                   class="{{ request()->routeIs('admin.subscriptions.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
+                                    {{ __('admin.subscribers') }}
+                                </a>
                                 <a href="{{ route('admin.plans.index') }}" wire:navigate
                                    class="{{ request()->routeIs('admin.plans.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 rounded-md text-sm font-medium">
                                     {{ __('admin.plans') }}

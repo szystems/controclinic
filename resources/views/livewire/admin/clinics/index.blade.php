@@ -25,6 +25,17 @@
                         </select>
                     </div>
                     <div>
+                        <select wire:model.live="filterBilling"
+                                class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">{{ __('admin.all_billing') }}</option>
+                            <option value="subscription">{{ __('admin.billing_subscription') }}</option>
+                            <option value="past_due">{{ __('admin.past_due') }}</option>
+                            <option value="courtesy">{{ __('admin.billing_courtesy') }}</option>
+                            <option value="previous">{{ __('admin.billing_previous') }}</option>
+                            <option value="none">{{ __('admin.billing_none') }}</option>
+                        </select>
+                    </div>
+                    <div>
                         <select wire:model.live="filterStatus"
                                 class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             <option value="">{{ __('admin.all_statuses') }}</option>
@@ -45,6 +56,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.clinic_name') }}</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.owner') }}</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.plan') }}</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.billing_column') }}</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('general.status') }}</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('patients.title') }}</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.users') }}</th>
@@ -79,6 +91,16 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
+                                        @php $billingState = $clinic->adminBillingState(); @endphp
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                            {{ $billingState === 'subscription' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                               ($billingState === 'past_due' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                                               ($billingState === 'courtesy' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' :
+                                               'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300')) }}">
+                                            {{ __('admin.billing_'.$billingState) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
                                         @if($clinic->status === 'active')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">{{ __('general.active') }}</span>
                                         @elseif($clinic->status === 'trial')
@@ -101,7 +123,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    <td colspan="9" class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
                                         {{ __('admin.no_clinics_found') }}
                                     </td>
                                 </tr>

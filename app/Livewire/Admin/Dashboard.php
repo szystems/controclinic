@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Billing\LiveSubscriptions;
 use App\Models\Clinic;
 use App\Models\Plan;
 use App\Models\User;
@@ -84,27 +85,27 @@ class Dashboard extends Component
 
     public function getActiveSubscriptionsProperty(): int
     {
-        return Subscription::where('status', Subscription::STATUS_ACTIVE)->count();
+        return LiveSubscriptions::query()->where('status', Subscription::STATUS_ACTIVE)->count();
     }
 
     public function getTrialingSubscriptionsProperty(): int
     {
-        return Subscription::where('status', Subscription::STATUS_TRIALING)->count();
+        return LiveSubscriptions::query()->where('status', Subscription::STATUS_TRIALING)->count();
     }
 
     public function getPastDueSubscriptionsProperty(): int
     {
-        return Subscription::where('status', Subscription::STATUS_PAST_DUE)->count();
+        return LiveSubscriptions::query()->where('status', Subscription::STATUS_PAST_DUE)->count();
     }
 
     public function getPausedSubscriptionsProperty(): int
     {
-        return Subscription::where('status', Subscription::STATUS_PAUSED)->count();
+        return LiveSubscriptions::query()->where('status', Subscription::STATUS_PAUSED)->count();
     }
 
     public function getCanceledSubscriptionsProperty(): int
     {
-        return Subscription::where('status', Subscription::STATUS_CANCELED)->count();
+        return LiveSubscriptions::query()->where('status', Subscription::STATUS_CANCELED)->count();
     }
 
     public function getSubscriptionBreakdownProperty(): array
@@ -122,28 +123,19 @@ class Dashboard extends Component
 
     public function getRevenueThisMonthProperty(): array
     {
-        $transactions = Transaction::where('status', Transaction::STATUS_COMPLETED)
-            ->whereMonth('billed_at', now()->month)
-            ->whereYear('billed_at', now()->year)
-            ->get();
-
-        $total = $transactions->sum(fn ($t) => (int) $t->total);
-        $currency = $transactions->first()?->currency ?? 'USD';
-
-        return [
-            'total' => number_format($total / 100, 2),
-            'currency' => $currency,
-            'count' => $transactions->count(),
-        ];
+        return $this->revenueFor(now()->month, now()->year);
     }
 
     public function getRevenueLastMonthProperty(): array
     {
         $lastMonth = now()->subMonth();
-        $transactions = Transaction::where('status', Transaction::STATUS_COMPLETED)
-            ->whereMonth('billed_at', $lastMonth->month)
-            ->whereYear('billed_at', $lastMonth->year)
-            ->get();
+
+        return $this->revenueFor($lastMonth->month, $lastMonth->year);
+    }
+
+    private function revenueFor(int $month, int $year): array
+    {
+        $transactions = LiveSubscriptions::revenueTransactions($month, $year)->get();
 
         $total = $transactions->sum(fn ($t) => (int) $t->total);
         $currency = $transactions->first()?->currency ?? 'USD';
@@ -164,7 +156,7 @@ class Dashboard extends Component
             return 0;
         }
 
-        $paidClinics = Clinic::whereHas('plan', fn ($q) => $q->where('is_free', false))->count();
+        $paidClinics = LiveSubscriptions::payingClinicCount();
 
         return round(($paidClinics / $totalClinics) * 100, 1);
     }
@@ -180,6 +172,7 @@ class Dashboard extends Component
     {
         return Transaction::with('billable')
             ->where('status', '!=', Transaction::STATUS_DRAFT)
+            ->whereIn('paddle_subscription_id', LiveSubscriptions::query()->select('paddle_id'))
             ->latest('billed_at')
             ->take(10)
             ->get();

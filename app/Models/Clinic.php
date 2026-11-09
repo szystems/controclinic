@@ -278,6 +278,61 @@ class Clinic extends Model
         return route('app.billing.index', ['clinic' => $this->slug]);
     }
 
+    /**
+     * A paid plan granted by an admin, without a live Paddle charge.
+     * Free clinics are also stored as manual plans, and those are not courtesy.
+     */
+    public function isCourtesyPlan(): bool
+    {
+        if (! $this->is_manual_plan) {
+            return false;
+        }
+
+        $plan = $this->relationLoaded('plan') ? $this->plan : $this->plan()->first();
+
+        if ($plan) {
+            return ! $plan->is_free;
+        }
+
+        return $this->plan_type !== 'free';
+    }
+
+    /**
+     * How this clinic should appear in the admin billing column.
+     * A live Paddle subscription wins over a courtesy plan.
+     */
+    public function adminBillingState(): string
+    {
+        $subscriptions = $this->relationLoaded('subscriptions')
+            ? $this->subscriptions
+            : $this->subscriptions()->get();
+
+        $live = $subscriptions->first(function ($subscription) {
+            return $subscription->billing_environment === \App\Billing\LiveSubscriptions::ENVIRONMENT
+                && in_array($subscription->status, \App\Billing\LiveSubscriptions::openStatuses(), true);
+        });
+
+        if ($live) {
+            return $live->status === \Laravel\Paddle\Subscription::STATUS_PAST_DUE
+                ? 'past_due'
+                : 'subscription';
+        }
+
+        if ($this->isCourtesyPlan()) {
+            return 'courtesy';
+        }
+
+        $hasLiveAccount = $subscriptions->contains(
+            fn ($subscription) => $subscription->billing_environment === \App\Billing\LiveSubscriptions::ENVIRONMENT
+        );
+
+        if (! $hasLiveAccount && $subscriptions->isNotEmpty()) {
+            return 'previous';
+        }
+
+        return 'none';
+    }
+
     public function getPlanLimits(): array
     {
         $plan = $this->resolvePlan();

@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Admin\Clinics;
 
+use App\Billing\LiveSubscriptions;
 use App\Models\Clinic;
 use App\Models\Plan;
+use Laravel\Paddle\Subscription;
 use Livewire\Component;
 
 class Show extends Component
@@ -65,7 +67,7 @@ class Show extends Component
 
     public function getSubscriptionInfoProperty(): ?array
     {
-        $subscription = $this->clinic->subscription('default');
+        $subscription = $this->preferredSubscription();
 
         if (! $subscription) {
             return null;
@@ -93,7 +95,53 @@ class Show extends Component
             'trial_ends_at' => $subscription->trial_ends_at,
             'ends_at' => $subscription->ends_at,
             'paused_at' => $subscription->paused_at,
+            'is_live' => $subscription->billing_environment === LiveSubscriptions::ENVIRONMENT,
+            'can_cancel' => $subscription->billing_environment === LiveSubscriptions::ENVIRONMENT
+                && $subscription->status === Subscription::STATUS_ACTIVE
+                && ! $subscription->ends_at,
         ];
+    }
+
+    public function cancelSubscription(): void
+    {
+        $this->ensureSuperAdmin();
+
+        $subscription = $this->preferredSubscription();
+
+        if (! $subscription || $subscription->billing_environment !== LiveSubscriptions::ENVIRONMENT) {
+            session()->flash('error', __('admin.subscription_not_live'));
+
+            return;
+        }
+
+        if ($subscription->status !== Subscription::STATUS_ACTIVE || $subscription->ends_at) {
+            return;
+        }
+
+        try {
+            $subscription->cancel();
+        } catch (\Throwable $e) {
+            report($e);
+            session()->flash('error', __('admin.subscription_cancel_failed'));
+
+            return;
+        }
+
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($this->clinic)
+            ->withProperties(['paddle_id' => $subscription->paddle_id])
+            ->log('subscription_canceled');
+
+        session()->flash('success', __('admin.subscription_canceled'));
+    }
+
+    private function preferredSubscription(): ?Subscription
+    {
+        return $this->clinic->subscriptions()
+            ->orderByRaw('case when billing_environment = ? then 0 else 1 end', [LiveSubscriptions::ENVIRONMENT])
+            ->latest('id')
+            ->first();
     }
 
     public function assignManualPlan(int $planId): void
