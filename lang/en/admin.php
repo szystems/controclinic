@@ -247,7 +247,7 @@ return [
     'seo_og_image_select' => 'Select image',
     'seo_ga_id' => 'Google Analytics 4 ID',
     'seo_gtm_id' => 'Google Tag Manager ID',
-    'seo_analytics_help' => 'Leave both empty until the account exists. Using both counts the same visit twice. One is enough, and Google Analytics comes first.',
+    'seo_analytics_help' => 'If both are filled in, the site uses Tag Manager and Analytics is measured from there. The Analytics tag is not added on its own, so the visit is not counted twice.',
     'save_seo' => 'Save SEO',
     'weekly_registrations' => 'Clinic registrations per week',
     'last_12_weeks' => 'Last 12 weeks',

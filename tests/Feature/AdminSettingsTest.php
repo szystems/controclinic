@@ -529,6 +529,19 @@ class AdminSettingsTest extends TestCase
             ->assertSee('googletagmanager.com/gtag/js', false);
     }
 
+    public function test_public_home_uses_tag_manager_without_a_second_analytics_tag(): void
+    {
+        AppSetting::set('seo.google_analytics_id', 'G-TESTID12345');
+        AppSetting::set('seo.gtm_id', 'GTM-TEST123');
+        AppSetting::clearCache();
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('GTM-TEST123', false)
+            ->assertSee('googletagmanager.com/gtm.js', false)
+            ->assertDontSee('googletagmanager.com/gtag/js', false);
+    }
+
     public function test_public_home_omits_ga_when_not_configured(): void
     {
         AppSetting::set('seo.google_analytics_id', null);

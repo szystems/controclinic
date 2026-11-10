@@ -70,7 +70,7 @@
     })(window,document,'script','dataLayer','{{ $gtmId }}');</script>
     @endif
 
-    @if($gaId)
+    @if($gaId && ! $gtmId)
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
     <script>

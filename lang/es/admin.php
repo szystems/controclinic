@@ -247,7 +247,7 @@ return [
     'seo_og_image_select' => 'Seleccionar imagen',
     'seo_ga_id' => 'Google Analytics 4 ID',
     'seo_gtm_id' => 'Google Tag Manager ID',
-    'seo_analytics_help' => 'Déjalos vacíos hasta tener la cuenta. Si más adelante usas los dos, las visitas se cuentan dos veces. Con uno basta, y empieza por Google Analytics.',
+    'seo_analytics_help' => 'Si llenas los dos, el sitio usa Tag Manager y Analytics se mide desde ahí. La etiqueta de Analytics no se añade aparte, para no contar la visita dos veces.',
     'save_seo' => 'Guardar SEO',
     'weekly_registrations' => 'Registros de clínicas por semana',
     'last_12_weeks' => 'Últimas 12 semanas',
